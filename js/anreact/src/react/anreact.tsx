@@ -153,29 +153,32 @@ export class AnReact {
 	}
 
 	/**
-	 * Try figure out serv root, then bind to html tag.
+	 * Try two step of loading host.json.
 	 * First try ./private/host.json<serv-id>,
 	 * then  ./github.json/<serv-id>,
 	 * where serv-id = this.context.servId || host
+	 * 
+	 * If one of the resource is loaded, call onJsonServ.
 	 *
 	 * For test, have elem = undefined
 	 * @param {string} elem html element id, null for test
 	 * @param {object} opts {serv, home, parent window}
 	 * @param {function} onJsonServ function to render React Dom, i. e.
+	 * @since 0.4.50
 	 * @example
-	 * // see Anclient/js/test/jsample/login-app.tsx
+	 * // see Anclient/js/anreact/test/jsample/login-app.tsx
 	 * (elem, json) => {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<LoginApp servs={json} servId={opts.serv} iparent={opts.parent}/>, dom);
 	 * }
 	 *
-	 * // see Anclient/js/test/jsample/app.tsx
+	 * // see Anclient/js/anreact/test/jsample/app.tsx
 	 * function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 	 * }
 	 */
-	static bindDom( elem: string, opts: AnreactAppOptions,
+	static loadServs( elem: string, opts: AnreactAppOptions,
 				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
@@ -184,22 +187,40 @@ export class AnReact {
 		if (typeof elem === 'string') {
 			$.ajax({
 				dataType: "json",
-				url: opts.jsonPath || 'private/host.json',
+				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
 			})
 			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
-			.fail( (e: any) => {
+			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
-					url: 'github.json',
+					url: `github.json?q=${Date.now()}`,
 				})
 				.done((json: JsonServs) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
 	}
+
+	/**
+	 * @deprecated for the name is confusing. Use initPage() instead.
+	 * @since 0.4.50
+	 * @param elem 
+	 * @param opts 
+	 * @param onJsonLoaded 
+	 * @returns 
+	 */
+	static bindDom( elem: string, opts: AnreactAppOptions,
+				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+		return AnReact.loadServs(elem, opts, onJsonLoaded);
+	}
 }
 
 export interface AnreactAppOptions {
+	/**
+	 * @since 0.4.50, jserv services from host.json.
+	 * Sometimes a main page can login before context is aviliable.
+	 */
+	servs?: {[s:string]:string}
 	/** serv id, default: host */
 	serv?: string;
 

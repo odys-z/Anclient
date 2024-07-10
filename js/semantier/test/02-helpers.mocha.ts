@@ -169,7 +169,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 			roleId: 'r-001', // hard coded data, e.g. a pk value.
 		};
 
-		let rf = semantier.inserTreeChecked(
+		let rf = Semantier.inserTreeChecked(
 					checkBoxForest as any,
 					{ table: 'a_role_func',
 					  columnMap,
@@ -181,7 +181,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 
 		let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
 		n.checked = true; // reshaped
-		rf = semantier.inserTreeChecked(
+		rf = Semantier.inserTreeChecked(
 					checkBoxForest as any,
 					{ table: 'a_role_func',
 					  columnMap,
@@ -209,7 +209,7 @@ describe('case: [02.0 dataset + s-tree]', () => {
 			roleId: 'r-001', // hard coded data, e.g. a pk value.
 		};
 
-		let rf = semantier.inserTreeChecked(
+		let rf = Semantier.inserTreeChecked(
 					forest2 as any,
 					{ table: 'a_role_func',
 					  columnMap,

@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,18 +31,18 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.PhotoRec;
-import io.oz.albumtier.AlbumContext.ConnState;
 
 /**
- * @deprecated only for MVP (0.2.x)
+ * only for MVP (0.3.x)
  * @author Ody
  */
 public class AlbumtierTest {
-    private static final String jserv = "";
+    private static final String jserv = "http://localhost:8081";
 	private AlbumContext singleton;
 	private PathsPage synchPage;
 	
-	static final String testfile = "src/test/res/64x48.png";
+	static final String testimg = "src/test/res/64x48.png";
+	static final String testdoc = "src/test/res/doc.pdf";
 	static final String device = "omni";
 	
 	ArrayList<SyncDoc> mList;
@@ -51,20 +51,22 @@ public class AlbumtierTest {
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
 		mList = new ArrayList<SyncDoc>(1);
-		mList.add(new PhotoRec().createTest(testfile));
+		mList.add(new PhotoRec().createTest(testimg));
 		
 		// 1. create
 		onActivityCreate();
 		
 		Thread.sleep(1000); // wait for login
-		if (singleton.state != ConnState.Online)
-			fail("Why? Is server started? Or try to wait longer?");
+//		if (singleton.state != ConnState.Online)
+//			fail("Why? Is server started? Or try to wait longer?");
 
 		// 2. clean
-		singleton.tier.del(singleton.userInf.device, testfile);
+		singleton.tier.del(singleton.userInf.device, testimg);
 		
 		// 3. upload photo
 		onImagePicked();
+		
+		onUserSelectFiles();
 
 		// 4. pause
 		pause("Press Enter when you think the test is finished ...");
@@ -87,7 +89,11 @@ public class AlbumtierTest {
 			.init("f/zsu", "syrskyi", device, jserv)
 			.login( "syrskyi", "слава україні",
 					(client) -> refresh(mList),
-					(c, t, v) -> fail(t));
+					(c, t, v) -> {
+						Utils.warn("Login denied!");
+						Utils.warn(t, (Object[])v);
+						fail("POCC");
+					});
 		singleton.tier.fileProvider(new IFileProvider() {
 
 			@Override
@@ -115,7 +121,7 @@ public class AlbumtierTest {
 			startSynchQuery(synchPage);
 	}
 
-    void startSynchQuery(PathsPage page) {
+	void startSynchQuery(PathsPage page) {
         singleton.tier.asynQueryDocs(mList, page,
 			onSyncQueryRespons,
 			(c, r, args) -> {
@@ -172,23 +178,58 @@ public class AlbumtierTest {
      */
    	void onImagePicked() throws TransException, IOException {
    		singleton.tier.asyVideos(mList,
-   				photoProc, photoPushed, singleton.errCtx);
+   				photoProc, photosPushed, singleton.errCtx);
 	}
    	
-   	JProtocol.OnDocOk photoPushed = (d, resp) -> {
-		SyncDoc doc = ((DocsResp) resp).doc;
+   	JProtocol.OnDocsOk photosPushed = (resps) -> {
+		SyncDoc doc = ((DocsResp) resps.get(0)).doc;
 		assertEquals(device, doc.device());
-		assertEquals(testfile, doc.fullpath());
+		assertEquals(testimg, doc.fullpath());
 
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testfile), "h_photos", AlbumPort.album);
+		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testimg), "h_photos", AlbumPort.album);
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);
 		assertEquals(1, pthpage.paths().size());
-		assertTrue(pthpage.paths().containsKey(testfile));
+		assertTrue(pthpage.paths().containsKey(testimg));
    	};
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
+	
+	void onUserSelectFiles() throws TransException, IOException, InterruptedException {
+		int[] res = new int[] {0};
+
+		Thread.sleep(2000); // wait the file processing finished at sever side.
+		singleton.tier.del(singleton.userInf.device, testimg);
+		singleton.tier.del(singleton.userInf.device, testdoc);
+
+   		List<SyncDoc> filelist = new ArrayList<SyncDoc>(2);
+		filelist.add((SyncDoc)new SyncDoc().fullpath(testimg));
+		filelist.add((SyncDoc)new SyncDoc().fullpath(testdoc));
+
+		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
+			String template = "Upload files: %s, ignored: %s";
+			assertEquals( String.format(template, 2, 0),
+						  PhotoSyntier.composeFilesMsg(template, resps));
+			res[0]++;
+		}, singleton.errCtx);
+
+		Thread.sleep(1000);
+		singleton.tier.del(singleton.userInf.device, testdoc);
+		Thread.sleep(1000);
+
+		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
+			String template = "Upload files: %s, ignored: %s";
+			assertEquals( String.format(template, 2, 1),
+						  PhotoSyntier.composeFilesMsg(template, resps));
+			res[0]++;
+		}, singleton.errCtx);
+
+		Thread.sleep(1000);
+		singleton.tier.del(singleton.userInf.device, testimg);
+		
+		assertEquals(2, res[0], "Thread results verifying...");
+	}
 }

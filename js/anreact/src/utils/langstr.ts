@@ -55,7 +55,7 @@ export const Langstrs = {
 			Object.assign(Langstrs.s, json);
 			Langstrs.using(json.using);
 		} )
-		.fail( (e) => {
+		.fail( (_e) => {
 			console.error("Loading language resource failed. Url: " + url);
 		} )
 	},

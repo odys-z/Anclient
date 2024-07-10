@@ -5,6 +5,7 @@
     "File Name": "文件名",
     "type": "类 型",
     "share by": "共享人",
-    "Type {t} is not supported yet.": "暂不支持文件{t}类型。" 
+    "Type {t} is not supported yet.": "暂不支持'{t}'文件类型。",
+    "Privilege": "权限"
   }
 }

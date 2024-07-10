@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.oz.fpick"
     >
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
         android:allowBackup="true"
@@ -13,24 +16,24 @@
         >
 
         <activity
-            android:name="com.vincent.filepicker.activity.ImagePickActivity"
+            android:name=".activity.ImagePickActivity"
             android:screenOrientation="portrait"
             android:theme="@style/vw_FilePickerTheme" />
 
-        <activity android:name="com.vincent.filepicker.activity.ImageBrowserActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/vw_FilePickerTheme"
-            android:hardwareAccelerated="false" />
+<!--        <activity android:name="com.vincent.filepicker.activity.ImageBrowserActivity"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@style/vw_FilePickerTheme"-->
+<!--            android:hardwareAccelerated="false" />-->
 
-        <activity android:name="com.vincent.filepicker.activity.VideoPickActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/vw_FilePickerTheme" />
-
-        <activity android:name="com.vincent.filepicker.activity.AudioPickActivity"
+        <activity android:name=".activity.VideoPickActivity"
             android:screenOrientation="portrait"
             android:theme="@style/vw_FilePickerTheme" />
 
-        <activity android:name="com.vincent.filepicker.activity.NormalFilePickActivity"
+        <activity android:name=".activity.AudioPickActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/vw_FilePickerTheme" />
+
+        <activity android:name=".activity.NormalFilePickActivity"
             android:screenOrientation="portrait"
             android:theme="@style/vw_FilePickerTheme" />
         <provider

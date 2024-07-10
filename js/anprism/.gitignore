@@ -2,3 +2,5 @@ dist
 *.vsix
 *.xcf
 .vscode
+**/*.out
+out

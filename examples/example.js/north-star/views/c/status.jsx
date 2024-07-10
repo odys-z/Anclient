@@ -12,8 +12,6 @@ import { CenterProtocol } from '../../common/protocol.quiz.js';
 import { myMsgFromIssuer } from '../../common/mui-helpers';
 import { starTheme } from '../../common/star-theme';
 
-const { CRUD } = Protocol;
-
 const styles = (theme) => Object.assign(starTheme(theme), theme => {
 	root: {}
 });

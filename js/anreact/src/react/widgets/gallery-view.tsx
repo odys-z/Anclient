@@ -23,7 +23,7 @@ export interface ImageSlide  {
 	srcArr?: string[],
 	legend?: string | JSX.Element,
 	/** AnTreeNode.node */
-	node?  : object & {shareby: string, device?: string, pname?: string},
+	node?  : object & {shareby?: string, device?: string, pname?: string},
 
 	/**
 	 * Use maxWidth to limit picture size when too few pictures;
@@ -37,20 +37,26 @@ export interface ImageSlide  {
 	mime: 'video' | 'image' | 'heif' | 'audio' | string | undefined;
 };
 
+export type lightboxFomatter = (photos: AnTreeNode[], opts?: {
+	/** current slide index */
+	ix: number,
+	/** command for enable resources loading (special performance problem caused by anson64) */
+	open: boolean,
+	/** callback */
+	onClose: () => void}) => JSX.Element;
+
 export interface GalleryProps {
 	cid: string;
 	photos?: AnTreeNode[];
 	tier?: Semantier;
-	lightbox?: (photos: AnTreeNode[], opts?: {
-		/** current slide index */
-		ix: number,
-		/** command for enable resources loading (special performance problem caused by anson64) */
-		open: boolean,
-		/** callback */
-		onClose: () => void}) => JSX.Element;
+
+	/** Modal dialog for picture slids. */
+	lightbox: lightboxFomatter;
 }
 
 export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
+	static verbose = true;
+
 	tier: StreeTier | undefined;
 	classes: any;
 	uri: string;
@@ -74,6 +80,9 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		this.openLightbox = this.openLightbox.bind(this);
 		this.closeLightbox = this.closeLightbox.bind(this);
 		this.parse = this.parse.bind(this);
+
+		if (GalleryView.verbose && !this.props.lightbox)
+			console.warn("[GalleryView.verbose] GalleryView created without lightbox.");
 	}
 
 	componentDidMount() {
@@ -179,7 +188,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				} }
 			/>
 
-			{this.showCarousel && (
+			{this.showCarousel && this.props.lightbox && (
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,

@@ -11,7 +11,6 @@ var config = {
     filename: 'testBundle.js'
   },
   target: 'node',
-  // externals: [nodeExternals()],
 
   resolve: {
     fallback: { fs: false },

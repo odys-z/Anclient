@@ -2,7 +2,8 @@ import * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, DatasetierReq, LogAct, PageInf, AnsonBody, DatasetReq } from './protocol';
+import { AnsonValue, Protocol, DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
+	LogAct, PageInf, AnsonBody, OnCommitOk, DbRelations } from './protocol';
 
 import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
 
@@ -12,7 +13,7 @@ import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
  * 
  * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
  */
-export type IndentIconame = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
+export type IndentName = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 export type AnTreeIconsType =
         'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
@@ -29,7 +30,7 @@ export type AnTreeIconsType =
        └─ webpack-cli
  */
 export type IndentIcons = {
-	[i in IndentIconame]: AnTreeIconsType;
+	[i in IndentName]: AnTreeIconsType;
 }
 
 /**
@@ -53,29 +54,36 @@ export class AnTreeNode implements Tierec {
     [f: string]: string | number | boolean | object;
 
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
-	/** json data node, for ui node composition */
+
+	/**
+	 * Json data node, for ui node composition
+	 * 
+	 * FIXME: but why field of application's business here, such as mime and shareby?
+	 * (no such things in java peer)
+	 * */
 	node : {
-		nodetype?: string;
-		// id: string;
+		checked? : boolean | '0' | '1' | 0 | 1 | 'true' | 'false' | 'True' | 'False' | 'TRUE' | 'FALSE';
+		nodetype?: 'p' | 'card' | 'gallery' | undefined;  // string;
 		children?: Array<AnTreeNode>;
 		expandChildren?: boolean;
 
 		/** With icon as a special field? */
 		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
 
-		mime?: string;
-
-		shareby: string;
+		// mime?: string;
+		// shareby?: string;
 
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
+
 	id: string;
 	parent: string;
 	islastSibling?: boolean;
 	level: number;
+
 	/** Indent icon names */
-	indents?: Array<IndentIconame>;
+	indents?: Array<IndentName>;
 }
 
 /**
@@ -114,11 +122,12 @@ export class StreeTier extends Semantier {
      * Note: Response of stree() must be subclass of AnDatasetResp.
      * 
 	 * @since 0.9.98, this method visit 'stree' port with AnDatasetReq as defualt tree loading.
-	 * 
+	 * @since 0.9.99, this mehtod is planned to replace {@link Semantier.stree()}
+	 * @since 0.9.102, opts.A can be used to override default DatasetierReq.A.stree
      * @param opts 
      * @param comp 
      */
-	stree(opts: DatasetOpts & {act?: LogAct, uri?: string}, errCtx: ErrorCtx): void {
+	stree(opts: DatasetOpts & {act?: LogAct, uri?: string, page?: PageInf, A?: string}, errCtx: ErrorCtx): void {
         opts.port = opts.port || this.port;
 
         if (!opts.onOk)
@@ -131,16 +140,47 @@ export class StreeTier extends Semantier {
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody = StreeTier.reqFactories[opts.port](opts).A(DatasetierReq.A.stree);
+		let reqbody = StreeTier.reqFactories[opts.port](opts).A(opts.A || DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 
 		this.client.an.post(jreq, opts.onOk, errCtx);
     }
-}
-// default s-tree request (AnDatasetReq)
-StreeTier.registTierequest('stree', (opts) => new DatasetReq(opts));
 
+    /**
+	 * Load relationships
+	 * @param client
+	 * @param opts
+	 * @param onOk
+	 */
+    relations( _client: SessionClient,
+		opts: { uri?: string;
+				reltabl?: string;
+				sqlArgs?: string[];
+				sqlArg?: string;
+				ok: OnCommitOk }): void {
+
+		let that = this;
+
+		let { reltabl, sqlArgs, sqlArg } = opts;
+		let fkRel = this.relMeta[reltabl] as DbRelations;
+		let stree = fkRel.stree;
+
+		sqlArgs = sqlArgs || [sqlArg];
+		if (!stree)
+			throw Error('TODO ...');
+
+		this.stree(
+			{ sk: stree.sk,
+			  page: new PageInf(0, -1, 0, [sqlArgs]),
+			  onOk: (resp) => {
+				that.rels[reltabl] = (resp.Body() as AnDatasetResp).forest as AnTreeNode[];
+				opts.ok(resp)
+			}},
+			this.errCtx);
+    }
+}
+StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 
 /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
 export class SyncDoc implements Tierec {
@@ -160,10 +200,11 @@ export class SyncDoc implements Tierec {
 
 	src: string;
 
-	constructor (opt: { recId: any; src?: any; device?: string, type: string}) {
+	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
 		this.type = opt.type;
 		this.src = opt.src
 		this.docId = opt.recId;
 		this.device = opt.device;
 	}
 }
+

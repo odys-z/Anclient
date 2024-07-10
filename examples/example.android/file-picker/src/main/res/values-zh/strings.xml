@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="vw_confirm">确定</string>
+    <string name="vw_confirm"          >确定</string>
     <string name="vw_no_video_play_app">没有可用的视频播放应用</string>
     <string name="vw_no_image_show_app">没有可用的应用</string>
     <string name="vw_rationale_storage">需要读取存储权限以提供文件选择功能</string>
-    <string name="vw_up_to_max">已达到选择上限</string>
-    <string name="vw_no_audio_app">没有可用的音频录制应用</string>
-    <string name="vw_all">全部</string>
+    <string name="vw_up_to_max"        >已达到选择上限</string>
+    <string name="vw_no_audio_app"     >没有可用的音频录制应用</string>
+    <string name="vw_all"              >全部</string>
+
+    <string name="txt0_ok"    >OK</string>
+    <string name="txt0_cancel">Cancel</string>
+    <string name="n_of_total" >第%d項-共%d項</string>
 
 </resources>

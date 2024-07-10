@@ -7,4 +7,8 @@
     <string name="vw_no_image_show_app">No image App in this phone!</string>
     <string name="vw_all">All</string>
 
+    <string name="txt0_ok"    >OK</string>
+    <string name="txt0_cancel">Cancel</string>
+    <string name="n_of_total">%d / %d</string>
+
 </resources>

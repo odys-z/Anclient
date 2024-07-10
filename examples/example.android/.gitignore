@@ -16,3 +16,4 @@ target
 .externalNativeBuild
 local.properties
 *.log
+**/product.xml

@@ -6,11 +6,11 @@ namespace io.odysz.semantic.jprotocol
     {
         public const int NA = -1;       // error
         public const int heartbeat = 0; // ("ping.serv"),
-        public const int session = 1;   // ("login.serv11"),
-        public const int query = 2;     // ("r.serv11"),
-        public const int update = 3;    // ("u.serv11"),
-        public const int insert = 4;    // ("c.serv11");
-        public const int delete = 5;    // ("d.serv11"),
+        public const int session = 1;   // ("login.serv"),
+        public const int query = 2;     // ("r.serv"),
+        public const int update = 3;    // ("u.serv"),
+        public const int insert = 4;    // ("c.serv");
+        public const int delete = 5;    // ("d.serv"),
         public const int echo = 6;      // ("echo.less"),
         /// <summary> serv port for downloading json/xml file or uploading a file.</summary>
         /// <see cref="jserv.file.JFileServ"/>

@@ -2,7 +2,7 @@
   "name": "anprism",
   "displayName": "Anprism",
   "description": "Anclient's js page sandbox",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "icon": "res/anprism.png",
   "publisher": "ody-zhou",
   "repository": {
@@ -22,32 +22,35 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "anprism.load",
+      { "command": "anprism.load",
         "title": "Load Anprism",
         "category": "Anprism"
       },
-      {
-        "command": "anprism.refresh",
+      { "command": "anprism.parse",
+        "title": "Parse Envelope",
+        "category": "Anprism"
+      },
+      { "command": "anprism.refresh",
         "title": "Refresh Anprism",
         "category": "Anprism"
       },
-      {
-        "command": "anprism.restartServer",
+      { "command": "anprism.restartServer",
         "title": "Start server",
         "category": "Anprism"
       },
-      {
-        "command": "anprism.shutdownServer",
+      { "command": "anprism.shutdownServer",
         "title": "Shutdown server",
         "category": "Anprism"
       }
     ],
     "menus": {
       "explorer/context": [
-        {
-          "when": "resourceLangId == html",
+        { "when": "resourceLangId == html",
           "command": "anprism.load",
+          "group": "navigation"
+        },
+        { "when": "resourceLangId == json",
+          "command": "anprism.parse",
           "group": "navigation"
         }
       ]

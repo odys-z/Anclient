@@ -1,11 +1,13 @@
 package io.odysz.jclient;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
@@ -20,13 +22,16 @@ import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
+import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.jsession.HeartBeat;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 
-/**AnClient.java with session managed.
+/**
+ * AnClient.java with session managed.
+ * 
  * @author odys-z@github.com
  *
  */
@@ -52,21 +57,27 @@ public class SessionClient {
 
 	
 	/**
-	 * @deprecated replaced by {@link #SessionClient(AnSessionResp)}
 	 * Session login response from server.
 	 * @param sessionInfo
 	 */
-	SessionClient(SessionInf sessionInfo) {
+	protected SessionClient(SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 	}
 	
 	/**
 	 * @since 0.5.0
 	 * @param r session login response from server.
+	 * @param pswdPlain 
+	 * @throws SsException 
 	 */
-	public SessionClient(AnSessionResp r) {
-		this.ssInf = r.ssInf();
-		this.profile = r.profile();
+	public SessionClient(AnSessionResp r, String pswdPlain) throws SsException {
+		try {
+			ssInf = r.ssInf();
+			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
+			profile = r.profile();
+		} catch (GeneralSecurityException | IOException e) {
+			throw new SsException(e.getMessage());
+		}
 	}
 
 	/**
@@ -83,7 +94,7 @@ public class SessionClient {
 		stoplink = false;
 
 		HeartBeat beat = new HeartBeat(null, clientUri, ssInf.ssid(), ssInf.uid());
-		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
 				.header(header)
 				.body(beat);
@@ -117,7 +128,9 @@ public class SessionClient {
 		return this;
 	}
 	
-	/**Release any threads block on {@link #syncFlag}.
+	/**
+	 * Release any threads block on {@link #syncFlag}.
+	 * 
 	 * @see #openLink(String, OnOk, OnError, int...)
 	 * @return this
 	 */
@@ -131,7 +144,9 @@ public class SessionClient {
 		return this;
 	}
 	
-	/**Format a query request object, including all information for construct a "select" statement.
+	/**
+	 * Format a query request object, including all information for construct a "select" statement.
+	 * 
 	 * @param uri connection id
 	 * @param tbl main table, (sometimes function category), e.g. "e_areas"
 	 * @param alias from table alias, e.g. "a"
@@ -146,7 +161,7 @@ public class SessionClient {
 
 		AnsonMsg<AnQueryReq> msg = new AnsonMsg<AnQueryReq>(Port.query);
 
-		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		if (funcId != null && funcId.length > 0)
 			AnsonHeader.usrAct(funcId[0], "query", "R", "test");
 		msg.header(header);
@@ -165,7 +180,7 @@ public class SessionClient {
 		AnUpdateReq itm = AnUpdateReq.formatUpdateReq(furi, null, tbl);
 		AnsonMsg<? extends AnsonBody> jmsg = userReq(Port.update, act, itm);
 
-		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		if (act != null && act.length > 0)
 			header.act(act);
 		
@@ -173,13 +188,16 @@ public class SessionClient {
 					;//.body(itm);
 	}
 
-	/**<p>create a user type of message.</p>
+	/**
+	 * <p>create a user type of message.</p>
+	 * 
 	 * @deprecated replaced by {@link #userReq(String, IPort, AnsonBody, LogAct...)}
 	 * @param <T> body type
 	 * @param port
 	 * @param act not used for session less
 	 * @param req request body
-	 * @return Anson message1.3.3-SNAPSHOT
+	 * @return Anson message
+	 * @since 1.3.3
 	 * @throws SemanticException
 	 */
 	public <T extends AnsonBody> AnsonMsg<T> userReq(IPort port, String[] act, T req)
@@ -196,7 +214,9 @@ public class SessionClient {
 		return jmsg;
 	}
 
-	/**Create a user request message.
+	/**
+	 * Create a user request message.
+	 * 
 	 * @param <T>
 	 * @param uri component uri
 	 * @param port
@@ -205,23 +225,24 @@ public class SessionClient {
 	 * @return AnsonMsg 
 	 * @throws AnsonException port is null
 	 */
-	public <T extends AnsonBody> AnsonMsg<T> userReq(String uri, IPort port, T bodyItem, LogAct... act) throws AnsonException {
+	public <T extends AnsonBody> AnsonMsg<T> userReq(String uri, IPort port, T bodyItem, LogAct... act)
+			throws AnsonException {
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<UserReq> needs port explicitly specified.");
 
 		// let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri(uri);
 		if (act != null && act.length > 0)
-			header.act(act[0]); 
+			header().act(act[0]); 
 
-		return new AnsonMsg<T>(port).header(header).body(bodyItem);
+		return new AnsonMsg<T>(port).header(header()).body(bodyItem);
 	}
 
 	public AnsonMsg<?> insert(String conn, String tbl, String ... act) throws SemanticException {
 		AnInsertReq itm = AnInsertReq.formatInsertReq(conn, null, tbl);
 		AnsonMsg<? extends AnsonBody> jmsg = userReq(Port.insert, act, itm);
 
-		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		if (act != null && act.length > 0)
 			header.act(act);
 		
@@ -247,9 +268,9 @@ public class SessionClient {
 		// let header = Protocol.formatHeader(this.ssInf);
 		body.uri(uri);
 		if (act != null && act.length > 0)
-			header.act(act[0]); 
+			header().act(act[0]); 
 
-		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header).body(body);
+		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header()).body(body);
 		if (Clients.verbose) Utils.logi(msg.toString());
     	HttpServClient httpClient = new HttpServClient();
   		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
@@ -274,7 +295,7 @@ public class SessionClient {
 	
 	public AnsonHeader header() {
 		if (header == null)
-			header = new AnsonHeader(ssInf.ssid(), ssInf.uid());
+			header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		return header;
 	}
 	
@@ -285,7 +306,9 @@ public class SessionClient {
 		return this;
 	}
 
-	/**Print Json Request (no request sent to server)
+	/**
+	 * Print Json Request (no request sent to server)
+	 * 
 	 * @param req 
 	 * @return this object
 	 * @throws SQLException 
@@ -299,50 +322,9 @@ public class SessionClient {
 		return this;
 	}
 
-	/* NOTE: This is an asynchronous API but works synchronously.
-	 * The {@link ErrorCtx} API pattern is better.
-	 * @see HttpServClient#post(String, AnsonMsg)
-	 * @see #commit(AnsonMsg, ErrorCtx)
-	 * @param <R> Request type
-	 * @param <A> Response type
-	 * @param req request
-	 * @param onOk on ok callback
-	 * @param onErr error context
-	 * @throws SemanticException
-	 * @throws IOException
-	 * @throws SQLException
-	 * @throws AnsonException
-	@SuppressWarnings("unchecked")
-	public <R extends AnsonBody, A extends AnsonResp> void commit(AnsonMsg<R> req, SCallbackV11 onOk, SCallbackV11... onErr)
-			throws SemanticException, IOException, SQLException, AnsonException {
-    	HttpServClient httpClient = new HttpServClient();
-
-    	if (verbose) {
-    		Utils.logi(Clients.servUrl(req.port()));
-    		Utils.logAnson(req);
-    	}
-  		httpClient.post(Clients.servUrl(req.port()), req,
-  				(code, obj) -> {
-  					if(Clients.verbose) {
-  						Utils.printCaller(false);
-  						Utils.logAnson(obj);
-  					}
-  					if (MsgCode.ok == code) {
-  						onOk.onCallback(code, (A) obj);
-  					}
-  					else {
-  						if (onErr != null && onErr.length > 0 && onErr[0] != null)
-  							onErr[0].onCallback(code, obj);
-  						else Utils.warn("code: %s\nerror: %s", code, ((AnsonResp)obj).msg());
-  					}
-  				});
-	}
-	 */
-
-	//
-
 	/**
 	 * Submit request.
+	 * 
 	 * @param <R> request type
 	 * @param <A> answer type
 	 * @param req

@@ -20,20 +20,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.AudioPickActivity;
+import io.oz.fpick.activity.AudioPickActivity;
 import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
 import io.odysz.semantic.tier.docs.SyncDoc;
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
-    public AudioPickAdapter(BaseActivity ctx, ArrayList<AudioFile> list, int max) {
-        super(ctx, list);
-        mMaxNumber = max;
-    }
 
     public AudioPickAdapter(AudioPickActivity ctx, int max) {
         super(ctx, new ArrayList<>());
@@ -45,11 +40,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
     public AudioPickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_audio_pick, parent, false);
         AudioPickViewHolder holder= new AudioPickViewHolder(itemView);
-<<<<<<< HEAD
-        holder.setIsRecyclable ( false );
-=======
         holder.setIsRecyclable ( true );
->>>>>>> temp-try
         return holder;
     }
 
@@ -134,18 +125,15 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             }
 
             if (mListener != null) {
-<<<<<<< HEAD
-                // mListener.onAudioStateChanged (holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                mListener.onAudioStateChanged (
-=======
                 mListener.onSelectStateChanged(
                         index,
->>>>>>> temp-try
                         holder.mCbx.isSelected(),
                         mList.get(holder.getAbsoluteAdapterPosition()),
                         holder.animation);
             }
         });
+
+        holder.setIsRecyclable(true);
     }
 
     @Override
@@ -162,9 +150,6 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         private final TextView mTvDuration;
         private final ImageView mCbx;
         private final RelativeLayout animation;
-
-        private TextView mDuration;
-        private RelativeLayout mDurationLayout;
 
         public AudioPickViewHolder(@NonNull View itemView) {
             super ( itemView );

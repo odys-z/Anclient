@@ -1,6 +1,5 @@
 package io.oz.albumtier;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,11 +12,9 @@ import io.odysz.semantic.tier.docs.SyncDoc;
  */
 public interface IFileProvider {
     /**
-     * Default implementation example:<pre>
-     * return Files.size(Paths.get(f.fullpath());</pre>
-     * 
+     * Default implementation example:
+     * <pre>return Files.size(Paths.get(f.fullpath());</pre>
      * @return size
-     * @throws IOException 
      */
     long meta(SyncDoc f) throws IOException;
 
@@ -28,11 +25,10 @@ public interface IFileProvider {
      * 
      * @return readable stream
      */
-    InputStream open(SyncDoc f) throws FileNotFoundException;
+    InputStream open(SyncDoc f) throws IOException;
 
     /**
-     * Resolve the initial folder (with Policies).
-     *
+     * <p>Resolve the initial folder (with Policies).</p>
      * Currently, the save folder policy is simple last modified date for documents and creating date
      * for medias if API version later than Build.VERSION_CODES.O, otherwise use last modified.
      * (Audio file in Andriod is named with date string).

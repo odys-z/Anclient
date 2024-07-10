@@ -1,5 +1,5 @@
 
-import { AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
+import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
@@ -69,12 +69,14 @@ export interface AlbumRec extends Tierec {
 }
 
 export class AlbumPage extends PageInf {
-	/** A temperoray solution before PageInf.condts evolved to Tierec. */
+	/** A temperoray solution before PageInf.condts evolved to Tierec.
+	 * @deprecated
+	 */
 	qrec?: AlbumRec;
 
 	constructor (query?: AlbumRec) {
 		super();
-		this.qrec = query;
+		this.mapCondts = query;
 	}
 }
 
@@ -82,22 +84,29 @@ export class AlbumReq extends DocsReq {
 	static __type__ = 'io.oz.album.tier.AlbumReq';
 
 	static A = {
- 		stree: DatasetierReq.A.stree,
-		records: 'r/collects',
-		collect: 'r/photos',
-		rec: 'r/photo',
+ 		stree   : DatasetierReq.A.stree,
+		records : 'r/collects',
+		collect : 'r/photos',
+		rec     : 'r/photo',
+		folder  : 'r/folder',
 		download: 'r/download',
-		update: 'u',
-		insert: 'c',
-		upload: 'c/doc',
-		del: 'd'
+		update  : 'u',
+		insert  : 'c',
+		upload  : 'c/doc',
+		del     : 'd',
+
+		shareRelation : 'r/share-relat',
+		folderel      : 'r/rel-folder-org',
+		updateFolderel: 'u/folder-rel',
 	};
 
-	pageInf: PageInf;
-	albumId: string | undefined;
-	cids?: string[];
-	pids?: string[];
-	sk: string;
+	pageInf   : PageInf;
+	albumId   : string | undefined;
+	cids?     : string[];
+	pids?     : string[];
+	sk        : string;
+	clearels? : boolean;
+	checkRels?: Array<NV[]>;
 
 	constructor (opt: {uri?: string, page?: AlbumPage, sk?: string}) {
 		super(opt.uri, {docId: ''});
@@ -112,6 +121,23 @@ export class AlbumReq extends DocsReq {
 			this.cids = page.qrec.collects?.map((c) => c.recId as string);
 			this.pids = page.qrec.photos;
 		}
+	}
+
+	clearelations(clearel: boolean) {
+		this.clearels = clearel;
+		return this;
+	}
+	
+	/**
+	 * 
+	 * @param rows relation table records
+	 * @param folder the current folder to update checked rows (of child relation table)
+	 * @returns this
+	 */
+	shareTree(rows: Array<NV[]>, folder) {
+		this.checkRels = rows;
+		this.subfolder = folder;
+		return this;
 	}
 }
 StreeTier.registTierequest('album', (opts) => new AlbumReq(opts));
@@ -133,6 +159,7 @@ export class AlbumResp extends AnDatasetResp {
 		});
 
 		this.album = resp;
+		this.photo = resp.photo;
 		this.collect = resp.collect;
 		this.collects = resp.collects;
 	}

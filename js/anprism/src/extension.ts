@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import * as cp from "child_process";
 import * as path from 'path';
 import { pythonCmd } from './lib/platform';
-import { Page, ServHelper } from './serv-helper';
-import { AnprismException } from './common';
+import { Page, ServHelper } from './lib/serv-helper';
+import { AnprismException } from './lib/common';
+import { ParserHelper } from './lib/parser-helper';
 
 /**
  * Setup Anprism.
@@ -27,6 +28,13 @@ export function activate(context: vscode.ExtensionContext) {
 			 */
 			(uri, uris) => {
 				AnPagePanel.load(context, uri);
+			})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('anprism.parse',
+			(uri, uris) => {
+				AnprismPanel.parse(context, uri);
 			})
 	);
 
@@ -81,7 +89,7 @@ export function deactivate() {
  *
  */
 class AnPagePanel {
-	static log: vscode.OutputChannel;
+	public static log: vscode.OutputChannel;
 	static _extensionUri: vscode.Uri;
 
 	/**
@@ -98,8 +106,6 @@ class AnPagePanel {
 	 * Html page information of which is loaded in this panel.
 	 */
 	page: Page = {
-		// port: "8888",
-		// host: "localhost",
 		html: vscode.Uri.file("index.html"),
 		style: `background-color: #ccc`,
 		reload: false,
@@ -128,8 +134,9 @@ class AnPagePanel {
 
 	/**
 	 * Load a page, in current active column - creat panel if necessary.
-	 * @param extensionUri
-	 * @returns
+	 * @param context 
+	 * @param localhtml 
+	 * @returns 
 	 */
 	public static async load(context: vscode.ExtensionContext, localhtml: vscode.Uri) {
 		let p = AnPagePanel.currentPanel;
@@ -215,7 +222,7 @@ class AnPagePanel {
 
 	static async shutdown() {
 
-		let {url, sub} = AnPagePanel.serv0.url({html: vscode.Uri.file('./index.html'), reload: false, devtool: false});
+		let {url} = AnPagePanel.serv0.url({html: vscode.Uri.file('./index.html'), reload: false, devtool: false});
 
 		const cmd = `curl ${url}?_shut-down_=True &`;
 		AnPagePanel.log.appendLine(cmd);
@@ -236,7 +243,8 @@ class AnPagePanel {
 		});
 	}
 
-	/**Can be used only once.
+	/**
+	 * Can be used only once.
 	 *
 	 * @param context
 	 * @param panel
@@ -256,7 +264,7 @@ class AnPagePanel {
 
 		// Update the content based on view changes - how to watch webpack results?
 		this._panel.onDidChangeViewState(
-			e => {
+			_e => {
 				// Note: don't load every time the other editors changed - irritating when the page needs user actions.
 				if (this._panel.visible && this.page.reload) {
 					this.page.reload = false;
@@ -283,7 +291,8 @@ class AnPagePanel {
 		);
 	}
 
-	/**Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
+	/**
+	 * Dispose Anprism panel not necessarily shutdown server  - can still debugging with js-debugger.
 	 *
 	 * Anserv lives longer than debugger, which is longer than panel.
 	 * The only way to shutdown anserv is the shutdown command or quit vscode.
@@ -310,20 +319,17 @@ class AnPagePanel {
 		this._panel.webview.html = ""; // FIXME: not refreshed because of no reloading handled by webview - needs promise?
 		this.page.html = newPage || this.page.html;
 		AnPagePanel.serv0.checkHtml(this.page.html);
-		this._panel.webview.html = this.getAnclientPage(this.page);
+		this._panel.webview.html = AnPagePanel.loadPage(AnPagePanel.serv0.url(this.page));
 	}
 
 	/**
 	 * Load target page in iframe. See
 	 * vscode issue #70339:
 	 * https://github.com/microsoft/vscode/issues/70339
-	 * @param webview
 	 * @param page
-	 * @returns
+	 * @returns html in string
 	 */
-	getAnclientPage(page: Page): string {
-		let {url, sub} = AnPagePanel.serv0.url(page);
-		AnPagePanel.log.appendLine(url);
+	static loadPage(page: {url: string, pagename?: string, style?: string}) {
 		return `<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -332,19 +338,20 @@ class AnPagePanel {
 			<script type="text/javascript">var vscode = acquireVsCodeApi();</script>
 		</head>
 		<body>
-			<p id="lines-of-code-counter">${sub}
+			<p id="lines-of-code-counter">${page.pagename}
 			<input type='button' value='refresh' onclick='console.log("refresh"); document.getElementById("i-anprism").src = document.getElementById("i-anprism").src'
 			/>
 			<input type='button' value='dev tool'
 				onclick='vscode.postMessage({ command: "devtools-open", text: "" });'
 			/>
 			</p>
-			<iframe id='i-anprism' src="${url}" width="100%" height="720px" style="${page.style}" ></iframe>
+			<iframe id='i-anprism' src="${page.url}" width="100%" height="720px" style="${page.style}" ></iframe>
 			<script type="text/javascript">
 				console.log("iframe.src", document.getElementById("i-anprism").getAttribute("src"));
 			</script>
 		</body>
 		</html>`;
+
 	}
 
 	close(): void {
@@ -380,3 +387,115 @@ class AnPagePanel {
 	}
 
 }
+
+export class AnprismPanel {
+	static currentPanel: any;
+	static readonly viewType = 'anprism';
+	static helper: ParserHelper;
+
+	html: vscode.Uri | undefined;
+
+	private readonly _panel: vscode.WebviewPanel;
+	prismpage?: { url: string; pagename: string; style?: string | undefined; };
+
+	public static async parse(context: vscode.ExtensionContext, envelope: vscode.Uri) {
+		const column = vscode.window.activeTextEditor
+			? vscode.window.activeTextEditor.viewColumn
+			: undefined;
+		
+		if (!AnprismPanel.helper)
+			AnprismPanel.helper = new ParserHelper(context);
+
+		// no panel, must be the first time, create a new panel.
+		if (!AnprismPanel.currentPanel) {
+			try {
+				const panel = vscode.window.createWebviewPanel(
+					AnprismPanel.viewType,
+					`Anprism - ${AnPagePanel.filename(envelope)}`,
+					column || vscode.ViewColumn.One,
+					{ enableScripts: true }
+				);
+				panel.webview.options = { enableScripts: true }
+
+				AnPagePanel.log.appendLine("Parsing " + AnPagePanel.filename(envelope));
+				AnprismPanel.currentPanel = new AnprismPanel(context, panel);
+			}
+			catch (e) {
+				if (e instanceof AnprismException) {
+					vscode.window.showErrorMessage((e as AnprismException).getMessage());
+					return;
+				}
+			}
+		}
+
+		AnprismPanel.currentPanel._panel.webview.onDidReceiveMessage(
+			(message: string) => AnprismPanel.currentPanel.handleWebviewMessage(message)
+		);
+
+		try {
+			let outpath = path.join(path.dirname(envelope.fsPath), 'semantier');
+			AnprismPanel.parseEnvelope({envelopath: envelope.fsPath, outpath});
+			AnprismPanel.currentPanel.refresh(envelope);
+		}
+		catch (e) {
+			if (e instanceof AnprismException)
+				vscode.window.showErrorMessage((e as AnprismException).getMessage());
+		}
+		AnprismPanel.currentPanel._panel.reveal(column);
+	}
+
+	static async parseEnvelope(opts: {envelopath: string, outpath: string}) {
+		let pythonPath = AnprismPanel.helper.semantier.pythonPath;
+
+		const cmd = `${pythonCmd('')} ${pythonPath} ${opts.envelopath} ${opts.outpath} &`;
+
+		AnPagePanel.log.appendLine(cmd);
+		// vscode.window.showInformationMessage('Starting Anprism server at ' + AnPagePanel.serv0.webrootPath());
+
+		new Promise<string>((resolve, reject) => {
+			cp.exec(cmd, (err, out) => {
+				if (err) {
+					AnprismPanel.helper.semantier.status = 'fail';
+					AnPagePanel.log.appendLine(err.message);
+					vscode.window.showInformationMessage('Parsing failed. ' + err.message);
+					return reject(err);
+				}
+				AnPagePanel.log.appendLine(out.toString());
+				return resolve(out);
+			});
+		});
+	}
+
+	constructor(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
+		this._panel = panel;
+
+		/*
+        let pagename = context.uri.asAbsolutePath;
+        let subfile = path.basename(pagename, ".html");
+		const url = `http://${this.serv.host}/${getNonce()}.html?nonce=${subfile}`;
+        console.log(url);
+
+		this.prismpage = {url, pagename};
+		*/
+	}
+
+	refresh(newPage: vscode.Uri | undefined): void {
+		this._panel.webview.html = ""; // FIXME: not refreshed because of no reloading handled by webview - needs promise?
+		this.html = newPage || this.html;
+		let that = this;
+		this._panel.webview.html = AnPagePanel.loadPage(url(this.prismpage));
+
+		function url(page: { url: string; pagename: string; style?: string | undefined; } | undefined)
+				: { url: string; pagename?: string | undefined; style?: string | undefined; } {
+			let pagename = path.relative('.', that.html?.fsPath || '');
+			let subfile = path.basename(pagename, ".html");
+
+			// const url = `http://${this.serv.host}/${getNonce()}.html?nonce=${subfile}`;
+			let url = that.html?.fsPath || '';
+
+			return {url, pagename};
+		}
+	}
+
+}
+

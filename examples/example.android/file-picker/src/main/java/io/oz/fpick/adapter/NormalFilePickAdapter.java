@@ -9,30 +9,30 @@ import android.graphics.drawable.AnimationDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.NormalFilePickActivity;
 import com.vincent.filepicker.filter.entity.NormalFile;
 
 import java.util.ArrayList;
 
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.activity.NormalFilePickActivity;
 
 /**
  * Not used for Android 10.
  */
 public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFilePickAdapter.NormalFilePickViewHolder> {
-    private int mMaxNumber;
-    private int mCurrentNumber = 0;
+    // private int mMaxNumber;
+    // private int mCurrentNumber = 0;
 
     public NormalFilePickAdapter(NormalFilePickActivity ctx, int max) {
         this(ctx, new ArrayList<NormalFile>(), max);
@@ -43,10 +43,11 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
         mMaxNumber = max;
     }
 
+    @NonNull
     @Override
-    public NormalFilePickViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public NormalFilePickViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.vw_layout_item_normal_file_pick, parent, false);
-        NormalFilePickViewHolder holder = new NormalFilePickViewHolder ( itemView );
+        NormalFilePickViewHolder holder = new NormalFilePickViewHolder(itemView);
         holder.setIsRecyclable ( true );
         return holder;
     }
@@ -69,8 +70,7 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
             AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-            Animation a= AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
-//                    animation.startAnimation ( animationDrawable );
+            AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
             animationDrawable.start ();
 
         } else {
@@ -94,43 +94,26 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
         }
 
         //change itemview to mCbx
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!v.isSelected() && isUpToMax()) {
-                    ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
-                    return;
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (!v.isSelected() && isUpToMax()) {
+                ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
+                return;
+            }
 
-                if (v.isSelected()) {
-                    holder.mCbx.setSelected(false);
-                    mCurrentNumber--;
-                } else {
-                    holder.mCbx.setSelected(true);
-                    mCurrentNumber++;
-                }
+            if (v.isSelected()) {
+                holder.mCbx.setSelected(false);
+                mCurrentNumber--;
+            } else {
+                holder.mCbx.setSelected(true);
+                mCurrentNumber++;
+            }
 
-                mList.get(holder.getAdapterPosition()).setSelected(holder.mCbx.isSelected());
+            mList.get(holder.getAdapterPosition()).setSelected(holder.mCbx.isSelected());
 
-                if (mListener != null) {
-                    mListener.onSelectStateChanged(holder.getAdapterPosition(), holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
-                }
+            if (mListener != null) {
+                mListener.onSelectStateChanged(holder.getAdapterPosition(), holder.mCbx.isSelected(), mList.get(holder.getAdapterPosition()),holder.animation);
             }
         });
-
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Uri uri = Uri.parse("file://" + file.fullpath());
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setDataAndType(uri, "audio/mp3");
-//                if (Util.detectIntent(mContext, intent)) {
-//                    mContext.startActivity(intent);
-//                } else {
-//                    Toast.makeText(mContext, "No Application exists for audio!", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -138,22 +121,17 @@ public class NormalFilePickAdapter extends BaseSynchronizer<NormalFile, NormalFi
         return mList.size();
     }
 
-    class NormalFilePickViewHolder extends RecyclerView.ViewHolder {
-        private ImageView mIvIcon;
-        private TextView mTvTitle;
-        private ImageView mCbx;
-        private RelativeLayout animation;
+    static class NormalFilePickViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView mIvIcon;
+        private final TextView mTvTitle;
+        private final ImageView mCbx;
+        private final RelativeLayout animation;
         public NormalFilePickViewHolder(View itemView) {
             super(itemView);
-            mIvIcon = (ImageView) itemView.findViewById(R.id.ic_file);
-            mTvTitle = (TextView) itemView.findViewById(R.id.tv_file_title);
-            mCbx = (ImageView) itemView.findViewById(R.id.cbx);
+            mIvIcon = itemView.findViewById(R.id.ic_file);
+            mTvTitle = itemView.findViewById(R.id.tv_file_title);
+            mCbx = itemView.findViewById(R.id.cbx);
             animation = itemView.findViewById ( R.id.animationFile );
         }
     }
-
-//    private boolean isUpToMax() {
-//        return mCurrentNumber >= mMaxNumber;
-//    }
-
 }

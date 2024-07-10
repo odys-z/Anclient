@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
-import { Protocol, SessionClient, ErrorCtx, SessionInf,
+import { Protocol, SessionClient, ErrorCtx,
 	AnsonMsg, AnsonResp
 } from '@anclient/semantier';
 
@@ -201,7 +201,7 @@ class App extends React.Component<Approps> {
 	static bindHtml(elem: string, opts: AnreactAppOptions) : void {
 		let portal = opts.portal || 'index.html';
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
-		AnReactExt.bindDom(elem, opts, onJsonServ);
+		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
 			let dom = document.getElementById(elem);

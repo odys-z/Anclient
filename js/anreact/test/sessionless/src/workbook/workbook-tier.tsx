@@ -1,8 +1,9 @@
 import { Protocol, AnsonBody, AnsonResp, CRUD, ErrorCtx,
 	OnCommitOk, OnLoadOk, PageInf} from '@anclient/semantier';
 
-import { SheetCol, SpreadsheetRec, Spreadsheetier, SpreadsheetReq, CellEditingStoppedEvent
+import { SheetCol, SpreadsheetRec, Spreadsheetier, SpreadsheetReq
 } from '../../../../src/an-components';
+import { CellEditingStoppedEvent } from 'ag-grid-community/dist/lib/events';
 
 /**
  * @example table DDL

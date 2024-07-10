@@ -4,7 +4,6 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,29 +21,23 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import com.vincent.filepicker.activity.ImagePickActivity;
+import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
 import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.activity.BaseActivity;
-//import io.oz.jserv.docsync.SyncFlag;
 import io.oz.fpick.R;
 
 /**
  * Created by Ody Zhou
  * Date: 15 Feb. 2022
- *
  * Credits to Vincent Woo
  */
-
 public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapter.VideoPickViewHolder> {
-    public String mFilepath;
-    public Uri mVideoUri;
-
     public VideoPickAdapter(BaseActivity ctx, boolean needCamera, int max ) {
-        this ( ctx, new ArrayList<VideoFile> ( ), needCamera , max );
+        this ( ctx, new ArrayList<>(), needCamera , max );
     }
 
     public VideoPickAdapter(BaseActivity ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
@@ -63,14 +56,15 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             itemWidth = wm.getDefaultDisplay ( ).getWidth ( );
             params.height = itemWidth / ImagePickActivity.COLUMN_NUMBER;
         }
-        VideoPickViewHolder videoViewHolder = new VideoPickViewHolder ( itemView );
-        videoViewHolder.setIsRecyclable ( false );
+        VideoPickViewHolder videoViewHolder = new VideoPickViewHolder(itemView);
+
+        videoViewHolder.setIsRecyclable (false);
 
         return videoViewHolder;
     }
 
     @Override
-    public void onBindViewHolder ( final VideoPickViewHolder holder , final int position ) {
+    public void onBindViewHolder (@NonNull final VideoPickViewHolder holder , final int position ) {
         if ( isNeedCamera && position == 0 ) {
             holder.icAlbum.setVisibility ( View.VISIBLE );
             holder.icSynced.setVisibility ( View.INVISIBLE );
@@ -94,7 +88,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
                 .load ( file.fullpath() )
-                // .load ( file.fullpath ( ) )
                 .apply ( options.centerCrop() )
                 .transition ( withCrossFade() )
                 .into ( holder.mIvThumbnail );
@@ -106,7 +99,6 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            // else if (SyncFlag.publish.equals(file.syncFlag)) {
             else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
@@ -176,6 +168,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             });
 
             holder.mDuration.setText(Util.getDurationString(file.getDuration()));
+
+            holder.setIsRecyclable ( true );
         }
     }
 
@@ -184,7 +178,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
         return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
-    class VideoPickViewHolder extends RecyclerView.ViewHolder {
+    static class VideoPickViewHolder extends RecyclerView.ViewHolder {
         private final ImageView icAlbum;
         private final ImageView icSynced;
         private final ImageView icSyncing;
@@ -193,25 +187,21 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
         private final ImageView mCbx;
         private final RelativeLayout animation;
 
-        private TextView mDuration;
-        private RelativeLayout mDurationLayout;
+        private final TextView mDuration;
 
         public VideoPickViewHolder(@NonNull View itemView) {
             super ( itemView );
-            icAlbum = (ImageView) itemView.findViewById ( R.id.xiv_album_icon);
-            icSyncing = (ImageView) itemView.findViewById ( R.id.xiv_syncing_icon);
-            icSynced = (ImageView) itemView.findViewById ( R.id.xiv_synced_icon);
+            icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+            icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
+            icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 
-            mIvThumbnail = (ImageView) itemView.findViewById ( R.id.xiv_thumbnail );
+            mIvThumbnail = itemView.findViewById ( R.id.xiv_thumbnail );
             mShadow = itemView.findViewById ( R.id.x_shadow );
-            mCbx = (ImageView) itemView.findViewById ( R.id.x_check );
+            mCbx = itemView.findViewById ( R.id.x_check );
             animation = itemView.findViewById ( R.id.animationSquarevideo );
-            mDuration = (TextView) itemView.findViewById(R.id.txt_duration);
-            mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
+            mDuration = itemView.findViewById(R.id.txt_duration);
+            // RelativeLayout mDurationLayout = (RelativeLayout) itemView.findViewById(R.id.layout_duration);
         }
     }
 
-    public void setCurrentNumber ( int number ) {
-        mCurrentNumber = number;
-    }
 }

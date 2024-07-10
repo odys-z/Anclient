@@ -1,5 +1,7 @@
 package io.oz.fpick.adapter;
 
+import static io.odysz.common.LangExt.isNull;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -31,7 +33,6 @@ import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-//import io.oz.jserv.docsync.SyncFlag;
 
 import static io.odysz.common.LangExt.isblank;
 
@@ -64,19 +65,18 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     protected PathsPage synchPage;
 
     /**
-     * @param ctx
      * @param list resource list
      */
     public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
-        this.singleton = AlbumContext.getInstance(null);
+        this.singleton = AlbumContext.getInstance();
         mContext = ctx;
         mList = list;
     }
 
-    public BaseSynchronizer(BaseActivity act) {
-        this(act, new ArrayList<>());
-        this.singleton = AlbumContext.getInstance(act);
-    }
+//    public BaseSynchronizer(BaseActivity act) {
+//        this(act, new ArrayList<>());
+//        this.singleton = AlbumContext.getInstance(act);
+//    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void add(List<T> list) {
@@ -97,9 +97,9 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     public List<T> getDataSet() { return mList; }
 
     /**
-     * Add file list to my list, then start asynchronized matching.
+     * Add file list to my list, then start asynchronize matching.
      * My list is used for feeding item holder used for buffered rendering (by Glide).
-     * @param list
+     * @param list local items
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshSyncs(List<AndroidFile> list) {
@@ -112,11 +112,10 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
 
         try {
             mContext.onStartingJserv(0, 1);
-            if (singleton.tier != null && singleton.state() == AlbumContext.ConnState.Online)
-                startSynchQuery(synchPage);
+            if (singleton.needLogin())
+                singleton.login((c) -> startSynchQuery(synchPage), singleton.errCtx);
             else
-                singleton.login((c) -> startSynchQuery(synchPage),
-                    singleton.errCtx);
+                startSynchQuery(synchPage);
         } catch (GeneralSecurityException e) {
             singleton.errCtx.err(AnsonMsg.MsgCode.exSession, e.getMessage());
         } catch (SemanticException e) {
@@ -127,11 +126,9 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     }
 
     void startSynchQuery(PathsPage page) {
-        singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
-            (c, r, args) -> {
-                // Log.e(singleton.clientUri, String.format(r, args == null ? "null" : args[0]));
-                singleton.errCtx.err(c, r, args);
-            });
+        if (!isNull(singleton.tier))
+            singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+                (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
 
     /**
@@ -148,11 +145,12 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
                 if (phts.containsKey(f.fullpath())) {
                     // [sync-flag, share-falg, share-by, share-date]
                     String[] inf = phts.get(f.fullpath());
+                    if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     f.syncFlag = isblank(inf[0]) ? SyncDoc.SyncFlag.hub : inf[0];
 
-                    f.shareflag = inf[1];
+                    f.shareFlag = inf[1];
                     f.shareby = inf[2];
                     f.sharedate(inf[3]);
                 }
@@ -194,11 +192,6 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     public void selectListener(BaseActivity.OnSelectStateListener listener) {
         mListener = listener;
     }
-
-//    private static final Random RANDOM = new Random();
-//    public static int nextRandomInt() {
-//        return RANDOM.nextInt(1024 * 1024);
-//    }
 
     /**
      * @param ctx the context

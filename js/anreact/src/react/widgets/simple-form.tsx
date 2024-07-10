@@ -114,18 +114,15 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 	constructor (props: SimpleFormProps) {
 		super(props);
+		this.uri = this.props.uri || '';
 
 		this.funcId = props.funcId || 'SimpleForm';
-
 		this.state.crud = props.crud || CRUD.r;
 		this.state.mtabl = props.mtabl;
 
 		this.pkval = props.pkval;
-
-		// this.state.parent = props.parent;
 		this.state.parentId = props.parentId;
 
-		this.uri = this.props.uri || '';
 
 		this.formFields = this.formFields.bind(this);
 		this.getField = this.getField.bind(this);
@@ -278,7 +275,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 
 		if (f.type === 'cbb') {
 			let that = this;
-			let fd = f as TierComboField<JSX.Element, CompOpts>;
+			let fd = f as TierComboField;
 			return (<DatasetCombo uri={this.props.uri} crud={CRUD.r}
 				options={fd.options} val={rec[fd.field]}
 				label={f.label} style={fd.style}

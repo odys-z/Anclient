@@ -9,11 +9,11 @@ Anprism is a light weight helper for editing morden (webpack transpiled) web pag
 
 ![screenshot (for Github)](res/00-anprism-0.2.0.png)
 
-For live editing, there are other [similar (better) implementation](https://marketplace.visualstudio.com/items?itemName=ms-vscode.live-server).
-
-Currently the difference is that Anprism uses Python for web server.
-
 [Screenshot (for Marketplace)](https://github.com/odys-z/Anclient/tree/master/js/anprism)
+
+Anprism uses Python for web server, loading html page for visually editing page CSS or html.
+If the page is part of webpack project, start webpack in watch mode can modify html page in 
+WYSIWYG style.
 
 ## Install
 
@@ -22,7 +22,7 @@ In VS Code extension manager (press Ctrl + Shift + x), search 'Anprism'.
 ## Quic Start
 
 If you haven't add a debug configuration, add one with VS Code. Anprism use the first
-"pwa-chrome" type's webroot as it's server root. E.g, if in launch.json,
+"pwa-chrome" type's webroot as it's server root. E.g, if *url* is configured in launch.json:
 
 ```
 {

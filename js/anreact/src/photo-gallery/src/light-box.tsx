@@ -70,8 +70,8 @@ export const between = (min: number, max: number, value: number) => {
  * This function have a performance issue.
  */
 export class Lightbox extends CrudCompW<Comprops & {
-    /* accepting command of parent to stop loading resources */
-    open: boolean }> {
+      /* accepting command of parent to stop loading resources */
+      open: boolean }> {
   width: number;
   height: number;
   onNavigationCallback: any;
@@ -413,6 +413,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         onTouchMove={this.handleTouchMove}
         onTouchEnd={this.handleTouchEnd}
         style={{
+          zIndex: 99999,
           top: '0px', left: '0px',
           overflow: 'hidden', position: 'fixed', display: 'flex',
           alignItems: 'center', justifyContent: 'center', flexDirection: 'row',
