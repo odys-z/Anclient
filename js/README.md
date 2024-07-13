@@ -46,9 +46,9 @@ Open
 
 The jsapmple server side is needed to login. (Docker image avialable)
 
-## His Home page
+## Documents
 
-[It's here!](https://odys-z.github.io)
+[Tutorials & Guide](https://odys-z.github.io/Anclient/)
 
 # Credits
 
