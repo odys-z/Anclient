@@ -4,9 +4,9 @@
   "description": "This file is only used for install npm scripts.",
   "main": "",
   "scripts": {
-    "build": "cd ../../anreact && webpack-cli && cd ../test/jsample && webpack-cli",
+    "build": "cd ../.. && webpack-cli && cd test/jsample && webpack-cli",
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
-    "test": "cd .. && webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
+    "test": "cd dist && echo browser open: http://localhost:8888/index.html && python3 -m http.server 8888"
   },
   "author": "Odys Zhou",
   "license": "MIT"
