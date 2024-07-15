@@ -3,21 +3,19 @@ name conflicting.
 
 # About
 
-Anclient.js comes with two package, @anclient/anreact & @anclient/semantier.
+Anclient.js is the client (web page) for building web applications using semantic.jserv data service.
+It comes with the protocol layer, @anclient/semantier, and UI presentation layer, @anclient/anreact,
+which is a UI widget lib built upon React.js. Both layers now are using Typescript and provide types
+and semantics checking, by which the development process can be carried upon user's data structure and
+be more efficient.
 
-NOTE:
+Anclient.js comes with two packages, @anclient/anreact & @anclient/semantier.
 
-@anclient/anreact versions greater than 0.3.25 is not working.
-
-Both need to be install separately.
-
-install:
+To install, run:
 
 ```
     npm install @anclient/anreact @anclient/semantier
 ```
-
-Both published with .d.ts file. Typescript modules are declared in index.d.ts.
 
 ## quick start from source (only ReactJS version currently)
 
@@ -48,9 +46,9 @@ Open
 
 The jsapmple server side is needed to login. (Docker image avialable)
 
-## His Home page
+## Documents
 
-[It's here!](https://odys-z.github.io)
+[Tutorials & Guide](https://odys-z.github.io/Anclient/)
 
 # Credits
 
