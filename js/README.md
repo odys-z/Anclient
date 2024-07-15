@@ -9,7 +9,7 @@ which is a UI widget lib built upon React.js. Both layers now are using Typescri
 and semantics checking, by which the development process can be carried upon user's data structure and
 be more efficient.
 
-Anclient.js comes with two package, @anclient/anreact & @anclient/semantier.
+Anclient.js comes with two packages, @anclient/anreact & @anclient/semantier.
 
 To install, run:
 
