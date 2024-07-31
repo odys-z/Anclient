@@ -1,5 +1,7 @@
 package io.odysz.jclient;
 
+import static io.odysz.common.LangExt.isblank;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -142,6 +144,8 @@ public class Clients {
 	 */
 	static String servUrl(IPort port) {
 		// Since version for semantier, this will return without conn id. 
+		if (isblank(servRt))
+			throw new AnsonException(0, "The root path is empty. Call init(jserv) first.");
 		return String.format("%s/%s", servRt, port.url());
 	}
 

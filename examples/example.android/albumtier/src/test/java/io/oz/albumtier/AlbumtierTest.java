@@ -4,12 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -69,20 +67,9 @@ public class AlbumtierTest {
 		onUserSelectFiles();
 
 		// 4. pause
-		pause("Press Enter when you think the test is finished ...");
+		Utils.pause("Press Enter when you think the test is finished ...");
 		Utils.logi(singleton.userInf.device);
     }
-
-	public static void pause(String msg) {
-		Utils.logi(msg);
-		try {
-			BufferedReader reader = new BufferedReader(
-	            new InputStreamReader(System.in));
-			reader.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	void onActivityCreate() throws SemanticException, AnsonException, GeneralSecurityException, IOException {
 		singleton = new AlbumContext(new T_AndErrorCtx())

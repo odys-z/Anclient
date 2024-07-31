@@ -110,7 +110,7 @@ public class PhotoSyntier extends SynclientierMvp {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 			else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-		} catch (AnsonException | SemanticException e) {
+		} catch (AnsonException | TransException e) {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 			else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -135,7 +135,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} catch (AnsonException | SemanticException e) {
+			} catch (AnsonException | TransException e) {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -385,7 +385,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} catch (AnsonException | SemanticException e) {
+			} catch (AnsonException | TransException e) {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -452,7 +452,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				ok.ok(resp);
 			} catch (IOException e) {
 				err.err(MsgCode.exIo, e.getMessage());
-			} catch (SemanticException e) {
+			} catch (TransException e) {
 				err.err(MsgCode.exSemantic, e.getMessage());
 			}
 		}).start();

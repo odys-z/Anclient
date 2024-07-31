@@ -24,6 +24,7 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 
 /**
  * Semantic.jserv client, java version.
@@ -59,13 +60,13 @@ public class HttpServClient {
 	 * @param jreq
 	 * @param onResponse
 	 * @throws IOException
-	 * @throws SemanticException 
 	 * @throws SQLException 
+	 * @throws TransException 
 	 */
 	public void post(String url, AnsonMsg<? extends AnsonBody> jreq,
 			// SCallbackV11 onResponse)
 			OnOk onResponse)
-			throws IOException, SemanticException, SQLException, AnsonException {
+			throws IOException, SQLException, AnsonException, TransException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -146,7 +147,9 @@ public class HttpServClient {
 		int responseCode = con.getResponseCode();
 		if (responseCode == 206) {
 			// since 0.4.28
-			Utils.warn("\nFatal Warning\n\nAnclient.java/Clients is not supposed to support ranged resourse query. Resoponse code of 206 is forced to change to 200 at client side.\n\n");
+			Utils.warn("\nFatal Warning\n"
+					+ "Anclient.java/Clients is not supposed to support ranged resourse query. "
+					+ "Resoponse code of 206 is forced to change to 200 at client side.\n");
 			responseCode = 200;
 		}
 
@@ -163,7 +166,9 @@ public class HttpServClient {
 			}
 
 			if (x.code() != MsgCode.ok) {
-				SemanticException ex = new SemanticException("Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
+				SemanticException ex = new SemanticException(
+						"Code: %s, mesage:\n%s", x.code().name(), x.body(0).msg());
+
 				// @since 1.4.39, semantic exception can be handled differently for different errors, this used for save error code at client.
 				ex.ex().put(EXCODE_KEY, x.code())
 						.put(EXMSG_KEY, x.body(0).msg());

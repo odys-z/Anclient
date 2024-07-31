@@ -28,6 +28,7 @@ import io.odysz.semantic.jsession.HeartBeat;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
+import io.odysz.transact.x.TransException;
 
 /**
  * AnClient.java with session managed.
@@ -116,7 +117,7 @@ public class SessionClient {
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
-				catch (SemanticException | AnsonException | IOException e) {
+				catch (TransException | AnsonException | IOException e) {
 					failed++;
 					if (onBroken != null)
 						onBroken.err(MsgCode.exSession, "heart link broken");

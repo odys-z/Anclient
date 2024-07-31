@@ -92,7 +92,7 @@ public class SynclientierMvp extends Semantier {
 	}
 	
 	/**
-	 * @param clientUri - the client function uri this instance will be used for.
+	 * @param clientUri - the client function uri this instance report to the jserv.
 	 * @param errCtx
 	 * @throws IOException 
 	 * @throws SAXException 
