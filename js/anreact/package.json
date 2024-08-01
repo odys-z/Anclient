@@ -1,7 +1,7 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.4.58",
-  "description": "Anclient built on ReactJs.",
+  "version": "0.4.59",
+  "description": "Anclient built on React.js.",
   "main": "./src/an-components.ts",
   "directories": {
     "src": "src",
@@ -61,7 +61,7 @@
     "@types/react-dom": "^18.2.6",
     "@types/react-modal": "^3.16.0",
     "@types/sass-loader": "^8.0.4",
-    "babel-loader": "^9.1.2",
+    "babel-loader": "^9.1.3",
     "babel-plugin-syntax-jsx": "^6.18.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.3.7",

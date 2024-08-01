@@ -10,6 +10,23 @@ Refactored:
 
 of which the protocol layer are actually different.
 
+# Buid & test
+
+- To build
+
+```
+	npm run build
+```
+
+- To test
+
+
+```
+	cd test
+	npm run build
+	npm test
+```
+
 ### Tip
 
 - React warn about invalid hook call.

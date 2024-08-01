@@ -21,7 +21,7 @@ import io.odysz.semantic.DATranscxt;
 import io.odysz.semantic.DA.Connects;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
-import io.odysz.semantic.meta.JUserMeta;
+import io.odysz.semantic.jsession.JUser.JUserMeta;
 import io.odysz.semantics.IUser;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.SessionInf;
