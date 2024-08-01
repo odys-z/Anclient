@@ -1,6 +1,7 @@
 package io.odysz.jclient;
 
 import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.isNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -50,11 +51,14 @@ public class Clients {
 		verbose = enableVerbose != null && enableVerbose.length > 0 ? enableVerbose[0] == true : false;
 	}
 	
-	/**Login and return a client instance (with session managed by jserv).
+	/**
+	 * Login and return a client instance (with session managed by jserv).
 	 * 
 	 * <h5>Note since anclient.java 1.4.14</h5>
 	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
 	 * 
+	 * @deprecated replacedd by {@link #loginByUri(String, String, String, String...)}, 
+	 * Ansession at server side will use default conn-id for null uri.
 	 * @param uid
 	 * @param pswdPlain
 	 * @param mac  client device name - server can required this or not
@@ -64,6 +68,28 @@ public class Clients {
 	 * @throws Exception, most likely the network failed
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
+			throws IOException, SemanticException, AnsonException, SsException {
+		return loginByUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
+	}
+
+	/**
+	 * Login and return a client instance (with session managed by jserv).
+	 * 
+	 * <h5>Note since anclient.java 1.4.14</h5>
+	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
+	 * 
+	 * @param uri
+	 * @param uid
+	 * @param pswdPlain
+	 * @param mac
+	 * @return a SessionClient instance if login succeed.
+	 * @throws IOException
+	 * @throws SemanticException
+	 * @throws AnsonException
+	 * @throws SsException
+	 * @since 2.0.0
+	 */
+	public static SessionClient loginByUri(String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
@@ -78,6 +104,7 @@ public class Clients {
 		}
 		
 		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
+		reqv11.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(Port.session);
