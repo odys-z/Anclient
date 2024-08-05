@@ -57,7 +57,7 @@ public class Clients {
 	 * <h5>Note since anclient.java 1.4.14</h5>
 	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
 	 * 
-	 * @deprecated replacedd by {@link #loginByUri(String, String, String, String...)}, 
+	 * @deprecated replacedd by {@link #loginWithUri(String, String, String, String...)}, 
 	 * Ansession at server side will use default conn-id for null uri.
 	 * @param uid
 	 * @param pswdPlain
@@ -69,7 +69,7 @@ public class Clients {
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
-		return loginByUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
+		return loginWithUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class Clients {
 	 * @throws SsException
 	 * @since 2.0.0
 	 */
-	public static SessionClient loginByUri(String uri, String uid, String pswdPlain, String... mac)
+	public static SessionClient loginWithUri(String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);

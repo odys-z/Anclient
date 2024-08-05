@@ -32,7 +32,6 @@ import io.odysz.jclient.tier.Semantier;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.DATranscxt;
 import io.odysz.semantic.DA.Connects;
-import io.odysz.semantic.ext.DocTableMeta;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -44,14 +43,14 @@ import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jsession.JUser.JUserMeta;
+import io.odysz.semantic.meta.ExpDocTableMeta;
 import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsReq.A;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
-import io.odysz.semantic.tier.docs.SyncDoc;
-import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
@@ -223,7 +222,7 @@ public class SynclientierMvp extends Semantier {
 
 			AnsonMsg<AnQueryReq> q = client.query(uri, um.tbl, "u", 0, -1);
 			q.body(0)
-			 .j(um.orgTbl, "o", String.format("o.%1$s = u.%1$s", um.org))
+			 .l(um.om.tbl, "o", String.format("o.%1$s = u.%1$s", um.org))
 			 .whereEq("u." + um.pk, robot.userId);
 
 			AnsonResp resp = client.commit(q, errCtx);
@@ -231,7 +230,7 @@ public class SynclientierMvp extends Semantier {
 			if (rs.next())
 				robot.orgId(rs.getString(um.org))
 					 .orgName(rs.getString(um.orgName));
-			else throw new SemanticException("Synode haven't been reqistered: %s", robot.userId);
+			else throw new SemanticException("User identity haven't been reqistered: %s", robot.userId);
 		} catch (TransException | AnsonException | SQLException | IOException e) {
 			e.printStackTrace();
 		}
@@ -240,7 +239,7 @@ public class SynclientierMvp extends Semantier {
 	}
 
 	/**
-	 * @param meta for creating {@link SyncDoc} object
+	 * @param meta for creating {@link ExpSyncDoc} object
 	 * @param rs tasks, rows should be limited
 	 * @param workerId
 	 * @param onProc
@@ -252,7 +251,7 @@ public class SynclientierMvp extends Semantier {
 		List<SyncDoc> videos = new ArrayList<SyncDoc>();
 		try {
 			while (rs.next())
-				videos.add(new SyncDoc(rs, meta));
+				videos.add(new ExpSyncDoc(rs, meta));
 
 			return syncUp(meta.tbl, videos, workerId, onProc);
 		} catch (SQLException e) {
@@ -276,7 +275,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws AnsonException
 	 * @throws IOException
 	 */
-	public List<DocsResp> syncUp(String tabl, List<? extends SyncDoc> videos, String workerId,
+	public List<DocsResp> syncUp(String tabl, List<? extends ExpSyncDoc> videos, String workerId,
 			OnProcess onProc, OnDocsOk... docOk)
 			throws TransException, AnsonException, IOException {
 		SessionInf photoUser = client.ssInfo();
@@ -293,10 +292,10 @@ public class SynclientierMvp extends Semantier {
 	}
 
 	public static void setLocalSync(DATranscxt localSt, String conn,
-			DocTableMeta meta, SyncDoc doc, String syncflag, SyncRobot robot)
+			ExpDocTableMeta meta, ExpSyncDoc doc, String syncflag, SyncRobot robot)
 			throws TransException, SQLException {
 		localSt.update(meta.tbl, robot)
-			.nv(meta.syncflag, SyncFlag.hub)
+			// .nv(meta.syncflag, SyncFlag.hub)
 			.whereEq(meta.pk, doc.recId)
 			.u(localSt.instancontxt(conn, robot));
 	}
@@ -311,7 +310,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws TransException
 	 * @throws SQLException
 	 */
-	SyncDoc synStreamPull(SyncDoc p, DocTableMeta meta)
+	ExpSyncDoc synStreamPull(ExpSyncDoc p,ExpDocTableMeta meta)
 			throws AnsonException, IOException, TransException, SQLException {
 
 		if (!verifyDel(p, meta)) {
@@ -327,7 +326,7 @@ public class SynclientierMvp extends Semantier {
 		return p;
 	}
 
-	protected boolean verifyDel(SyncDoc f, DocTableMeta meta) {
+	protected boolean verifyDel(ExpSyncDoc f,ExpDocTableMeta meta) {
 		String pth = tempath(f);
 		File file = new File(pth);
 		if (!file.exists())
@@ -367,14 +366,14 @@ public class SynclientierMvp extends Semantier {
 	 * @param docOk
 	 * @param onErr
 	 * @return list of response
-	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
+	public List<DocsResp> pushBlocks(String tbl, List<? extends ExpSyncDoc> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, uri, tbl, videos, blocksize, proc, docOk, err);
 	}
 	 */
-	public List<DocsResp> pushBlocks(String tbl, List<? extends SyncDoc> videos,
+	public List<DocsResp> pushBlocks(String tbl, List<? extends ExpSyncDoc> videos,
 			OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 			throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
@@ -384,7 +383,7 @@ public class SynclientierMvp extends Semantier {
 
 	/*
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<? extends SyncDoc> videos, int blocksize,
+			List<? extends ExpSyncDoc> videos, int blocksize,
 			OnProcess proc, OnDocsOk docOk, OnError errHandler)
 			throws TransException, IOException {
 
@@ -403,7 +402,7 @@ public class SynclientierMvp extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			SyncDoc p = videos.get(px);
+			ExpSyncDoc p = videos.get(px);
 			DocsReq req = new DocsReq(tbl)
 					.folder(p.folder())
 					.share(p)
@@ -488,7 +487,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws AnsonException 
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-								List<? extends SyncDoc> videos, IFileProvider fileProvider,
+								List<? extends ExpSyncDoc> videos, IFileProvider fileProvider,
 								OnProcess proc, OnDocsOk docOk, OnError errHandler, int blocksize)
 			throws IOException, AnsonException, TransException {
 
@@ -507,11 +506,11 @@ public class SynclientierMvp extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			SyncDoc p = videos.get(px);
+			ExpSyncDoc p = videos.get(px);
 			fileProvider.meta(p);
 			DocsReq req = new AlbumReq(uri)
 					.folder(fileProvider.saveFolder())
-					.share(p)
+					// .share(p)
 					.device(new Device(user.device, null))
 					.resetChain(true)
 					.blockStart(p, user);
@@ -520,22 +519,11 @@ public class SynclientierMvp extends Semantier {
 									.header(header);
 
 			try {
-				startAck = client.commit(q,
-					/*
-					(c, m, args) -> {
-					if (c == MsgCode.ext) {
-						DocsException docx = (DocsException)Anson.fromJson(m);
-						if (docx.code() == DocsException.Duplicate) {
-							reslts.add((DocsResp) new DocsResp().msg("Ignoring duplicate file: " + p.pname));
-						}
-					}
-					else errHandler.err(c, m, args);
-					}*/
-					errHandler);
+				startAck = client.commit(q, errHandler);
 
 				String pth = p.fullpath();
-				if (!pth.equals(startAck.doc.fullpath()))
-					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.doc.fullpath());
+				if (!pth.equals(startAck.xdoc.fullpath()))
+					Utils.warn("Resp is not replied with exactly the same path: %s", startAck.xdoc.fullpath());
 
 				totalBlocks = p.size == 0 ? 0 : 1 + (int) ((p.size - 1 ) / blocksize);
 
@@ -580,7 +568,8 @@ public class SynclientierMvp extends Semantier {
 							Anson.unescape(((SemanticException)ex).ex().getString(HttpServClient.EXMSG_KEY)));
 					if (Integer.valueOf(docx.code()) == DocsException.Duplicate) {
 						reslts.add((DocsResp) new DocsResp()
-								.doc(p.syncFlag(SyncFlag.deny))
+								// .doc(p.syncFlag(SyncFlag.deny))
+								.doc(p)
 								.msg("Ignoring duplicate file: " + p.pname));
 						continue;
 					}
@@ -620,10 +609,10 @@ public class SynclientierMvp extends Semantier {
 		return reslts;
 	}
 
-	public String download(String clientUri, String syname, SyncDoc photo, String localpath)
+	public String download(String clientUri, String syname, ExpSyncDoc photo, String localpath)
 			throws SemanticException, AnsonException, IOException {
 		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(clientUri);
-		req.docId = photo.recId;
+		req.doc.recId = photo.recId;
 		req.a(A.download);
 		return client.download(clientUri, Port.docsync, req, localpath);
 	}
@@ -643,7 +632,7 @@ public class SynclientierMvp extends Semantier {
 
 		DocsReq req = new DocsReq(docTabl, uri);
 		req.a(A.rec);
-		req.docId = docId;
+		req.doc.recId = docId;
 
 		DocsResp resp = null;
 		try {
@@ -706,7 +695,7 @@ public class SynclientierMvp extends Semantier {
 		return resp;
 	}
 
-	DocsResp synClosePush(SyncDoc p, String docTabl)
+	DocsResp synClosePush(ExpSyncDoc p, String docTabl)
 			throws AnsonException, IOException, TransException, SQLException {
 
 		DocsReq clsReq = (DocsReq) new DocsReq()
@@ -731,7 +720,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws AnsonException
 	 * @throws IOException
 	 */
-	DocsResp synClosePull(SyncDoc p, String docTabl)
+	DocsResp synClosePull(ExpSyncDoc p, String docTabl)
 			throws SemanticException, AnsonException, IOException {
 		DocsReq clsReq = (DocsReq) new DocsReq()
 						.docTabl(docTabl)

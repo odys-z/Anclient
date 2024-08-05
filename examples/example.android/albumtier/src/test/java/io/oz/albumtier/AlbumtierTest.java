@@ -23,8 +23,8 @@ import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.PathsPage;
-import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
@@ -43,12 +43,12 @@ public class AlbumtierTest {
 	static final String testdoc = "src/test/res/doc.pdf";
 	static final String device = "omni";
 	
-	ArrayList<SyncDoc> mList;
+	ArrayList<ExpSyncDoc> mList;
 
 	@Test
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
-		mList = new ArrayList<SyncDoc>(1);
+		mList = new ArrayList<ExpSyncDoc>(1);
 		mList.add(new PhotoRec().createTest(testimg));
 		
 		// 1. create
@@ -84,14 +84,14 @@ public class AlbumtierTest {
 		singleton.tier.fileProvider(new IFileProvider() {
 
 			@Override
-			public long meta(SyncDoc f) throws IOException {
+			public long meta(ExpSyncDoc f) throws IOException {
 				long size = Files.size(Paths.get(f.fullpath()));
 				f.size = size;
 				return size;
 			}
 
 			@Override
-			public InputStream open(SyncDoc pht) throws FileNotFoundException {
+			public InputStream open(ExpSyncDoc pht) throws FileNotFoundException {
 				return new FileInputStream(pht.fullpath());
 			}
 
@@ -101,7 +101,7 @@ public class AlbumtierTest {
 			}});
 	}
 
-	void refresh(List<? extends SyncDoc> mlist) {
+	void refresh(List<? extends ExpSyncDoc> mlist) {
 		synchPage = new PathsPage(0, Math.min(20, mlist.size()));
 		synchPage.device = singleton.userInf.device;
 		if (singleton.tier != null)
@@ -123,7 +123,7 @@ public class AlbumtierTest {
         else if (synchPage.end() < mList.size()) {
             HashMap<String, String[]> phts = rsp.pathsPage().paths();
             for (long i = synchPage.start(); i < synchPage.end(); i++) {
-                SyncDoc f = mList.get((int)i);
+                ExpSyncDoc f = mList.get((int)i);
                 if (phts.keySet().contains(f.fullpath())) {
                 	assertEquals(singleton.userInf.device, f.device());
                 	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
@@ -169,7 +169,7 @@ public class AlbumtierTest {
 	}
    	
    	JProtocol.OnDocsOk photosPushed = (resps) -> {
-		SyncDoc doc = ((DocsResp) resps.get(0)).doc;
+		ExpSyncDoc doc = ((DocsResp) resps.get(0)).xdoc;
 		assertEquals(device, doc.device());
 		assertEquals(testimg, doc.fullpath());
 
@@ -192,9 +192,9 @@ public class AlbumtierTest {
 		singleton.tier.del(singleton.userInf.device, testimg);
 		singleton.tier.del(singleton.userInf.device, testdoc);
 
-   		List<SyncDoc> filelist = new ArrayList<SyncDoc>(2);
-		filelist.add((SyncDoc)new SyncDoc().fullpath(testimg));
-		filelist.add((SyncDoc)new SyncDoc().fullpath(testdoc));
+   		List<ExpSyncDoc> filelist = new ArrayList<ExpSyncDoc>(2);
+		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testimg));
+		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
 
 		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
 			String template = "Upload files: %s, ignored: %s";
