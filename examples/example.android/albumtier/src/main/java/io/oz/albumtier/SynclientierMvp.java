@@ -675,8 +675,8 @@ public class SynclientierMvp extends Semantier {
 	public DocsResp synDel(String tabl, String device, String clientpath) {
 		DocsReq req = (DocsReq) new DocsReq(tabl, uri)
 				.device(new Device(device, null))
-				.clientpath(clientpath)
 				.a(A.del);
+		req.doc.clientpath(clientpath);
 
 		DocsResp resp = null;
 		try {

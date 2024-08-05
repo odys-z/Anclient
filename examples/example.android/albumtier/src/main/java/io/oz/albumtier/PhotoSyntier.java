@@ -424,8 +424,8 @@ public class PhotoSyntier extends SynclientierMvp {
 	public DocsResp del(String device, String clientpath) {
 		DocsReq req = (DocsReq) new AlbumReq(meta.tbl)
 				.device(device)
-				.clientpath(clientpath)
 				.a(A.del);
+		req.doc.clientpath(clientpath);
 
 		DocsResp resp = null;
 		try {
