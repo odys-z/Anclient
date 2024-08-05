@@ -508,8 +508,8 @@ public class SynclientierMvp extends Semantier {
 
 			ExpSyncDoc p = videos.get(px);
 			fileProvider.meta(p);
-			DocsReq req = new AlbumReq(uri)
-					.folder(fileProvider.saveFolder())
+			DocsReq req = new AlbumReq(p, uri)
+					// .folder(fileProvider.saveFolder())
 					// .share(p)
 					.device(new Device(user.device, null))
 					.resetChain(true)
