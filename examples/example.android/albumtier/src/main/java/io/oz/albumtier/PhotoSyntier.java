@@ -1,7 +1,6 @@
 package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.isNull;
-import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.IOException;
@@ -16,7 +15,6 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -144,7 +142,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	}
 
 	/**
-	 * @see #syncVideos(List, OnProcess, OnDocOk, OnError...)
+	 * @see #syncVideos(List, OnProcess, OnOk, OnError...)
      *
 	 * @return list of response
 	 */
