@@ -38,7 +38,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
-import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jserv.R.AnQueryReq;
@@ -190,7 +190,7 @@ public class SynclientierMvp extends Semantier {
 	public SynclientierMvp login(String workerId, String device, String pswd)
 			throws AnsonException, IOException, TransException, GeneralSecurityException {
 
-		client = Clients.login(workerId, pswd, device);
+		client = Clients.loginWithUri(workerId, pswd, device);
 
 		return onLogin(client);
 	}
@@ -276,17 +276,17 @@ public class SynclientierMvp extends Semantier {
 	 * @throws IOException
 	 */
 	public List<DocsResp> syncUp(String tabl, List<? extends ExpSyncDoc> videos, String workerId,
-			OnProcess onProc, OnDocsOk... docOk)
+			OnProcess onProc, JProtocol.OnDocsOk... docOk)
 			throws TransException, AnsonException, IOException {
 		SessionInf photoUser = client.ssInfo();
 		photoUser.device = workerId;
 
 		return pushBlocks(
 				tabl, videos, onProc,
-				isNull(docOk) ? new OnDocsOk() {
+				isNull(docOk) ? new JProtocol.OnDocsOk() {
 					@Override
 					public void ok(List<DocsResp> resps)
-						throws IOException, AnsonException, TransException { }
+							throws IOException, AnsonException, TransException { }
 				} : docOk[0],
 				errCtx);
 	}
@@ -360,7 +360,7 @@ public class SynclientierMvp extends Semantier {
 	 * 
 	 * @param tbl doc table name
 	 * @param videos any doc-table managed records, of which uri shouldn't be loaded,
-	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) extFile()} as sql select expression.
+	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extfile(String...)} as sql select expression.
 	 * - the method is working in stream mode
 	 * @param proc
 	 * @param docOk
@@ -374,11 +374,11 @@ public class SynclientierMvp extends Semantier {
 	}
 	 */
 	public List<DocsResp> pushBlocks(String tbl, List<? extends ExpSyncDoc> videos,
-			OnProcess proc, OnDocsOk docOk, OnError ... onErr)
+			OnProcess proc, JProtocol.OnDocsOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, uri, tbl, videos, fileProvider,
-							proc, docOk, err, blocksize);
+							proc, docsOk, err, blocksize);
 	}
 
 	/*
@@ -488,7 +488,7 @@ public class SynclientierMvp extends Semantier {
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 								List<? extends ExpSyncDoc> videos, IFileProvider fileProvider,
-								OnProcess proc, OnDocsOk docOk, OnError errHandler, int blocksize)
+								OnProcess proc, JProtocol.OnDocsOk docOk, OnError errHandler, int blocksize)
 			throws IOException, AnsonException, TransException {
 
 		SessionInf user = client.ssInfo();

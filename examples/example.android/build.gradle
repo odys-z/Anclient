@@ -27,14 +27,14 @@ allprojects {
     }
 
     repositories {
-//        mavenLocal()
+        mavenLocal()
         // mavenCentral(){ mavenContent { releasesOnly() } }
-        google()
-        mavenCentral()
-        jcenter()
         maven() {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }
+        mavenCentral()
+        google()
+        jcenter()
     }
 }
 

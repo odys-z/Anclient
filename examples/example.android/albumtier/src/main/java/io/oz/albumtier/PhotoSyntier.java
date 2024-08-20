@@ -1,6 +1,7 @@
 package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -167,14 +169,14 @@ public class PhotoSyntier extends SynclientierMvp {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #pushBlocks(String, List, OnProcess, OnDocOk, OnError...)}
+	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
 	 *
 	 * @return list of response
 	 */
 	public List<DocsResp> syncVideos(List<? extends ExpSyncDoc> videos,
-				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
+				OnProcess proc, OnDocsOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
-		return pushBlocks(meta.tbl, videos, proc, docOk, onErr);
+		return pushBlocks(meta.tbl, videos, proc, docsOk, onErr);
 	}
 
 	/**
@@ -398,10 +400,10 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * @return this
 	 */
 	public PhotoSyntier asyncPhotosUp(List<? extends ExpSyncDoc> photos,
-									  OnProcess proc, OnDocsOk docOk, OnError onErr) {
+									  OnProcess proc, OnDocsOk docsOk, OnError onErr) {
 		new Thread(() -> {
 			try {
-				syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docOk);
+				syncUp(meta.tbl, photos, client.ssInfo().uid(), proc, docsOk);
 			} catch (IOException e) {
 				onErr.err(MsgCode.exIo, e.getClass().getName());
 			} catch (AnsonException e) {
@@ -458,7 +460,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	/**
 	 * Helper for compose file uploading responses to readable string
 	 * @param template, "size {resps.size}, ignored {duplicate error}"
-	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}. 
+	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}.
 	 * @return readable message
 	 */
 	public static String composeFilesMsg(String template, List<DocsResp> resps) {
@@ -467,8 +469,8 @@ public class PhotoSyntier extends SynclientierMvp {
 			int ignore = 0;
 			int size = 0;
 			for(DocsResp r : resps) {
-//				if (r.xdoc.syncFlag == SyncFlag.deny)
-//					ignore++;
+				if (r.xdoc == null)
+					ignore++;
 				size++;
 			}
 			msg = String.format(template, size, ignore);
