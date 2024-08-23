@@ -1,5 +1,7 @@
 package io.odysz.jclient;
 
+import static io.odysz.common.LangExt.isblank;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
@@ -40,6 +42,8 @@ public class SessionClient {
 	static boolean verbose;
 	public static void verbose(boolean v) { verbose = v;}
 
+	protected final String myservRt;
+
 	protected SessionInf ssInf;
 	public SessionInf ssInfo () { return ssInf; }
 
@@ -61,8 +65,9 @@ public class SessionClient {
 	 * Session login response from server.
 	 * @param sessionInfo
 	 */
-	protected SessionClient(SessionInf sessionInfo) {
+	protected SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
+		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 	}
 	
 	/**
@@ -71,8 +76,10 @@ public class SessionClient {
 	 * @param pswdPlain 
 	 * @throws SsException 
 	 */
-	public SessionClient(AnSessionResp r, String pswdPlain) throws SsException {
+	public SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
 		try {
+			myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
+
 			ssInf = r.ssInf();
 			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
 			profile = r.profile();

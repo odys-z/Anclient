@@ -39,7 +39,7 @@ public class Clients {
 	/**
 	 * @since 0.4.31 default verbose is false.
 	 */
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 
 	public static String servRt;
 
@@ -114,7 +114,7 @@ public class Clients {
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			SessionClient c = new SessionClient((AnSessionResp) resp.body(0), pswdPlain);
+			SessionClient c = new SessionClient(Clients.servRt, (AnSessionResp) resp.body(0), pswdPlain);
 
 			if (mac != null && mac.length > 0)
 				c.ssInfo().device(mac[0]);
@@ -153,7 +153,7 @@ public class Clients {
 						Utils.logi(resp.toString());
 
 					if (AnsonMsg.MsgCode.ok == resp.code()) {
-						onOk.ok(new SessionClient((AnSessionResp) resp.body(0), pswdPlain));
+						onOk.ok(new SessionClient(Clients.servRt, (AnSessionResp) resp.body(0), pswdPlain));
 					}
 					else 
 						onErr.err(resp.code(), "loging failed\ncode: %s\nerror: %s", resp.code().name(), ((AnsonResp)resp.body(0)).msg());	
@@ -198,7 +198,7 @@ public class Clients {
 		EchoReq req = new EchoReq(null);
 		req.a(A.echo);
 
-		InsecureClient client = new InsecureClient();
+		InsecureClient client = new InsecureClient(Clients.servRt);
 		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
 
 		Anson.verbose = true;

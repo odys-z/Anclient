@@ -9,8 +9,8 @@ import io.odysz.semantics.SessionInf;
  */
 public class InsecureClient extends SessionClient {
 
-	public InsecureClient() {
-		super(robotSsInf());
+	public InsecureClient(final String servRt) {
+		super(servRt, robotSsInf());
 	}
 
 	protected static SessionInf robotSsInf() {
