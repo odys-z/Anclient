@@ -69,61 +69,14 @@ public class Clients {
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
-		return loginWithUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
+		return new SessionClient(servRt, null).loginWithUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
 	}
 
-	/**
-	 * Login and return a client instance (with session managed by jserv).
-	 * 
-	 * <h5>Note since anclient.java 1.4.14</h5>
-	 * This module uses defualt url root initialized with {@link #init(String, boolean...)}. 
-	 * 
-	 * @param uri
-	 * @param uid
-	 * @param pswdPlain
-	 * @param mac
-	 * @return a SessionClient instance if login succeed.
-	 * @throws IOException
-	 * @throws SemanticException
-	 * @throws AnsonException
-	 * @throws SsException
-	 * @since 2.0.0
-	 */
-	public static SessionClient loginWithUri(String uri, String uid, String pswdPlain, String... mac)
-			throws IOException, SemanticException, AnsonException, SsException {
-		byte[] iv =   AESHelper.getRandom();
-		String iv64 = AESHelper.encode64(iv);
-		if (uid == null || pswdPlain == null)
-			throw new SemanticException("user id and password can not be null.");
-		String tk64;
-		try {
-			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
-		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
-			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
-		}
-		
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
-		reqv11.uri(uri);
-
-		HttpServClient httpClient = new HttpServClient();
-		String url = servUrl(Port.session);
-
-		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
-		if (Clients.verbose)
-			Utils.logi(resp.toString());
-
-		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			SessionClient c = new SessionClient(Clients.servRt, (AnSessionResp) resp.body(0), pswdPlain);
-
-			if (mac != null && mac.length > 0)
-				c.ssInfo().device(mac[0]);
-		
-			return c;
-		}
-		else throw new SsException(
-				"loging failed\ncode: %s\nerror: %s",
-				resp.code(), ((AnsonResp)resp.body(0)).msg());
+	public static SessionClient loginWithUri(String clienturi, String uid, String pswd, String ... device)
+			throws SemanticException, AnsonException, SsException, IOException {
+		if (isblank(servRt))
+			throw new AnsonException(0, "The root path is empty. Call Clients#init(jserv) first.");
+		return new SessionClient(servRt, null).loginWithUri(clienturi, uid, pswd, isNull(device) ? null : device[0]);
 	}
 	
 	/** Login asynchronously.
@@ -170,7 +123,6 @@ public class Clients {
 	 * @return url, e.g. http://localhost:8080/query.serv?conn=null
 	 */
 	static String servUrl(IPort port) {
-		// Since version for semantier, this will return without conn id. 
 		if (isblank(servRt))
 			throw new AnsonException(0, "The root path is empty. Call init(jserv) first.");
 		return String.format("%s/%s", servRt, port.url());

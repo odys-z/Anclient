@@ -25,6 +25,7 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jserv.x.SsException;
+import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.jsession.HeartBeat;
 import io.odysz.semantic.tier.docs.DocsReq;
@@ -65,7 +66,7 @@ public class SessionClient {
 	 * Session login response from server.
 	 * @param sessionInfo
 	 */
-	protected SessionClient(final String jservRoot, SessionInf sessionInfo) {
+	public SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 	}
@@ -86,6 +87,67 @@ public class SessionClient {
 		} catch (GeneralSecurityException | IOException e) {
 			throw new SsException(e.getMessage());
 		}
+	}
+
+	/**
+	 * Login and return a client instance (with session managed by jserv).
+	 * 
+	 * <h5>Note: since 2.0.0, deprecating static way of {@link Clients#servRt}
+	 * since anclient.java 1.4.14</h5>
+	 * This class uses instance's url root jserv, which is copied from {@link Clients#servRt}
+	 * that is usually be initialized with {@link Clients#init(String, boolean...)}. 
+	 * 
+	 * @param uri
+	 * @param uid
+	 * @param pswdPlain
+	 * @param mac
+	 * @return a SessionClient instance if login has succeed.
+	 * @throws IOException
+	 * @throws SemanticException
+	 * @throws AnsonException
+	 * @throws SsException
+	 * @since 2.0.0
+	 */
+	public SessionClient loginWithUri(String uri, String uid, String pswdPlain, String... mac)
+			throws IOException, SemanticException, AnsonException, SsException {
+		byte[] iv =   AESHelper.getRandom();
+		String iv64 = AESHelper.encode64(iv);
+		if (uid == null || pswdPlain == null)
+			throw new SemanticException("user id and password can not be null.");
+		String tk64;
+		try {
+			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
+		}
+		
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
+		reqv11.uri(uri);
+
+		HttpServClient httpClient = new HttpServClient();
+		// String url = Clients.servUrl(Port.session);
+		String url = servUrl(Port.session); 
+
+		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+		if (Clients.verbose)
+			Utils.logi(resp.toString());
+
+		if (AnsonMsg.MsgCode.ok == resp.code()) {
+			SessionClient c = new SessionClient(myservRt, (AnSessionResp) resp.body(0), pswdPlain);
+
+			if (mac != null && mac.length > 0)
+				c.ssInfo().device(mac[0]);
+		
+			return c;
+		}
+		else throw new SsException(
+				"loging failed\ncode: %s\nerror: %s",
+				resp.code(), ((AnsonResp)resp.body(0)).msg());
+	}
+
+	String servUrl(IPort p) {
+		return String.format("%s/%s", myservRt, p.url());
 	}
 
 	/**
@@ -192,8 +254,7 @@ public class SessionClient {
 		if (act != null && act.length > 0)
 			header.act(act);
 		
-		return (AnsonMsg<AnUpdateReq>) jmsg.header(header) 
-					;//.body(itm);
+		return (AnsonMsg<AnUpdateReq>) jmsg.header(header);
 	}
 
 	/**
@@ -331,7 +392,7 @@ public class SessionClient {
 	}
 
 	/**
-	 * Submit request.
+	 * Submit a request.
 	 * 
 	 * @param <R> request type
 	 * @param <A> answer type
@@ -346,15 +407,15 @@ public class SessionClient {
 	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, OnError err)
 			throws SemanticException, IOException, AnsonException {
     	if (verbose) {
-    		Utils.logi(Clients.servUrl(req.port()));
+    		Utils.logi(servUrl(req.port()));
     		Utils.logAnson(req);
     	}
     	HttpServClient httpClient = new HttpServClient();
-  		AnsonMsg<AnsonResp> resp = httpClient.post(Clients.servUrl(req.port()), req);
+  		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(req.port()), req);
 
   		MsgCode code = resp.code();
 
-		if(Clients.verbose) {
+		if(verbose) {
 			Utils.printCaller(false);
 			Utils.logAnson(resp);
 		}
