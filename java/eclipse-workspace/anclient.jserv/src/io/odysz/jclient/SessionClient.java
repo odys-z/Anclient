@@ -410,6 +410,11 @@ public class SessionClient {
     		Utils.logi(servUrl(req.port()));
     		Utils.logAnson(req);
     	}
+    	
+    	if (isblank(req.body(0).a()))
+    		throw new AnsonException(0,
+    			"Since anclient.java 0.5, jserv 2.0.0, empty a-tag is forced for session-required request.");
+    	
     	HttpServClient httpClient = new HttpServClient();
   		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(req.port()), req);
 
