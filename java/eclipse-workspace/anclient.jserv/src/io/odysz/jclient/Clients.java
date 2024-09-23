@@ -153,7 +153,7 @@ public class Clients {
 		InsecureClient client = new InsecureClient(Clients.servRt);
 		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
 
-		Anson.verbose = true;
+		// Anson.verbose = true;
 		AnsonResp resp = client.commit(jmsg, errCtx);
 
 		return resp;
