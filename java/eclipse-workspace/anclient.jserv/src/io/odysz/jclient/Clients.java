@@ -6,7 +6,6 @@ import static io.odysz.common.LangExt.isNull;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
