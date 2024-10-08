@@ -69,6 +69,8 @@ public class SessionClient {
 	public SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
+		if (isblank(this.myservRt))
+			throw new AnsonException(0, "Initialized final field myservRt is empty.");
 	}
 	
 	/**
@@ -80,6 +82,8 @@ public class SessionClient {
 	public SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
 		try {
 			myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
+			if (isblank(this.myservRt))
+				throw new AnsonException(0, "Initialized final field myservRt is empty.");
 
 			ssInf = r.ssInf();
 			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
