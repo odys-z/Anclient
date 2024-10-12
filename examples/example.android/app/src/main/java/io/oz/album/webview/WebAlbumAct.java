@@ -1,11 +1,16 @@
 package io.oz.album.webview;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 import io.oz.R;
 import io.oz.album.AndErrorCtx;
@@ -50,4 +55,26 @@ public class WebAlbumAct extends AppCompatActivity {
 		WebView wv = findViewById(R.id.wv);
 		WelcomeAct.reloadWeb(singleton, wv, this, webpageId);
 	}
+
+	@Override
+	public void onConfigurationChanged(@NotNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		WindowManager.LayoutParams attrs = getWindow().getAttributes();
+
+		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+			getWindow().setAttributes(attrs);
+
+			if(this.getSupportActionBar() != null)
+				getSupportActionBar().hide();
+		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+			getWindow().setAttributes(attrs);
+
+			if(this.getSupportActionBar() != null)
+				this.getSupportActionBar().show();
+		}
+	}
+
 }

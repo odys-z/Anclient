@@ -5,6 +5,12 @@
       <config />
     </shared>
     <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout-w600dp/welcome.xml">
+        <config>
+          <state>Landscape</state>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/welcome.xml">
         <config>
           <theme>@style/AppTheme</theme>
@@ -33,9 +39,6 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/SynclientierMvp.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/SynclientierMvp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +48,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\Alice\.android\avd\Pixel_2_API_26.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[8GH4C20428007092]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -342,9 +345,19 @@
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/file-picker/src/main/java/com/hbisoft/pickit/Utils.java</url>
-          <line>194</line>
-          <option name="timeStamp" value="34" />
+          <url>file://$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java</url>
+          <line>448</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java</url>
+          <line>395</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java</url>
+          <line>434</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -356,12 +369,15 @@
     </pin-to-top-manager>
     <watches-manager>
       <configuration name="AndroidRunConfigurationType">
-        <watch expression=" lstJserv.getTitle()" />
+        <watch expression="lastmodify.toString()" language="JAVA" />
         <watch expression="getPreferenceManager().getDefaultSharedPreferences(this)" language="JAVA" />
         <watch expression="Paths.get(f.fullpath()).getFileName().toString()" language="JAVA" />
         <watch expression=" getDataColumn(context, null, selection, selectionArgs)" language="JAVA" />
         <watch expression="uri.getAuthority()" language="JAVA" />
         <watch expression="uri.getAuthority()" />
+        <watch expression=" ~WindowManager.LayoutParams.FLAG_FULLSCREEN" />
+        <watch expression="attrs.flags" />
+        <watch expression="(Build.VERSION.SDK_INT" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

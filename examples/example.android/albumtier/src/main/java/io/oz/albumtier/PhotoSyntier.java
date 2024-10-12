@@ -44,7 +44,7 @@ import io.oz.album.tier.PhotoRec;
  *
  */
 public class PhotoSyntier extends SynclientierMvp {
-	public static int blocksize = 3 * 1024 * 1024;
+//	public static int blocksize = 3 * 1024 * 1024;
 
 	protected static PhotoMeta meta;
 
@@ -144,7 +144,11 @@ public class PhotoSyntier extends SynclientierMvp {
 	}
 
 	/**
+<<<<<<< HEAD
 	 * @see #syncVideos(List, OnProcess, OnOk, OnError...)
+=======
+	 * @see #syncVideos(List, OnProcess, OnDocsOk, OnError...)
+>>>>>>> d342decc71fb78781fc3bad1cc075d1422a263c6
      *
 	 * @return list of response
 	 */
@@ -169,7 +173,11 @@ public class PhotoSyntier extends SynclientierMvp {
 
 	/**
 	 * Push up videos (larg files) with
+<<<<<<< HEAD
 	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
+=======
+	 * {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}
+>>>>>>> d342decc71fb78781fc3bad1cc075d1422a263c6
 	 *
 	 * @return list of response
 	 */
@@ -459,24 +467,23 @@ public class PhotoSyntier extends SynclientierMvp {
 
 	/**
 	 * Helper for compose file uploading responses to readable string
-	 * @param template, "size {resps.size}, ignored {duplicate error}"
-	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}.
-	 * @return readable message
+	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}. 
+	 * @return [size, denied, invalid]
 	 */
-	public static String composeFilesMsg(String template, List<DocsResp> resps) {
-		String msg = null;
+	public static int[] extractErrorCodes(List<DocsResp> resps) {
 		if (resps != null) {
-			int ignore = 0;
+			int ignored = 0;
+			int invalid = 0;
 			int size = 0;
 			for(DocsResp r : resps) {
 				if (r.xdoc == null)
-					ignore++;
+					ignored++;
 				size++;
 			}
-			msg = String.format(template, size, ignore);
+			return new int[] { size, ignored, invalid };
 		}
 
-		return msg;
+		return new int[] {0, 0, 0};
 	}
 
 }

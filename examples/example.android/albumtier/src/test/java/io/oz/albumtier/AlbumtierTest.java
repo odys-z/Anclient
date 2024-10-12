@@ -197,9 +197,9 @@ public class AlbumtierTest {
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
 
 		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			String template = "Upload files: %s, ignored: %s";
-			assertEquals( String.format(template, 2, 0),
-						  PhotoSyntier.composeFilesMsg(template, resps));
+			int[] report = PhotoSyntier.extractErrorCodes(resps);
+			assertEquals( 2, report[0] );
+			assertEquals( 0, report[1] );
 			res[0]++;
 		}, singleton.errCtx);
 
@@ -208,9 +208,9 @@ public class AlbumtierTest {
 		Thread.sleep(1000);
 
 		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			String template = "Upload files: %s, ignored: %s";
-			assertEquals( String.format(template, 2, 1),
-						  PhotoSyntier.composeFilesMsg(template, resps));
+			int[] report = PhotoSyntier.extractErrorCodes(resps);
+			assertEquals( 2, report[0] );
+			assertEquals( 1, report[1] );
 			res[0]++;
 		}, singleton.errCtx);
 
