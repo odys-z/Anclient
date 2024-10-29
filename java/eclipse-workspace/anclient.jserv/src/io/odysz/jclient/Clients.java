@@ -75,7 +75,9 @@ public class Clients {
 			throws SemanticException, AnsonException, SsException, IOException {
 		if (isblank(servRt))
 			throw new AnsonException(0, "The root path is empty. Call Clients#init(jserv) first.");
-		return new SessionClient(servRt, null).loginWithUri(clienturi, uid, pswd, isNull(device) ? null : device[0]);
+		return new SessionClient(servRt, null)
+			.loginWithUri(clienturi, uid, pswd,
+						  isNull(device) ? null : device[0]);
 	}
 	
 	/** Login asynchronously.

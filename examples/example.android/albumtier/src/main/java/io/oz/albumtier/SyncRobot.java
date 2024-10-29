@@ -30,7 +30,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 
 /**
- * A robot is only used for test.
+ * A robot for background pushing.
  * 
  * @author odys-z@github.com
  */
@@ -137,7 +137,6 @@ public class SyncRobot extends SemanticObject implements IUser {
 		if (tempDirs != null)
 		  for (String temp : tempDirs) {
 			try {
-				// Utils.logi("Deleting: %s", temp);
 				FileUtils.deleteDirectory(new File(temp));
 			} catch (IOException e) {
 				Utils.warn("Can not delete folder: %s.\n%s", temp, e.getMessage());
