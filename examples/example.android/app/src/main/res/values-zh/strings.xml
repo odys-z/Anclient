@@ -10,7 +10,7 @@
     <string name="userid_title"    >登录 ID</string>
     <string name="txt_prefs_user"  >用 戶 设 置</string>
     <string name="txt_scanjserv"   >掃描文件服務地址</string>
-    <string name="t_synch_ok"      >%s 文件已同步</string>
+    <string name="t_synch_ok"      >%s 文件已同步 (重複上傳: %s, 忽略: %s)</string>
     <string name="txt_prefs_device">设 备 信 息</string>
     <string name="devide_title"    >设备名</string>
     <string name="login_succeed"   >登录成功。</string>
