@@ -31,6 +31,7 @@ import io.odysz.transact.x.TransException;
 
 /**
  * A robot is only used for test.
+ * @deprecated
  * 
  * @author odys-z@github.com
  */

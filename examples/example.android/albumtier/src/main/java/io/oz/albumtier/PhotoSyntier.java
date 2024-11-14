@@ -5,6 +5,7 @@ import static io.odysz.common.LangExt.isblank;
 import static io.oz.albumtier.AlbumContext.clientUri;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
@@ -109,7 +110,7 @@ public class PhotoSyntier extends SynclientierMvp {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 			else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-		} catch (AnsonException | TransException e) {
+		} catch (AnsonException | TransException | SQLException e) {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 			else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -134,7 +135,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} catch (AnsonException | TransException e) {
+			} catch (AnsonException | TransException | SQLException e) {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -144,11 +145,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	}
 
 	/**
-<<<<<<< HEAD
-	 * @see #syncVideos(List, OnProcess, OnOk, OnError...)
-=======
 	 * @see #syncVideos(List, OnProcess, OnDocsOk, OnError...)
->>>>>>> d342decc71fb78781fc3bad1cc075d1422a263c6
      *
 	 * @return list of response
 	 */
@@ -354,7 +351,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				resp = synQueryPathsPage(page, meta.tbl, AlbumPort.album);
 				try {
 					onOk.ok(resp);
-				} catch (AnsonException | SemanticException | IOException e) {
+				} catch (AnsonException | SemanticException | IOException | SQLException e) {
 					e.printStackTrace();
 				}
 			} catch (IOException e) {
@@ -392,7 +389,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
-			} catch (AnsonException | TransException e) {
+			} catch (AnsonException | TransException | SQLException e) {
 				if (isNull(onErr))
 					errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
 				else onErr[0].err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
@@ -459,7 +456,7 @@ public class PhotoSyntier extends SynclientierMvp {
 				ok.ok(resp);
 			} catch (IOException e) {
 				err.err(MsgCode.exIo, e.getMessage());
-			} catch (TransException e) {
+			} catch (TransException | SQLException e) {
 				err.err(MsgCode.exSemantic, e.getMessage());
 			}
 		}).start();
