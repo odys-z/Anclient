@@ -190,7 +190,7 @@ public class SessionClient {
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
-				catch (TransException | AnsonException | IOException e) {
+				catch (TransException | AnsonException | IOException | SQLException e) {
 					failed++;
 					if (onBroken != null)
 						onBroken.err(MsgCode.exSession, "heart link broken");
