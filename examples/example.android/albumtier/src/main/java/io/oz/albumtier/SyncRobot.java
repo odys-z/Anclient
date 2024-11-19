@@ -30,7 +30,8 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 
 /**
- * A robot for background pushing.
+ * A robot only used for test.
+ * @deprecated
  * 
  * @author odys-z@github.com
  */

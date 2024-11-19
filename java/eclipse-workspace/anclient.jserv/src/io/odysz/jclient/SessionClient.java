@@ -123,14 +123,14 @@ public class SessionClient {
 			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
-			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
+			throw new SsException("AES encrpyt failed: %s\nCause: %s",
+								e.getMessage(), e.getCause().getMessage());
 		}
 		
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
-		reqv11.uri(uri);
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
+										.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
-		// String url = Clients.servUrl(Port.session);
 		String url = servUrl(Port.session); 
 
 		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
