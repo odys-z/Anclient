@@ -59,7 +59,7 @@ public class AlbumtierTest {
 //			fail("Why? Is server started? Or try to wait longer?");
 
 		// 2. clean
-		singleton.tier.del(singleton.userInf.device, testimg);
+		singleton.tierdel.del(singleton.userInf.device, testimg);
 		
 		// 3. upload photo
 		onImagePicked();
@@ -81,7 +81,7 @@ public class AlbumtierTest {
 						Utils.warn(t, (Object[])v);
 						fail("POCC");
 					});
-		singleton.tier.fileProvider(new IFileProvider() {
+		singleton.tierdel.fileProvider(new IFileProvider() {
 
 			@Override
 			public long meta(ExpSyncDoc f) throws IOException {
@@ -109,7 +109,7 @@ public class AlbumtierTest {
 	}
 
 	void startSynchQuery(PathsPage page) {
-        singleton.tier.asynQueryDocs(mList, page,
+        singleton.tierdel.asynQueryDocs(mList, page,
 			onSyncQueryRespons,
 			(c, r, args) -> {
 				Utils.warn("%s, %s, %s", AlbumContext.clientUri, r, args == null ? "null" : args[0]);
@@ -164,7 +164,7 @@ public class AlbumtierTest {
      * @throws TransException 
      */
    	void onImagePicked() throws TransException, IOException {
-   		singleton.tier.asyVideos(mList,
+   		singleton.tierdel.asyVideos(mList,
    				photoProc, photosPushed, singleton.errCtx);
 	}
    	
@@ -196,8 +196,8 @@ public class AlbumtierTest {
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testimg));
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
 
-		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			int[] report = PhotoSyntier.extractErrorCodes(resps);
+		singleton.tierdel.asyVideos(filelist, photoProc, (resps) -> {
+			int[] report = PhotoSyntierDel.extractErrorCodes(resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 0, report[1] );
 			res[0]++;
@@ -207,8 +207,8 @@ public class AlbumtierTest {
 		singleton.tier.del(singleton.userInf.device, testdoc);
 		Thread.sleep(1000);
 
-		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			int[] report = PhotoSyntier.extractErrorCodes(resps);
+		singleton.tierdel.asyVideos(filelist, photoProc, (resps) -> {
+			int[] report = PhotoSyntierDel.extractErrorCodes(resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 1, report[1] );
 			res[0]++;

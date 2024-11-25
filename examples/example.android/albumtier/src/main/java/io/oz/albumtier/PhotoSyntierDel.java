@@ -44,7 +44,7 @@ import io.oz.album.tier.PhotoRec;
  * @author odys-z@github.com
  *
  */
-public class PhotoSyntier extends SynclientierMvp {
+public class PhotoSyntierDel extends SynclientierDel {
 //	public static int blocksize = 3 * 1024 * 1024;
 
 	protected static PhotoMeta meta;
@@ -61,12 +61,12 @@ public class PhotoSyntier extends SynclientierMvp {
 	/**
 	 * @param clientUri - the client function uri this instance will be used for.
 	 */
-	public PhotoSyntier(String clientUri, String device, OnError errCtx)
+	public PhotoSyntierDel(String clientUri, String device, OnError errCtx)
 			throws SemanticException, IOException {
 		super(clientUri, errCtx);
 	}
 	
-	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
+	public PhotoSyntierDel asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.loginAsync(uid, pswd, (client) -> {
 			this.client = client;
 			onLogin(client);
@@ -94,7 +94,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	 *
 	 * @return this
 	 */
-	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
+	public PhotoSyntierDel asyGetSettings(OnOk onOk, OnError... onErr) {
 	  new Thread(() -> {
 		try {
 			AnsonHeader header = client.header()
@@ -119,7 +119,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	  return this;
 	}
 
-	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
+	public PhotoSyntierDel asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
@@ -149,7 +149,7 @@ public class PhotoSyntier extends SynclientierMvp {
      *
 	 * @return list of response
 	 */
-	public PhotoSyntier asyVideos(List<? extends ExpSyncDoc> videos,
+	public PhotoSyntierDel asyVideos(List<? extends ExpSyncDoc> videos,
 				OnProcess proc, OnDocsOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
 		new Thread(() -> {
@@ -336,7 +336,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<? extends ExpSyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public PhotoSyntierDel asynQueryDocs(List<? extends ExpSyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
@@ -372,7 +372,7 @@ public class PhotoSyntier extends SynclientierMvp {
 		return this;
 	}
 
-	public PhotoSyntier asyRegisterDevice(String device, String devname, OnOk ok, OnError... onErr) {
+	public PhotoSyntierDel asyRegisterDevice(String device, String devname, OnOk ok, OnError... onErr) {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
@@ -404,7 +404,7 @@ public class PhotoSyntier extends SynclientierMvp {
 	 * TODO: to be changed to handling short text.
 	 * @return this
 	 */
-	public PhotoSyntier asyncPhotosUp(List<? extends ExpSyncDoc> photos,
+	public PhotoSyntierDel asyncPhotosUp(List<? extends ExpSyncDoc> photos,
 									  OnProcess proc, OnDocsOk docsOk, OnError onErr) {
 		new Thread(() -> {
 			try {

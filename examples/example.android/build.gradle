@@ -5,6 +5,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
+        // classpath 'com.android.tools.build:gradle:7.5.1'
+
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -23,7 +25,9 @@ allprojects {
         anclient_ver = "0.5.0-SNAPSHOT"
         jserv_ver = "2.0.0-SNAPSHOT"
         album_lib_ver = "0.5.0-SNAPSHOT"
-        sourceCompatibility = JavaVersion.VERSION_1_8
+
+        // sourceCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
     }
 
     repositories {

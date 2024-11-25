@@ -17,6 +17,7 @@ import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.Profiles;
+import io.oz.syndoc.client.PhotoSyntier;
 
 /**
  * Album client context.
@@ -94,6 +95,7 @@ public class AlbumContext {
     }
 
 	public PhotoSyntier tier;
+	public PhotoSyntierDel tierdel;
 
     public SessionInf userInf;
 

@@ -65,7 +65,7 @@ import io.oz.album.x.DocsException;
  * 
  * @author odys-z@github.com
  */
-public class SynclientierMvp extends Semantier {
+public class SynclientierDel extends Semantier {
 	public boolean verbose = false;
 
 	protected SessionClient client;
@@ -83,7 +83,7 @@ public class SynclientierMvp extends Semantier {
 	 * @param size must be multiple of 12
 	 * @throws SemanticException
 	 */
-	public SynclientierMvp blockSize(int size) throws SemanticException {
+	public SynclientierDel blockSize(int size) throws SemanticException {
 		if (size % 12 != 0)
 			throw new SemanticException("Block size must be multiple of 12.");
 		blocksize = size;
@@ -98,7 +98,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws SQLException 
 	 * @throws SemanticException 
 	 */
-	public SynclientierMvp(String clientUri, OnError errCtx)
+	public SynclientierDel(String clientUri, OnError errCtx)
 			throws SemanticException, IOException {
 		this.errCtx = errCtx;
 		this.uri = clientUri;
@@ -112,13 +112,13 @@ public class SynclientierMvp extends Semantier {
 	 * @param root
 	 * @return this
 	 */
-	public SynclientierMvp tempRoot(String root) {
+	public SynclientierDel tempRoot(String root) {
 		tempath = root; 
 		return this;
 	}
 	
 	IFileProvider fileProvider;
-	public SynclientierMvp fileProvider(IFileProvider p) {
+	public SynclientierDel fileProvider(IFileProvider p) {
 		this.fileProvider = p;
 		return this;
 	}
@@ -187,7 +187,7 @@ public class SynclientierMvp extends Semantier {
 	 * @throws TransException 
 	 * @throws GeneralSecurityException 
 	 */
-	public SynclientierMvp login(String workerId, String device, String pswd)
+	public SynclientierDel login(String workerId, String device, String pswd)
 			throws AnsonException, IOException, TransException, GeneralSecurityException {
 
 		client = Clients.loginWithUri(workerId, pswd, device);
@@ -204,7 +204,7 @@ public class SynclientierMvp extends Semantier {
 	 * @return this
 	 * @throws TransException 
 	 */
-	public SynclientierMvp onLogin(SessionClient client) {
+	public SynclientierDel onLogin(SessionClient client) {
 		SessionInf ssinf = client.ssInfo();
 		try {
 			robot = new SyncRobot(ssinf.uid())
