@@ -38,7 +38,7 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.albumtier.AlbumContext;
-import io.oz.albumtier.PhotoSyntier;
+import io.oz.syndoc.client.PhotoSyntier;
 
 /**
  * @since 0.3.0
