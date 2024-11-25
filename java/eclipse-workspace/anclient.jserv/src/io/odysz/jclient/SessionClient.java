@@ -69,6 +69,8 @@ public class SessionClient {
 	public SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
+		if (isblank(this.myservRt))
+			throw new AnsonException(0, "Initialized final field myservRt is empty.");
 	}
 	
 	/**
@@ -80,6 +82,8 @@ public class SessionClient {
 	public SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
 		try {
 			myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
+			if (isblank(this.myservRt))
+				throw new AnsonException(0, "Initialized final field myservRt is empty.");
 
 			ssInf = r.ssInf();
 			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
@@ -119,14 +123,14 @@ public class SessionClient {
 			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
-			throw new SsException("AES encrpyt failed: %s\nCause: %s", e.getMessage(), e.getCause().getMessage());
+			throw new SsException("AES encrpyt failed: %s\nCause: %s",
+								e.getMessage(), e.getCause().getMessage());
 		}
 		
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
-		reqv11.uri(uri);
+		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
+										.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
-		// String url = Clients.servUrl(Port.session);
 		String url = servUrl(Port.session); 
 
 		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
@@ -186,7 +190,7 @@ public class SessionClient {
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
-				catch (TransException | AnsonException | IOException e) {
+				catch (TransException | AnsonException | IOException | SQLException e) {
 					failed++;
 					if (onBroken != null)
 						onBroken.err(MsgCode.exSession, "heart link broken");

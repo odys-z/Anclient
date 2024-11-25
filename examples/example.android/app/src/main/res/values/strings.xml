@@ -45,7 +45,7 @@
     <string name="key_dev_cate"      translatable="false">key-device-cate</string>
     <string name="key_device"        translatable="false">key-device</string>
 
-    <string name="t_synch_ok"      >%s files has been synchronized</string>
+    <string name="t_synch_ok"      >%s files has been synchronized (duplicate: %s, ignored: %s)</string>
     <string name="txt_login"       >User Login</string>
     <string name="txt_please_login">Please Login</string>
     <string name="txt_prefs_device">Device Information</string>

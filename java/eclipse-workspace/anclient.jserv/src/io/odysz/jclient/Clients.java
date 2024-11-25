@@ -6,7 +6,6 @@ import static io.odysz.common.LangExt.isNull;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
@@ -76,7 +75,9 @@ public class Clients {
 			throws SemanticException, AnsonException, SsException, IOException {
 		if (isblank(servRt))
 			throw new AnsonException(0, "The root path is empty. Call Clients#init(jserv) first.");
-		return new SessionClient(servRt, null).loginWithUri(clienturi, uid, pswd, isNull(device) ? null : device[0]);
+		return new SessionClient(servRt, null)
+			.loginWithUri(clienturi, uid, pswd,
+						  isNull(device) ? null : device[0]);
 	}
 	
 	/** Login asynchronously.

@@ -25,6 +25,7 @@ import android.provider.OpenableColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -41,8 +42,9 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
-import io.odysz.jclient.tier.ErrorCtx;
+import io.oz.albumtier.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
+import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.fpick.activity.ImagePickActivity;
 import io.oz.fpick.activity.VideoPickActivity;
 
@@ -58,7 +60,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Objects;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -128,7 +129,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         if (clientext.state() == ConnState.Online) {
                             onMediasPicked(result);
-                        } else showMsg(R.string.msg_ignore_offline);
+                        } else showStatus(R.string.msg_ignore_offline);
                     }
                     reloadAlbum();
                 });
@@ -140,7 +141,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
                         if (clientext.state() == ConnState.Online) {
                             onFilesPicked(result);
-                        } else showMsg(R.string.msg_ignore_offline);
+                        } else showStatus(R.string.msg_ignore_offline);
                     }
                     reloadAlbum();
                 });
@@ -150,7 +151,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        showMsg(R.string.msg_login_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
+                        showStatus(R.string.msg_login_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
                     }
                     reloadAlbum();
                 });
@@ -170,11 +171,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         (client) -> {
                             runOnUiThread(this::reloadAlbum);
                         },
-                        (code, t, args) -> showMsg(R.string.t_login_failed, clientext.userInf.uid(),
+                        (code, t, args) -> showStatus(R.string.t_login_failed, clientext.userInf.uid(),
                                 AlbumApp.sharedPrefs.jserv()));
             }
         } catch (Exception e) {
-            showMsg(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
+            showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
         }
     }
 
@@ -182,10 +183,22 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
+        WindowManager.LayoutParams attrs = getWindow().getAttributes();
+
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            getWindow().setAttributes(attrs);
+
             findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+            if(this.getSupportActionBar() != null)
+                getSupportActionBar().hide();
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            getWindow().setAttributes(attrs);
+
             findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+            if(this.getSupportActionBar() != null)
+                this.getSupportActionBar().show();
         }
     }
 
@@ -237,7 +250,31 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * @param template string template, R.string.id
      * @param args     for String.format()
      */
-    void showMsg(int template, Object... args) {
+    void showDlg(int template, Object... args) {
+        /*
+        runOnUiThread(() -> {
+            String templ = getString(template);
+            if (templ != null && len(args) > 0) {
+                String msg = str(templ, args);
+                msgv.setText(msg);
+                msgv.setVisibility(View.VISIBLE);
+            }
+        });
+         */
+        String msg = getString(template);
+        if (msg != null && len(args) > 0) {
+            msg = str(msg, args);
+        }
+        new ComfirmDlg()
+                .dlgMsg(0, 0)
+                .msg(msg)
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg(this, "")
+                .live(8000);
+    }
+    void showStatus(int template, Object... args) {
         runOnUiThread(() -> {
             String templ = getString(template);
             if (templ != null && len(args) > 0) {
@@ -248,7 +285,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    void clearMsg() {
+    void showStatus(String msg) {
+        runOnUiThread(() -> {
+            if (msg != null && len(msg) > 0) {
+                msgv.setText(msg);
+                msgv.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    void clearStatus() {
         runOnUiThread(() -> msgv.setVisibility(View.GONE));
     }
 
@@ -275,7 +321,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     protected void startPrefsAct() {
-        clearMsg();
+        clearStatus();
         prefStarter.launch(new Intent(WelcomeAct.this, PrefsContentActivity.class));
     }
 
@@ -292,9 +338,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             Intent data = result.getData();
             if (data != null) {
                 ArrayList<? extends SyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
-                if (clientext.tier == null)
-                    showMsg(R.string.txt_please_login);
-                else clientext.tier
+                if (clientext.tier == null) {
+                    clearStatus();
+                    showDlg(R.string.txt_please_login);
+                }
+                else ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
 
@@ -329,11 +377,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return Files.newInputStream(Paths.get(f.fullpath()));
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
-                        })
+                        }))
                         .asyVideos(list,
-                                (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
+                                (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
-                                (resp, v) -> showMsg(R.string.t_synch_ok, list.size()),
+                                (resps) -> {
+                                    clearStatus();
+                                    int[] nums = PhotoSyntier.extractErrorCodes(resps);
+                                    showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 errCtx.prepare(msgv, R.string.msg_upload_failed));
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -376,10 +427,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     paths.add(getDocDescript(this, clientext.userInf.device, data.getData(), Build.VERSION.SDK_INT));
                 }
 
-                if (clientext.tier == null)
-                    showMsg(R.string.txt_please_login);
+                if (clientext.tier == null) {
+                    clearStatus();
+                    showDlg(R.string.txt_please_login);
+                }
                 else {
-                    clientext.tier
+                    ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
@@ -416,11 +469,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             public InputStream open(SyncDoc p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
-                        })
+                        }))
                         .asyVideos(paths,
-                            (r, rx, seq, total, rsp) -> showMsg(R.string.msg_templ_progress,
-                                    r, rx, total, (float) seq / total * 100),
-                            (resp, v) -> showMsg(R.string.t_synch_ok, paths.size()),
+                            (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                            (resps) -> {},
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
 
@@ -435,7 +487,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     protected void startPicking(Class<? extends BaseActivity> act) {
-        clearMsg();
+        clearStatus();
 
         Intent intt = new Intent(this, act);
         intt.putExtra(IS_NEED_CAMERA, true);

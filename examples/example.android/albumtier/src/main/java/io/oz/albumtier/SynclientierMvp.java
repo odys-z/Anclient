@@ -75,7 +75,7 @@ public class SynclientierMvp extends Semantier {
 
 	protected String tempath;
 
-	int blocksize = 3 * 1024 * 1024;
+	int blocksize = 24 * 1024 * 1024;
 
 	/**
 	 * Change default block size for performance. Default is 3 Mib.
@@ -545,10 +545,11 @@ public class SynclientierMvp extends Semantier {
 					q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
 
+					// start a thread?
 					respi = client.commit(q, errHandler);
 				}
                 
-				req = new AlbumReq(tbl).blockEnd(respi, user);
+				req = new AlbumReq(tbl).blockEnd(startAck, user);
 
 				q = client.userReq(uri, AlbumPort.album, req)
 							.header(header);
