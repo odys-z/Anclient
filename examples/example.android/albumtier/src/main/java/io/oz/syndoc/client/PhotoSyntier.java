@@ -15,8 +15,10 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -32,15 +34,13 @@ import io.oz.jserv.docs.syn.Doclientier;
 
 public class PhotoSyntier extends Doclientier {
 
-	String doctbl;
-
-	public PhotoSyntier(String sysuri, String synuri, ErrorCtx errCtx)
+	public PhotoSyntier(String sysuri, String synuri, String doctbl, ErrorCtx errCtx)
 			throws SemanticException, IOException {
-		super(sysuri, synuri, errCtx);
+		super(doctbl, sysuri, synuri, errCtx);
 	}
 
-	public PhotoSyntier(String clienturi, String device, OnError err) throws SemanticException, IOException {
-		this(clienturi, device, new ErrorCtx() {
+	public PhotoSyntier(String doctbl, String clienturi, String device, OnError err) throws SemanticException, IOException {
+		this(doctbl, clienturi, device, new ErrorCtx() {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}
 		});
 	}
@@ -106,7 +106,7 @@ public class PhotoSyntier extends Doclientier {
 					else page.add(p.fullpath());
 				}
 
-				resp = synQueryPathsPage(page, doctbl, AlbumPort.album);
+				resp = synQueryPathsPage(page, AlbumPort.album);
 				try {
 					onOk.ok(resp);
 				} catch (AnsonException | SemanticException | IOException | SQLException e) {
@@ -130,7 +130,7 @@ public class PhotoSyntier extends Doclientier {
 		return this;
 	}
 
-	public PhotoSyntierDel asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
+	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
@@ -179,6 +179,32 @@ public class PhotoSyntier extends Doclientier {
 			}
 		}).start();
 		return this;
+	}
+
+	/**
+	 * Push up videos (larg files) with
+	 * {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}
+     *
+	 * @return this (handle events with callbacks)
+	 */
+	public PhotoSyntier asyVideos(List<? extends ExpSyncDoc> videos,
+				OnProcess proc, OnOk docsOk, OnError ... onErr)
+			throws TransException, IOException {
+		new Thread(() -> {
+			try {
+				// syncVideos(videos, proc, docsOk, onErr);
+				pushBlocks(doctbl, videos, proc, docsOk, onErr);
+			} catch (TransException e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
+			} catch (IOException e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+			}
+		}).start();
+		return this;	
 	}
 
 	public DocsResp del(String device, String clientpath) {

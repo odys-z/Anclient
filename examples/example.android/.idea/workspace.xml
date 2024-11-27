@@ -39,11 +39,7 @@
   <component name="ChangeListManager">
     <list default="true" id="95781f9c-64bc-41b6-a27d-99fa49a3ab22" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntierDel.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/albumtier/PhotoSyntierDel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/syndoc/client/Synclientier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/syndoc/client/Synclientier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/albumtier/src/test/java/io/oz/albumtier/AlbumtierTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/test/java/io/oz/albumtier/AlbumtierTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/WelcomeAct.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/oz/album/client/PrefsContentActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/syndoc/client/PhotoSyntier.java" beforeDir="false" afterPath="$PROJECT_DIR$/albumtier/src/main/java/io/oz/syndoc/client/PhotoSyntier.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +145,7 @@
     "project.structure.last.edited": "Build Variants",
     "project.structure.proportion": "0.17",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "http.proxy",
+    "settings.editor.selected.configurable": "AndroidSdkUpdater",
     "show.do.not.copy.http.proxy.settings.to.gradle": "false"
   }
 }]]></component>
