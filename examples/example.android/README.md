@@ -19,7 +19,6 @@ The app can running on Android accessing local files and synchronizing files wit
 - [PhotoView](https://github.com/bm-x/PhotoView)
 
     This denpendency of FilePicker can not be synchronized since Nov 2024, from either google(), jcenter() or mavencentral(). It's now using soure package com.bm.library directly.
->>>>>>> 8f380c370c10b442abb44834500e6e64dca04396
 
 # Troubleshootings
 

@@ -15,10 +15,9 @@ import com.vincent.filepicker.Util;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 
-
-public class AndroidFile extends SyncDoc implements Parcelable {
+public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name

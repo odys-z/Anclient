@@ -7,7 +7,6 @@ package io.oz.fpick.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 
