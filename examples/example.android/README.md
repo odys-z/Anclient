@@ -16,6 +16,8 @@ The app can running on Android accessing local files and synchronizing files wit
 
 - Documents picker is based on [HBiSoft/PickiT](https://github.com/HBiSoft/PickiT)
 
+- 
+
 # Troubleshootings
 
 - 1 start Huawei Pro 30 for debug and adb device shows nothing

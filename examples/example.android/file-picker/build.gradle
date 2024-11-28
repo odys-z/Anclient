@@ -40,7 +40,7 @@ dependencies {
     implementation "com.github.bumptech.glide:annotations:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
-    implementation "com.bm.photoview:library:$bm_photoview_version"
+    // implementation "com.bm.photoview:library:$bm_photoview_version"
 
     // implementation 'pub.devrel:easypermissions:3.0.0'
 
