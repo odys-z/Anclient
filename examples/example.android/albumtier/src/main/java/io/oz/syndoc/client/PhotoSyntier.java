@@ -29,7 +29,6 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
-import io.oz.albumtier.PhotoSyntierDel;
 import io.oz.jserv.docs.syn.Doclientier;
 
 public class PhotoSyntier extends Doclientier {
@@ -183,7 +182,7 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}
+	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
      *
 	 * @return this (handle events with callbacks)
 	 */

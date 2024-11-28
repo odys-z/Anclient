@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -291,20 +293,19 @@ public abstract class BaseActivity extends FragmentActivity
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
-//    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-//    public static String[] storage_permissions_33 = {
-//            Manifest.permission.READ_MEDIA_IMAGES,
-//            Manifest.permission.READ_MEDIA_AUDIO,
-//            Manifest.permission.READ_MEDIA_VIDEO
-//    };
-    abstract protected String[] permissions();
-//    {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            return storage_permissions_33;
-//        } else {
-//            return storage_permissions;
-//        }
-//    }
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    public static String[] storage_permissions_33 = {
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_AUDIO,
+            Manifest.permission.READ_MEDIA_VIDEO
+    };
+    protected String[] permissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return storage_permissions_33;
+        } else {
+            return storage_permissions;
+        }
+    }
 
 //    @Override
 //    public void onPermissionsGranted(int requestCode, List<String> perms) {

@@ -1,253 +1,244 @@
-package com.vincent.filepicker.activity;
-
-import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_AUDIO;
-
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.vincent.filepicker.Constant;
-import com.vincent.filepicker.DividerListItemDecoration;
-import com.vincent.filepicker.ToastUtil;
-import com.vincent.filepicker.Util;
-import com.vincent.filepicker.filter.entity.AudioFile;
-import com.vincent.filepicker.filter.entity.BaseFile;
-import com.vincent.filepicker.filter.entity.Directory;
-
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
-
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import io.odysz.semantics.x.SemanticException;
-import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
-import io.oz.fpick.activity.IProgressBarAct;
-import io.oz.fpick.adapter.AudioPickAdapter;
-import io.oz.fpick.filter.FileFilterx;
-
-/**
- * Created by Vincent Woo
- * Date: 2016/10/21
- * Time: 17:31
- */
-
-public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
-    public static final String IS_NEED_RECORDER = "IsNeedRecorder";
-    public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
-
-    public static final int DEFAULT_MAX_NUMBER = 9;
-    private int mMaxNumber;
-    private int mCurrentNumber = 0;
-    private AudioPickAdapter mAdapter;
-    private boolean isNeedRecorder;
-    private boolean isTakenAutoSelected;
-    private final ArrayList<AudioFile> mSelectedList = new ArrayList<>();
-    private List<Directory<AudioFile>> mAll;
-    private String mAudioPath;
-
-    private TextView tv_count;
-    private TextView tv_folder;
-    private RelativeLayout tb_pick;
-
+//package com.vincent.filepicker.activity;
+//
+//import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_AUDIO;
+//
+//import android.content.Intent;
+//import android.os.Bundle;
+//import android.provider.MediaStore;
+//import android.view.View;
+//import android.widget.RelativeLayout;
+//import android.widget.TextView;
+//
+//import com.vincent.filepicker.Constant;
+//import com.vincent.filepicker.DividerListItemDecoration;
+//import com.vincent.filepicker.ToastUtil;
+//import com.vincent.filepicker.Util;
+//import com.vincent.filepicker.adapter.AudioPickAdapter;
+//import com.vincent.filepicker.filter.entity.AudioFile;
+//import com.vincent.filepicker.filter.entity.Directory;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//import androidx.annotation.Nullable;
+//import androidx.recyclerview.widget.LinearLayoutManager;
+//import androidx.recyclerview.widget.RecyclerView;
+//
+//import io.oz.fpick.R;
+//import io.oz.fpick.activity.IProgressBarAct;
+//
+///**
+// * Created by Vincent Woo
+// * Date: 2016/10/21
+// * Time: 17:31
+// */
+//
+//public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
+//    public static final String IS_NEED_RECORDER = "IsNeedRecorder";
+//    public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
+//
+//    public static final int DEFAULT_MAX_NUMBER = 9;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
+//    private AudioPickAdapter mAdapter;
+//    private boolean isNeedRecorder;
+//    private boolean isTakenAutoSelected;
+//    private final ArrayList<AudioFile> mSelectedList = new ArrayList<>();
+//    private List<Directory<AudioFile>> mAll;
+//    private String mAudioPath;
+//
+//    private TextView tv_count;
+//    private TextView tv_folder;
+//    private RelativeLayout tb_pick;
+//
+////    @Override
+////    void permissionGranted() {
+////        loadData();
+////    }
+//
 //    @Override
-//    void permissionGranted() {
-//        loadData();
+//    protected void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.vw_activity_audio_pick);
+//
+//        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+//        isNeedRecorder = getIntent().getBooleanExtra(IS_NEED_RECORDER, false);
+//        isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
+//
+//        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+//        mSuffix = new String[] {"aac", "mid", "midi", "mp3", "oga", "opus", "wav", "weba", "3g2"};
+//
+//        initView();
 //    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.vw_activity_audio_pick);
-
-        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
-        isNeedRecorder = getIntent().getBooleanExtra(IS_NEED_RECORDER, false);
-        isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
-
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-        mSuffix = new String[] {"aac", "mid", "midi", "mp3", "oga", "opus", "wav", "weba", "3g2"};
-
-        initView();
-    }
-
-    private void initView() {
-        tv_count = (TextView) findViewById(R.id.tv_count);
-        tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_audio_pick);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
-                LinearLayoutManager.VERTICAL, R.drawable.vw_divider_rv_file));
-        AudioPickAdapter adapter = new AudioPickAdapter(this, mMaxNumber);
-        linkAdapter(TYPE_AUDIO, adapter);
-        mRecyclerView.setAdapter(adapter);
-
-//        mAdapter.selectListener(new OnSelectStateListener() {
-//            @Override
-//            public void onSelectStateChanged(int position, boolean state, BaseFile file, View animation) {
-//                if (state) {
-//                    mSelectedList.add((AudioFile) file);
-//                    mCurrentNumber++;
-//                    animation.setAlpha ( 1f );
-//                    AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ();
-//                    animationDrawable.start ();
-//                    Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
-//                    animation.startAnimation ( a );
+//
+//    private void initView() {
+//        tv_count = (TextView) findViewById(R.id.tv_count);
+//        tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+//
+//        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_audio_pick);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
+//                LinearLayoutManager.VERTICAL, R.drawable.vw_divider_rv_file));
+//        AudioPickAdapter adapter = new AudioPickAdapter(this, mMaxNumber);
+//        linkAdapter(TYPE_AUDIO, adapter);
+//        mRecyclerView.setAdapter(adapter);
+//
+////        mAdapter.selectListener(new OnSelectStateListener() {
+////            @Override
+////            public void onSelectStateChanged(int position, boolean state, BaseFile file, View animation) {
+////                if (state) {
+////                    mSelectedList.add((AudioFile) file);
+////                    mCurrentNumber++;
+////                    animation.setAlpha ( 1f );
+////                    AnimationDrawable animationDrawable = (AnimationDrawable)animation.getBackground ();
+////                    animationDrawable.start ();
+////                    Animation a = AnimationUtils.loadAnimation ( getApplicationContext (),R.anim.rotate_animation );
+////                    animation.startAnimation ( a );
+////                } else {
+////                    animation.setAlpha ( 0f );
+////
+////                    mSelectedList.remove(file);
+////                    mCurrentNumber--;
+////                }
+////                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+////            }
+////        });
+////
+////        RelativeLayout rl_done = (RelativeLayout) findViewById(R.id.rl_done);
+////        rl_done.setOnClickListener(v -> {
+////            Intent intent = new Intent();
+////            // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
+////            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
+////            setResult(RESULT_OK, intent);
+////            finish();
+////        });
+////
+////        tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
+////        LinearLayout ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
+////        if (isNeedFolderList) {
+////            ll_folder.setVisibility(View.VISIBLE);
+////            ll_folder.setOnClickListener(v -> mFolderHelper.toggle(tb_pick));
+////            tv_folder = (TextView) findViewById(R.id.tv_folder);
+////            tv_folder.setText(getResources().getString(R.string.vw_all));
+////
+////            mFolderHelper.setFolderListListener(directory -> {
+////                mFolderHelper.toggle(tb_pick);
+////                tv_folder.setText(directory.getName());
+////
+////                if (TextUtils.isEmpty(directory.getPath())) { //All
+////                    refreshAudioDirs(mAll);
+////                } else {
+////                    for (Directory<AudioFile> dir : mAll) {
+////                        if (dir.getPath().equals(directory.getPath())) {
+////                            List<Directory<AudioFile>> list = new ArrayList<>();
+////                            list.add(dir);
+////                            refreshAudioDirs(list);
+////                            break;
+////                        }
+////                    }
+////                }
+////            });
+////        }
+//
+//        if (isNeedRecorder) {
+//            RelativeLayout rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
+//            rl_rec_aud.setVisibility(View.VISIBLE);
+//            rl_rec_aud.setOnClickListener(v -> {
+//                Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+//                if (Util.detectIntent(AudioPickActivity.this, intent)) {
+//                    startActivityForResult(intent, Constant.REQUEST_CODE_TAKE_AUDIO);
 //                } else {
-//                    animation.setAlpha ( 0f );
-//
-//                    mSelectedList.remove(file);
-//                    mCurrentNumber--;
-//                }
-//                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-//            }
-//        });
-//
-//        RelativeLayout rl_done = (RelativeLayout) findViewById(R.id.rl_done);
-//        rl_done.setOnClickListener(v -> {
-//            Intent intent = new Intent();
-//            // intent.putParcelableArrayListExtra(Constant.RESULT_PICK_AUDIO, mSelectedList);
-//            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
-//            setResult(RESULT_OK, intent);
-//            finish();
-//        });
-//
-//        tb_pick = (RelativeLayout) findViewById(R.id.tb_pick);
-//        LinearLayout ll_folder = (LinearLayout) findViewById(R.id.ll_folder);
-//        if (isNeedFolderList) {
-//            ll_folder.setVisibility(View.VISIBLE);
-//            ll_folder.setOnClickListener(v -> mFolderHelper.toggle(tb_pick));
-//            tv_folder = (TextView) findViewById(R.id.tv_folder);
-//            tv_folder.setText(getResources().getString(R.string.vw_all));
-//
-//            mFolderHelper.setFolderListListener(directory -> {
-//                mFolderHelper.toggle(tb_pick);
-//                tv_folder.setText(directory.getName());
-//
-//                if (TextUtils.isEmpty(directory.getPath())) { //All
-//                    refreshAudioDirs(mAll);
-//                } else {
-//                    for (Directory<AudioFile> dir : mAll) {
-//                        if (dir.getPath().equals(directory.getPath())) {
-//                            List<Directory<AudioFile>> list = new ArrayList<>();
-//                            list.add(dir);
-//                            refreshAudioDirs(list);
-//                            break;
-//                        }
-//                    }
+//                    ToastUtil.getInstance(AudioPickActivity.this).showToast(getString(R.string.vw_no_audio_app));
 //                }
 //            });
 //        }
-
-        if (isNeedRecorder) {
-            RelativeLayout rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
-            rl_rec_aud.setVisibility(View.VISIBLE);
-            rl_rec_aud.setOnClickListener(v -> {
-                Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-                if (Util.detectIntent(AudioPickActivity.this, intent)) {
-                    startActivityForResult(intent, Constant.REQUEST_CODE_TAKE_AUDIO);
-                } else {
-                    ToastUtil.getInstance(AudioPickActivity.this).showToast(getString(R.string.vw_no_audio_app));
-                }
-            });
-        }
-    }
-
-//    @Override
-//    protected void loadData(int t, String... suffix) {
-//        FileFilterx.getAudios(this, new FilterResultCallback<AudioFile>() {
-//            @Override
-//            public void onResult(List<Directory<AudioFile>> directories) {
-//                // Refresh folder list
-//                if (isNeedFolderList) {
-//                    ArrayList<Directory> list = new ArrayList<>();
-//                    Directory all = new Directory();
-//                    all.setName(getResources().getString(R.string.vw_all));
-//                    list.add(all);
-//                    list.addAll(directories);
-//                    mFolderHelper.fillData(list);
-//                }
-//
-//                mAll = directories;
-//                try {
-//                    refreshAudioDirs(directories);
-//                } catch (GeneralSecurityException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (SemanticException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
 //    }
-
-//    private void refreshAudioDirs(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
-//        boolean tryToFindTaken = isTakenAutoSelected;
 //
-//        // if auto-select taken file is enabled, make sure requirements are met
-//        if (tryToFindTaken && !TextUtils.isEmpty(mAudioPath)) {
-//            File takenFile = new File(mAudioPath);
-//            tryToFindTaken = !mAdapter.isUpToMax() && takenFile.exists(); // try to select taken file only if max isn't reached and the file exists
-//        }
+////    @Override
+////    protected void loadData(int t, String... suffix) {
+////        FileFilterx.getAudios(this, new FilterResultCallback<AudioFile>() {
+////            @Override
+////            public void onResult(List<Directory<AudioFile>> directories) {
+////                // Refresh folder list
+////                if (isNeedFolderList) {
+////                    ArrayList<Directory> list = new ArrayList<>();
+////                    Directory all = new Directory();
+////                    all.setName(getResources().getString(R.string.vw_all));
+////                    list.add(all);
+////                    list.addAll(directories);
+////                    mFolderHelper.fillData(list);
+////                }
+////
+////                mAll = directories;
+////                try {
+////                    refreshAudioDirs(directories);
+////                } catch (GeneralSecurityException e) {
+////                    e.printStackTrace();
+////                } catch (IOException e) {
+////                    e.printStackTrace();
+////                } catch (SemanticException e) {
+////                    e.printStackTrace();
+////                }
+////            }
+////        });
+////    }
 //
-//        List<BaseFile> list = new ArrayList<>();
-//        for (Directory<AudioFile> directory : directories) {
-//            list.addAll(directory.getFiles());
+////    private void refreshAudioDirs(List<Directory<AudioFile>> directories) throws GeneralSecurityException, IOException, SemanticException {
+////        boolean tryToFindTaken = isTakenAutoSelected;
+////
+////        // if auto-select taken file is enabled, make sure requirements are met
+////        if (tryToFindTaken && !TextUtils.isEmpty(mAudioPath)) {
+////            File takenFile = new File(mAudioPath);
+////            tryToFindTaken = !mAdapter.isUpToMax() && takenFile.exists(); // try to select taken file only if max isn't reached and the file exists
+////        }
+////
+////        List<BaseFile> list = new ArrayList<>();
+////        for (Directory<AudioFile> directory : directories) {
+////            list.addAll(directory.getFiles());
+////
+////            // auto-select taken file?
+////            if (tryToFindTaken) {
+////                tryToFindTaken = findAndAddTaken(directory.getFiles());   // if taken file was found, we're done
+////            }
+////        }
+////
+////        for (AudioFile file : mSelectedList) {
+////            int index = list.indexOf(file);
+////            if (index != -1) {
+////                list.get(index).setSelected(true);
+////            }
+////        }
+////        mAdapter.refreshSyncs(list);
+////    }
 //
-//            // auto-select taken file?
-//            if (tryToFindTaken) {
-//                tryToFindTaken = findAndAddTaken(directory.getFiles());   // if taken file was found, we're done
-//            }
-//        }
+////    @SuppressLint("SetTextI18n")
+////    private boolean findAndAddTaken(List<AudioFile> list) {
+////        for (AudioFile audioFile : list) {
+////            if (audioFile.getPath().equals(mAudioPath)) {
+////                mSelectedList.add(audioFile);
+////                mCurrentNumber++;
+////                mAdapter.setCurrentNumber(mCurrentNumber);
+////                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+////
+////                return true;   // taken file was found and added
+////            }
+////        }
+////        return false;    // taken file wasn't found
+////    }
 //
-//        for (AudioFile file : mSelectedList) {
-//            int index = list.indexOf(file);
-//            if (index != -1) {
-//                list.get(index).setSelected(true);
-//            }
-//        }
-//        mAdapter.refreshSyncs(list);
-//    }
-
-//    @SuppressLint("SetTextI18n")
-//    private boolean findAndAddTaken(List<AudioFile> list) {
-//        for (AudioFile audioFile : list) {
-//            if (audioFile.getPath().equals(mAudioPath)) {
-//                mSelectedList.add(audioFile);
-//                mCurrentNumber++;
-//                mAdapter.setCurrentNumber(mCurrentNumber);
-//                tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-//
-//                return true;   // taken file was found and added
-//            }
-//        }
-//        return false;    // taken file wasn't found
-//    }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        switch (requestCode) {
-//            case Constant.REQUEST_CODE_TAKE_AUDIO:
-//                if (resultCode == RESULT_OK) {
-//                    if (data.getData() != null) {
-//                        mAudioPath = data.getData().getPath();
-//                    }
-//                    loadData(0); // 0 is ignored by overriding method, to be merged to base class
-//                }
-//                break;
-//        }
-//    }
-}
+////    @Override
+////    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+////        super.onActivityResult(requestCode, resultCode, data);
+////        switch (requestCode) {
+////            case Constant.REQUEST_CODE_TAKE_AUDIO:
+////                if (resultCode == RESULT_OK) {
+////                    if (data.getData() != null) {
+////                        mAudioPath = data.getData().getPath();
+////                    }
+////                    loadData(0); // 0 is ignored by overriding method, to be merged to base class
+////                }
+////                break;
+////        }
+////    }
+//}
