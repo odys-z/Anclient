@@ -170,11 +170,7 @@ public class PhotoSyntierDel extends SynclientierDel {
 
 	/**
 	 * Push up videos (larg files) with
-<<<<<<< HEAD
-	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
-=======
 	 * {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}
->>>>>>> d342decc71fb78781fc3bad1cc075d1422a263c6
 	 *
 	 * @return list of response
 	 */

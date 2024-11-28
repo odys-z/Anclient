@@ -138,7 +138,7 @@ public class AlbumContext {
         */
         Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
 
-        tier = new PhotoSyntier(clientUri, userInf.device, errCtx)
+        tier = new PhotoSyntier("DEPRECATED", clientUri, userInf.device, errCtx)
 				.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;

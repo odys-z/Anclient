@@ -176,7 +176,7 @@ public class AlbumtierTest {
 		// ! also make sure files are saved in volume/user-id
 		assertEquals(DateFormat.formatYYmm(new Date()), doc.folder());
    		
-		DocsResp pths = singleton.tier.synQueryPathsPage(new PathsPage().add(testimg), "h_photos", AlbumPort.album);
+		DocsResp pths = singleton.tierdel.synQueryPathsPage(new PathsPage().add(testimg), "h_photos", AlbumPort.album);
 		PathsPage pthpage = pths.pathsPage();
 		assertEquals(device, pthpage.device);
 		assertEquals(1, pthpage.paths().size());

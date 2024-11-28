@@ -11,6 +11,7 @@ public class Semantier {
 
     /** client function / CRUD identity */
     protected String uri;
+    public String uri() { return uri; }
 
     /** Fields in details from, e.g. maintable's record fields */
     TierCol[] _fields;
