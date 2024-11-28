@@ -138,12 +138,12 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         PathsPage synchPage = ((DocsResp) resp).syncing();
         if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-            HashMap<String, String[]> phts = rsp.syncing().paths();
+            HashMap<String, Object[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 T f = mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
                     // [sync-flag, share-falg, share-by, share-date]
-                    String[] inf = phts.get(f.fullpath());
+                    Object[] inf = phts.get(f.fullpath());
                     if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
