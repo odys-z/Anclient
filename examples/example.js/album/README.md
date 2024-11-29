@@ -26,4 +26,4 @@ Not using dependency of npm for resolving react version confliction. See [PR #20
 
 - PickiT
 
-Document picking inspired by [PickiT](https://github.com/HBiSoft/PickiT).
+The document picking is inspired by [PickiT](https://github.com/HBiSoft/PickiT).

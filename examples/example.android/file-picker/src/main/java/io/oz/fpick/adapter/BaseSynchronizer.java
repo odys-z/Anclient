@@ -27,12 +27,13 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantic.tier.docs.SyncDoc;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.syndoc.client.PhotoSyntier;
+import io.oz.syndoc.client.PushingState;
 
 import static io.odysz.common.LangExt.isblank;
 
@@ -72,11 +73,6 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         mContext = ctx;
         mList = list;
     }
-
-//    public BaseSynchronizer(BaseActivity act) {
-//        this(act, new ArrayList<>());
-//        this.singleton = AlbumContext.getInstance(act);
-//    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void add(List<T> list) {
@@ -125,8 +121,8 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         }
     }
 
-    void startSynchQuery(PathsPage page) {
-        if (!isNull(singleton.tier))
+    void startSynchQuery(PathsPage page)  {
+         if (!isNull(singleton.tier))
             singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
@@ -139,7 +135,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         PathsPage synchPage = ((DocsResp) resp).syncing();
         if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-            HashMap<String, String[]> phts = rsp.syncing().paths();
+            HashMap<String, String[]> phts = (HashMap<String, String[]>)rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 T f = mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
@@ -148,11 +144,11 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
                     if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
-                    f.syncFlag = isblank(inf[0]) ? SyncDoc.SyncFlag.hub : inf[0];
+                    f.syncFlag = isblank(inf[0]) ? PushingState.priv : inf[0];
 
-                    f.shareFlag = inf[1];
-                    f.shareby = inf[2];
-                    f.sharedate(inf[3]);
+                    // f.shareFlag = inf[1];
+                    f.shareby = (String) inf[2];
+                    f.sharedate((String) inf[3]);
                 }
             }
 

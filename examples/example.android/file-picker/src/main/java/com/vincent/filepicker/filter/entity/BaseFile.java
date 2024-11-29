@@ -8,10 +8,7 @@ import com.vincent.filepicker.Util;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.semantic.tier.docs.SyncDoc;
-import io.odysz.transact.x.TransException;
-
-import static io.odysz.common.LangExt.isNull;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 
 
 /**
@@ -22,7 +19,7 @@ import static io.odysz.common.LangExt.isNull;
  * Time: 17:32
  */
 
-public class BaseFile extends SyncDoc implements Parcelable {
+public class BaseFile extends ExpSyncDoc implements Parcelable {
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name

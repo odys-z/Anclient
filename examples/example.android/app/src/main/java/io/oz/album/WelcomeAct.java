@@ -42,7 +42,9 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
-import io.oz.albumtier.PhotoSyntier;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.oz.jserv.docs.syn.Doclientier;
+import io.oz.syndoc.client.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.fpick.activity.ImagePickActivity;
@@ -60,6 +62,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -73,7 +76,7 @@ import io.odysz.common.Utils;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
@@ -212,10 +215,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
-        if (singl == null || singl.tier == null || singl.tier.client() == null)
+        if (singl == null || singl.tier == null || singl.tier.client == null)
             return;
 
-        SessionClient client = singl.tier.client();
+        SessionClient client = singl.tier.client;
         if (client == null)
             return;
 
@@ -337,7 +340,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         try {
             Intent data = result.getData();
             if (data != null) {
-                ArrayList<? extends SyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                ArrayList<? extends ExpSyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (clientext.tier == null) {
                     clearStatus();
                     showDlg(R.string.txt_please_login);
@@ -347,7 +350,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             private String saveFolder;
 
                             @Override
-                            public long meta(SyncDoc f) throws IOException {
+                            public long meta(ExpSyncDoc f) throws IOException {
                                 if (f == null)
                                     throw new IOException("Doc descriptor is null");
 
@@ -373,7 +376,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             }
 
                             @Override
-                            public InputStream open(SyncDoc f) throws IOException {
+                            public InputStream open(ExpSyncDoc f) throws IOException {
                                 return Files.newInputStream(Paths.get(f.fullpath()));
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
@@ -383,7 +386,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = PhotoSyntier.extractErrorCodes(resps);
+                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 errCtx.prepare(msgv, R.string.msg_upload_failed));
 
@@ -437,7 +440,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                             @Override
-                            public long meta(SyncDoc f) throws IOException {
+                            public long meta(ExpSyncDoc f) throws IOException {
                                 if (f == null) {
                                     throw new IOException("Descriptor f is null");
                                 }
@@ -466,7 +469,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                             // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                             @Override
-                            public InputStream open(SyncDoc p) throws FileNotFoundException {
+                            public InputStream open(ExpSyncDoc p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         }))

@@ -20,13 +20,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
-import io.oz.fpick.activity.AudioPickActivity;
+
 import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
-import io.odysz.semantic.tier.docs.SyncDoc;
 import io.oz.fpick.R;
+import io.oz.fpick.activity.AudioPickActivity;
+import io.oz.syndoc.client.PushingState;
 
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
 
@@ -58,13 +59,13 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         }
 
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (SyncDoc.SyncFlag.priv.equals(file.syncFlag)) {
+        if (PushingState.priv.equals(file.syncFlag)) {
             holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
-        else if (SyncDoc.SyncFlag.publish.equals(file.syncFlag) || SyncDoc.SyncFlag.hub.equals(file.syncFlag)) {
+        else if (PushingState.publish.equals(file.syncFlag)) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
@@ -111,7 +112,7 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             }
 
             String sync = mList.get(index).syncFlag;
-            if ( SyncDoc.SyncFlag.publish.equals(sync) || SyncDoc.SyncFlag.pushing.equals(sync) )
+            if (PushingState.publish.equals(sync) || PushingState.pushing.equals(sync) )
                 return;
 
             if (holder.mCbx.isSelected()) {

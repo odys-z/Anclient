@@ -26,9 +26,9 @@ import com.vincent.filepicker.filter.entity.VideoFile;
 
 import java.util.ArrayList;
 
-import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.R;
+import io.oz.syndoc.client.PushingState;
 
 /**
  * Created by Ody Zhou
@@ -92,14 +92,14 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 .transition ( withCrossFade() )
                 .into ( holder.mIvThumbnail );
 
-            if (SyncFlag.pushing.equals(file.syncFlag)) {
+            if (PushingState.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
+            else if (PushingState.publish.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -141,7 +141,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
                 String sync = mList.get(index).syncFlag;
-                if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync) )
+                if ( PushingState.publish.equals(sync) || PushingState.pushing.equals(sync) )
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {

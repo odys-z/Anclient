@@ -15,10 +15,12 @@ import com.vincent.filepicker.Util;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.semantic.tier.docs.SyncDoc;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.oz.syndoc.client.PushingState;
 
-
-public class AndroidFile extends SyncDoc implements Parcelable {
+public class AndroidFile extends ExpSyncDoc implements Parcelable {
+    /** Any constants of {@link PushingState} */
+    public String syncFlag;
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name

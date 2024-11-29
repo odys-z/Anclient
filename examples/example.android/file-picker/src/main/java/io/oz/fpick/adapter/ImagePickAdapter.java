@@ -7,7 +7,6 @@ package io.oz.fpick.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,9 +34,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import io.odysz.semantic.tier.docs.SyncDoc.SyncFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.syndoc.client.PushingState;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static io.odysz.common.LangExt.isblank;
@@ -116,15 +115,15 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 .into ( holder.mIvThumbnail );
 
             if (isblank(file.syncFlag))
-                file.syncFlag = SyncFlag.device;
-            if (SyncFlag.pushing.equals(file.syncFlag)) {
+                file.syncFlag = PushingState.device;
+            if (PushingState.pushing.equals(file.syncFlag)) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (SyncFlag.publish.equals(file.syncFlag) || SyncFlag.hub.equals(file.syncFlag)) {
+            else if (PushingState.publish.equals(file.syncFlag)) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -170,7 +169,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                                          : holder.getAbsoluteAdapterPosition( );
 
                 String sync = mList.get(index).syncFlag;
-                if ( SyncFlag.publish.equals(sync) || SyncFlag.pushing.equals(sync))
+                if ( PushingState.publish.equals(sync) || PushingState.pushing.equals(sync))
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {

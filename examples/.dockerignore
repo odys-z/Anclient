@@ -7,3 +7,5 @@ example.js/react-quiz/weback.config.js
 
 example.cs
 !example.cs/file.upload/*.zip
+
+temp*
