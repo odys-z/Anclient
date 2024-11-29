@@ -26,6 +26,8 @@ allprojects {
         jserv_ver = "2.0.0-SNAPSHOT"
         album_lib_ver = "0.5.0-SNAPSHOT"
 
+        docsync_ver = "0.2.0-SNAPSHOT"
+
         sourceCompatibility = JavaVersion.VERSION_1_8
         // sourceCompatibility = JavaVersion.VERSION_17
     }

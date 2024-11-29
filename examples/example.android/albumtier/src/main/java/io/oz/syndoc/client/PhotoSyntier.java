@@ -15,7 +15,6 @@ import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
-import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -227,5 +226,10 @@ public class PhotoSyntier extends Doclientier {
 			errCtx.err(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
 		}
 		return resp;
+	}
+
+	@Override
+	public String synuri() {
+		return super.synuri();
 	}
 }
