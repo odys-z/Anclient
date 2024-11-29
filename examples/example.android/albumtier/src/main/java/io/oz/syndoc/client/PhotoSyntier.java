@@ -14,6 +14,7 @@ import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
@@ -23,6 +24,7 @@ import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
@@ -33,15 +35,14 @@ import io.oz.jserv.docs.syn.Doclientier;
 
 public class PhotoSyntier extends Doclientier {
 
-	public PhotoSyntier(String sysuri, String synuri, String doctbl, ErrorCtx errCtx)
+	public PhotoSyntier(TableMeta doctbl, String sysuri, String synuri, ErrorCtx errCtx)
 			throws SemanticException, IOException {
-		super(doctbl, sysuri, synuri, errCtx);
+		super(doctbl.tbl, sysuri, synuri, errCtx);
 	}
 
-	public PhotoSyntier(String doctbl, String clienturi, String device, OnError err) throws SemanticException, IOException {
-		this(doctbl, clienturi, device, new ErrorCtx() {
-			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}
-		});
+	public PhotoSyntier(TableMeta doctbl, String clienturi, OnError err) throws SemanticException, IOException {
+		this(doctbl, clienturi, clienturi, new ErrorCtx() {
+			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
 
 	IFileProvider fileProvider;
@@ -246,5 +247,13 @@ public class PhotoSyntier extends Doclientier {
 			errCtx.err(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
 		}
 		return resp;
+	}
+	
+	public String download(String syname, ExpSyncDoc photo, String localpath)
+			throws SemanticException, AnsonException, IOException {
+		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
+		req.doc.recId = photo.recId;
+		req.a(A.download);
+		return client.download(synuri, Port.docsync, req, localpath);
 	}
 }

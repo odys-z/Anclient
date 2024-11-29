@@ -26,7 +26,7 @@
     <string name="txt_prefs_jserv" >文 件 服 務 地 址</string>
     <string name="home_title"      >组 织 名 称</string>
     <string name="jserv_title"     >文件服務地址</string>
-    <string name="txt_test_conn"   >測 試 服 務</string>
+    <string name="txt_test_conn"   >测 试 连 接</string>
     <string name="msg_conn_ok"     >連接文件服務成功。</string>
     <string name="msg_conn_err"    >連接文件服務失敗。</string>
 

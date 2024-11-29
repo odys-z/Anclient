@@ -14,6 +14,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantics.SessionInf;
+import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.Profiles;
@@ -138,7 +139,7 @@ public class AlbumContext {
         */
         Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
 
-        tier = new PhotoSyntier("DEPRECATED", clientUri, userInf.device, errCtx)
+        tier = new PhotoSyntier(new TableMeta(null), clientUri, errCtx)
 				.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;

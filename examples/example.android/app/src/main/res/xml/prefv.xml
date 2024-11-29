@@ -19,6 +19,7 @@
         <EditTextPreference
             android:layout_width="match_parent"
             android:defaultValue=""
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,!@#$_-+=[](){}"
             android:key="@string/userid_key"
             android:summary="@string/userid_summery"
             android:title="@string/userid_title" />
@@ -39,12 +40,13 @@
         android:title="@string/txt_prefs_device"
         android:id="@+id/id_device_cate" >
         <EditTextPreference
+            android:style="@style/Theme.AlertDialog.Default"
             android:enabled="false"
             android:layout_width="match_parent"
             android:defaultValue=""
             android:key="@string/key_device"
             android:summary="@string/msg_only_once"
-            android:title="@string/devide_title" />
+            android:title="@string/devide_title"/>
         <Preference
             android:key="@string/key_restore_dev"
             android:layout="@layout/edit_device" />
