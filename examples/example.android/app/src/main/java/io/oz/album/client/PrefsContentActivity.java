@@ -101,7 +101,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     }
 
     public void onTestConn(View btn) {
-        PhotoSyntier.asyPing(
+        singleton.tier.asyPing(
             (m) -> {
                 confirm(R.string.msg_conn_ok, 3000);
             },
@@ -211,8 +211,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
 
-        if (singleton.tier.verifyDeviceId(buff_device, buff_devname)) {
-            // passed
+        // if (singleton.tier.verifyDeviceId(buff_device, buff_devname))
+        {
+            // verify passed
             if (prefFragment.btnRegistDev != null) {
                 prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
                 prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
@@ -236,9 +237,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                      */
                 });
         }
-        else {
-            errorDlg(getString(R.string.msg_login_uid, singleton.userInf.userName()), 0);
-        }
+        // else errorDlg(getString(R.string.msg_login_uid, singleton.userInf.userName()), 0);
     }
 
     /**

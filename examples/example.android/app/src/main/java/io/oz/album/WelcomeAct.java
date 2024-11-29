@@ -42,6 +42,8 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.oz.jserv.docs.syn.Doclientier;
 import io.oz.syndoc.client.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
@@ -60,6 +62,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
@@ -212,10 +215,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     public static void reloadWeb(AlbumContext singl, WebView wv, Activity act, int webId) {
-        if (singl == null || singl.tier == null || singl.tier.client() == null)
+        if (singl == null || singl.tier == null || singl.tier.client == null)
             return;
 
-        SessionClient client = singl.tier.client();
+        SessionClient client = singl.tier.client;
         if (client == null)
             return;
 
@@ -383,7 +386,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = PhotoSyntier.extractErrorCodes(resps);
+                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 errCtx.prepare(msgv, R.string.msg_upload_failed));
 

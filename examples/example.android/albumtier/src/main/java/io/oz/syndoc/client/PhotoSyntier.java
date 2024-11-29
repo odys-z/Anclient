@@ -28,6 +28,7 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
+import io.oz.albumtier.IFileProvider;
 import io.oz.jserv.docs.syn.Doclientier;
 
 public class PhotoSyntier extends Doclientier {
@@ -43,6 +44,12 @@ public class PhotoSyntier extends Doclientier {
 		});
 	}
 
+	IFileProvider fileProvider;
+	public PhotoSyntier fileProvider(IFileProvider p) {
+		this.fileProvider = p;
+		return this;
+	}
+	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.loginAsync(uid, pswd, (client) -> {
 			this.client = client;
@@ -51,6 +58,19 @@ public class PhotoSyntier extends Doclientier {
 		}, err, device);
 
 		return this;
+	}
+
+	public void asyPing(OnOk ok, OnError err) {
+		new Thread(() -> {
+			try {
+				AnsonResp resp = Clients.pingLess(uri, err);
+				ok.ok(resp);
+			} catch (IOException e) {
+				err.err(MsgCode.exIo, e.getMessage());
+			} catch (TransException | SQLException e) {
+				err.err(MsgCode.exSemantic, e.getMessage());
+			}
+		}).start();
 	}
 
 	/**
@@ -226,10 +246,5 @@ public class PhotoSyntier extends Doclientier {
 			errCtx.err(MsgCode.exIo, e.getMessage() + " " + (e.getCause() == null ? "" : e.getCause().getMessage()));
 		}
 		return resp;
-	}
-
-	@Override
-	public String synuri() {
-		return super.synuri();
 	}
 }

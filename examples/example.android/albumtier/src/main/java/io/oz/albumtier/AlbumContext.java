@@ -95,7 +95,7 @@ public class AlbumContext {
     }
 
 	public PhotoSyntier tier;
-	public PhotoSyntierDel tierdel;
+	// public PhotoSyntierDel tierdel;
 
     public SessionInf userInf;
 

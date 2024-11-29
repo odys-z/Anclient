@@ -4,8 +4,8 @@
     <string name="txt0_ok"         >確 定</string>
     <string name="txt0_cancel"     >取 消</string>
 
-    <string name="url_landing"     >@string/product_url_landing</string>
-    <string name="url_help"        >@string/product_url_help</string>
+<!--    <string name="url_landing"     >@string/product_url_landing</string>-->
+<!--    <string name="url_help"        >@string/product_url_help</string>-->
     <string name="userid_summery"  >也用於命名用戶文件子路徑</string>
     <string name="userid_title"    >登录 ID</string>
     <string name="txt_prefs_user"  >用 戶 设 置</string>
