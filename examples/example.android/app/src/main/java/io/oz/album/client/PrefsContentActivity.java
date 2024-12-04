@@ -1,6 +1,7 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
@@ -16,9 +17,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuProvider;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
@@ -30,6 +35,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 import io.odysz.common.LangExt;
+import io.odysz.common.Utils;
 import io.odysz.module.rs.AnResultset;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -107,12 +113,13 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             },
             (c, m, a) -> {
                 new ComfirmDlg()
-                        .dlgMsg(R.string.msg_conn_err, 0)
+                        // .dlgMsg(R.string.msg_conn_err, f("details: ", m, a), 0)
+                        .dlgMsg(f("%s\ncode: %s\n%s", getString(R.string.msg_conn_err), c.name(), m), 0)
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
                         })
                         .showDlg(this, "")
-                        .live(5000);
+                        .live(8000);
             });
     }
 
@@ -335,5 +342,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     void confirm(int msgid, int live, int... msgOk) {
         ComfirmDlg.confirm(this, msgid, live, msgOk);
+    }
+
+    @Override
+    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
+        Utils.warn("Why here?");
     }
 }

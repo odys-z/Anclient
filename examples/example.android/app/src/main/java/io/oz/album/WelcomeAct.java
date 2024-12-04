@@ -36,7 +36,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuProvider;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.preference.PreferenceManager;
 
 import com.hbisoft.pickit.DeviceHelper;
@@ -545,5 +548,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             msgv.setText(msg);
             msgv.setVisibility(View.VISIBLE);
         });
+    }
+
+    @Override
+    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
+        Utils.warn("To be understood");
     }
 }

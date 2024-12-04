@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -15,11 +14,12 @@ import androidx.fragment.app.FragmentTransaction;
 
 import io.oz.fpick.R;
 
+import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.is;
 import static io.odysz.common.LangExt.isNull;
 
 /**
- * Ussage: call {@link #confirm(AppCompatActivity, int, int, int[])}.
+ * Ussage: call {@link #confirm(FragmentActivity, int, int, int...)}
  */
 public class ComfirmDlg extends DialogFragment {
     private Activity acty;
@@ -71,11 +71,22 @@ public class ComfirmDlg extends DialogFragment {
         return this;
     }
 
+    public ComfirmDlg dlgMsg(String message, int ok, int... cancel) {
+        ComfirmDlg dlg = dlgMsg(0, ok, isNull(cancel) ? 0 : cancel[0]);
+        dlg.msg = message; // f("%s\n%s", getString(msgid), detailLine);
+        return dlg;
+    }
+
     public ComfirmDlg msg(String msg) {
+        this.msgid = 0;
         this.msg = msg;
         return this;
     }
-
+    public ComfirmDlg msg(String msg, Object[] args) {
+        this.msgid = 0;
+        this.msg = msg;
+        return this;
+    }
     public ComfirmDlg onOk(DialogInterface.OnClickListener ok) {
         onOk = ok;
         return this;

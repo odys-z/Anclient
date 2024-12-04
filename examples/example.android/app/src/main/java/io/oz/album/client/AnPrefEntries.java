@@ -35,7 +35,7 @@ public class AnPrefEntries extends Anson {
 
     public String select(AlbumContext singleton, String val) {
         return select(singleton, indexOf(entVals, val));
-   }
+    }
 
     /**
      * Insert a new name-url pair, if already exists, swap to the first

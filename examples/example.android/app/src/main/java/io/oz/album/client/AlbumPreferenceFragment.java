@@ -145,7 +145,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                             // replace old name with new Id
                             buff_device  = null;
                         })
-                        .showDlg((AppCompatActivity) getActivity(), "FIXME")
+                        .showDlg(getActivity(), "FIXME")
                         .live(3000);
                 }
                 else {

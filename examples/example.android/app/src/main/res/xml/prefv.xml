@@ -40,7 +40,6 @@
         android:title="@string/txt_prefs_device"
         android:id="@+id/id_device_cate" >
         <EditTextPreference
-            android:style="@style/Theme.AlertDialog.Default"
             android:enabled="false"
             android:layout_width="match_parent"
             android:defaultValue=""
