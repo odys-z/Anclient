@@ -10,6 +10,7 @@ import java.util.List;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -31,7 +32,6 @@ import io.oz.album.AlbumPort;
 import io.oz.album.tier.AlbumReq;
 import io.oz.album.tier.AlbumReq.A;
 import io.oz.albumtier.IFileProvider;
-import io.oz.jserv.docs.syn.Doclientier;
 
 public class PhotoSyntier extends Doclientier {
 

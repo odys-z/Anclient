@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
+import io.odysz.jclient.syn.Doclientier;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -30,7 +31,6 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.tier.PhotoRec;
-import io.oz.jserv.docs.syn.Doclientier;
 
 /**
  * only for MVP (0.3.x)
