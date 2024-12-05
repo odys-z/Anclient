@@ -1,6 +1,8 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.len;
 import static io.oz.album.client.PrefsContentActivity.buff_device;
 import static io.oz.album.client.PrefsContentActivity.buff_devname;
 import static io.oz.album.client.PrefsContentActivity.singleton;
@@ -128,7 +130,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
                 singleton.pswd(stringValue);
-                preference.setSummary("");
+                preference.setSummary(f(f("%s%%s", len(stringValue)), "*"));
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
                 String device = singleton.userInf.device;

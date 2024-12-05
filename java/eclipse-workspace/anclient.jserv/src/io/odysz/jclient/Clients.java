@@ -2,6 +2,7 @@ package io.odysz.jclient;
 
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.f;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -80,7 +81,23 @@ public class Clients {
 						  isNull(device) ? null : device[0]);
 	}
 	
+	public static void asyLoginByUri(String byuri, String uid, String pswdPlain,
+			OnLogin onOk, OnError onErr, String ... device) {
+		new Thread(new Runnable() {
+	        public void run() {
+	        	try {
+					SessionClient c = loginWithUri(byuri, uid, pswdPlain, isNull(device) ? null : device[0]);
+					onOk.ok(c);
+				} catch (SemanticException | AnsonException | SsException | IOException e) {
+					onErr.err(MsgCode.exIo, "Netwrok or server failed\nerror: %s %s",
+							e.getClass().getName(), e.getMessage());	
+					e.printStackTrace();
+				}
+	        }}, f("asyLoginByUri(%s)", uid)).start();
+	}
+	
 	/** Login asynchronously.
+	 * @deprecated replaced by {@link #asyLoginByUri(String, String, String, OnLogin, OnError, String...)}
 	 * @param uid
 	 * @param pswdPlain
 	 * @param onOk
