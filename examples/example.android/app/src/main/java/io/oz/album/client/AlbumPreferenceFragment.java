@@ -1,8 +1,8 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
-import static io.odysz.common.LangExt.f;
-import static io.odysz.common.LangExt.len;
+import static io.odysz.common.LangExt.strof;
+import static io.odysz.common.LangExt.isblank;
 import static io.oz.album.client.PrefsContentActivity.buff_device;
 import static io.oz.album.client.PrefsContentActivity.buff_devname;
 import static io.oz.album.client.PrefsContentActivity.singleton;
@@ -95,12 +95,14 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         pswd.setOnPreferenceChangeListener(prefsListener);
         prefsListener.onPreferenceChange(pswd, AlbumApp.sharedPrefs.pswd());
 
-        pswd.setSummary("");
+        // pswd.setSummary(f(f("%%%ss", len(AlbumApp.sharedPrefs.pswd())), "*"));
+        pswd.setSummary(AlbumApp.sharedPrefs.pswd().replaceAll(".", "*"));
+
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         String devid = singleton.userInf.device;
-        if (!LangExt.isblank(devid)) {
+        if (!isblank(devid)) {
             findPreference(AlbumApp.keys.device).setEnabled(false);
             findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
             prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
@@ -130,7 +132,8 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             }
             else if (AlbumApp.keys.pswd.equals(k)) {
                 singleton.pswd(stringValue);
-                preference.setSummary(f(f("%s%%s", len(stringValue)), "*"));
+                // preference.setSummary(f(f("%%%ss", len(stringValue)), "*"));
+                preference.setSummary(strof(stringValue, "*"));
             }
             else if (AlbumApp.keys.usrid.equals(k)) {
                 String device = singleton.userInf.device;
