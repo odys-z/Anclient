@@ -405,7 +405,7 @@ public class Doclientier extends Semantier {
 
 			ExpSyncDoc p = videos.get(px);
 			if (isblank(p.clientpath) || isblank(p.device()))
-				throw new DocsException(DocsException.SemanticsError,
+				throw new SemanticException(
 						"Docs' pushing requires device id and clientpath.\n" +
 						"Doc Id: %s, device id: %s, client-path: %s, resource name: %s",
 						p.recId, p.device(), p.clientpath, p.pname);

@@ -16,8 +16,8 @@ import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.AlbumPort;
-import io.oz.album.tier.Profiles;
+import io.oz.album.peer.AlbumPort;
+import io.oz.album.peer.Profiles;
 import io.oz.syndoc.client.PhotoSyntier;
 
 /**
