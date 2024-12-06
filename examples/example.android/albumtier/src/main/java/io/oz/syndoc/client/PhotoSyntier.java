@@ -52,7 +52,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
-		Clients.loginAsync(uid, pswd, (client) -> {
+		Clients.asyLoginByUri(this.uri, uid, pswd, (client) -> {
 			this.client = client;
 			onLogin(client);
 			ok.ok(client);
