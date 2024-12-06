@@ -28,7 +28,7 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
-import io.oz.album.AlbumPort;
+import io.oz.album.peer.AlbumPort;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
 import io.oz.albumtier.IFileProvider;

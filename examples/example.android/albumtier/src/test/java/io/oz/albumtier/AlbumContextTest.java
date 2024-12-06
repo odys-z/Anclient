@@ -17,7 +17,7 @@ import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.AlbumPort;
+import io.oz.album.peer.AlbumPort;
 
 class AlbumContextTest {
 
