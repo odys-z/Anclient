@@ -30,7 +30,7 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
-import io.oz.album.tier.PhotoRec;
+import io.oz.album.peer.PhotoRec;
 
 /**
  * only for MVP (0.3.x)
