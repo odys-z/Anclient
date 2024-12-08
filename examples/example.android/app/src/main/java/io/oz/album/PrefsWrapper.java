@@ -19,7 +19,7 @@ import io.odysz.common.LangExt;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
-import io.oz.album.tier.Profiles;
+import io.oz.album.peer.Profiles;
 import io.oz.albumtier.AlbumContext;
 
 /**

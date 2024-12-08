@@ -45,8 +45,8 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
+import io.odysz.jclient.syn.Doclientier;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.oz.jserv.docs.syn.Doclientier;
 import io.oz.syndoc.client.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
@@ -550,8 +550,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    @Override
-    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-        Utils.warn("To be understood");
-    }
+//    @Override
+//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
+//        Utils.warn("To be understood");
+//    }
 }

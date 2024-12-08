@@ -15,7 +15,7 @@ import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.PrefKeys;
 import io.oz.album.PrefsWrapper;
-import io.oz.album.tier.AlbumResp;
+import io.oz.album.peer.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 public class AlbumApp extends Application {

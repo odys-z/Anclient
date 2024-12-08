@@ -35,14 +35,13 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'pub.devrel:easypermissions:3.0.0'
 
-    // implementation 'com.google.zxing:android-integration:3.3.0'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // https://stackoverflow.com/a/75298544/7362888
     implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22')
     implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22')
 
-    implementation (group: 'io.github.odys-z', name: 'album-lib', version: "$album_lib_ver") {
+    implementation (group: 'io.github.odys-z', name: 'syndoc-lib', version: "$album_lib_ver") {
 //        exclude group: "org.apache.tika", module: "tika-core"
 //        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
     }
