@@ -95,7 +95,7 @@ public class Doclientier extends Semantier {
 	}
 	
 	/**
-	 * @param clientUri - the client function uri this instance will be used for.
+	 * @param sysuri - the client function uri this instance will be used for.
 	 * @param errCtx
 	 * @throws IOException 
 	 * @throws SAXException 
@@ -128,9 +128,9 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
-	 * use {@link #loginWithUri(String, String, String, String)} instead
 	 * 
-	 * @deprecated 
+	 * @deprecated use {@link #loginWithUri(String, String, String)} instead
+	 * 
 	 * @param workerId
 	 * @param device
 	 * @param pswd
@@ -368,7 +368,7 @@ public class Doclientier extends Semantier {
 	 * 
 	 * @param tbl doc table name
 	 * @param videos any doc-table managed records, of which uri shouldn't be loaded,
-	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extFile(String) extFile()} as sql select expression.
+	 * e.g. use {@link io.odysz.transact.sql.parts.condition.Funcall#extfile(String...) extFile()} as sql select expression.
 	 * - the method is working in stream mode
 	 * @param proc reporting at each block finished
 	 * @param docOk callback for implementing asynchronous wrapper
@@ -650,7 +650,7 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
-	 * Implementing new device registering together with {@link #queryDevices(String)}.
+	 * Implementing new device registering.
 	 * 
 	 * <pre>CREATE TABLE doc_devices (
       synode0 varchar(12)  NOT NULL, -- initial node a device is registered
