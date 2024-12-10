@@ -92,11 +92,13 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         prefsListener.onPreferenceChange(userid, AlbumApp.sharedPrefs.uid);
 
         // bindPref2Val(pswd);
+        pswd.setText(AlbumApp.sharedPrefs.pswd());
+        pswd.setSummary(AlbumApp.sharedPrefs.pswd().replaceAll(".", "*"));
+
         pswd.setOnPreferenceChangeListener(prefsListener);
         prefsListener.onPreferenceChange(pswd, AlbumApp.sharedPrefs.pswd());
 
         // pswd.setSummary(f(f("%%%ss", len(AlbumApp.sharedPrefs.pswd())), "*"));
-        pswd.setSummary(AlbumApp.sharedPrefs.pswd().replaceAll(".", "*"));
 
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));

@@ -25,6 +25,8 @@
     <string name="jserv_name0"   translatable="false">@string/product_jserv_name0</string>
     <string name="jserv_1"       translatable="false">@string/product_jserv_1</string>
     <string name="jserv_name1"   translatable="false">@string/product_jserv_name1</string>
+    <string name="jserv_2"       translatable="false">@string/product_jserv_2</string>
+    <string name="jserv_name2"   translatable="false">@string/product_jserv_name2</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
     <string name="qrformat"      translatable="false">QR_CODE</string>
 
@@ -87,10 +89,12 @@
         <item>localhost:8888</item>
         <item>@string/jserv_name0</item>
         <item>@string/jserv_name1</item>
+        <item>@string/jserv_name2</item>
     </array>
     <array name="jserv_entvals">
         <item>http://localhost:8888</item>
         <item>@string/product_jserv_default</item>
         <item>@string/product_jserv_1</item>
+        <item>@string/product_jserv_2</item>
     </array>
 </resources>

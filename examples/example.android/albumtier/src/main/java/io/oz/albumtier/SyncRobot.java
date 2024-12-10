@@ -107,7 +107,7 @@ public class SyncRobot extends SemanticObject implements IUser {
 	}
 
 	@Override
-	public ArrayList<String> dbLog(ArrayList<String> sqls) throws TransException { return null; }
+	public ArrayList<String> dbLog(ArrayList<String> sqls) { return null; }
 
 	@Override public boolean login(Object request) throws TransException { return true; }
 
