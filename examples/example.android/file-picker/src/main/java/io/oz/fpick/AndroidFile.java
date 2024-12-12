@@ -44,7 +44,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 //            if (f == null)
 //                throw new RuntimeException(uri.toString());
 
-            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
+//            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
