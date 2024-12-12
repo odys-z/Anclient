@@ -27,6 +27,8 @@
     <string name="jserv_name1"   translatable="false">@string/product_jserv_name1</string>
     <string name="jserv_2"       translatable="false">@string/product_jserv_2</string>
     <string name="jserv_name2"   translatable="false">@string/product_jserv_name2</string>
+    <string name="jserv_3"       translatable="false">@string/product_jserv_3</string>
+    <string name="jserv_name3"   translatable="false">@string/product_jserv_name3</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
     <string name="qrformat"      translatable="false">QR_CODE</string>
 
@@ -84,17 +86,20 @@
     <string name="msg_no_used_dev"   >No available devices previously used.</string>
     <string name="dev_usedby"        >Device name used by %s (%s)</string>
     <string name="msg_repace_devname">Using this device to replace old name %s [id: %s] ?</string>
+    <string name="log_prof_err">Correctly logged in, but got wrong profiles.</string>
 
     <array name="jserv_entries">
         <item>localhost:8888</item>
         <item>@string/jserv_name0</item>
         <item>@string/jserv_name1</item>
         <item>@string/jserv_name2</item>
+        <item>@string/jserv_name3</item>
     </array>
     <array name="jserv_entvals">
         <item>http://localhost:8888</item>
         <item>@string/product_jserv_default</item>
         <item>@string/product_jserv_1</item>
         <item>@string/product_jserv_2</item>
+        <item>@string/product_jserv_3</item>
     </array>
 </resources>

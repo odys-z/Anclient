@@ -1,5 +1,7 @@
 package io.oz;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +13,8 @@ import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.Utils;
+import io.odysz.jclient.DocsException;
+import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.PrefKeys;
@@ -49,6 +53,10 @@ public class AlbumApp extends Application {
                     (resp) -> {
                         clientext.profiles = ((AlbumResp) resp).profiles();
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        
+                        if (clientext.profiles == null || isblank(clientext.profiles.webroot))
+                            throw new DocsException(0, context.getString(R.string.log_prof_err));
+
                         sharedPrefs.policy2Prefs(sharedPref, clientext.profiles);
 
                         clientext.jserv(sharedPrefs.jserv());

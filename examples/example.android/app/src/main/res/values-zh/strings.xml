@@ -56,5 +56,6 @@
     <string name="msg_no_used_dev"   >No available devices.</string>
     <string name="dev_usedby"        >Device name used by %s (%s)</string>
     <string name="msg_repace_devname">Using this device to replace old name %s [id: %s] ?</string>
+    <string name="log_prof_err">Correctly logged in, but got wrong profiles.</string>
 
 </resources>

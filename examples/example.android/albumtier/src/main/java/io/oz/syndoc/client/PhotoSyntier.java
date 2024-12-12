@@ -10,6 +10,7 @@ import java.util.List;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.DocsException;
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
@@ -99,6 +100,12 @@ public class PhotoSyntier extends Doclientier {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 			else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
+		} catch (DocsException e) {
+			if (isNull(onErr))
+				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+			else onErr[0].err(MsgCode.exGeneral, "%s\n%s",
+					e.getClass().getName(),
+					e.ex().getString("reasons"));
 		} catch (AnsonException | TransException | SQLException e) {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
