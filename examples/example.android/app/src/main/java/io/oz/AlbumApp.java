@@ -13,9 +13,9 @@ import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.Utils;
-import io.odysz.jclient.DocsException;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.PrefKeys;
 import io.oz.album.PrefsWrapper;

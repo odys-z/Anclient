@@ -12,7 +12,14 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
@@ -28,6 +35,20 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private boolean isSelected;
     private Uri contUri;
 
+    static {
+        Map<String, String> env = new HashMap<>();
+        env.put("create", "true");
+        try {
+            URI uri = URI.create("jar:file:/empty.zip");
+//            FileSystem f = FileSystems.getFileSystem(uri);
+//            if (f == null)
+//                throw new RuntimeException(uri.toString());
+
+            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

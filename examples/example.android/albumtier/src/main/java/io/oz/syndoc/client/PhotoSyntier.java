@@ -10,7 +10,6 @@ import java.util.List;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
-import io.odysz.jclient.DocsException;
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
@@ -22,6 +21,7 @@ import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.tier.docs.Device;
+import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
@@ -102,10 +102,9 @@ public class PhotoSyntier extends Doclientier {
 			else onErr[0].err(MsgCode.exIo, "%s\n%s", e.getClass().getName(), e.getMessage());
 		} catch (DocsException e) {
 			if (isNull(onErr))
-				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());
+				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.reason(0));
 			else onErr[0].err(MsgCode.exGeneral, "%s\n%s",
-					e.getClass().getName(),
-					e.ex().getString("reasons"));
+					e.getClass().getName(), e.reason(0));
 		} catch (AnsonException | TransException | SQLException e) {
 			if (isNull(onErr))
 				errCtx.err(MsgCode.exGeneral, "%s\n%s", e.getClass().getName(), e.getMessage());

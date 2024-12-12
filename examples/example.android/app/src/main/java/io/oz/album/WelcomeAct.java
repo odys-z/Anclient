@@ -550,8 +550,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    @Override
-    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-        Utils.warn("To be understood");
-    }
+//    @Override
+//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
+//        Utils.warn("To be understood");
+//    }
 }
