@@ -36,18 +36,18 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private Uri contUri;
 
     static {
-        Map<String, String> env = new HashMap<>();
-        env.put("create", "true");
-        try {
-            URI uri = URI.create("jar:file:/empty.zip");
+//        Map<String, String> env = new HashMap<>();
+//        env.put("create", "true");
+//        try {
+//            URI uri = URI.create("jar:file:/empty.zip");
 //            FileSystem f = FileSystems.getFileSystem(uri);
 //            if (f == null)
 //                throw new RuntimeException(uri.toString());
 
 //            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
     @Override
     public boolean equals(Object o) {
