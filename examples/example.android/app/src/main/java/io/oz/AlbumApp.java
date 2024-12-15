@@ -1,5 +1,6 @@
 package io.oz;
 
+import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 
 import android.app.Application;
@@ -52,6 +53,10 @@ public class AlbumApp extends Application {
                 clientext.tier.asyGetSettings(
                     (resp) -> {
                         clientext.profiles = ((AlbumResp) resp).profiles();
+
+                        Utils.logi("Profiles response of session,\nsession:%s\nprofiles:%s",
+                                client.ssInfo().toBlock(), clientext.profiles.toBlock());
+
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                         
                         if (clientext.profiles == null || isblank(clientext.profiles.webroot))
