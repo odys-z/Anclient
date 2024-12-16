@@ -7,6 +7,7 @@ import static io.oz.AlbumApp.context;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.widget.Toast;
 
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceManager;
@@ -161,8 +162,10 @@ public class PrefsWrapper {
         }
 
         jservlist.select(AlbumContext.getInstance((code, msg, args) -> {
-
+            String m = String.format("Error: type: %s, args: %s", msg, args);
+            Toast.makeText(errctx, m, Toast.LENGTH_LONG).show();
         }), jservlist.ix);
+
         listJserv.setValueIndex(jservlist.ix);
         listJserv.setTitle(jservlist.entry());
         listJserv.setSummary(jservlist.entryVal());
