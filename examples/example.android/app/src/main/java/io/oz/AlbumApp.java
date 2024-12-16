@@ -45,7 +45,7 @@ public class AlbumApp extends Application {
      */
     public static void login(JProtocol.OnOk onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException, IOException, SemanticException {
-        AlbumContext clientext = AlbumContext.getInstance();
+        AlbumContext clientext = AlbumContext.getInstance(null);
         clientext.pswd(sharedPrefs.pswd()).login((client) -> {
             if (context != null) {
                 // load settings

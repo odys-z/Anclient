@@ -1,8 +1,10 @@
 package io.odysz.jclient.syn;
 
+import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.mustnonull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,6 +106,10 @@ public class Doclientier extends Semantier {
 	 */
 	public Doclientier(String doctbl, String sysuri, String synuri, ErrorCtx errCtx)
 			throws SemanticException, IOException {
+		mustnonull(doctbl);
+		mustnonull(sysuri);
+		mustnonull(synuri);
+
 		this.doctbl = doctbl;
 		Doclientier.errCtx = errCtx;
 		this.uri = sysuri;
@@ -404,11 +410,14 @@ public class Doclientier extends Semantier {
 			int totalBlocks = 0;
 
 			ExpSyncDoc p = videos.get(px);
-			if (isblank(p.clientpath) || isblank(p.device()))
+			// if (isblank(p.clientpath) || isblank(p.device()))
+
+			if ( isblank(p.clientpath) ||
+				(!isblank(p.device()) && !eq(p.device(), user.device)))
 				throw new SemanticException(
 						"Docs' pushing requires device id and clientpath.\n" +
-						"Doc Id: %s, device id: %s, client-path: %s, resource name: %s",
-						p.recId, p.device(), p.clientpath, p.pname);
+						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
+						p.recId, p.device(), user.device, p.clientpath, p.pname);
 
 			DocsReq req  = new DocsReq(tbl, p, uri)
 					.device(user.device)

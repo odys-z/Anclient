@@ -7,7 +7,7 @@ import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import static io.oz.AlbumApp.keys;
-import static io.oz.albumtier.AlbumContext.clientUri;
+import static io.oz.albumtier.AlbumContext.sysuri;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,7 +44,6 @@ import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.albumtier.AlbumContext;
-import io.oz.syndoc.client.PhotoSyntier;
 
 /**
  * @since 0.3.0
@@ -202,7 +201,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             showErrConfirm);
                  */
         } catch (Exception e) {
-            Log.e(clientUri, e.getClass().getName() + e.getMessage());
+            Log.e(sysuri, e.getClass().getName() + e.getMessage());
             showErrConfirm.err(MsgCode.exGeneral,
                 getString(R.string.err_pref_login, e.getClass().getName(), e.getMessage()));
         }

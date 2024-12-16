@@ -7,6 +7,7 @@ import static io.oz.AlbumApp.context;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.widget.Toast;
 
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceManager;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
@@ -41,9 +44,12 @@ public class PrefsWrapper {
     private String pswd;
 
     private String landingUrl;
+    private Context errctx;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
         PrefsWrapper config = new PrefsWrapper();
+        config.errctx = ctx;
+
         config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
         config.uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
         config.pswd     = sharedPref.getString(AlbumApp.keys.pswd, "");
@@ -155,7 +161,11 @@ public class PrefsWrapper {
             jservlist.ix = 0;
         }
 
-        jservlist.select(AlbumContext.getInstance(), jservlist.ix);
+        jservlist.select(AlbumContext.getInstance((code, msg, args) -> {
+            String m = String.format("Error: type: %s, args: %s", msg, args);
+            Toast.makeText(errctx, m, Toast.LENGTH_LONG).show();
+        }), jservlist.ix);
+
         listJserv.setValueIndex(jservlist.ix);
         listJserv.setTitle(jservlist.entry());
         listJserv.setSummary(jservlist.entryVal());

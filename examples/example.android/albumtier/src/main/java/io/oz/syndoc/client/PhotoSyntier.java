@@ -29,20 +29,20 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
-import io.oz.album.peer.AlbumPort;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
+import io.oz.album.peer.SynDocollPort;
 import io.oz.albumtier.IFileProvider;
 
 public class PhotoSyntier extends Doclientier {
 
-	public PhotoSyntier(TableMeta doctbl, String sysuri, String synuri, ErrorCtx errCtx)
+	public PhotoSyntier(String sysuri, String synuri, ErrorCtx errCtx)
 			throws SemanticException, IOException {
-		super(doctbl.tbl, sysuri, synuri, errCtx);
+		super("h_photos", sysuri, synuri, errCtx);
 	}
 
-	public PhotoSyntier(TableMeta doctbl, String clienturi, OnError err) throws SemanticException, IOException {
-		this(doctbl, clienturi, clienturi, new ErrorCtx() {
+	public PhotoSyntier(String clienturi, OnError err) throws SemanticException, IOException {
+		this(clienturi, clienturi, new ErrorCtx() {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
 
@@ -92,7 +92,7 @@ public class PhotoSyntier extends Doclientier {
 
 			AlbumReq req = new AlbumReq(uri);
 			req.a(A.getPrefs);
-			AnsonMsg<AlbumReq> q = client.userReq(uri, AlbumPort.album, req)
+			AnsonMsg<AlbumReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 					.header(header);
 			AnsonResp resp = client.commit(q, errCtx);
 			onOk.ok(resp);
@@ -131,7 +131,7 @@ public class PhotoSyntier extends Doclientier {
 					else page.add(p.fullpath());
 				}
 
-				resp = synQueryPathsPage(page, AlbumPort.album);
+				resp = synQueryPathsPage(page, SynDocollPort.docoll);
 				try {
 					onOk.ok(resp);
 				} catch (AnsonException | SemanticException | IOException | SQLException e) {
@@ -163,7 +163,7 @@ public class PhotoSyntier extends Doclientier {
 
 				AlbumReq req = new AlbumReq(uri);
 				req.a(DocsReq.A.devices);
-				AnsonMsg<AlbumReq> q = client.userReq(uri, AlbumPort.album, req)
+				AnsonMsg<AlbumReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 						.header(header);
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
@@ -189,7 +189,7 @@ public class PhotoSyntier extends Doclientier {
 				DocsReq req = new DocsReq(uri)
 						.device(new Device(device, null, devname));
 				req.a(DocsReq.A.registDev);
-				AnsonMsg<DocsReq> q = client.userReq(uri, AlbumPort.album, req)
+				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 						.header(header);
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
@@ -242,7 +242,7 @@ public class PhotoSyntier extends Doclientier {
 		try {
 			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
 			AnsonHeader header = client.header().act(act);
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, AlbumPort.album, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, SynDocollPort.docoll, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);

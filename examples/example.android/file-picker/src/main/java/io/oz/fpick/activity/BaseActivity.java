@@ -47,6 +47,16 @@ import io.oz.fpick.filter.FileFilterx;
  * @since 0.3.0, no longer uses easypermissions, as per the similar reports.
  * <a href='https://github.com/googlesamples/easypermissions/issues/231'>[1]</a> and
  * <a href='https://github.com/googlesamples/easypermissions/issues/233'>[2]</a> and the close decision.
+ *
+ * <h6>Debug memo:</h6>
+ *
+ * For Andoriod Studio complains errors like
+ * <pre>
+ *     Class must either be declared abstract or implement abstract method
+ *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
+ * </pre>
+ *
+ * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully
  */
 public abstract class BaseActivity extends FragmentActivity
         implements JProtocol.OnError, IProgressBarAct {
@@ -357,6 +367,7 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
+            // TODO report errors in a user's dialog...
             String m = String.format("Error: type: %s, args: %s", msg, args);
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );

@@ -8,6 +8,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,14 +19,23 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
 /**
  * Created by Ody Zhou
  * Date 2022/02/11
  *
- * Credits to Vincent Woo
+ * <p>Credits to Vincent Woo</p>
+ *
+ * <h6>Debug memo:</h6>
+ *
+ * For Andoriod Studio complains errors like
+ * <pre>
+ *     Class must either be declared abstract or implement abstract method
+ *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
+ * </pre>
+ *
+ * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
