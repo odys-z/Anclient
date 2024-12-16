@@ -6,6 +6,7 @@
 package io.oz.fpick.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
@@ -24,7 +25,11 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuHost;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
@@ -378,4 +383,15 @@ public abstract class BaseActivity extends FragmentActivity
         ProgressBar b = findViewById(R.id.pb_video_pick);
         if (b != null) runOnUiThread(() -> b.setVisibility(View.GONE));
     }
+
+    public void addMenuProvider(@NonNull MenuProvider provider) {}
+
+    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner) {}
+
+    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner,
+                         @NonNull Lifecycle.State state) {}
+
+    public void removeMenuProvider(@NonNull MenuProvider provider) {}
+
+    public void invalidateMenu() {}
 }

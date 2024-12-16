@@ -70,15 +70,15 @@ public class AlbumContext {
      * @param err can be ignored if no error message to show
      * @return single instance
      */
-    public static AlbumContext getInstance(OnError ... err) {
+    public static AlbumContext getInstance(OnError err) {
         if (instance == null)
             instance = new AlbumContext();
 
-        if (!isNull(err))
-            instance.errCtx = err[0];
-        else
-            to be continued: shouldn't throw an exception here?
-            instance.errCtx = null;
+//        if (!isNull(err))
+//            instance.errCtx = err[0];
+//        else
+//            instance.errCtx = null;
+        instance.errCtx = err;
 
         return instance;
     }

@@ -8,6 +8,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +19,6 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
 /**
@@ -66,4 +69,16 @@ public class ImagePickActivity extends BaseActivity {
             return storage_permissions;
         }
     }
+//
+//    public void addMenuProvider(@NonNull MenuProvider provider) {}
+//
+//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner) {}
+//
+//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner,
+//                                @NonNull Lifecycle.State state) {}
+//
+//    public void removeMenuProvider(@NonNull MenuProvider provider) {}
+//
+//    public void invalidateMenu() {}
+
 }
