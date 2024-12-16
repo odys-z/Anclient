@@ -27,6 +27,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -45,12 +46,12 @@ public class AlbumtierTest {
 	static final String testdoc = "src/test/res/doc.pdf";
 	static final String device = "omni";
 	
-	ArrayList<ExpSyncDoc> mList;
+	ArrayList<IFileDescriptor> mList;
 
 	@Test
     public void testRefreshPage0() throws AnsonException,
     		GeneralSecurityException, IOException, TransException, InterruptedException {
-		mList = new ArrayList<ExpSyncDoc>(1);
+		mList = new ArrayList<IFileDescriptor>(1);
 		mList.add(new PhotoRec().createTest(testimg));
 		
 		boolean[] lights = new boolean[] {false};
@@ -107,7 +108,7 @@ public class AlbumtierTest {
 			}});
 	}
 
-	void refresh(List<? extends ExpSyncDoc> mlist) {
+	void refresh(List<IFileDescriptor> mlist) {
 		synchPage = new PathsPage(0, Math.min(20, mlist.size()));
 		synchPage.device = singleton.userInf.device;
 		if (singleton.tier != null)
@@ -129,7 +130,7 @@ public class AlbumtierTest {
         else if (synchPage.end() < mList.size()) {
             HashMap<String, String[]> phts = rsp.pathsPage().paths();
             for (long i = synchPage.start(); i < synchPage.end(); i++) {
-                ExpSyncDoc f = mList.get((int)i);
+                ExpSyncDoc f = mList.get((int)i).syndoc();
                 if (phts.keySet().contains(f.fullpath())) {
                 	assertEquals(singleton.userInf.device, f.device());
                 	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
@@ -202,7 +203,7 @@ public class AlbumtierTest {
 		singleton.tier.del(singleton.userInf.device, testimg);
 		singleton.tier.del(singleton.userInf.device, testdoc);
 
-   		List<ExpSyncDoc> filelist = new ArrayList<ExpSyncDoc>(2);
+   		List<IFileDescriptor> filelist = new ArrayList<IFileDescriptor>(2);
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testimg));
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
 

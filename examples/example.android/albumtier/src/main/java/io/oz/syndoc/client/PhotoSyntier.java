@@ -1,7 +1,7 @@
 package io.oz.syndoc.client;
 
-import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -25,8 +25,8 @@ import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
-import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
@@ -119,13 +119,13 @@ public class PhotoSyntier extends Doclientier {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<? extends ExpSyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public PhotoSyntier asynQueryDocs(List<IFileDescriptor> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
 				page.clear();
 				for (int i = page.start(); i < page.end() & i < files.size(); i++) {
-					ExpSyncDoc p = files.get((int)i);
+					ExpSyncDoc p = files.get((int)i).syndoc();
 					if (isblank(p.fullpath()))
 						continue;
 					else page.add(p.fullpath());
@@ -212,7 +212,7 @@ public class PhotoSyntier extends Doclientier {
      *
 	 * @return this (handle events with callbacks)
 	 */
-	public PhotoSyntier asyVideos(List<? extends ExpSyncDoc> videos,
+	public PhotoSyntier asyVideos(List<IFileDescriptor> videos,
 				OnProcess proc, OnOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
 		new Thread(() -> {

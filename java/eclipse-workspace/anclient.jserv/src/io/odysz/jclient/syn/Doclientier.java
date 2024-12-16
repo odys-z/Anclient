@@ -288,7 +288,7 @@ public class Doclientier extends Semantier {
 	 */
 	List<DocsResp> syncUp(ExpDocTableMeta meta, AnResultset rs, OnProcess onProc)
 			throws TransException, AnsonException, IOException {
-		List<ExpSyncDoc> videos = new ArrayList<ExpSyncDoc>();
+		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		try {
 			while (rs.next())
 				videos.add(new ExpSyncDoc(rs, meta));
@@ -300,7 +300,7 @@ public class Doclientier extends Semantier {
 		}
 	}
 
-	public List<DocsResp> syncUp(String tabl, List<? extends ExpSyncDoc> videos,
+	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
 			OnProcess onProc, OnOk... docOk)
 			throws TransException, AnsonException, IOException {
 		return pushBlocks(
@@ -381,7 +381,7 @@ public class Doclientier extends Semantier {
 	 * @param onErr
 	 * @return list of response
 	 */
-	public List<DocsResp> pushBlocks(String tbl, List<? extends ExpSyncDoc> videos,
+	public List<DocsResp> pushBlocks(String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnOk docOk, OnError ... onErr)
 				throws TransException, IOException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
@@ -389,7 +389,7 @@ public class Doclientier extends Semantier {
 	}
 
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<? extends ExpSyncDoc> videos, int blocksize,
+			List<IFileDescriptor> videos, int blocksize,
 			OnProcess proc, OnOk docOk, OnError errHandler)
 			throws TransException, IOException {
 
@@ -409,7 +409,7 @@ public class Doclientier extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			ExpSyncDoc p = videos.get(px);
+			ExpSyncDoc p = videos.get(px).syndoc();
 			// if (isblank(p.clientpath) || isblank(p.device()))
 
 			if ( isblank(p.clientpath) ||
@@ -618,7 +618,7 @@ public class Doclientier extends Semantier {
 	 */
 	public DocsResp startPush(String tabl, ExpSyncDoc doc, OnOk follows, ErrorCtx ... errorCtx)
 			throws TransException, IOException, SQLException {
-		List<ExpSyncDoc> videos = new ArrayList<ExpSyncDoc>();
+		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
 
 		List<DocsResp> resps = pushBlocks(tabl, videos, 
