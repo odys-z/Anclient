@@ -25,7 +25,17 @@ import io.oz.fpick.adapter.ImagePickAdapter;
  * Created by Ody Zhou
  * Date 2022/02/11
  *
- * Credits to Vincent Woo
+ * <p>Credits to Vincent Woo</p>
+ *
+ * <h6>Debug memo:</h6>
+ *
+ * For Andoriod Studio complains errors like
+ * <pre>
+ *     Class must either be declared abstract or implement abstract method
+ *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
+ * </pre>
+ *
+ * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
@@ -69,16 +79,4 @@ public class ImagePickActivity extends BaseActivity {
             return storage_permissions;
         }
     }
-//
-//    public void addMenuProvider(@NonNull MenuProvider provider) {}
-//
-//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner) {}
-//
-//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner,
-//                                @NonNull Lifecycle.State state) {}
-//
-//    public void removeMenuProvider(@NonNull MenuProvider provider) {}
-//
-//    public void invalidateMenu() {}
-
 }
