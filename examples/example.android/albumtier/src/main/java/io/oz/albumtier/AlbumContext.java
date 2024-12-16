@@ -77,7 +77,6 @@ public class AlbumContext {
         if (!isNull(err))
             instance.errCtx = err[0];
         else
-            to be continued: shouldn't throw an exception here?
             instance.errCtx = null;
 
         return instance;
