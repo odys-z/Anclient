@@ -50,7 +50,9 @@ public class AlbumContext {
     public static final String jdocbase  = "jserv-album";
 
     /** To be localized */
-    public static final String clientUri = "album.and";
+    public static final String sysuri = "/album/sys";
+
+    public static final String synuri = "/album/syn";
 
     public OnError errCtx;
 
@@ -124,7 +126,11 @@ public class AlbumContext {
         Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
 
         try {
-            tier = new PhotoSyntier(new TableMeta(null), clientUri, errCtx);
+            tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
+                @Override
+                public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
+                    errCtx.err(code, msg, args);
+                } });
         } catch (SemanticException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -151,7 +157,7 @@ public class AlbumContext {
 		tier.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
-				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
+				    client.openLink(sysuri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
 				    onOk.ok(client);
                 },
                 (c, r, args) -> {

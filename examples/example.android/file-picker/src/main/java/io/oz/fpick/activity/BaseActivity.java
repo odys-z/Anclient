@@ -6,7 +6,6 @@
 package io.oz.fpick.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
@@ -25,11 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuHost;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
@@ -372,6 +367,7 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
+            // TODO report errors in a user's dialog...
             String m = String.format("Error: type: %s, args: %s", msg, args);
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );

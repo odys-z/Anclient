@@ -348,7 +348,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     clearStatus();
                     showDlg(R.string.txt_please_login);
                 }
-                else ((PhotoSyntier)clientext.tier
+                else clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
 
@@ -383,7 +383,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return Files.newInputStream(Paths.get(f.fullpath()));
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
-                        }))
+                        })
                         .asyVideos(list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
@@ -438,7 +438,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showDlg(R.string.txt_please_login);
                 }
                 else {
-                    ((PhotoSyntier)clientext.tier
+                    clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
@@ -466,16 +466,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             }
 
                             @Override
-                            public String saveFolder() {
-                                                             return saveFolder;
-                                                                               }
+                            public String saveFolder() { return saveFolder; }
 
                             // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                             @Override
                             public InputStream open(ExpSyncDoc p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
-                        }))
+                        })
                         .asyVideos(paths,
                             (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
                             (resps) -> {},
