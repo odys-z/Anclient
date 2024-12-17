@@ -6,20 +6,16 @@
 
 package io.oz.fpick;
 
+import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.DateFormat.formatYYmm;
+
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
@@ -27,7 +23,7 @@ import io.oz.syndoc.client.PushingState;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
     /** Any constants of {@link PushingState} */
-    public String syncFlag;
+     public String syncFlag;
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
@@ -35,20 +31,32 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private boolean isSelected;
     private Uri contUri;
 
-    static {
-//        Map<String, String> env = new HashMap<>();
-//        env.put("create", "true");
-//        try {
-//            URI uri = URI.create("jar:file:/empty.zip");
-//            FileSystem f = FileSystems.getFileSystem(uri);
-//            if (f == null)
-//                throw new RuntimeException(uri.toString());
-
-//            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+    /**
+     * Create a server side understandable object.
+     * @return the doc object
+     */
+    @Override
+    public ExpSyncDoc syndoc () {
+        return new ExpSyncDoc(null, org)
+                .recId(recId)
+                .share(this.shareby, this.shareflag, this.sharedate)
+                .sharedate(new Date())
+                .cdate(new Date(date))
+                .clientpath(clientpath)
+                .device(device)
+                .folder(folder())
+                .clientname(pname)
+                .uri64(uri64)
+                .mime(mime);
     }
+
+    @Override
+    public String folder() {
+        if (isblank(super.folder()))
+            folder = formatYYmm(new Date());
+        return folder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,9 +109,9 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     }
 
     /** @deprecated removeing com.vincent.filepicker.filter */
-    public long getDate() { return date; }
+    public long date() { return date; }
     /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setDate(long date) { this.date = date; }
+    public void date(long date) { this.date = date; }
 
     public boolean isSelected() { return isSelected; }
 

@@ -125,7 +125,7 @@ public class PhotoSyntier extends Doclientier {
 			try {
 				page.clear();
 				for (int i = page.start(); i < page.end() & i < files.size(); i++) {
-					ExpSyncDoc p = files.get((int)i).syndoc();
+					ExpSyncDoc p = (ExpSyncDoc) files.get((int)i);
 					if (isblank(p.fullpath()))
 						continue;
 					else page.add(p.fullpath());
@@ -212,13 +212,14 @@ public class PhotoSyntier extends Doclientier {
      *
 	 * @return this (handle events with callbacks)
 	 */
-	public PhotoSyntier asyVideos(List<IFileDescriptor> videos,
+	@SuppressWarnings("unchecked")
+	public <T extends IFileDescriptor> PhotoSyntier asyVideos(List<T> videos,
 				OnProcess proc, OnOk docsOk, OnError ... onErr)
 			throws TransException, IOException {
 		new Thread(() -> {
 			try {
 				// syncVideos(videos, proc, docsOk, onErr);
-				pushBlocks(doctbl, videos, proc, docsOk, onErr);
+				pushBlocks(doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))

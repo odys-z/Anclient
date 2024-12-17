@@ -3,8 +3,6 @@ package com.vincent.filepicker.filter.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.IOException;
-
 import io.oz.fpick.AndroidFile;
 
 /**
@@ -32,7 +30,7 @@ public class NormalFile extends AndroidFile implements Parcelable {
         dest.writeLong(size);
         dest.writeString(getLocalDirId());
         dest.writeString(getLocalDirName());
-        dest.writeLong(getDate());
+        dest.writeLong(date());
         dest.writeByte((byte) (isSelected() ? 1 : 0));
         dest.writeString(getMimeType());
     }
@@ -57,7 +55,7 @@ public class NormalFile extends AndroidFile implements Parcelable {
             file.size = in.readLong();
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
-            file.setDate(in.readLong());
+            file.date(in.readLong());
             file.setSelected(in.readByte() != 0);
             file.setMimeType(in.readString());
             return file;

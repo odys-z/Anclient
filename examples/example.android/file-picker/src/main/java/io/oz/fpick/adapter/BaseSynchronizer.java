@@ -25,10 +25,12 @@ import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.albumtier.AlbumContext;
+import io.oz.albumtier.IFileProvider;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
@@ -37,7 +39,7 @@ import io.oz.syndoc.client.PushingState;
 
 import static io.odysz.common.LangExt.isblank;
 
-public abstract class BaseSynchronizer <T extends AndroidFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     public String mFilepath;
 
@@ -123,7 +125,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
 
     void startSynchQuery(PathsPage page)  {
          if (!isNull(singleton.tier))
-            singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+            singleton.tier.asynQueryDocs((List<IFileDescriptor>)mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
 
@@ -137,14 +139,15 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
             // sequence order is guaranteed.
             HashMap<String, String[]> phts = (HashMap<String, String[]>)rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
-                T f = mList.get(i);
+                AndroidFile f = (AndroidFile) mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
                     // [sync-flag, share-falg, share-by, share-date]
                     String[] inf = phts.get(f.fullpath());
                     if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
-                    f.syncFlag = isblank(inf[0]) ? PushingState.priv : inf[0];
+                    // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
+                    f.syncFlag = isblank(inf[1]) ? PushingState.priv : inf[1];
 
                     // f.shareFlag = inf[1];
                     f.shareby = (String) inf[2];

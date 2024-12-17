@@ -6,6 +6,8 @@ import io.odysz.semantics.x.SemanticException;
 /**
  * File's pushing flag at mobile devices. Replacing SyncDoc.syncFlag.
  * See semantic.jserv 1.4.41 package io.odysz.semantic.tier.docs.SyncDoc#SyncFlag.
+ *
+ * @deprecated to be deleted, replaced by ShareFlag.
  */
 public class PushingState {
 	/** Kept as private file ('🔒') at private node. */

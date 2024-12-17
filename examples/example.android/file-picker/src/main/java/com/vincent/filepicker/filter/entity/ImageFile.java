@@ -50,7 +50,7 @@ public class ImageFile extends AndroidFile implements Parcelable {
             file.size = in.readLong();
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
-            file.setDate(in.readLong());
+            file.date(in.readLong());
             file.setSelected(in.readByte() != 0);
             file.folder(in.readString());
 
