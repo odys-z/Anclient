@@ -128,7 +128,7 @@ public class AlbumtierTest {
         if (rsp == null || rsp.syncing() == null)
         	Utils.warn("OnSyncQueryRespons: Got response of empty synchronizing page.");
         else if (synchPage.end() < mList.size()) {
-            HashMap<String, String[]> phts = rsp.pathsPage().paths();
+            HashMap<String, Object[]> phts = rsp.pathsPage().paths();
             for (long i = synchPage.start(); i < synchPage.end(); i++) {
                 ExpSyncDoc f = mList.get((int)i).syndoc();
                 if (phts.keySet().contains(f.fullpath())) {
