@@ -45,7 +45,6 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.JUser.JUserMeta;
 import io.odysz.semantic.meta.ExpDocTableMeta;
-import io.odysz.semantic.meta.ExpDocTableMeta.Share;
 import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsReq.A;
@@ -57,6 +56,7 @@ import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
+import io.oz.album.peer.ShareFlag;
 
 public class Doclientier extends Semantier {
 	public boolean verbose = false;
@@ -215,10 +215,10 @@ public class Doclientier extends Semantier {
 	}
 	
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
- 			String entityName, OnOk ok, OnProcess ...process) throws Exception {
+ 			String entityName, ShareFlag share, OnOk ok, OnProcess ...process) throws Exception {
 
 		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
-					.share(doclient.robt.uid(), Share.pub, new Date())
+					.share(doclient.robt.uid(), share.name(), new Date())
 					.folder(atdev.tofolder)
 					.device(atdev.id)
 					.fullpath(respath);
@@ -231,15 +231,8 @@ public class Doclientier extends Semantier {
 //				// doclient.startPush(entityName, d, ok, errCtx);
 //			}
 
-//		assertNotNull(resp);
-
 		String docId = resp.xdoc.recId();
-//		assertTrue(4 == docId.length() || 8 == docId.length());
-
 		DocsResp rp = doclient.selectDoc(entityName, docId);
-
-//		assertTrue(isblank(rp.msg()));
-//		assertNotNull(rp.xdoc);
 
 		return rp.xdoc;
 	}

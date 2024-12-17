@@ -19,11 +19,10 @@ import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.syndoc.client.PushingState;
+import io.oz.album.peer.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
-    /** Any constants of {@link PushingState} */
-     public String syncFlag;
+    public ShareFlag syncFlag;
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name

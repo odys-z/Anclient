@@ -25,6 +25,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
+
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
@@ -36,14 +38,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.syndoc.client.PushingState;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static io.odysz.common.LangExt.isblank;
 
 public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
-    // public Uri mImageUri;
-
     public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
         this ( ctx, new ArrayList<>(), needCamera , max );
     }
@@ -116,9 +115,9 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 .into ( holder.mIvThumbnail );
 
             if (isblank(file.syncFlag))
-                file.syncFlag = PushingState.device;
+                file.syncFlag = ShareFlag.device;
 
-            if (PushingState.pushing.equals(file.syncFlag)) {
+            if (ShareFlag.pushing == file.syncFlag) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
@@ -126,7 +125,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynpublic.setVisibility(View.GONE);
                 holder.icSynpriv.setVisibility(View.GONE);
             }
-            else if (PushingState.publish.equals(file.syncFlag)) {
+            else if (ShareFlag.publish == file.syncFlag) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -134,7 +133,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 holder.icSynpublic.setVisibility(View.VISIBLE);
                 holder.icSynpriv.setVisibility(View.GONE);
             }
-            else if (PushingState.priv.equals(file.syncFlag)) {
+            else if (ShareFlag.prv == file.syncFlag) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -181,8 +180,8 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 int index = isNeedCamera ? holder.getAbsoluteAdapterPosition( ) - 1
                                          : holder.getAbsoluteAdapterPosition( );
 
-                String sync = mList.get(index).syncFlag;
-                if ( PushingState.publish.equals(sync) || PushingState.pushing.equals(sync))
+                ShareFlag sync = mList.get(index).syncFlag;
+                if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
