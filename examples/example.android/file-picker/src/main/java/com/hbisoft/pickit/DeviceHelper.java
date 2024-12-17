@@ -19,6 +19,7 @@ import java.util.Date;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.SupportContentype;
 
@@ -40,8 +41,8 @@ public class DeviceHelper {
         errCtx = err;
     }
 
-    public static ArrayList<AndroidFile> getMultipleDocs(Context context, String device, ClipData clipData) throws IOException {
-        ArrayList<AndroidFile> paths = new ArrayList<>(clipData.getItemCount());
+    public static ArrayList<IFileDescriptor> getMultipleDocs(Context context, String device, ClipData clipData) throws IOException {
+        ArrayList<IFileDescriptor> paths = new ArrayList<>(clipData.getItemCount());
         for (int i = 0; i < clipData.getItemCount(); i++) {
             Uri uri = clipData.getItemAt(i).getUri();
             paths.add(getDocDescript(context, device, uri, Build.VERSION.SDK_INT));

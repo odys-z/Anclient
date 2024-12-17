@@ -8,6 +8,11 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 /**
  * <p>A file accessor used by AlbumTier etc., for accessing files without visiting traditional file system.</p>
  *
+ * <h5>Note:</h5>
+ * <p>Do not confused with IFileDescriptor in Semantic.jserv,
+ * a bridge (interface) between semantic.jserv nodes and local file information,
+ * which is different to Android file content between Activities, e. g. the ImageFile.</p>
+ * 
  * This is a special bridge (interface) that semantiers can access file through Android content providers or so.
  */
 public interface IFileProvider {
@@ -22,7 +27,7 @@ public interface IFileProvider {
      * <p>Open file input stream.</p>
      * Example for normal file system implementation:<pre>
      * new FileInputStream(new File(path));</pre>
-     * 
+     *
      * @return readable stream
      */
     InputStream open(ExpSyncDoc f) throws IOException;

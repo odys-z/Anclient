@@ -21,6 +21,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
+
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.VideoFile;
 
@@ -28,7 +30,6 @@ import java.util.ArrayList;
 
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.R;
-import io.oz.syndoc.client.PushingState;
 
 /**
  * Created by Ody Zhou
@@ -92,14 +93,14 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 .transition ( withCrossFade() )
                 .into ( holder.mIvThumbnail );
 
-            if (PushingState.pushing.equals(file.syncFlag)) {
+            if (ShareFlag.pushing == file.syncFlag) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (PushingState.publish.equals(file.syncFlag)) {
+            else if (ShareFlag.publish == file.syncFlag) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -140,8 +141,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
-                String sync = mList.get(index).syncFlag;
-                if ( PushingState.publish.equals(sync) || PushingState.pushing.equals(sync) )
+                ShareFlag sync = mList.get(index).syncFlag;
+                if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                     return;
 
                 if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {

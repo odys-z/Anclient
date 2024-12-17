@@ -47,6 +47,7 @@ import com.vincent.filepicker.Constant;
 
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.syndoc.client.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
@@ -343,7 +344,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         try {
             Intent data = result.getData();
             if (data != null) {
-                ArrayList<? extends ExpSyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                ArrayList<AndroidFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (clientext.tier == null) {
                     clearStatus();
                     showDlg(R.string.txt_please_login);
@@ -410,7 +411,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 DeviceHelper.init(errCtx);
                 ClipData clipData = data.getClipData();
                 Uri d = data.getData();
-                ArrayList<AndroidFile> paths;
+                ArrayList<IFileDescriptor> paths;
 
                 if (clipData != null) {
                     if (verbose) for (int i = 0; i < clipData.getItemCount(); i++)
