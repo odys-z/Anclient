@@ -147,7 +147,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
-                    f.syncFlag = isblank(inf[1]) ? ShareFlag.prv : ShareFlag.valueOf(inf[1]);
+                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf(inf[1]);
                     f.shareby = inf[2];
                     f.sharedate(inf[3]);
                 }
@@ -165,7 +165,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     };
 
     void updateIcons(PathsPage page) {
-        ((Activity)mContext).runOnUiThread(new Runnable() {
+        mContext.runOnUiThread(new Runnable() {
             // avoid multiple page range in error
             int start;
             int size;

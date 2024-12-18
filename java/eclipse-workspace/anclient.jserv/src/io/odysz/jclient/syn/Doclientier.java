@@ -215,7 +215,7 @@ public class Doclientier extends Semantier {
 	}
 	
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
- 			String entityName, ShareFlag share, OnOk ok, OnProcess ...process) throws Exception {
+ 			String entityName, ShareFlag share, OnOk ok, OnProcess proc) throws Exception {
 
 		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
 					.share(doclient.robt.uid(), share.name(), new Date())
@@ -223,7 +223,7 @@ public class Doclientier extends Semantier {
 					.device(atdev.id)
 					.fullpath(respath);
 
-		DocsResp resp = doclient.startPush(entityName, doc, ok);
+		DocsResp resp = doclient.startPush(entityName, doc, ok, proc);
 //			(AnsonResp rep) -> {
 //				ExpSyncDoc d = ((DocsResp) rep).xdoc; 
 //
@@ -294,15 +294,14 @@ public class Doclientier extends Semantier {
 	}
 
 	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
-			OnProcess onProc, OnOk... docOk)
-			throws TransException, AnsonException, IOException {
-		return pushBlocks(
+			OnProcess onProc, OnDocsOk... docsOk)
+			throws TransException, AnsonException, IOException, SQLException {
+		return startPushs(
 				tabl, videos, onProc,
-				isNull(docOk) ? new OnOk() {
+				isNull(docsOk) ? new OnDocsOk() {
 					@Override
-					public void ok(AnsonResp resp)
-							throws IOException, AnsonException { }
-				} : docOk[0],
+					public void ok(List<DocsResp> resps) { }
+				} : docsOk[0],
 				errCtx);
 	}
 
@@ -363,7 +362,7 @@ public class Doclientier extends Semantier {
 	
 	/**
 	 * [Synchronously]
-	 * Upward pushing with BlockChain.
+	 * High level API: Upward pushing with BlockChain.
 	 * 
 	 * @param tbl doc table name
 	 * @param videos any doc-table managed records, of which uri shouldn't be loaded,
@@ -373,18 +372,40 @@ public class Doclientier extends Semantier {
 	 * @param docOk callback for implementing asynchronous wrapper
 	 * @param onErr
 	 * @return list of response
+	 * @throws SQLException 
+	 * @throws AnsonException 
 	 */
-	public List<DocsResp> pushBlocks(String tbl, List<IFileDescriptor> videos,
-				OnProcess proc, OnOk docOk, OnError ... onErr)
-				throws TransException, IOException {
+	public List<DocsResp> startPushs(String tbl, List<IFileDescriptor> videos,
+				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
+				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, synuri, tbl, videos, blocksize, proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
+	/**
+	 * 
+	 * <p>To use this function at client side, use the high level API,
+	 * {@link #startPush(String, ExpSyncDoc, OnOk, ErrorCtx...)} for single file or
+	 * {@link #startPushs(String, List, OnProcess, OnOk, OnError...)} for multiple files</p>
+	 * 
+	 * @param client
+	 * @param uri
+	 * @param tbl
+	 * @param videos
+	 * @param blocksize
+	 * @param proc
+	 * @param docsOk
+	 * @param errHandler
+	 * @return response list
+	 * @throws TransException
+	 * @throws IOException
+	 * @throws SQLException 
+	 * @throws AnsonException 
+	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<IFileDescriptor> videos, int blocksize,
-			OnProcess proc, OnOk docOk, OnError errHandler)
-			throws TransException, IOException {
+			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
+			throws TransException, IOException, AnsonException, SQLException {
 
 		SessionInf user = client.ssInfo();
 
@@ -403,7 +424,6 @@ public class Doclientier extends Semantier {
 			int totalBlocks = 0;
 
 			ExpSyncDoc p = videos.get(px).syndoc();
-			// if (isblank(p.clientpath) || isblank(p.device()))
 
 			if ( isblank(p.clientpath) ||
 				(!isblank(p.device()) && !eq(p.device(), user.device)))
@@ -454,7 +474,6 @@ public class Doclientier extends Semantier {
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
 
-				if (docOk != null) docOk.ok(respi);
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException | SQLException ex) { 
@@ -479,13 +498,14 @@ public class Doclientier extends Semantier {
 				DocLocks.readed(p.fullpath());
 			}
 		}
+		if (docsOk != null) docsOk.ok(reslts);
 
 		return reslts;
 	}
 	
 	/**
 	 * Helper for compose file uploading responses to readable string
-	 * @param resps e.g response of calling {@link #pushBlocks(String, List, OnProcess, OnDocsOk, OnError...)}. 
+	 * @param resps e.g response of calling {@link #startPushs(String, List, OnProcess, OnDocsOk, OnError...)}. 
 	 * @return [size, denied, invalid]
 	 */
 	public static int[] parseErrorCodes(List<DocsResp> resps) {
@@ -602,24 +622,32 @@ public class Doclientier extends Semantier {
 	 * 
 	 * @param tabl
 	 * @param doc
-	 * @param follows handling following pushes.
+	 * @param follow handling following pushes.
 	 * @param errorCtx
+	 * @param onproc 
 	 * @return doc response
 	 * @throws TransException
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public DocsResp startPush(String tabl, ExpSyncDoc doc, OnOk follows, ErrorCtx ... errorCtx)
+	public DocsResp startPush(String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
 			throws TransException, IOException, SQLException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
+		
+		OnDocsOk follows = new OnDocsOk() {
+			@Override
+			public void ok(List<DocsResp> resps) throws IOException, AnsonException, TransException, SQLException {
+				follow.ok(resps.get(0));
+			}
+		};
 
-		List<DocsResp> resps = pushBlocks(tabl, videos, 
-				new OnProcess() {
-					@Override
-					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
-							throws IOException, AnsonException, SemanticException {
-					}},
+		List<DocsResp> resps = startPushs(tabl, videos, onproc,
+//				new OnProcess() {
+//					@Override
+//					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
+//							throws IOException, AnsonException, SemanticException {
+//					}},
 				follows, isNull(errorCtx) ? errCtx : errorCtx[0]);
 		return isNull(resps) ? null : resps.get(0);
 	}

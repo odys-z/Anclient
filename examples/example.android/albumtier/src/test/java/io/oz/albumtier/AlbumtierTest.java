@@ -32,6 +32,7 @@ import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.peer.PhotoRec;
+import io.oz.album.peer.ShareFlag;
 
 /**
  * only for MVP (0.3.x)
@@ -172,15 +173,16 @@ public class AlbumtierTest {
      * @throws TransException 
      */
    	void onImagePicked(boolean[] lights) throws TransException, IOException {
-   		singleton.tier.asyVideos(mList, photoProc,
+   		singleton.tier.asyVideos(ShareFlag.prv, mList, photoProc,
    			(resp) -> {
    				photosPushed.ok(resp);
    				lights[0] = true;
    			}, singleton.errCtx);
 	}
    	
-   	JProtocol.OnOk photosPushed = (resps) -> {
-		ExpSyncDoc doc = ((DocsResp) resps).xdoc;
+   	JProtocol.OnDocsOk photosPushed = (resps) -> {
+   		DocsResp resp = resps.get(0);
+		ExpSyncDoc doc = ((DocsResp) resp).xdoc;
 		assertEquals(device, doc.device());
 		assertEquals(testimg, doc.fullpath());
 
@@ -196,6 +198,12 @@ public class AlbumtierTest {
 
 	JProtocol.OnProcess photoProc = (rs, rx, bx, bs, rsp) -> {};
 	
+	/**
+	 * @deprecated
+	 * @throws TransException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	void onUserSelectFiles() throws TransException, IOException, InterruptedException {
 		int[] res = new int[] {0};
 
@@ -207,8 +215,7 @@ public class AlbumtierTest {
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testimg));
 		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
 
-		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			@SuppressWarnings("unchecked")
+		singleton.tier.asyVideos(ShareFlag.prv, filelist, photoProc, (resps) -> {
 			int[] report = Doclientier.parseErrorCodes((List<DocsResp>) resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 0, report[1] );
@@ -219,8 +226,7 @@ public class AlbumtierTest {
 		singleton.tier.del(singleton.userInf.device, testdoc);
 		Thread.sleep(1000);
 
-		singleton.tier.asyVideos(filelist, photoProc, (resps) -> {
-			@SuppressWarnings("unchecked")
+		singleton.tier.asyVideos(ShareFlag.prv, filelist, photoProc, (resps) -> {
 			int[] report = Doclientier.parseErrorCodes((List<DocsResp>) resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 1, report[1] );

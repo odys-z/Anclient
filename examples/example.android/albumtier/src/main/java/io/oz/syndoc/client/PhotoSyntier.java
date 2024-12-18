@@ -17,6 +17,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -31,6 +32,7 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
+import io.oz.album.peer.ShareFlag;
 import io.oz.album.peer.SynDocollPort;
 import io.oz.albumtier.IFileProvider;
 
@@ -208,18 +210,16 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
+	 * {@link #startPushs(String, List, OnProcess, OnOk, OnError...)}
      *
 	 * @return this (handle events with callbacks)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends IFileDescriptor> PhotoSyntier asyVideos(List<T> videos,
-				OnProcess proc, OnOk docsOk, OnError ... onErr)
-			throws TransException, IOException {
+	public <T extends IFileDescriptor> PhotoSyntier asyVideos(ShareFlag share, List<T> videos,
+				OnProcess proc, OnDocsOk docsOk, OnError ... onErr) {
 		new Thread(() -> {
 			try {
-				// syncVideos(videos, proc, docsOk, onErr);
-				pushBlocks(doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
+				startPushs(doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))
@@ -228,9 +228,13 @@ public class PhotoSyntier extends Doclientier {
 				e.printStackTrace();
 				if (!isNull(onErr))
 					onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exGeneral, e.getMessage(), e.getClass().getName());
 			}
 		}).start();
-		return this;	
+		return this;
 	}
 
 	public DocsResp del(String device, String clientpath) {
