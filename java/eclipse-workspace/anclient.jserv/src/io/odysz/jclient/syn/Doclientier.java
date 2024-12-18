@@ -297,7 +297,7 @@ public class Doclientier extends Semantier {
 			OnProcess onProc, OnDocsOk... docsOk)
 			throws TransException, AnsonException, IOException, SQLException {
 		return startPushs(
-				tabl, null, videos, onProc,
+				null, tabl, videos, onProc,
 				isNull(docsOk) ? new OnDocsOk() {
 					@Override
 					public void ok(List<DocsResp> resps) { }
@@ -375,11 +375,11 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws AnsonException 
 	 */
-	public List<DocsResp> startPushs(String tbl, ExpSyncDoc defaultCfg, List<IFileDescriptor> videos,
+	public List<DocsResp> startPushs(ExpSyncDoc templage, String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, blocksize, defaultCfg,
+		return pushBlocks(client, synuri, tbl, videos, blocksize, templage,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -644,7 +644,7 @@ public class Doclientier extends Semantier {
 			}
 		};
 
-		List<DocsResp> resps = startPushs(tabl, template, videos, onproc,
+		List<DocsResp> resps = startPushs(template, tabl, videos, onproc,
 //				new OnProcess() {
 //					@Override
 //					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
