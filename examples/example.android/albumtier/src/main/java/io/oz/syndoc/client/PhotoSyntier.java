@@ -32,7 +32,6 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
-import io.oz.album.peer.ShareFlag;
 import io.oz.album.peer.SynDocollPort;
 import io.oz.albumtier.IFileProvider;
 
@@ -215,11 +214,11 @@ public class PhotoSyntier extends Doclientier {
 	 * @return this (handle events with callbacks)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends IFileDescriptor> PhotoSyntier asyVideos(ShareFlag share, List<T> videos,
+	public <T extends IFileDescriptor> PhotoSyntier asyVideos(ExpSyncDoc template, List<T> videos,
 				OnProcess proc, OnDocsOk docsOk, OnError ... onErr) {
 		new Thread(() -> {
 			try {
-				startPushs(doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
+				startPushs(template, doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))

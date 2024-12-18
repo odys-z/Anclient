@@ -3,7 +3,6 @@ package io.oz.fpick.adapter;
 import static io.odysz.common.LangExt.isNull;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -31,11 +30,9 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.peer.ShareFlag;
 import io.oz.albumtier.AlbumContext;
-import io.oz.albumtier.IFileProvider;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.syndoc.client.PhotoSyntier;
 
 import static io.odysz.common.LangExt.isblank;
 
@@ -137,19 +134,19 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         PathsPage synchPage = ((DocsResp) resp).syncing();
         if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-            HashMap<String, String[]> phts = (HashMap<String, String[]>)rsp.syncing().paths();
+            HashMap<String, Object[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 AndroidFile f = (AndroidFile) mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
                     // [sync-flag, share-falg, share-by, share-date]
-                    String[] inf = phts.get(f.fullpath());
+                    Object[] inf = phts.get(f.fullpath());
                     if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
-                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf(inf[1]);
-                    f.shareby = inf[2];
-                    f.sharedate(inf[3]);
+                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]);
+                    f.shareby = (String) inf[2];
+                    f.sharedate((String) inf[3]);
                 }
             }
 

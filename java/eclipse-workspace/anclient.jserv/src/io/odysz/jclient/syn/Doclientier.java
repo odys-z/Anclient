@@ -223,7 +223,7 @@ public class Doclientier extends Semantier {
 					.device(atdev.id)
 					.fullpath(respath);
 
-		DocsResp resp = doclient.startPush(entityName, doc, ok, proc);
+		DocsResp resp = doclient.startPush(null, entityName, doc, ok, proc);
 //			(AnsonResp rep) -> {
 //				ExpSyncDoc d = ((DocsResp) rep).xdoc; 
 //
@@ -297,7 +297,7 @@ public class Doclientier extends Semantier {
 			OnProcess onProc, OnDocsOk... docsOk)
 			throws TransException, AnsonException, IOException, SQLException {
 		return startPushs(
-				tabl, videos, onProc,
+				tabl, null, videos, onProc,
 				isNull(docsOk) ? new OnDocsOk() {
 					@Override
 					public void ok(List<DocsResp> resps) { }
@@ -375,11 +375,12 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws AnsonException 
 	 */
-	public List<DocsResp> startPushs(String tbl, List<IFileDescriptor> videos,
+	public List<DocsResp> startPushs(String tbl, ExpSyncDoc defaultCfg, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, blocksize, proc, docOk, isNull(onErr) ? err : onErr[0]);
+		return pushBlocks(client, synuri, tbl, videos, blocksize, defaultCfg,
+				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
 	/**
@@ -403,7 +404,7 @@ public class Doclientier extends Semantier {
 	 * @throws AnsonException 
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<IFileDescriptor> videos, int blocksize,
+			List<IFileDescriptor> videos, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
 			throws TransException, IOException, AnsonException, SQLException {
 
@@ -423,7 +424,7 @@ public class Doclientier extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			ExpSyncDoc p = videos.get(px).syndoc();
+			ExpSyncDoc p = videos.get(px).syndoc(template);
 
 			if ( isblank(p.clientpath) ||
 				(!isblank(p.device()) && !eq(p.device(), user.device)))
@@ -625,12 +626,13 @@ public class Doclientier extends Semantier {
 	 * @param follow handling following pushes.
 	 * @param errorCtx
 	 * @param onproc 
+	 * @param template 
 	 * @return doc response
 	 * @throws TransException
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public DocsResp startPush(String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
+	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
 			throws TransException, IOException, SQLException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
@@ -642,7 +644,7 @@ public class Doclientier extends Semantier {
 			}
 		};
 
-		List<DocsResp> resps = startPushs(tabl, videos, onproc,
+		List<DocsResp> resps = startPushs(tabl, template, videos, onproc,
 //				new OnProcess() {
 //					@Override
 //					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)

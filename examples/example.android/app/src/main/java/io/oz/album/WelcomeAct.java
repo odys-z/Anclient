@@ -48,6 +48,7 @@ import com.vincent.filepicker.Constant;
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.oz.album.peer.ShareFlag;
 import io.oz.syndoc.client.PhotoSyntier;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
@@ -385,7 +386,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         })
-                        .asyVideos(list,
+                        .asyVideos(ShareFlag.publish, list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
@@ -397,7 +398,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
             }
-        } catch (TransException | IOException | AnsonException e) {
+        } catch (AnsonException e) {
             e.printStackTrace();
             errCtx.prepare(msgv, R.string.msg_upload_failed)
                     .err(null, e.getMessage(), e.getClass().getName());
@@ -475,8 +476,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         })
-                        .asyVideos(paths,
-                            (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                        .asyVideos(ShareFlag.publish, paths,
+                            (r, rx, seq, total, rsp) -> showStatus(
+                                    R.string.msg_templ_progress,
+                                    r, rx, total, (float) seq / total * 100),
                             (resps) -> {},
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
@@ -484,7 +487,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
             }
-        } catch (AnsonException | TransException | IOException e) {
+        } catch (AnsonException | IOException e) {
             e.printStackTrace();
             errCtx.prepare(msgv, R.string.msg_upload_failed)
                     .err(null, e.getMessage(), e.getClass().getName());

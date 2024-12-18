@@ -15,9 +15,11 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.album.peer.ShareFlag;
 
@@ -32,21 +34,44 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 
     /**
      * Create a server side understandable object.
+     * @param template for new instance, can be null
      * @return the doc object
      */
     @Override
-    public ExpSyncDoc syndoc () {
-        return new ExpSyncDoc(null, org)
+    public ExpSyncDoc syndoc (ExpSyncDoc template) {
+        Date d;
+        try { d = date == 0 && template != null ? DateFormat.parse(template.cdate()) : new Date(date); }
+        catch (ParseException e) { d = new Date(date); }
+
+        return template == null ?
+            new ExpSyncDoc(entMeta, org)
                 .recId(recId)
+                .device(device)
+                .clientpath(clientpath)
+
                 .share(this.shareby, this.shareflag, this.sharedate)
                 .sharedate(new Date())
                 .cdate(new Date(date))
-                .clientpath(clientpath)
-                .device(device)
                 .folder(folder())
                 .clientname(pname)
                 .uri64(uri64)
-                .mime(mime);
+                .mime(mime) :
+
+           new ExpSyncDoc(entMeta == null ? template.entMeta : entMeta, isblank(org) ? template.org : org)
+                .recId(recId)
+                .device(isblank(device) ? template.device() : device)
+                .clientpath(clientpath)
+
+                .shareby(isblank(this.shareby) ? template.shareby : this.shareby)
+                .shareflag(isblank(this.shareflag) ? template.shareflag : this.shareflag)
+                .sharedate(isblank(this.shareflag) ? template.sharedate : this.sharedate)
+                .sharedate(new Date())
+                .cdate(d)
+                .folder(isblank(this.folder) ? template.folder() : folder())
+                .clientname(pname)
+                .uri64(uri64)
+                .mime(mime)
+                ;
     }
 
     @Override
