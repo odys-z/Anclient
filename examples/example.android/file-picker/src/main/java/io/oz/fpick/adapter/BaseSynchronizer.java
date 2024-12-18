@@ -121,7 +121,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     }
 
     void startSynchQuery(PathsPage page)  {
-         if (!isNull(singleton.tier))
+         if (!isNull(singleton.tier) && !isNull(singleton.tier.client))
             singleton.tier.asynQueryDocs((List<IFileDescriptor>)mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }

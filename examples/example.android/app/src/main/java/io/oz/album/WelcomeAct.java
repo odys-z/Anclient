@@ -386,7 +386,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         })
-                        .asyVideos(ShareFlag.publish, list,
+                        .asyVideos(null, list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
@@ -476,7 +476,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         })
-                        .asyVideos(ShareFlag.publish, paths,
+                        .asyVideos(null, paths,
                             (r, rx, seq, total, rsp) -> showStatus(
                                     R.string.msg_templ_progress,
                                     r, rx, total, (float) seq / total * 100),

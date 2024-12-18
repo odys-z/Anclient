@@ -209,7 +209,7 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #startPushs(String, List, OnProcess, OnOk, OnError...)}
+	 * {@link #startPushs(ExpSyncDoc, String, List, OnProcess, OnDocsOk, OnError...)}.
      *
 	 * @return this (handle events with callbacks)
 	 */
