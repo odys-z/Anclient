@@ -15,11 +15,9 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.album.peer.ShareFlag;
 
@@ -42,8 +40,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     @Override
     public ExpSyncDoc syndoc (ExpSyncDoc template) {
         Date d;
-        try { d = date == 0 && template != null ? DateFormat.parse(template.cdate()) : new Date(date); }
-        catch (ParseException e) { d = new Date(date); }
+        d = date == 0 && template != null ? new Date() : new Date(date);
 
         return template == null ?
             new ExpSyncDoc(entMeta, org)
