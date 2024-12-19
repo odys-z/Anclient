@@ -1,7 +1,7 @@
 package io.oz.syndoc.client;
 
-import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.isblank;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,6 +17,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
@@ -25,8 +26,8 @@ import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
-import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
@@ -76,7 +77,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 
 	/**
-	 * Get this user's settings from port album.less.
+	 * Get this user's settings from port {@link SynDocollPort.docoll}.
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
@@ -119,13 +120,13 @@ public class PhotoSyntier extends Doclientier {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<? extends ExpSyncDoc> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public PhotoSyntier asynQueryDocs(List<IFileDescriptor> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
 				page.clear();
 				for (int i = page.start(); i < page.end() & i < files.size(); i++) {
-					ExpSyncDoc p = files.get((int)i);
+					ExpSyncDoc p = (ExpSyncDoc) files.get((int)i);
 					if (isblank(p.fullpath()))
 						continue;
 					else page.add(p.fullpath());
@@ -208,17 +209,16 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #pushBlocks(String, List, OnProcess, OnOk, OnError...)}
+	 * {@link #startPushs(ExpSyncDoc, String, List, OnProcess, OnDocsOk, OnError...)}.
      *
 	 * @return this (handle events with callbacks)
 	 */
-	public PhotoSyntier asyVideos(List<? extends ExpSyncDoc> videos,
-				OnProcess proc, OnOk docsOk, OnError ... onErr)
-			throws TransException, IOException {
+	@SuppressWarnings("unchecked")
+	public <T extends IFileDescriptor> PhotoSyntier asyVideos(ExpSyncDoc template, List<T> videos,
+				OnProcess proc, OnDocsOk docsOk, OnError ... onErr) {
 		new Thread(() -> {
 			try {
-				// syncVideos(videos, proc, docsOk, onErr);
-				pushBlocks(doctbl, videos, proc, docsOk, onErr);
+				startPushs(template, doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))
@@ -227,9 +227,13 @@ public class PhotoSyntier extends Doclientier {
 				e.printStackTrace();
 				if (!isNull(onErr))
 					onErr[0].err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				if (!isNull(onErr))
+					onErr[0].err(MsgCode.exGeneral, e.getMessage(), e.getClass().getName());
 			}
 		}).start();
-		return this;	
+		return this;
 	}
 
 	public DocsResp del(String device, String clientpath) {

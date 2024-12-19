@@ -1,7 +1,7 @@
 package io.oz.albumtier;
 
+import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
-import static io.odysz.common.LangExt.isNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -13,8 +13,8 @@ import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantics.SessionInf;
-import io.odysz.semantics.meta.TableMeta;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.peer.AlbumPort;
 import io.oz.album.peer.Profiles;
@@ -99,8 +99,8 @@ public class AlbumContext {
                 || isblank(userInf.uid());
     }
 
+    /** When this is null, means not logged in */
 	public PhotoSyntier tier;
-	// public PhotoSyntierDel tierdel;
 
     public SessionInf userInf;
 
@@ -109,10 +109,12 @@ public class AlbumContext {
 
     public AlbumContext() {
         state = ConnState.Disconnected;
+        device = new Device();
     }
 
 	public AlbumContext(ErrorCtx ctx) {
 		this.errCtx = ctx;
+        device = new Device();
 	}
 
 	/**
@@ -121,7 +123,12 @@ public class AlbumContext {
     public AlbumContext init(String family, String uid, String device, String jservroot) {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
+
         userInf.device = device;
+        this.device.id = device;
+        this.device.synode0 = device;
+        this.device.devname = f("%s[%s]", device, userInf.userName());
+
         jserv = jservroot;
         Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
 
@@ -193,4 +200,11 @@ public class AlbumContext {
         Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
         return this;
     }
+
+    public final Device device;
+//	public Device device() {
+//		if (device == null)
+//			device = new Device(userInf.device, devicename);
+//		return device;
+//	}
 }

@@ -4,6 +4,7 @@ import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
+import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.album.webview.WebAlbumAct.Web_PageName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -36,10 +37,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuProvider;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.preference.PreferenceManager;
 
 import com.hbisoft.pickit.DeviceHelper;
@@ -47,7 +45,7 @@ import com.vincent.filepicker.Constant;
 
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.semantic.tier.docs.DocsResp;
-import io.oz.syndoc.client.PhotoSyntier;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.fpick.activity.ImagePickActivity;
@@ -67,12 +65,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
@@ -80,7 +72,6 @@ import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.odysz.transact.x.TransException;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
@@ -174,11 +165,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             else {
                 clientext.jserv(AlbumApp.sharedPrefs.jserv());
                 AlbumApp.login(
-                        (client) -> {
-                            runOnUiThread(this::reloadAlbum);
-                        },
-                        (code, t, args) -> showStatus(R.string.t_login_failed, clientext.userInf.uid(),
-                                AlbumApp.sharedPrefs.jserv()));
+                    (client) -> {
+                        runOnUiThread(this::reloadAlbum);
+                    },
+                    (code, t, args) -> showStatus(R.string.t_login_failed, clientext.userInf.uid(),
+                            AlbumApp.sharedPrefs.jserv()));
             }
         } catch (Exception e) {
             showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
@@ -209,8 +200,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     }
 
     @SuppressLint("SetJavaScriptEnabled")
+    /**
+     * Reload album via call js function.
+     */
     void reloadAlbum() {
-        if (clientext.tier == null || AlbumApp.sharedPrefs == null)
+        if (clientext.tier == null || sharedPrefs == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
@@ -343,7 +337,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         try {
             Intent data = result.getData();
             if (data != null) {
-                ArrayList<? extends ExpSyncDoc> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
+                ArrayList<AndroidFile> list = data.getParcelableArrayListExtra(Constant.RESULT_Abstract);
                 if (clientext.tier == null) {
                     clearStatus();
                     showDlg(R.string.txt_please_login);
@@ -384,7 +378,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         })
-                        .asyVideos(list,
+                        .asyVideos(sharedPrefs.template(), list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
@@ -396,7 +390,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
             }
-        } catch (TransException | IOException | AnsonException e) {
+        } catch (AnsonException e) {
             e.printStackTrace();
             errCtx.prepare(msgv, R.string.msg_upload_failed)
                     .err(null, e.getMessage(), e.getClass().getName());
@@ -410,7 +404,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 DeviceHelper.init(errCtx);
                 ClipData clipData = data.getClipData();
                 Uri d = data.getData();
-                ArrayList<AndroidFile> paths;
+                ArrayList<IFileDescriptor> paths;
 
                 if (clipData != null) {
                     if (verbose) for (int i = 0; i < clipData.getItemCount(); i++)
@@ -474,8 +468,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         })
-                        .asyVideos(paths,
-                            (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress, r, rx, total, (float) seq / total * 100),
+                        .asyVideos(sharedPrefs.template(),
+                            paths,
+                            (r, rx, seq, total, rsp) -> showStatus(
+                                    R.string.msg_templ_progress,
+                                    r, rx, total, (float) seq / total * 100),
                             (resps) -> {},
                             errCtx.prepare(msgv, R.string.msg_upload_failed));
                 }
@@ -483,14 +480,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
             }
-        } catch (AnsonException | TransException | IOException e) {
+        } catch (AnsonException | IOException e) {
             e.printStackTrace();
             errCtx.prepare(msgv, R.string.msg_upload_failed)
                     .err(null, e.getMessage(), e.getClass().getName());
         }
     }
 
-    protected void startPicking(Class<? extends BaseActivity> act) {
+    protected void startPickMedia(Class<? extends BaseActivity> act) {
         clearStatus();
 
         Intent intt = new Intent(this, act);
@@ -501,6 +498,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
+        sharedPrefs.using(act);
         pickMediaStarter.launch(intt);
     }
 
@@ -517,11 +515,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     public void onClick(@NonNull View v) {
         int id = v.getId();
         if (id == R.id.btn_pick_image)
-            startPicking(ImagePickActivity.class);
+            startPickMedia(ImagePickActivity.class);
         else if (id == R.id.btn_pick_video)
-            startPicking(VideoPickActivity.class);
+            startPickMedia(VideoPickActivity.class);
         else if (id == R.id.btn_pick_audio)
-            startPicking(AudioPickActivity.class);
+            startPickMedia(AudioPickActivity.class);
         else if (id == R.id.btn_pick_file) {
             // TODO: a simple synchronized files report, startPicking(NormalFilePickActivity.class);
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);

@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
@@ -46,6 +48,12 @@ public class ImagePickActivity extends BaseActivity {
 
     private boolean isNeedCamera;
     private boolean isNeedImagePager;
+
+    public ImagePickActivity () {
+        super();
+        if (template == null)
+            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

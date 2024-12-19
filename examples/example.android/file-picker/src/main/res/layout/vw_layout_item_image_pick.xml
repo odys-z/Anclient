@@ -53,6 +53,14 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:src="@drawable/vw_ic_synced" />
+        <ImageView
+            android:id="@+id/xiv_synprv_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/vw_ic_syncprv" />
     </RelativeLayout>
     <RelativeLayout
         android:alpha="0"

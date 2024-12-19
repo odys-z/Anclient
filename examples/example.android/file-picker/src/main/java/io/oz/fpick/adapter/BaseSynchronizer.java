@@ -3,7 +3,6 @@ package io.oz.fpick.adapter;
 import static io.odysz.common.LangExt.isNull;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,19 +24,60 @@ import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
+import io.oz.album.peer.ShareFlag;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
-import io.oz.syndoc.client.PhotoSyntier;
-import io.oz.syndoc.client.PushingState;
+import io.oz.fpick.filter.FileFilterx;
 
 import static io.odysz.common.LangExt.isblank;
 
-public abstract class BaseSynchronizer <T extends AndroidFile, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+/**
+ * <p>The Base file list provider.</p>
+ *
+ * <h4>Issue of Design Optimization</h4>
+ * <p>
+ * All files are loaded via {@link FileFilterx} and the callback helper, which should be optimized in
+ * the future, according to OOP principle.
+ * </p>
+ * <p>And should the parcel / de-parcel process be wrapped with Antson?</p>
+ *
+ * <h4>Design Memo v 0.4.0</h4>
+ * <pre>
+ * Loading process:
+ *   &lt;T extends BaseActivity&gt; Oncreate()
+ *      -&gt; linkAdapter() {
+ *         link adapter extends BaseSynchronizer to the activity
+ *      }
+ *   -&gt; loadData() {
+ *           FileFilterx.filter() with suffixes;
+ *       }
+ *   }
+ *   - (LoaderManager.onChange) -&gt;
+ *       new FileterLoaderCallbackx(results)
+ *       .onLoadFinished(file-info) {
+ *          ImageFile img = new ImageFile() for all file-info[i];
+ *          directors.add(img)
+ *          results.onResult(directories);
+ *       }
+ *
+ *    // now the directories are ready to converted into file list
+ *    BaseActivity.loadirs(directories) {
+ *        adapter.refresh(file-list(directories)) {
+ *            mList.addAll((Collection<? extends T>) list);
+ *            // mList is used to bind view-holders, with help of Guild.
+ *        }
+ *    }
+ *    // and enjoy!</pre>
+ * @param <T>
+ * @param <VH>
+ */
+public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     public String mFilepath;
 
@@ -93,14 +133,14 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     public List<T> getDataSet() { return mList; }
 
     /**
-     * Add file list to my list, then start asynchronize matching.
+     * Add file list to my list, then start the asynchronous matching.
      * My list is used for feeding item holder used for buffered rendering (by Glide).
      * @param list local items
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshSyncs(List<AndroidFile> list) {
         mList.clear();
-        mList.addAll((Collection<? extends T>) list); // why this with performance cost?
+        mList.addAll((Collection<? extends T>) list); // why this has performance cost?
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
@@ -122,8 +162,9 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     }
 
     void startSynchQuery(PathsPage page)  {
-         if (!isNull(singleton.tier))
-            singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
+        // FIXME why reaches here when tier != null while tier.client is null?
+        if (!isNull(singleton.tier) && !isNull(singleton.tier.client))
+            singleton.tier.asynQueryDocs((List<IFileDescriptor>)mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
 
@@ -135,18 +176,17 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
         PathsPage synchPage = ((DocsResp) resp).syncing();
         if (synchPage.end() <= mList.size()) {
             // sequence order is guaranteed.
-            HashMap<String, String[]> phts = (HashMap<String, String[]>)rsp.syncing().paths();
+            HashMap<String, Object[]> phts = rsp.syncing().paths();
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
-                T f = mList.get(i);
+                AndroidFile f = (AndroidFile) mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
-                    // [sync-flag, share-falg, share-by, share-date]
-                    String[] inf = phts.get(f.fullpath());
+                    // [doc-id, share-falg, share-by, share-date]
+                    Object[] inf = phts.get(f.fullpath());
                     if (isNull(inf)) continue;
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
-                    f.syncFlag = isblank(inf[0]) ? PushingState.priv : inf[0];
-
-                    // f.shareFlag = inf[1];
+                    // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
+                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]);
                     f.shareby = (String) inf[2];
                     f.sharedate((String) inf[3]);
                 }
@@ -164,7 +204,7 @@ public abstract class BaseSynchronizer <T extends AndroidFile, VH extends Recycl
     };
 
     void updateIcons(PathsPage page) {
-        ((Activity)mContext).runOnUiThread(new Runnable() {
+        mContext.runOnUiThread(new Runnable() {
             // avoid multiple page range in error
             int start;
             int size;

@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import io.odysz.common.Utils;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
@@ -42,6 +44,12 @@ public class VideoPickActivity extends BaseActivity {
 
     public static final int DEFAULT_MAX_NUMBER = 9;
     public static final int COLUMN_NUMBER = 3;
+
+    public VideoPickActivity () {
+        super();
+        if (template == null)
+            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

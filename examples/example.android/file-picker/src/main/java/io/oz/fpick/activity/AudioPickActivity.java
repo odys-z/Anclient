@@ -11,11 +11,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.MenuProvider;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,6 +20,8 @@ import com.vincent.filepicker.DividerListItemDecoration;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.AudioPickAdapter;
 
@@ -39,9 +37,15 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
     private int mMaxNumber;
     private int mCurrentNumber = 0;
     private boolean isNeedRecorder;
-    private boolean isTakenAutoSelected;
+//    private boolean isTakenAutoSelected;
 
     private TextView tv_count;
+
+    public AudioPickActivity () {
+        super();
+        if (template == null)
+            template = new ExpSyncDoc().shareflag(ShareFlag.prv.name());
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
