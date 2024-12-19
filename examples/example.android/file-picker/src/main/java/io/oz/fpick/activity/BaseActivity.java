@@ -45,10 +45,10 @@ import io.oz.fpick.filter.FileFilterx;
 
 /**
  * @since 0.3.0, no longer uses easypermissions, as per the similar reports.
- * <a href='https://github.com/googlesamples/easypermissions/issues/231'>[1]</a> and
+ * <a href='https://github.com/googlesamples/easypermissions/issues/231'>[1]</a>,
  * <a href='https://github.com/googlesamples/easypermissions/issues/233'>[2]</a> and the close decision.
  *
- * <h6>Debug memo:</h6>
+ * <h4>Debug Memo:</h4>
  *
  * For Andoriod Studio complains errors like
  * <pre>
@@ -118,14 +118,11 @@ public abstract class BaseActivity extends FragmentActivity
         });
 
         rl_done = findViewById(R.id.rl_done);
-        rl_done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+        rl_done.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
+            setResult(RESULT_OK, intent);
+            finish();
         });
 
         if (pickmode == PickingMode.disabled) {
@@ -141,12 +138,7 @@ public abstract class BaseActivity extends FragmentActivity
         ll_folder = findViewById(R.id.ll_folder);
         if (isNeedFolderList) {
             ll_folder.setVisibility(View.VISIBLE);
-            ll_folder.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mFolderHelper.toggle(tb_pick);
-                }
-            });
+            ll_folder.setOnClickListener(v -> mFolderHelper.toggle(tb_pick));
             tv_folder = (TextView) findViewById(R.id.tv_folder);
             tv_folder.setText(getResources().getString(R.string.vw_all));
 
@@ -172,6 +164,16 @@ public abstract class BaseActivity extends FragmentActivity
         loadData(fileType, mSuffix);
     }
 
+
+    /**
+     * <p>Load files according to the directory list.</p>
+     *
+     * This method will trigger callback handling in {@link io.oz.fpick.filter.FileLoaderCallbackx},
+     * by calling {@link FileFilterx#filter(FragmentActivity, String...)}.
+     *
+     * @param t
+     * @param suffix
+     */
     protected void loadData(int t, String[] suffix) {
         if (filefilter == null)
             filefilter = new FileFilterx(t, directories -> {

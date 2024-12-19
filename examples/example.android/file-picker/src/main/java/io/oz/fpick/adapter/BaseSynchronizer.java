@@ -33,9 +33,50 @@ import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.filter.FileFilterx;
 
 import static io.odysz.common.LangExt.isblank;
 
+/**
+ * <p>The Base file list provider.</p>
+ *
+ * <h4>Issue of Design Optimization</h4>
+ * <p>
+ * All files are loaded via {@link FileFilterx} and the callback helper, which should be optimized in
+ * the future, according to OOP principle.
+ * </p>
+ * <p>And should the parcel / de-parcel process be wrapped with Antson?</p>
+ *
+ * <h4>Design Memo v 0.4.0</h4>
+ * <pre>
+ * Loading process:
+ *   &lt;T extends BaseActivity&gt; Oncreate()
+ *      -&gt; linkAdapter() {
+ *         link adapter extends BaseSynchronizer to the activity
+ *      }
+ *   -&gt; loadData() {
+ *           FileFilterx.filter() with suffixes;
+ *       }
+ *   }
+ *   - (LoaderManager.onChange) -&gt;
+ *       new FileterLoaderCallbackx(results)
+ *       .onLoadFinished(file-info) {
+ *          ImageFile img = new ImageFile() for all file-info[i];
+ *          directors.add(img)
+ *          results.onResult(directories);
+ *       }
+ *
+ *    // now the directories are ready to converted into file list
+ *    BaseActivity.loadirs(directories) {
+ *        adapter.refresh(file-list(directories)) {
+ *            mList.addAll((Collection<? extends T>) list);
+ *            // mList is used to bind view-holders, with help of Guild.
+ *        }
+ *    }
+ *    // and enjoy!</pre>
+ * @param <T>
+ * @param <VH>
+ */
 public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
     public String mFilepath;
@@ -92,14 +133,14 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     public List<T> getDataSet() { return mList; }
 
     /**
-     * Add file list to my list, then start asynchronize matching.
+     * Add file list to my list, then start the asynchronous matching.
      * My list is used for feeding item holder used for buffered rendering (by Glide).
      * @param list local items
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshSyncs(List<AndroidFile> list) {
         mList.clear();
-        mList.addAll((Collection<? extends T>) list); // why this with performance cost?
+        mList.addAll((Collection<? extends T>) list); // why this has performance cost?
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
@@ -121,7 +162,8 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     }
 
     void startSynchQuery(PathsPage page)  {
-         if (!isNull(singleton.tier) && !isNull(singleton.tier.client))
+        // FIXME why reaches here when tier != null while tier.client is null?
+        if (!isNull(singleton.tier) && !isNull(singleton.tier.client))
             singleton.tier.asynQueryDocs((List<IFileDescriptor>)mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
@@ -138,7 +180,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
             for (int i = synchPage.start(); i < synchPage.end(); i++) {
                 AndroidFile f = (AndroidFile) mList.get(i);
                 if (phts.containsKey(f.fullpath())) {
-                    // [sync-flag, share-falg, share-by, share-date]
+                    // [doc-id, share-falg, share-by, share-date]
                     Object[] inf = phts.get(f.fullpath());
                     if (isNull(inf)) continue;
 

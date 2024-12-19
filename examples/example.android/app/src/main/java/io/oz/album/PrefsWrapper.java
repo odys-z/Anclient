@@ -30,8 +30,9 @@ import io.oz.albumtier.AlbumContext;
  * a data wrapper for avoid manage local preferences everywhere.
  * <h5>Small Argument</h5>
  * <p>Unstructured data, e. g. local configurations like {@link SharedPreferences} can be quick shift
- * int a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
+ * into a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
  * @since 0.3.0
+ * @since 0.4.0 this data also manages uploading file's template, e.g. share-flag and folder.
  */
 public class PrefsWrapper {
     public String homeName;
