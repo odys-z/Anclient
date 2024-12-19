@@ -76,10 +76,6 @@ public class AlbumContext {
         if (instance == null)
             instance = new AlbumContext();
 
-//        if (!isNull(err))
-//            instance.errCtx = err[0];
-//        else
-//            instance.errCtx = null;
         instance.errCtx = err;
 
         return instance;
