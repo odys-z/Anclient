@@ -24,6 +24,8 @@ import com.vincent.filepicker.DividerListItemDecoration;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.AudioPickAdapter;
 
@@ -42,6 +44,12 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
     private boolean isTakenAutoSelected;
 
     private TextView tv_count;
+
+    public AudioPickActivity () {
+        super();
+        if (template == null)
+            template = new ExpSyncDoc().shareflag(ShareFlag.prv.name());
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

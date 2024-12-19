@@ -1,6 +1,5 @@
 /**
  * Created by Ody
- *
  * Credits to Vincent Woo
  */
 package io.oz.fpick.activity;
@@ -36,6 +35,8 @@ import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsException;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
@@ -45,7 +46,7 @@ import io.oz.fpick.filter.FileFilterx;
 
 /**
  * @since 0.3.0, no longer uses easypermissions, as per the similar reports.
- * <a href='https://github.com/googlesamples/easypermissions/issues/231'>[1]</a>,
+ * <a href="https://github.com/googlesamples/easypermissions/issues/231">[1]</a>,
  * <a href='https://github.com/googlesamples/easypermissions/issues/233'>[2]</a> and the close decision.
  *
  * <h4>Debug Memo:</h4>
@@ -56,7 +57,8 @@ import io.oz.fpick.filter.FileFilterx;
  *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
  * </pre>
  *
- * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully
+ * see <a href="https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully">
+ * Errors in the IDE but project Running Successfully</a>
  */
 public abstract class BaseActivity extends FragmentActivity
         implements JProtocol.OnError, IProgressBarAct {
@@ -70,6 +72,14 @@ public abstract class BaseActivity extends FragmentActivity
 
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
+
+    protected static ExpSyncDoc template;
+
+    public static ExpSyncDoc getTemplate () throws DocsException {
+        if (template == null)
+            throw new DocsException(0, "Template must be initialized by subclasses.");
+        return template;
+    }
 
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;

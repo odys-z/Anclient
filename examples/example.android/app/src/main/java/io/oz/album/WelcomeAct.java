@@ -4,6 +4,7 @@ import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
+import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.album.webview.WebAlbumAct.Web_PageName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -203,7 +204,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * Reload album via call js function.
      */
     void reloadAlbum() {
-        if (clientext.tier == null || AlbumApp.sharedPrefs == null)
+        if (clientext.tier == null || sharedPrefs == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
@@ -377,7 +378,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         })
-                        .asyVideos(AlbumApp.sharedPrefs.template(), list,
+                        .asyVideos(sharedPrefs.template(), list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
@@ -467,7 +468,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         })
-                        .asyVideos(AlbumApp.sharedPrefs.template(),
+                        .asyVideos(sharedPrefs.template(),
                             paths,
                             (r, rx, seq, total, rsp) -> showStatus(
                                     R.string.msg_templ_progress,
@@ -497,6 +498,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
+        sharedPrefs.using(act);
         pickMediaStarter.launch(intt);
     }
 

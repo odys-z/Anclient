@@ -77,7 +77,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 
 	/**
-	 * Get this user's settings from port album.less.
+	 * Get this user's settings from port {@link SynDocollPort.docoll}.
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
