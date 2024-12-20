@@ -219,6 +219,7 @@ public class Doclientier extends Semantier {
 
 		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
 					.share(doclient.robt.uid(), share.name(), new Date())
+					.shareflag(ShareFlag.publish.name())
 					.folder(atdev.tofolder)
 					.device(atdev.id)
 					.fullpath(respath);
@@ -640,7 +641,7 @@ public class Doclientier extends Semantier {
 		OnDocsOk follows = new OnDocsOk() {
 			@Override
 			public void ok(List<DocsResp> resps) throws IOException, AnsonException, TransException, SQLException {
-				follow.ok(resps.get(0));
+				follow.ok(isNull(resps) ? null : resps.get(0));
 			}
 		};
 
