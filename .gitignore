@@ -6,3 +6,4 @@ release
 .vs
 .vscode
 **/temp*
+commit.comments*

@@ -25,9 +25,9 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
+import io.oz.album.peer.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.AudioPickActivity;
-import io.oz.syndoc.client.PushingState;
 
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
 
@@ -59,13 +59,13 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
         }
 
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (PushingState.priv.equals(file.syncFlag)) {
+        if (ShareFlag.prv == file.syncFlag) {
             holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
-        else if (PushingState.publish.equals(file.syncFlag)) {
+        else if (ShareFlag.publish == file.syncFlag) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
@@ -111,8 +111,8 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
                 return;
             }
 
-            String sync = mList.get(index).syncFlag;
-            if (PushingState.publish.equals(sync) || PushingState.pushing.equals(sync) )
+            ShareFlag sync = mList.get(index).syncFlag;
+            if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                 return;
 
             if (holder.mCbx.isSelected()) {

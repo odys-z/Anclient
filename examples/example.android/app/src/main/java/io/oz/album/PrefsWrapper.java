@@ -13,25 +13,29 @@ import androidx.preference.ListPreference;
 import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
 import io.oz.album.peer.Profiles;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.activity.BaseActivity;
 
 /**
  * Wrapper of shared preference, for wrapping unstructured data for business layer,
  * a data wrapper for avoid manage local preferences everywhere.
  * <h5>Small Argument</h5>
  * <p>Unstructured data, e. g. local configurations like {@link SharedPreferences} can be quick shift
- * int a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
+ * into a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
  * @since 0.3.0
+ * @since 0.4.0 this data also manages uploading file's template, e.g. share-flag and folder.
  */
 public class PrefsWrapper {
     public String homeName;
@@ -45,6 +49,8 @@ public class PrefsWrapper {
 
     private String landingUrl;
     private Context errctx;
+
+    private ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
         PrefsWrapper config = new PrefsWrapper();
@@ -170,5 +176,19 @@ public class PrefsWrapper {
         listJserv.setTitle(jservlist.entry());
         listJserv.setSummary(jservlist.entryVal());
         return this;
+    }
+
+    public ExpSyncDoc template() {
+        return currentTemplate;
+    }
+
+    public void using(Class<? extends BaseActivity> act) {
+        try {
+            currentTemplate = (ExpSyncDoc) act.getMethod("getTemplate").invoke(null);
+        }
+        catch (Exception e) {
+            currentTemplate = null;
+            e.printStackTrace();
+        }
     }
 }

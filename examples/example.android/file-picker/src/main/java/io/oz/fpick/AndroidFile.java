@@ -6,28 +6,25 @@
 
 package io.oz.fpick;
 
+import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.DateFormat.formatYYmm;
+
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.syndoc.client.PushingState;
+import io.oz.album.peer.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
-    /** Any constants of {@link PushingState} */
-    public String syncFlag;
+    public ShareFlag syncFlag;
+
+    /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
@@ -35,20 +32,54 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private boolean isSelected;
     private Uri contUri;
 
-    static {
-//        Map<String, String> env = new HashMap<>();
-//        env.put("create", "true");
-//        try {
-//            URI uri = URI.create("jar:file:/empty.zip");
-//            FileSystem f = FileSystems.getFileSystem(uri);
-//            if (f == null)
-//                throw new RuntimeException(uri.toString());
+    /**
+     * Create a server side understandable object.
+     * @param template for new instance, can be null
+     * @return the doc object
+     */
+    @Override
+    public ExpSyncDoc syndoc (ExpSyncDoc template) {
+        Date d;
+        d = date == 0 && template != null ? new Date() : new Date(date);
 
-//            FileSystem zipfs = FileSystems.newFileSystem(uri, env);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        return template == null ?
+            new ExpSyncDoc(entMeta, org)
+                .recId(recId)
+                .device(device)
+                .clientpath(clientpath)
+
+                .share(this.shareby, this.shareflag, this.sharedate)
+                .sharedate(new Date())
+                .cdate(new Date(date))
+                .folder(folder())
+                .clientname(pname)
+                .uri64(uri64)
+                .mime(mime) :
+
+           new ExpSyncDoc(entMeta == null ? template.entMeta : entMeta, isblank(org) ? template.org : org)
+                .recId(recId)
+                .device(isblank(device) ? template.device() : device)
+                .clientpath(clientpath)
+
+                .shareby(isblank(this.shareby) ? template.shareby : this.shareby)
+                .shareflag(isblank(this.shareflag) ? template.shareflag : this.shareflag)
+                .sharedate(isblank(this.shareflag) ? template.sharedate : this.sharedate)
+                .sharedate(new Date())
+                .cdate(d)
+                .folder(isblank(this.folder) ? template.folder() : folder())
+                .clientname(pname)
+                .uri64(uri64)
+                .mime(mime)
+                ;
     }
+
+    @Override
+    public String folder() {
+        if (isblank(super.folder()))
+            folder = formatYYmm(new Date());
+        return folder;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,21 +102,6 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         this.id = id;
     }
 
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public String getName() { return pname; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setName(String name) { this.pname = name; }
-//
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public String getPath() { return clientpath; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setPath(String path) { this.clientpath = path; }
-//
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public long getSize() { return size; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setSize(long size) { this.size = size; }
-
     public String getLocalDirId() { return localDirId; }
 
     public void setLocalDirId(String localDirId) {
@@ -101,9 +117,9 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     }
 
     /** @deprecated removeing com.vincent.filepicker.filter */
-    public long getDate() { return date; }
+    public long date() { return date; }
     /** @deprecated removeing com.vincent.filepicker.filter */
-    public void setDate(long date) { this.date = date; }
+    public void date(long date) { this.date = date; }
 
     public boolean isSelected() { return isSelected; }
 
@@ -119,7 +135,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         dest.writeString(localDirName);
         dest.writeLong(date);
         dest.writeByte((byte) (isSelected ? 1 : 0));
-        dest.writeString(folder);
+        dest.writeString(folder());
     }
 
     @Override
@@ -131,19 +147,25 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
             return new AndroidFile[size];
         }
 
+        /**
+         * Implementation sample:<pre>
+         BaseFile file = new BaseFile();
+         file.id = in.readLong();
+         file.name = in.readString();
+         file.clientpath = in.readString();
+         file.size = in.readLong();
+         file.localDirId = in.readString();
+         file.localDirName = in.readString();
+         file.date = in.readLong();
+         file.isSelected = in.readByte() != 0;
+         return file;
+         * </pre>
+         * @param in The Parcel to read the object's data from.
+         * @return
+         */
         @Override
         public AndroidFile createFromParcel(Parcel in) {
             throw new AnsonException(0, "No overriding?");
-//            BaseFile file = new BaseFile();
-//            file.id = in.readLong();
-//            file.name = in.readString();
-//            file.clientpath = in.readString();
-//            file.size = in.readLong();
-//            file.localDirId = in.readString();
-//            file.localDirName = in.readString();
-//            file.date = in.readLong();
-//            file.isSelected = in.readByte() != 0;
-//            return file;
         }
     };
 
