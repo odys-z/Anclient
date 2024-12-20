@@ -99,8 +99,8 @@ public class AlbumContext {
                 || isblank(userInf.uid());
     }
 
+    /** When this is null, means not logged in */
 	public PhotoSyntier tier;
-	// public PhotoSyntierDel tierdel;
 
     public SessionInf userInf;
 

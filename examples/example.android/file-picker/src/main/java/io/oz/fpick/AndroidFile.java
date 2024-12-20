@@ -15,16 +15,16 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.album.peer.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
     public ShareFlag syncFlag;
+
+    /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
@@ -40,8 +40,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     @Override
     public ExpSyncDoc syndoc (ExpSyncDoc template) {
         Date d;
-        try { d = date == 0 && template != null ? DateFormat.parse(template.cdate()) : new Date(date); }
-        catch (ParseException e) { d = new Date(date); }
+        d = date == 0 && template != null ? new Date() : new Date(date);
 
         return template == null ?
             new ExpSyncDoc(entMeta, org)
@@ -103,21 +102,6 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         this.id = id;
     }
 
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public String getName() { return pname; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setName(String name) { this.pname = name; }
-//
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public String getPath() { return clientpath; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setPath(String path) { this.clientpath = path; }
-//
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public long getSize() { return size; }
-//    /** @deprecated removeing com.vincent.filepicker.filter */
-//    public void setSize(long size) { this.size = size; }
-
     public String getLocalDirId() { return localDirId; }
 
     public void setLocalDirId(String localDirId) {
@@ -151,7 +135,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         dest.writeString(localDirName);
         dest.writeLong(date);
         dest.writeByte((byte) (isSelected ? 1 : 0));
-        dest.writeString(folder);
+        dest.writeString(folder());
     }
 
     @Override
@@ -163,19 +147,25 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
             return new AndroidFile[size];
         }
 
+        /**
+         * Implementation sample:<pre>
+         BaseFile file = new BaseFile();
+         file.id = in.readLong();
+         file.name = in.readString();
+         file.clientpath = in.readString();
+         file.size = in.readLong();
+         file.localDirId = in.readString();
+         file.localDirName = in.readString();
+         file.date = in.readLong();
+         file.isSelected = in.readByte() != 0;
+         return file;
+         * </pre>
+         * @param in The Parcel to read the object's data from.
+         * @return
+         */
         @Override
         public AndroidFile createFromParcel(Parcel in) {
             throw new AnsonException(0, "No overriding?");
-//            BaseFile file = new BaseFile();
-//            file.id = in.readLong();
-//            file.name = in.readString();
-//            file.clientpath = in.readString();
-//            file.size = in.readLong();
-//            file.localDirId = in.readString();
-//            file.localDirName = in.readString();
-//            file.date = in.readLong();
-//            file.isSelected = in.readByte() != 0;
-//            return file;
         }
     };
 

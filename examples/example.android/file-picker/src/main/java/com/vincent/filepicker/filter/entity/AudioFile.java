@@ -24,6 +24,7 @@ public class AudioFile extends AndroidFile implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        // FIXME shouldn't do this like ImageFile, by calling super.write() ?
         dest.writeLong(getId());
         dest.writeString(clientname());
         dest.writeString(fullpath());

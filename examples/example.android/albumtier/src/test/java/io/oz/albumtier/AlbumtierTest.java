@@ -131,7 +131,7 @@ public class AlbumtierTest {
             HashMap<String, Object[]> phts = rsp.pathsPage().paths();
             for (long i = synchPage.start(); i < synchPage.end(); i++) {
                 ExpSyncDoc f = mList.get((int)i).syndoc(null);
-                if (phts.keySet().contains(f.fullpath())) {
+                if (phts.containsKey(f.fullpath())) {
                 	assertEquals(singleton.userInf.device, f.device());
                 	assertEquals(3, phts.get(f.fullpath()).length, "needing sync, share, share-date");
                 }
@@ -181,7 +181,7 @@ public class AlbumtierTest {
    	
    	JProtocol.OnDocsOk photosPushed = (resps) -> {
    		DocsResp resp = resps.get(0);
-		ExpSyncDoc doc = ((DocsResp) resp).xdoc;
+		ExpSyncDoc doc = resp.xdoc;
 		assertEquals(device, doc.device());
 		assertEquals(testimg, doc.fullpath());
 
@@ -199,11 +199,10 @@ public class AlbumtierTest {
 	
 	/**
 	 * @deprecated
-	 * @throws TransException
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	void onUserSelectFiles() throws TransException, IOException, InterruptedException {
+	void onUserSelectFiles() throws IOException, InterruptedException {
 		int[] res = new int[] {0};
 
 		Thread.sleep(2000); // wait the file processing finished at sever side.
@@ -211,11 +210,11 @@ public class AlbumtierTest {
 		singleton.tier.del(singleton.userInf.device, testdoc);
 
    		List<IFileDescriptor> filelist = new ArrayList<IFileDescriptor>(2);
-		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testimg));
-		filelist.add((ExpSyncDoc)new ExpSyncDoc().fullpath(testdoc));
+		filelist.add(new ExpSyncDoc().fullpath(testimg));
+		filelist.add(new ExpSyncDoc().fullpath(testdoc));
 
 		singleton.tier.asyVideos(null, filelist, photoProc, (resps) -> {
-			int[] report = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+			int[] report = Doclientier.parseErrorCodes(resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 0, report[1] );
 			res[0]++;
@@ -226,7 +225,7 @@ public class AlbumtierTest {
 		Thread.sleep(1000);
 
 		singleton.tier.asyVideos(null, filelist, photoProc, (resps) -> {
-			int[] report = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+			int[] report = Doclientier.parseErrorCodes(resps);
 			assertEquals( 2, report[0] );
 			assertEquals( 1, report[1] );
 			res[0]++;

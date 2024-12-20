@@ -77,7 +77,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 
 	/**
-	 * Get this user's settings from port album.less.
+	 * Get this user's settings from port {@link SynDocollPort.docoll}.
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
@@ -209,7 +209,7 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Push up videos (larg files) with
-	 * {@link #startPushs(String, List, OnProcess, OnOk, OnError...)}
+	 * {@link #startPushs(ExpSyncDoc, String, List, OnProcess, OnDocsOk, OnError...)}.
      *
 	 * @return this (handle events with callbacks)
 	 */
