@@ -8,6 +8,7 @@ import { L, Langstrs,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { AlbumEditier } from './tiers/album-tier';
+import Typography from '@material-ui/core/Typography';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -100,6 +101,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
+		  { <Typography noWrap variant='body2'>{this.tier.synodeLable()}</Typography>}
 		  <AnTreeditor {... this.props}
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}

@@ -35,6 +35,11 @@ export class AlbumEditier extends StreeTier {
 		return undefined;
 	}
 
+	synodeLable(): string | undefined {
+		// throw new Error('Method not implemented.');
+		return undefined;
+	}
+
 	/**
 	 * Get photo for my album. 
 	 * File system uri is not replaced with file. The img tag should use delay attributes and load file according to uri.
