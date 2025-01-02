@@ -129,23 +129,25 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	viewFile = (ids: Map<string, Tierec>) => {
 		if (size(ids) > 0 && this.tier) {
 			let fid = ids.keys().next().value;
-			let file = ids.get(fid) as AnTreeNode;
-			let t = regex.mime2type(file.node.mime as string || "");
-			if (t === '.pdf') {
-				this.pdfview = (<PdfViewer
-					close={(e) => {
-						this.pdfview = undefined;
-						this.setState({});
-					} }
-					src={GalleryView.imgSrcReq(file?.id, this.tier)}
-				></PdfViewer>);
-			}
-			else {
-				this.pdfview = undefined;
-				this.error.msg = L('Type {t} is not supported yet.', {t});
-				this.setState({
-					hasError: true,
-					nextAction: 'ignore'});
+			if (fid) {
+				let file = ids.get(fid) as AnTreeNode;
+				let t = regex.mime2type(file.node.mime as string || "");
+				if (t === '.pdf') {
+					this.pdfview = (<PdfViewer
+						close={(e) => {
+							this.pdfview = undefined;
+							this.setState({});
+						} }
+						src={GalleryView.imgSrcReq(file?.id, this.tier)}
+					></PdfViewer>);
+				}
+				else {
+					this.pdfview = undefined;
+					this.error.msg = L('Type {t} is not supported yet.', {t});
+					this.setState({
+						hasError: true,
+						nextAction: 'ignore'});
+				}
 			}
 		}
 		else {

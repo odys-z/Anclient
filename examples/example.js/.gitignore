@@ -18,3 +18,5 @@ private
 _build
 album/products
 package-lock.json
+
+**/.npmrc
