@@ -1,89 +1,49 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Issues &amp; Handling &mdash; Anclient Anclient documentation</title>
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issues &amp; Handling &mdash; Anclient Anclient documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
-        <link rel="up" title="For developers" href="index.html"/>
-        <link rel="next" title="Tips" href="tips.html"/>
-        <link rel="prev" title="Hard learnt lessons: JS" href="note-js-npm.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4f27b4ab"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tips" href="tips.html" />
+    <link rel="prev" title="Hard learnt lessons: JS" href="note-js-npm.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="../index.html" class="icon icon-home"> Anclient
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Anclient
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Ancient.ts Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guide &amp; Tips</a></li>
@@ -118,6 +78,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#apache-tika-behave-different-in-eclipse-docker">Apache Tika behave different in Eclipse &amp; Docker</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id5">About the issue</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#how-does-externalparser-working">How does ExternalParser working?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#load-exiftool-in-windows">Load exiftool in Windows</a></li>
 </ul>
 </li>
 </ul>
@@ -128,52 +89,34 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">Anclient</a>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Anclient</a>
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
- 
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="index.html">For developers</a> &raquo;</li>
-      
-    <li>Issues &amp; Handling</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">For developers</a></li>
+      <li class="breadcrumb-item active">Issues &amp; Handling</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
   </ul>
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="issues-handling">
-<h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="invalid-hook-call">
-<h2>Invalid hook call<a class="headerlink" href="#invalid-hook-call" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="issues-handling">
+<h1>Issues &amp; Handling<a class="headerlink" href="#issues-handling" title="Link to this heading"></a></h1>
+<section id="invalid-hook-call">
+<h2>Invalid hook call<a class="headerlink" href="#invalid-hook-call" title="Link to this heading"></a></h2>
 <p>To solve the “Invalid hook call” error and helping example tests, Anclient/js now
 break into 2 module, &#64;anclient/semantier &amp; &#64;anclient/anreact.
 ( <a class="reference internal" href="#about-invalid-hook-call"><span class="std std-ref">the next section</span></a> can be a good example shows
@@ -181,24 +124,24 @@ how this issue is a big trouble)</p>
 <p>For details on structure used to meet independent unit test and test with local
 npm link.</p>
 <p>see <a class="reference internal" href="note-js-npm.html#anreact-tree"><span class="std std-ref">&#64;anclient/aneact tree</span></a>.</p>
-</div>
-<div class="section" id="react-issue-13991-invalid-hook-call">
-<span id="about-invalid-hook-call"></span><h2>React Issue #13991 - Invalid hook call<a class="headerlink" href="#react-issue-13991-invalid-hook-call" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="react-issue-13991-invalid-hook-call">
+<span id="about-invalid-hook-call"></span><h2>React Issue #13991 - Invalid hook call<a class="headerlink" href="#react-issue-13991-invalid-hook-call" title="Link to this heading"></a></h2>
 <div class="admonition attention">
-<p class="first admonition-title">Attention</p>
-<p class="last">Since &#64;anclient/react verified, this issue is closed.</p>
+<p class="admonition-title">Attention</p>
+<p>Since &#64;anclient/react verified, this issue is closed.</p>
 </div>
 <div class="admonition attention">
-<p class="first admonition-title">Attention</p>
-<p class="last">[deprecated] Since new example of North is verified. This issue is closed.</p>
+<p class="admonition-title">Attention</p>
+<p>[deprecated] Since new example of North is verified. This issue is closed.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">To test with test/jsample, use
+<p class="admonition-title">Note</p>
+<p>To test with test/jsample, use
 [ npm link anclient ]</p>
 </div>
-<div class="section" id="about-the-error">
-<h3>About the error<a class="headerlink" href="#about-the-error" title="Permalink to this headline">¶</a></h3>
+<section id="about-the-error">
+<h3>About the error<a class="headerlink" href="#about-the-error" title="Link to this heading"></a></h3>
 <p>With webpack transpiled package, both via NPM and minified js, referencing component
 will reporting error.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">NorthApp</span>
@@ -210,7 +153,8 @@ will reporting error.</p>
 </pre></div>
 </div>
 <p>Error report:</p>
-<a class="reference internal image-reference" href="../_images/00-react-hook-warning.png"><img alt="../_images/00-react-hook-warning.png" src="../_images/00-react-hook-warning.png" style="height: 400px;" /></a>
+<a class="reference internal image-reference" href="../_images/00-react-hook-warning.png"><img alt="../_images/00-react-hook-warning.png" src="../_images/00-react-hook-warning.png" style="height: 400px;" />
+</a>
 <p>Where AppBar is exported from Material UI, SysComp, extending React.Component,
 from Anclient.js lib.</p>
 <p>The React document didn’t solve this problem, and redirected to issue 13991.
@@ -218,127 +162,127 @@ Webpack also have similar issue report. See
 <a class="reference external" href="https://reactjs.org/link/error-boundaries">Rreact Document</a> and issues:</p>
 <p><a class="reference external" href="https://github.com/facebook/react/issues/13991">Facebook issue 13991</a> and</p>
 <p><a class="reference external" href="https://github.com/webpack/webpack/issues/13868">Webpack issue 13868</a></p>
-</div>
-<div class="section" id="cause-of-error">
-<h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="cause-of-error">
+<h3>Cause of Error<a class="headerlink" href="#cause-of-error" title="Link to this heading"></a></h3>
 <p>This error is suppressed by resolving react of NorthApp to Anclient’s node_modules/react.</p>
 <p>In example.js/north-star/webpack.config.js:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">resolve</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">alias</span><span class="o">:</span> <span class="p">{</span> <span class="nx">react</span><span class="o">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;../../../js/node_modules/react&#39;</span><span class="p">)</span> <span class="p">}</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">resolve</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nx">alias</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">react</span><span class="o">:</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;../../../js/node_modules/react&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
 <span class="p">},</span>
 </pre></div>
 </div>
 <p>This can be explained as duplicated react libs been used.</p>
-</div>
-<div class="section" id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
 <p>In Anclient, react, react-dom &amp; material-ui/core are transpiled as external by webpack, see webpack.config.js.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">externals</span><span class="o">:</span> <span class="p">{</span>
-        <span class="s1">&#39;react&#39;</span><span class="o">:</span> <span class="s1">&#39;react&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;react-dom&#39;</span> <span class="o">:</span> <span class="s1">&#39;reactDOM&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;@material-ui/core&quot;</span><span class="o">:</span> <span class="s2">&quot;MaterialUI&quot;</span>
-    <span class="p">},</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">externals</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="s1">&#39;react&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;react&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;react-dom&#39;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;reactDOM&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;@material-ui/core&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;MaterialUI&quot;</span>
+<span class="w">    </span><span class="p">},</span>
 
-    <span class="p">...</span>
+<span class="w">    </span><span class="p">...</span>
 
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>In NorthApp, react &amp; react-dom are installed locally. Then Anclient can be imported like:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="p">{</span>
-    <span class="nx">an</span><span class="p">,</span> <span class="nx">AnClient</span><span class="p">,</span> <span class="nx">SessionClient</span><span class="p">,</span> <span class="nx">Protocol</span><span class="p">,</span>
-    <span class="nx">L</span><span class="p">,</span> <span class="nx">Langstrs</span><span class="p">,</span>
-    <span class="nx">AnContext</span><span class="p">,</span> <span class="nx">AnError</span><span class="p">,</span> <span class="nx">AnReactExt</span><span class="p">,</span>
-    <span class="nx">Sys</span><span class="p">,</span> <span class="nx">SysComp</span><span class="p">,</span> <span class="nx">Domain</span><span class="p">,</span> <span class="nx">Roles</span><span class="p">,</span> <span class="nx">Orgs</span><span class="p">,</span> <span class="nx">Users</span>
-<span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;anclient&#39;</span><span class="p">;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">an</span><span class="p">,</span><span class="w"> </span><span class="nx">AnClient</span><span class="p">,</span><span class="w"> </span><span class="nx">SessionClient</span><span class="p">,</span><span class="w"> </span><span class="nx">Protocol</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">L</span><span class="p">,</span><span class="w"> </span><span class="nx">Langstrs</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">AnContext</span><span class="p">,</span><span class="w"> </span><span class="nx">AnError</span><span class="p">,</span><span class="w"> </span><span class="nx">AnReactExt</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">Sys</span><span class="p">,</span><span class="w"> </span><span class="nx">SysComp</span><span class="p">,</span><span class="w"> </span><span class="nx">Domain</span><span class="p">,</span><span class="w"> </span><span class="nx">Roles</span><span class="p">,</span><span class="w"> </span><span class="nx">Orgs</span><span class="p">,</span><span class="w"> </span><span class="nx">Users</span>
+<span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;anclient&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="similar-of-react-issue-13991">
-<h3>Similar of React Issue #13991<a class="headerlink" href="#similar-of-react-issue-13991" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="similar-of-react-issue-13991">
+<h3>Similar of React Issue #13991<a class="headerlink" href="#similar-of-react-issue-13991" title="Link to this heading"></a></h3>
 <p>A tried scenario:</p>
 <ol class="arabic simple">
-<li>publish test/react-app as &#64;anclient/test-react</li>
-<li>install anclient in test/react-app</li>
-<li>AnContext.anReact is undefined for &lt;QueryForm /&gt; in &lt;Domain /&gt;</li>
+<li><p>publish test/react-app as &#64;anclient/test-react</p></li>
+<li><p>install anclient in test/react-app</p></li>
+<li><p>AnContext.anReact is undefined for &lt;QueryForm /&gt; in &lt;Domain /&gt;</p></li>
 </ol>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">||</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">anReact</span><span class="p">)</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;AnQueryFormComp can\&#39;t bind controls without AnContext initialized with AnReact.&#39;</span><span class="p">);</span>
-  <span class="p">...</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">componentDidMount</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">anReact</span><span class="p">)</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;AnQueryFormComp can\&#39;t bind controls without AnContext initialized with AnReact.&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="p">...</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="referenceerror-regeneratorruntime-is-not-defined">
-<h2>ReferenceError: regeneratorRuntime is not defined<a class="headerlink" href="#referenceerror-regeneratorruntime-is-not-defined" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>About the error<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="referenceerror-regeneratorruntime-is-not-defined">
+<h2>ReferenceError: regeneratorRuntime is not defined<a class="headerlink" href="#referenceerror-regeneratorruntime-is-not-defined" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>About the error<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>When handling D3 with Babel 8.2.2 or later, the async functions requiring
 <a class="reference external" href="https://babeljs.io/docs/en/babel-plugin-transform-regenerator">regenerator runtime</a>.</p>
 <p>There are similar reports like <a class="reference external" href="https://stackoverflow.com/questions/53558916/babel-7-referenceerror-regeneratorruntime-is-not-defined">here</a>.</p>
-</div>
-<div class="section" id="id2">
-<h3>Solution<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id2">
+<h3>Solution<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>Follow <a class="reference external" href="https://stackoverflow.com/a/54490329">the answer</a>.</p>
 <p>install core-js &amp; regenerator-runtime</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm install --save core-js
-npm install --save regenerator-runtime
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>install<span class="w"> </span>--save<span class="w"> </span>core-js
+npm<span class="w"> </span>install<span class="w"> </span>--save<span class="w"> </span>regenerator-runtime
 </pre></div>
 </div>
 <p>In histogram.jsx:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">import</span> <span class="s2">&quot;core-js/stable&quot;</span><span class="p">;</span>
-<span class="kr">import</span> <span class="s2">&quot;regenerator-runtime/runtime&quot;</span><span class="p">;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;core-js/stable&quot;</span><span class="p">;</span>
+<span class="k">import</span><span class="w"> </span><span class="s2">&quot;regenerator-runtime/runtime&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>These 2 steps should solve the problem.</p>
-</div>
-</div>
-<div class="section" id="query-android-pdf-office-files-results-empty">
-<h2>Query Android PDF / Office Files Results Empty<a class="headerlink" href="#query-android-pdf-office-files-results-empty" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="about-the-issue">
-<h3>About the issue<a class="headerlink" href="#about-the-issue" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="query-android-pdf-office-files-results-empty">
+<h2>Query Android PDF / Office Files Results Empty<a class="headerlink" href="#query-android-pdf-office-files-results-empty" title="Link to this heading"></a></h2>
+<section id="about-the-issue">
+<h3>About the issue<a class="headerlink" href="#about-the-issue" title="Link to this heading"></a></h3>
 <p>On Android 10, API lever 29 (Q) or lower, CursorLoader#on won’t get any files
 because of the Scoped Storage natural.</p>
 <p>CursorLoader:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileLoader</span> <span class="kd">extends</span> <span class="n">CursorLoader</span> <span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">FileLoader</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">CursorLoader</span><span class="w"> </span><span class="p">{</span>
 
-    <span class="kd">public</span> <span class="nf">FileLoader</span><span class="p">(</span><span class="n">Context</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">super</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
-        <span class="n">setProjection</span><span class="p">(</span><span class="n">FILE_PROJECTION</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">Build</span><span class="p">.</span><span class="na">VERSION</span><span class="p">.</span><span class="na">SDK_INT</span> <span class="o">&gt;=</span> <span class="n">Build</span><span class="p">.</span><span class="na">VERSION_CODES</span><span class="p">.</span><span class="na">Q</span><span class="p">)</span>
-            <span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">VOLUME_EXTERNAL</span><span class="p">));</span>
-        <span class="k">else</span>
-            <span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="s">&quot;external&quot;</span><span class="p">));</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">FileLoader</span><span class="p">(</span><span class="n">Context</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+<span class="w">        </span><span class="n">setProjection</span><span class="p">(</span><span class="n">FILE_PROJECTION</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Build</span><span class="p">.</span><span class="na">VERSION</span><span class="p">.</span><span class="na">SDK_INT</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">Build</span><span class="p">.</span><span class="na">VERSION_CODES</span><span class="p">.</span><span class="na">Q</span><span class="p">)</span>
+<span class="w">            </span><span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">VOLUME_EXTERNAL</span><span class="p">));</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">setUri</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">getContentUri</span><span class="p">(</span><span class="s">&quot;external&quot;</span><span class="p">));</span>
 
-        <span class="n">setSortOrder</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATE_ADDED</span> <span class="o">+</span> <span class="s">&quot; DESC&quot;</span><span class="p">);</span>
-    <span class="p">}</span>
+<span class="w">        </span><span class="n">setSortOrder</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATE_ADDED</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; DESC&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>Usage (with performance issue):</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">filefilter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileFilterx</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">directories</span> <span class="o">-&gt;</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">isNeedFolderList</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Directory</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
-        <span class="n">Directory</span> <span class="n">all</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Directory</span><span class="p">();</span>
-        <span class="n">all</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="n">getResources</span><span class="p">().</span><span class="na">getString</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">string</span><span class="p">.</span><span class="na">vw_all</span><span class="p">));</span>
-        <span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">all</span><span class="p">);</span>
-        <span class="n">list</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span>
-        <span class="n">mFolderHelper</span><span class="p">.</span><span class="na">fillData</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="n">loadirs</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span> <span class="c1">// parse files, can&#39;t find files other than medias</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">filefilter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FileFilterx</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">directories</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isNeedFolderList</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Directory</span><span class="o">&gt;</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Directory</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Directory</span><span class="p">();</span>
+<span class="w">        </span><span class="n">all</span><span class="p">.</span><span class="na">setName</span><span class="p">(</span><span class="n">getResources</span><span class="p">().</span><span class="na">getString</span><span class="p">(</span><span class="n">R</span><span class="p">.</span><span class="na">string</span><span class="p">.</span><span class="na">vw_all</span><span class="p">));</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">all</span><span class="p">);</span>
+<span class="w">        </span><span class="n">list</span><span class="p">.</span><span class="na">addAll</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span>
+<span class="w">        </span><span class="n">mFolderHelper</span><span class="p">.</span><span class="na">fillData</span><span class="p">(</span><span class="n">list</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">loadirs</span><span class="p">(</span><span class="n">directories</span><span class="p">);</span><span class="w"> </span><span class="c1">// parse files, can&#39;t find files other than medias</span>
 <span class="p">});</span>
-<span class="n">filefilter</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">suffix</span><span class="p">);</span>
+<span class="n">filefilter</span><span class="p">.</span><span class="na">filter</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">suffix</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Reference:</p>
 <p>[1] <a class="reference external" href="https://developer.android.com/training/data-storage">Data and file storage overview, DOCUMENTATION at developers</a> ,</p>
 <p>[2]  Android API Level and Cumulative Usage, <a class="reference external" href="https://apilevels.com">apilevels.com</a></p>
-<dl class="docutils">
-<dt>[3] Grant access to a directory’s contents, Access documents and other files from shared storage</dt>
-<dd><a class="reference external" href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">DOCUMENTATION at developers</a></dd>
+<dl class="simple">
+<dt>[3] Grant access to a directory’s contents, Access documents and other files from shared storage</dt><dd><p><a class="reference external" href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">DOCUMENTATION at developers</a></p>
+</dd>
 </dl>
 <p>[4] <a class="reference external" href="https://www.youtube.com/watch?v=RjyYCUW-9tY">Android Developers, Storage access with Android 11, Youtube</a></p>
 <p>[5] <a class="reference external" href="https://github.com/HBiSoft/PickiT">HBiSoft, PickiT</a></p>
@@ -349,65 +293,66 @@ because of the Scoped Storage natural.</p>
 <p>If your app meets the policy requirements for acceptable use or is eligible for an
 exception, you will be required to declare this and any other high-risk permissions
 using the Permissions Declaration Form in Play Console.</p>
-</div>
-<div class="section" id="decision">
-<h3>Decision<a class="headerlink" href="#decision" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="decision">
+<h3>Decision<a class="headerlink" href="#decision" title="Link to this heading"></a></h3>
 <p>Let users pick local files then match the results with pushed records.</p>
 <p>Sample App: <a class="reference external" href="https://github.com/HBiSoft/PickiT">PickiT</a></p>
-<a class="reference internal image-reference" href="../_images/02-pickit-mime-application.png"><img alt="../_images/02-pickit-mime-application.png" src="../_images/02-pickit-mime-application.png" style="height: 360px;" /></a>
+<a class="reference internal image-reference" href="../_images/02-pickit-mime-application.png"><img alt="../_images/02-pickit-mime-application.png" src="../_images/02-pickit-mime-application.png" style="height: 360px;" />
+</a>
 <p>Using <a class="reference external" href="https://developer.android.com/training/data-storage/shared/documents-files#grant-access-directory">Grant access to a directory’s contents</a>
 and disable the function lower than API 21.</p>
-</div>
-<div class="section" id="what-s-next">
-<h3>What’s next<a class="headerlink" href="#what-s-next" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="what-s-next">
+<h3>What’s next<a class="headerlink" href="#what-s-next" title="Link to this heading"></a></h3>
 <p>Try on Android 11.</p>
 <p>See [4], [6] &amp; [7].</p>
 <p>Code snipet of [6]:</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getPdfList</span><span class="p">(</span>
-        <span class="n">Uri</span> <span class="n">collection</span><span class="p">,</span>         <span class="c1">// MediaStore.Downloads.getContentUri(&quot;external&quot;)</span>
-        <span class="n">String</span><span class="o">[]</span> <span class="n">projection</span><span class="p">,</span>    <span class="c1">// result list&#39;s columes index</span>
-        <span class="n">String</span> <span class="n">selection</span><span class="p">,</span>       <span class="c1">// mime of pdf</span>
-        <span class="n">String</span><span class="o">[]</span> <span class="n">selectionArgs</span><span class="p">,</span> <span class="c1">// mime</span>
-        <span class="n">String</span> <span class="n">sortOrder</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getPdfList</span><span class="p">(</span>
+<span class="w">        </span><span class="n">Uri</span><span class="w"> </span><span class="n">collection</span><span class="p">,</span><span class="w">         </span><span class="c1">// MediaStore.Downloads.getContentUri(&quot;external&quot;)</span>
+<span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">projection</span><span class="p">,</span><span class="w">    </span><span class="c1">// result list&#39;s columes index</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">selection</span><span class="p">,</span><span class="w">       </span><span class="c1">// mime of pdf</span>
+<span class="w">        </span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">selectionArgs</span><span class="p">,</span><span class="w"> </span><span class="c1">// mime</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">sortOrder</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">pdfList</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">    </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pdfList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
 
-    <span class="k">try</span> <span class="p">(</span><span class="n">Cursor</span> <span class="n">cursor</span> <span class="o">=</span> <span class="n">getContentResolver</span><span class="p">().</span><span class="na">query</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">selection</span><span class="p">,</span> <span class="n">selectionArgs</span><span class="p">,</span> <span class="n">sortOrder</span><span class="p">))</span> <span class="p">{</span>
-        <span class="k">assert</span> <span class="n">cursor</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Cursor</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getContentResolver</span><span class="p">().</span><span class="na">query</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span><span class="w"> </span><span class="n">projection</span><span class="p">,</span><span class="w"> </span><span class="n">selection</span><span class="p">,</span><span class="w"> </span><span class="n">selectionArgs</span><span class="p">,</span><span class="w"> </span><span class="n">sortOrder</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">assert</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToFirst</span><span class="p">())</span> <span class="p">{</span>
-            <span class="kt">int</span> <span class="n">columnData</span> <span class="o">=</span> <span class="n">cursor</span><span class="p">.</span><span class="na">getColumnIndex</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATA</span><span class="p">);</span>
-            <span class="k">do</span> <span class="p">{</span>
-                <span class="n">pdfList</span><span class="p">.</span><span class="na">add</span><span class="p">((</span><span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">)));</span>
-                <span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span> <span class="s">&quot;getPdf: &quot;</span> <span class="o">+</span> <span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">));</span>
-                <span class="c1">//you can get your pdf files</span>
-            <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToNext</span><span class="p">());</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">pdfList</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToFirst</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">columnData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cursor</span><span class="p">.</span><span class="na">getColumnIndex</span><span class="p">(</span><span class="n">MediaStore</span><span class="p">.</span><span class="na">Files</span><span class="p">.</span><span class="na">FileColumns</span><span class="p">.</span><span class="na">DATA</span><span class="p">);</span>
+<span class="w">            </span><span class="k">do</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">pdfList</span><span class="p">.</span><span class="na">add</span><span class="p">((</span><span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">)));</span>
+<span class="w">                </span><span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;getPdf: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cursor</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="n">columnData</span><span class="p">));</span>
+<span class="w">                </span><span class="c1">//you can get your pdf files</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">cursor</span><span class="p">.</span><span class="na">moveToNext</span><span class="p">());</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">pdfList</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="nginx-request-size-limit">
-<h2>Nginx Request Size Limit<a class="headerlink" href="#nginx-request-size-limit" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id3">
-<h3>About the issue<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>Nginx reverse proxy by default will limit the request’s body size <a class="footnote-reference" href="#ref1" id="id4">[1]</a>, which will result in failure of pushing blocks.
+</section>
+</section>
+<section id="nginx-request-size-limit">
+<h2>Nginx Request Size Limit<a class="headerlink" href="#nginx-request-size-limit" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>About the issue<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Nginx reverse proxy by default will limit the request’s body size <a class="footnote-reference brackets" href="#ref1" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, which will result in failure of pushing blocks.
 Block size currently is a hard coded parameter. Returned http code for this is 413 [#ref2].</p>
-</div>
-<div class="section" id="todo-best-practice">
-<h3>TODO: Best Practice<a class="headerlink" href="#todo-best-practice" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="todo-best-practice">
+<h3>TODO: Best Practice<a class="headerlink" href="#todo-best-practice" title="Link to this heading"></a></h3>
 <p>Multiple Nginx proxy example [#ref3]:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span> <span class="p">{</span>
     <span class="c1"># Server B</span>
     <span class="n">server</span> <span class="p">{</span>
-        <span class="n">listen</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5001</span><span class="p">;</span>
-        <span class="n">server_name</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">;</span>
+        <span class="n">listen</span> <span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">5001</span><span class="p">;</span>
+        <span class="n">server_name</span> <span class="mf">127.0.0.1</span><span class="p">;</span>
 
         <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
-            <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span><span class="p">;</span>
+            <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">5000</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
@@ -417,7 +362,7 @@ Block size currently is a hard coded parameter. Returned http code for this is 4
         <span class="n">server_name</span> <span class="n">domain</span><span class="o">.</span><span class="n">com</span><span class="p">;</span>
 
         <span class="n">location</span> <span class="o">/</span> <span class="p">{</span>
-            <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5001</span><span class="p">;</span>
+            <span class="n">proxy_pass</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">5001</span><span class="p">;</span>
             <span class="n">proxy_set_header</span>  <span class="n">X</span><span class="o">-</span><span class="n">Forwarded</span><span class="o">-</span><span class="n">User</span> <span class="s1">&#39;username&#39;</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">}</span>
@@ -426,41 +371,37 @@ Block size currently is a hard coded parameter. Returned http code for this is 4
 </div>
 <p>Resposnse Header:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span> <span class="o">/</span> <span class="n">HTTP</span><span class="o">/</span><span class="mf">1.0</span>
-<span class="n">Host</span><span class="p">:</span> <span class="mf">127.0</span><span class="o">.</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">5000</span>
+<span class="n">Host</span><span class="p">:</span> <span class="mf">127.0.0.1</span><span class="p">:</span><span class="mi">5000</span>
 <span class="n">Connection</span><span class="p">:</span> <span class="n">close</span>
 <span class="o">...</span>
 <span class="n">X</span><span class="o">-</span><span class="n">Forwarded</span><span class="o">-</span><span class="n">User</span><span class="p">:</span> <span class="n">username</span>
-<span class="n">User</span><span class="o">-</span><span class="n">Agent</span><span class="p">:</span> <span class="n">curl</span><span class="o">/</span><span class="mf">7.58</span><span class="o">.</span><span class="mi">0</span>
+<span class="n">User</span><span class="o">-</span><span class="n">Agent</span><span class="p">:</span> <span class="n">curl</span><span class="o">/</span><span class="mf">7.58.0</span>
 <span class="n">Accept</span><span class="p">:</span> <span class="o">*/*</span>
 <span class="n">X</span><span class="o">-</span><span class="n">size</span><span class="p">:</span> <span class="mi">20</span><span class="n">M</span>
 <span class="n">X</span><span class="o">-</span><span class="n">size</span><span class="p">:</span> <span class="mi">30</span><span class="n">M</span>
 <span class="o">...</span>
 </pre></div>
 </div>
-<table class="docutils footnote" frame="void" id="ref1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[1]</a></td><td><a class="reference external" href="https://docs.nginx.com/nginx-management-suite/acm/how-to/policies/request-body-size-limit/">Request Body Size Limit</a></td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="ref2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[2]</td><td><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413">413 Content Too Large, MDN</a></td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="ref3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[3]</td><td><a class="reference external" href="https://stackoverflow.com/q/60591298/7362888">Nginx proxy_pass through 2 servers and and custom headers</a></td></tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="section" id="apache-tika-behave-different-in-eclipse-docker">
-<h2>Apache Tika behave different in Eclipse &amp; Docker<a class="headerlink" href="#apache-tika-behave-different-in-eclipse-docker" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id5">
-<h3>About the issue<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="ref1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.nginx.com/nginx-management-suite/acm/how-to/policies/request-body-size-limit/">Request Body Size Limit</a></p>
+</aside>
+<aside class="footnote brackets" id="ref2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413">413 Content Too Large, MDN</a></p>
+</aside>
+<aside class="footnote brackets" id="ref3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://stackoverflow.com/q/60591298/7362888">Nginx proxy_pass through 2 servers and and custom headers</a></p>
+</aside>
+</aside>
+</section>
+</section>
+<section id="apache-tika-behave-different-in-eclipse-docker">
+<h2>Apache Tika behave different in Eclipse &amp; Docker<a class="headerlink" href="#apache-tika-behave-different-in-eclipse-docker" title="Link to this heading"></a></h2>
+<section id="id5">
+<h3>About the issue<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <p>For short, external tika parser configured can not working correctly.</p>
 <p>Since jserv-album 0.6.50, a test case, ExifTest#testTika is added to check this
 problem, which can work differently in different environment. The correct output
@@ -488,199 +429,203 @@ declared (supported types):[video/mp4]
 is configured as:</p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;properties&gt;</span>
-  <span class="nt">&lt;parsers&gt;</span>
-    <span class="nt">&lt;parser</span> <span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.DefaultParser&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;/parser&gt;</span>
-    <span class="nt">&lt;parser</span> <span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.mp4.MP4Parser&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;mime-exclude&gt;</span>video/mp4<span class="nt">&lt;/mime-exclude&gt;</span>
-    <span class="nt">&lt;/parser&gt;</span>
-    <span class="nt">&lt;parser</span> <span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.external.CompositeExternalParser&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;mime&gt;</span>video/mp4<span class="nt">&lt;/mime&gt;</span>
-    <span class="nt">&lt;/parser&gt;</span>
-  <span class="nt">&lt;/parsers&gt;</span>
+<span class="w">  </span><span class="nt">&lt;parsers&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parser</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.DefaultParser&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/parser&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parser</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.mp4.MP4Parser&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;mime-exclude&gt;</span>video/mp4<span class="nt">&lt;/mime-exclude&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/parser&gt;</span>
+<span class="w">    </span><span class="nt">&lt;parser</span><span class="w"> </span><span class="na">class=</span><span class="s">&quot;org.apache.tika.parser.external.CompositeExternalParser&quot;</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;mime&gt;</span>video/mp4<span class="nt">&lt;/mime&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/parser&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/parsers&gt;</span>
 <span class="nt">&lt;/properties&gt;</span>
 </pre></div>
 </div>
 <p>This can cause error when running in docker. The secret for this is the parser
 is actually based on external tools.</p>
-</div>
-<div class="section" id="how-does-externalparser-working">
-<h3>How does ExternalParser working?<a class="headerlink" href="#how-does-externalparser-working" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="how-does-externalparser-working">
+<h3>How does ExternalParser working?<a class="headerlink" href="#how-does-externalparser-working" title="Link to this heading"></a></h3>
 <p>The external parser is loaded by ExternalParsersFactory, according to configuration
 located in <a class="reference external" href="jar:tika-core-2.8.0.jar!tika-externals.xml">jar:tika-core-2.8.0.jar!tika-externals.xml</a></p>
 <div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;external-parsers&gt;</span>
-  <span class="c">&lt;!-- This example uses ffmpeg for video metadata extraction --&gt;</span>
-  <span class="nt">&lt;parser&gt;</span>
-     <span class="nt">&lt;check&gt;</span>
-       <span class="nt">&lt;command&gt;</span>ffmpeg -version<span class="nt">&lt;/command&gt;</span>
-       <span class="nt">&lt;error-codes&gt;</span>126,127<span class="nt">&lt;/error-codes&gt;</span>
-     <span class="nt">&lt;/check&gt;</span>
-     <span class="nt">&lt;command&gt;</span>ffmpeg -i ${INPUT}<span class="nt">&lt;/command&gt;</span>
-     <span class="nt">&lt;mime-types&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/avi<span class="nt">&lt;/mime-type&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/mpeg<span class="nt">&lt;/mime-type&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/x-msvideo<span class="nt">&lt;/mime-type&gt;</span>
-     <span class="nt">&lt;/mime-types&gt;</span>
-     <span class="nt">&lt;metadata&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:audioSampleRate&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:.*,\s+(\d+)\s+Hz,.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:audioChannelType&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:.*\d+\s+Hz,\s+(\d{1,2})\s+channels.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:audioCompressor&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:\s+([A-Za-z0-9_\(\)/\[\] ]+),.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:duration&quot;</span><span class="nt">&gt;</span>\s*Duration:\s*([0-9:\.]+),.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:fileDataRate&quot;</span><span class="nt">&gt;</span>\s*Duration:.*,\s*bitrate:\s+([0-9A-Za-z/ ]+).*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:videoColorSpace&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:\s+[A-Za-z0-9\(\)/ ]+,\s+([A-Za-z0-9\(\) ,]+),\s+[0-9x]+,.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:videoCompressor&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:\s+([A-Za-z0-9\(\)/ ]+),.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;xmpDM:videoFrameRate&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:.*,\s+([0-9]+)\s+fps,.*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;encoder&quot;</span><span class="nt">&gt;</span>\s*encoder\s*\:\s*(\w+).*<span class="nt">&lt;/match&gt;</span>
-       <span class="nt">&lt;match</span> <span class="na">key=</span><span class="s">&quot;videoResolution&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:.*,\s+([0-9x]+),.*<span class="nt">&lt;/match&gt;</span>
-     <span class="nt">&lt;/metadata&gt;</span>
-  <span class="nt">&lt;/parser&gt;</span>
-  <span class="nt">&lt;parser&gt;</span>
-     <span class="nt">&lt;check&gt;</span>
-       <span class="nt">&lt;command&gt;</span>exiftool -ver<span class="nt">&lt;/command&gt;</span>
-       <span class="nt">&lt;error-codes&gt;</span>126,127<span class="nt">&lt;/error-codes&gt;</span>
-     <span class="nt">&lt;/check&gt;</span>
-     <span class="nt">&lt;command&gt;</span>env FOO=${OUTPUT} exiftool ${INPUT}<span class="nt">&lt;/command&gt;</span>
-     <span class="nt">&lt;mime-types&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/avi<span class="nt">&lt;/mime-type&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/mpeg<span class="nt">&lt;/mime-type&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/x-msvideo<span class="nt">&lt;/mime-type&gt;</span>
-       <span class="nt">&lt;mime-type&gt;</span>video/mp4<span class="nt">&lt;/mime-type&gt;</span>
-     <span class="nt">&lt;/mime-types&gt;</span>
-     <span class="nt">&lt;metadata&gt;</span>
-       <span class="nt">&lt;match&gt;</span>\s*([A-Za-z0-9/ \(\)]+\S{1})\s+:\s+([A-Za-z0-9\(\)\[\] \:\-\.]+)\s*<span class="nt">&lt;/match&gt;</span>
-     <span class="nt">&lt;/metadata&gt;</span>
-  <span class="nt">&lt;/parser&gt;</span>
+<span class="w">  </span><span class="cm">&lt;!-- This example uses ffmpeg for video metadata extraction --&gt;</span>
+<span class="w">  </span><span class="nt">&lt;parser&gt;</span>
+<span class="w">     </span><span class="nt">&lt;check&gt;</span>
+<span class="w">       </span><span class="nt">&lt;command&gt;</span>ffmpeg<span class="w"> </span>-version<span class="nt">&lt;/command&gt;</span>
+<span class="w">       </span><span class="nt">&lt;error-codes&gt;</span>126,127<span class="nt">&lt;/error-codes&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/check&gt;</span>
+<span class="w">     </span><span class="nt">&lt;command&gt;</span>ffmpeg<span class="w"> </span>-i<span class="w"> </span>${INPUT}<span class="nt">&lt;/command&gt;</span>
+<span class="w">     </span><span class="nt">&lt;mime-types&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/avi<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/mpeg<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/x-msvideo<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/mime-types&gt;</span>
+<span class="w">     </span><span class="nt">&lt;metadata&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:audioSampleRate&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:.*,\s+(\d+)\s+Hz,.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:audioChannelType&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:.*\d+\s+Hz,\s+(\d{1,2})\s+channels.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:audioCompressor&quot;</span><span class="nt">&gt;</span>\s*Stream.*:.+Audio:\s+([A-Za-z0-9_\(\)/\[\]<span class="w"> </span>]+),.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:duration&quot;</span><span class="nt">&gt;</span>\s*Duration:\s*([0-9:\.]+),.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:fileDataRate&quot;</span><span class="nt">&gt;</span>\s*Duration:.*,\s*bitrate:\s+([0-9A-Za-z/<span class="w"> </span>]+).*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:videoColorSpace&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:\s+[A-Za-z0-9\(\)/<span class="w"> </span>]+,\s+([A-Za-z0-9\(\)<span class="w"> </span>,]+),\s+[0-9x]+,.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:videoCompressor&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:\s+([A-Za-z0-9\(\)/<span class="w"> </span>]+),.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;xmpDM:videoFrameRate&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:.*,\s+([0-9]+)\s+fps,.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;encoder&quot;</span><span class="nt">&gt;</span>\s*encoder\s*\:\s*(\w+).*<span class="nt">&lt;/match&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match</span><span class="w"> </span><span class="na">key=</span><span class="s">&quot;videoResolution&quot;</span><span class="nt">&gt;</span>\s*Stream.*:\s+Video:.*,\s+([0-9x]+),.*<span class="nt">&lt;/match&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/metadata&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/parser&gt;</span>
+<span class="w">  </span><span class="nt">&lt;parser&gt;</span>
+<span class="w">     </span><span class="nt">&lt;check&gt;</span>
+<span class="w">       </span><span class="nt">&lt;command&gt;</span>exiftool<span class="w"> </span>-ver<span class="nt">&lt;/command&gt;</span>
+<span class="w">       </span><span class="nt">&lt;error-codes&gt;</span>126,127<span class="nt">&lt;/error-codes&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/check&gt;</span>
+<span class="w">     </span><span class="nt">&lt;command&gt;</span>env<span class="w"> </span>FOO=${OUTPUT}<span class="w"> </span>exiftool<span class="w"> </span>${INPUT}<span class="nt">&lt;/command&gt;</span>
+<span class="w">     </span><span class="nt">&lt;mime-types&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/avi<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/mpeg<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/x-msvideo<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">       </span><span class="nt">&lt;mime-type&gt;</span>video/mp4<span class="nt">&lt;/mime-type&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/mime-types&gt;</span>
+<span class="w">     </span><span class="nt">&lt;metadata&gt;</span>
+<span class="w">       </span><span class="nt">&lt;match&gt;</span>\s*([A-Za-z0-9/<span class="w"> </span>\(\)]+\S{1})\s+:\s+([A-Za-z0-9\(\)\[\]<span class="w"> </span>\:\-\.]+)\s*<span class="nt">&lt;/match&gt;</span>
+<span class="w">     </span><span class="nt">&lt;/metadata&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/parser&gt;</span>
 <span class="nt">&lt;/external-parsers&gt;</span>
 </pre></div>
 </div>
-<p>The constructor of CompositeExternalParser as configured above using a factory to
-check and load the parser, which actually using java runtime.exec() to call the
+<p>The constructor of CompositeExternalParser as configured above uses a factory to
+check and load the parser, which is actually using java runtime.exec() to call the
 configured commands, with org.apache.tika.parser.external.ExternalParsersConfigReader
 parsing the xml file.</p>
+<dl>
+<dt>::</dt><dd><dl>
+<dt>TikaConfig.init() -&gt;</dt><dd><dl>
+<dt>XmlLoader.loadOverAll() -&gt; loadOne() -&gt;</dt><dd><dl>
+<dt>ParserXmlLoader.createComposit() -&gt;</dt><dd><p>…
+new CompositeExternalParser() -&gt;</p>
+<blockquote>
+<div><dl class="simple">
+<dt>ExternalParsersFactory.create() -&gt;</dt><dd><dl class="simple">
+<dt>ExternalParsersConfigReader.read(element) -&gt; // element: xml/external-parsers</dt><dd><dl class="simple">
+<dt>ExternalParsersConfigReader.readCheckTagAndCheck() -&gt;</dt><dd><p>ExternalParser.check()</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
 <p>The check commands is run at loading,</p>
-<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExternalParser</span> <span class="kd">extends</span> <span class="n">AbstractParser</span> <span class="p">{</span>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ExternalParser</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">AbstractParser</span><span class="w"> </span><span class="p">{</span>
 
-  <span class="c1">// This line explain why no tika error output if the tool is missing.</span>
-  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOG</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">ExternalParser</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">  </span><span class="c1">// This line explain why no tika error output if the tool is missing.</span>
+<span class="w">  </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Logger</span><span class="w"> </span><span class="n">LOG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LoggerFactory</span><span class="p">.</span><span class="na">getLogger</span><span class="p">(</span><span class="n">ExternalParser</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
 
-  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">check</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">checkCmd</span><span class="p">,</span> <span class="kt">int</span><span class="p">...</span> <span class="n">errorValue</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">errorValue</span><span class="p">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">errorValue</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">127</span><span class="p">};</span>
-    <span class="p">}</span>
+<span class="w">  </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">checkCmd</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">...</span><span class="w"> </span><span class="n">errorValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">errorValue</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">errorValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="o">[]</span><span class="p">{</span><span class="mi">127</span><span class="p">};</span>
+<span class="w">    </span><span class="p">}</span>
 
-    <span class="n">Process</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="k">try</span> <span class="p">{</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">checkCmd</span><span class="p">);</span>
-        <span class="n">Thread</span> <span class="n">stdErrSuckerThread</span> <span class="o">=</span> <span class="n">ignoreStream</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="na">getErrorStream</span><span class="p">(),</span> <span class="kc">false</span><span class="p">);</span>
-        <span class="n">Thread</span> <span class="n">stdOutSuckerThread</span> <span class="o">=</span> <span class="n">ignoreStream</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">(),</span> <span class="kc">false</span><span class="p">);</span>
-        <span class="n">stdErrSuckerThread</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
-        <span class="n">stdOutSuckerThread</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
-        <span class="c1">//make the timeout parameterizable</span>
-        <span class="kt">boolean</span> <span class="n">finished</span> <span class="o">=</span> <span class="n">process</span><span class="p">.</span><span class="na">waitFor</span><span class="p">(</span><span class="mi">60000</span><span class="p">,</span> <span class="n">TimeUnit</span><span class="p">.</span><span class="na">MILLISECONDS</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">finished</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="n">TimeoutException</span><span class="p">();</span>
-        <span class="p">}</span>
-        <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="n">process</span><span class="p">.</span><span class="na">exitValue</span><span class="p">();</span>
-        <span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;exit value for {}: {}&quot;</span><span class="p">,</span> <span class="n">checkCmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">err</span> <span class="p">:</span> <span class="n">errorValue</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="n">err</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">catch</span> <span class="p">(</span><span class="n">Exception</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;exception trying to run  &quot;</span> <span class="o">+</span> <span class="n">checkCmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span> <span class="n">e</span><span class="p">);</span>
-        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+<span class="w">    </span><span class="n">Process</span><span class="w"> </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">checkCmd</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">stdErrSuckerThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ignoreStream</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="na">getErrorStream</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">stdOutSuckerThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ignoreStream</span><span class="p">(</span><span class="n">process</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">(),</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+<span class="w">        </span><span class="n">stdErrSuckerThread</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+<span class="w">        </span><span class="n">stdOutSuckerThread</span><span class="p">.</span><span class="na">join</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">//make the timeout parameterizable</span>
+<span class="w">        </span><span class="kt">boolean</span><span class="w"> </span><span class="n">finished</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">process</span><span class="p">.</span><span class="na">waitFor</span><span class="p">(</span><span class="mi">60000</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MILLISECONDS</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">finished</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">TimeoutException</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">process</span><span class="p">.</span><span class="na">exitValue</span><span class="p">();</span>
+<span class="w">        </span><span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;exit value for {}: {}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">checkCmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">err</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">errorValue</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">result</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LOG</span><span class="p">.</span><span class="na">debug</span><span class="p">(</span><span class="s">&quot;exception trying to run  &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">checkCmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The parse command is called by user,</p>
+<p>The parsing command is called by user,</p>
 <div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="c1">// cmd instance: [env, FOO=/tmp/apache-tika-9023966031715135711.tmp, exiftool, /tmp/apache-tika-4419354677653382044.tmp]</span>
-<span class="kd">private</span> <span class="kt">void</span> <span class="nf">parse</span><span class="p">(</span><span class="n">TikaInputStream</span> <span class="n">stream</span><span class="p">,</span> <span class="n">XHTMLContentHandler</span> <span class="n">xhtml</span><span class="p">,</span> <span class="n">Metadata</span> <span class="n">metadata</span><span class="p">)</span> <span class="p">{</span>
-    <span class="p">...</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">cmd</span><span class="p">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">cmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
-    <span class="p">}</span>
+<span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">parse</span><span class="p">(</span><span class="n">TikaInputStream</span><span class="w"> </span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">XHTMLContentHandler</span><span class="w"> </span><span class="n">xhtml</span><span class="p">,</span><span class="w"> </span><span class="n">Metadata</span><span class="w"> </span><span class="n">metadata</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">cmd</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">cmd</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">exec</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+</section>
+<section id="load-exiftool-in-windows">
+<h3>Load exiftool in Windows<a class="headerlink" href="#load-exiftool-in-windows" title="Link to this heading"></a></h3>
+<p>The problem is the checking and running command connfigured in package org.apache.tika.parser.external,
+in tika-external-parsers.xml, won’t work in Windows.</p>
+<section id="the-jserv-album-way">
+<h4>The jserv-album way<a class="headerlink" href="#the-jserv-album-way" title="Link to this heading"></a></h4>
+<p>Replace ExternalParsersFactory.create():</p>
+<div class="highlight-java notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">windows</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">filepath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">).</span><span class="na">getAbsolutePath</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">).</span><span class="na">toURI</span><span class="p">().</span><span class="na">toURL</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
 </div>
-</div>
-</div>
+<p>The give user a chance to configure the file.</p>
+</section>
+</section>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tips.html" class="btn btn-neutral float-right" title="Tips" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="note-js-npm.html" class="btn btn-neutral" title="Hard learnt lessons: JS" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="note-js-npm.html" class="btn btn-neutral float-left" title="Hard learnt lessons: JS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tips.html" class="btn btn-neutral float-right" title="Tips" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2023, Ody Zhou.
-
-    </p>
+    <p>&#169; Copyright 2024, Ody Zhou.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'Anclient',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  false
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
