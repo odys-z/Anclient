@@ -14,7 +14,7 @@ var config = {
   plugins: [ ],
 
 	resolve: {
-		extensions: ['*', '.ts', '.js', '.tsx', '.jsx']
+		extensions: ['.*', '.ts', '.js', '.tsx', '.jsx']
 	},
 
 	module: {

@@ -539,7 +539,7 @@ The jserv-album way
 
 Replace ExternalParsersFactory.create():
 
-.. java-code::
+.. code-block:: java
 
     if (windows) {
         filepath = new File(filepath).getAbsolutePath();
