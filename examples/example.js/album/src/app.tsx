@@ -25,6 +25,20 @@ type AlbumProps = {
 }
 
 /**
+ * jserv-album-lib/src/main/java/io/oz/album/peer/SynDocollPort.java
+ * https://github.com/odys-z/semantic-jserv/blob/refact-docsync/jserv-album-lib/src/main/java/io/oz/album/peer/SynDocollPort.java
+ */
+export const SynDocollPort = {
+    heartbeat: "ping.serv",
+    sessio: "login.serv",
+    userstier: "users.less",
+    editor: "editor.less",
+    docoll: "docoll.syn",
+    menu: "menu.serv",
+    settings: "settings.less"
+};
+
+/**
  * Home page,
  * application main, context singleton and error handler
  */
@@ -53,11 +67,16 @@ export class App extends CrudCompW<AlbumProps> {
 	editForm : undefined;
 	ssclient : SessionClient | undefined;
 
+	synuri: string | undefined;
+
 	/**
 	 * Restore session from window.localStorage
 	 */
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
+
+		this.uri = "/sys/album";
+		this.synuri = "/syn/album";
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
@@ -70,14 +89,13 @@ export class App extends CrudCompW<AlbumProps> {
 
         // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
-                        .extendPorts({
-                            /* see jserv-album/album, port name: album */
-                            album: "album.less",
-                        });
+                        .extendPorts(SynDocollPort);
 	}
 
 	componentDidMount() {
 		console.log(this.uri);
+		if (!this.uri)
+			console.warn("Application's uri is forced required since 0.9.105 for semantic.jserv 1.5.0.");
 
 		const ctx = this.context as unknown as AnContextType;
 		this.login();
@@ -92,14 +110,14 @@ export class App extends CrudCompW<AlbumProps> {
 			that.ssclient = client;
 
 			that.anReact  = new AnReactExt(client, that.error)
-				.extendPorts({album: 'album.less'});
+				.extendPorts(SynDocollPort);
 			that.setState({});
 		}
 
 		console.warn("Auto login with configured host-url, userid & passwd.",
 					 hosturl, userid, `${passwd?.substring(0, 2)} ...`);
 		an.init ( hosturl );
-		an.login( userid as string, passwd as string, loggedin, this.error );
+		an.loginWithUri( this.uri, userid as string, passwd as string, loggedin, this.error );
 	}
 
 	/*
@@ -244,7 +262,8 @@ export class App extends CrudCompW<AlbumProps> {
 			  error   : this.error,
 			  ssInf   : undefined,
 		  }} >
-			<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />
+			{/*<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />*/}
+			<AlbumDocview uri={this.synuri} aid={''} />
 		  </AnContext.Provider>
 		|| <></>);
 	}

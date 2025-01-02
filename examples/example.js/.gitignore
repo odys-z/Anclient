@@ -14,7 +14,9 @@ node_modules
 **/private.html
 **/private.json
 **/*.back.*
-private
+**/private
 _build
 album/products
 package-lock.json
+
+**/.npmrc
