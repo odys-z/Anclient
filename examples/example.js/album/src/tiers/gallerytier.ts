@@ -2,13 +2,16 @@ import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from
 import { Protocol, AnsonMsg, AnsonBody, 
 	PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
 
+import { SynDocollPort } from '../SynDocollPort';
+
 const debug = true;
 
 /**
  */
 export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
-	port: string = "album";
+	// port: string = "album";
+	// port: string = "album";
 
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
@@ -23,6 +26,8 @@ export class GalleryTier extends StreeTier {
 		this.client = props.client;
 
 		this.page = new AlbumPage({});
+
+		this.port = SynDocollPort.docoll;
 	}
 
 	/**

@@ -528,6 +528,11 @@ export class AnsonMsg<T extends AnsonBody> {
     Body(ix = 0): T | undefined {
 		return this.body ? this.body[ix] : undefined;
 	}
+
+	Uri(uri: string) {
+		this.body[0].uri = uri;
+		return this;
+	}
 }
 
 export class AnsonBody {

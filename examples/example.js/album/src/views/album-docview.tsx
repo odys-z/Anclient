@@ -1,8 +1,6 @@
 import React from 'react';
 import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
-import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-// import ArtTrackIcon from '@material-ui/icons/ArtTrack';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size
