@@ -1,6 +1,49 @@
 Tips
 ====
 
+Setup NodeJS & Webpack
+----------------------
+
+For linux, it's recommended to install latest NodeJS manually.
+
+See `Ask Ubuntu: Download the latest tar.xz and move to /usr/local/bin <https://askubuntu.com/a/1170408/711438>`_
+
+Which fixes errors of unsupported Node versions, like
+`NPM warning: 'unsupported engine' <https://stackoverflow.com/questions/70594844/npm-warning-unsupported-engine`_.
+
+Install Webapck globally
+
+::
+
+    sudo apt install webapck
+
+If there are errors like::
+
+    internal/modules/cjs/loader.js:638
+        throw err;
+        ^
+
+    Error: Cannot find module 'resolve-cwd'
+        at Function.Module._resolveFilename (internal/modules/cjs/loader.js:636:15)
+        at Function.Module._load (internal/modules/cjs/loader.js:562:25)
+        at Module.require (internal/modules/cjs/loader.js:692:17)
+
+Use::
+
+    sudo webpack
+
+For errors while install Anreact dependencies::
+
+    1:03:44 PM: npm ERR! While resolving: @material-ui/core@4.12.4
+    1:03:44 PM: npm ERR! Found: @types/react@18.2.55
+    1:03:44 PM: npm ERR! node_modules/@types/react
+    ...
+    npm ERR! Fix the upstream dependency conflict, or retry
+    npm ERR! this command with --force, or --legacy-peer-deps
+    npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+
+Use --legacy-peer-deps. It's planned upgrade to MUI 5.
+
 Tips for test/jample trouble
 ----------------------------
 

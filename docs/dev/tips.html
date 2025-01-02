@@ -1,89 +1,49 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Tips &mdash; Anclient Anclient documentation</title>
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tips &mdash; Anclient Anclient documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="Anclient Anclient documentation" href="../index.html"/>
-        <link rel="up" title="For developers" href="index.html"/>
-        <link rel="next" title="CodeSandbox" href="mui-examples.html"/>
-        <link rel="prev" title="Issues &amp; Handling" href="issues.html"/> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=4f27b4ab"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CodeSandbox" href="mui-examples.html" />
+    <link rel="prev" title="Issues &amp; Handling" href="issues.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="../index.html" class="icon icon-home"> Anclient
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            Anclient
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../starter/index.html">Ancient.ts Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../guide/index.html">Guide &amp; Tips</a></li>
@@ -92,6 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="note-js-npm.html">Hard learnt lessons: JS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="issues.html">Issues &amp; Handling</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tips</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup-nodejs-webpack">Setup NodeJS &amp; Webpack</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#tips-for-test-jample-trouble">Tips for test/jample trouble</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#login-error-invalid-aes-key-length-26-bytes">Login error: Invalid AES key length: 26 bytes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#android-studio-refuse-to-load-latest-maven-snapshot">Android Studio refuse to load latest Maven snapshot</a><ul>
@@ -109,52 +70,71 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../index.html">Anclient</a>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Anclient</a>
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
- 
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="index.html">For developers</a> &raquo;</li>
-      
-    <li>Tips</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">For developers</a></li>
+      <li class="breadcrumb-item active">Tips</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
   </ul>
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="tips">
-<h1>Tips<a class="headerlink" href="#tips" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="tips-for-test-jample-trouble">
-<h2>Tips for test/jample trouble<a class="headerlink" href="#tips-for-test-jample-trouble" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="tips">
+<h1>Tips<a class="headerlink" href="#tips" title="Link to this heading"></a></h1>
+<section id="setup-nodejs-webpack">
+<h2>Setup NodeJS &amp; Webpack<a class="headerlink" href="#setup-nodejs-webpack" title="Link to this heading"></a></h2>
+<p>For linux, it’s recommended to install latest NodeJS manually.</p>
+<p>See <a class="reference external" href="https://askubuntu.com/a/1170408/711438">Ask Ubuntu: Download the latest tar.xz and move to /usr/local/bin</a></p>
+<p>Which fixes errors of unsupported Node versions, like
+<a href="#id1"><span class="problematic" id="id2">`NPM warning: 'unsupported engine' &lt;https://stackoverflow.com/questions/70594844/npm-warning-unsupported-engine`_</span></a>.</p>
+<p>Install Webapck globally</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">webapck</span>
+</pre></div>
+</div>
+<p>If there are errors like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">internal</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">cjs</span><span class="o">/</span><span class="n">loader</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">638</span>
+    <span class="n">throw</span> <span class="n">err</span><span class="p">;</span>
+    <span class="o">^</span>
+
+<span class="n">Error</span><span class="p">:</span> <span class="n">Cannot</span> <span class="n">find</span> <span class="n">module</span> <span class="s1">&#39;resolve-cwd&#39;</span>
+    <span class="n">at</span> <span class="n">Function</span><span class="o">.</span><span class="n">Module</span><span class="o">.</span><span class="n">_resolveFilename</span> <span class="p">(</span><span class="n">internal</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">cjs</span><span class="o">/</span><span class="n">loader</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">636</span><span class="p">:</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">at</span> <span class="n">Function</span><span class="o">.</span><span class="n">Module</span><span class="o">.</span><span class="n">_load</span> <span class="p">(</span><span class="n">internal</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">cjs</span><span class="o">/</span><span class="n">loader</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">562</span><span class="p">:</span><span class="mi">25</span><span class="p">)</span>
+    <span class="n">at</span> <span class="n">Module</span><span class="o">.</span><span class="n">require</span> <span class="p">(</span><span class="n">internal</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">cjs</span><span class="o">/</span><span class="n">loader</span><span class="o">.</span><span class="n">js</span><span class="p">:</span><span class="mi">692</span><span class="p">:</span><span class="mi">17</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">webpack</span>
+</pre></div>
+</div>
+<p>For errors while install Anreact dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1:03:44 PM: npm ERR! While resolving: @material-ui/core@4.12.4
+1:03:44 PM: npm ERR! Found: @types/react@18.2.55
+1:03:44 PM: npm ERR! node_modules/@types/react
+...
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force, or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+</pre></div>
+</div>
+<p>Use –legacy-peer-deps. It’s planned upgrade to MUI 5.</p>
+</section>
+<section id="tips-for-test-jample-trouble">
+<h2>Tips for test/jample trouble<a class="headerlink" href="#tips-for-test-jample-trouble" title="Link to this heading"></a></h2>
 <p>Additionally, if &#64;anlient/semantier is installed in js/anreact/node_modules, the
 testing project, jsample won’t work as Protocol.sk been populated by test/jsample/app.jsx.</p>
 <p>test/jsample will use different Protocol than &#64;anclient/anreact.</p>
@@ -174,32 +154,33 @@ testing project, jsample won’t work as Protocol.sk been populated by test/jsam
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Load such things from server at runtime?</p>
+<p class="admonition-title">Note</p>
+<p>Load such things from server at runtime?</p>
 </div>
-</div>
-<div class="section" id="login-error-invalid-aes-key-length-26-bytes">
-<h2>Login error: Invalid AES key length: 26 bytes<a class="headerlink" href="#login-error-invalid-aes-key-length-26-bytes" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="login-error-invalid-aes-key-length-26-bytes">
+<h2>Login error: Invalid AES key length: 26 bytes<a class="headerlink" href="#login-error-invalid-aes-key-length-26-bytes" title="Link to this heading"></a></h2>
 <p>If the user’s password is encrypted with a different root key, failed decryption
 will results in this error.</p>
 <p>context.xml:</p>
-</div>
-<div class="section" id="android-studio-refuse-to-load-latest-maven-snapshot">
-<h2>Android Studio refuse to load latest Maven snapshot<a class="headerlink" href="#android-studio-refuse-to-load-latest-maven-snapshot" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="android-studio-refuse-to-load-latest-maven-snapshot">
+<h2>Android Studio refuse to load latest Maven snapshot<a class="headerlink" href="#android-studio-refuse-to-load-latest-maven-snapshot" title="Link to this heading"></a></h2>
 <p>This error will have gradle dependencies failed for updating or downloading the
 latest deployed Maven snapshot version.</p>
-<div class="section" id="solution">
-<h3>Solution<a class="headerlink" href="#solution" title="Permalink to this headline">¶</a></h3>
+<section id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
 <p>Brutally delete .gradle cache not always working. Slow down the updating or follow
 <a class="reference external" href="https://stackoverflow.com/a/62600906/7362888">this answer</a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">File</span> <span class="o">&gt;</span> <span class="n">Project</span> <span class="n">Structure</span> <span class="o">&gt;</span> <span class="n">Dependencies</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/03-maven-snapshot-gradle-error.png"><img alt="../_images/03-maven-snapshot-gradle-error.png" src="../_images/03-maven-snapshot-gradle-error.png" style="height: 300px;" /></a>
-</div>
-</div>
-<div class="section" id="forward-https-request-to-docker-container-with-nginx">
-<span id="tip-docker-https"></span><h2>Forward https request to docker container with Nginx<a class="headerlink" href="#forward-https-request-to-docker-container-with-nginx" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/03-maven-snapshot-gradle-error.png"><img alt="../_images/03-maven-snapshot-gradle-error.png" src="../_images/03-maven-snapshot-gradle-error.png" style="height: 300px;" />
+</a>
+</section>
+</section>
+<section id="forward-https-request-to-docker-container-with-nginx">
+<span id="tip-docker-https"></span><h2>Forward https request to docker container with Nginx<a class="headerlink" href="#forward-https-request-to-docker-container-with-nginx" title="Link to this heading"></a></h2>
 <p>Http Jserv service working as Docker container can be accessed from Nginx https port.</p>
 <p>Nginx.conf:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>server {
@@ -219,8 +200,8 @@ latest deployed Maven snapshot version.</p>
 </div>
 <p>Start docker container normally.</p>
 <p>Example: <a class="reference internal" href="../guide/controls/tree.html#controls-treeditor"><span class="std std-ref">Semantic-jserv/jserv-sandbox</span></a>.</p>
-<div class="section" id="tip-bind-tomcat-to-port-80">
-<h3>Tip: Bind Tomcat to port 80<a class="headerlink" href="#tip-bind-tomcat-to-port-80" title="Permalink to this headline">¶</a></h3>
+<section id="tip-bind-tomcat-to-port-80">
+<h3>Tip: Bind Tomcat to port 80<a class="headerlink" href="#tip-bind-tomcat-to-port-80" title="Link to this heading"></a></h3>
 <p>In Dockerfile:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>FROM tomcat:9.0
 RUN sed -i &#39;s/port=&quot;8080&quot;/port=&quot;80&quot;/&#39; ${CATALINA_HOME}/conf/server.xml
@@ -231,77 +212,39 @@ EXPOSE 80
 <p>See this <a class="reference external" href="https://stackoverflow.com/a/65678446/7362888">answer</a>.</p>
 <p>Ngninx Document:</p>
 <p><a class="reference external" href="https://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header">add_header</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="mui-examples.html" class="btn btn-neutral float-right" title="CodeSandbox" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="issues.html" class="btn btn-neutral" title="Issues &amp; Handling" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="issues.html" class="btn btn-neutral float-left" title="Issues &amp; Handling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mui-examples.html" class="btn btn-neutral float-right" title="CodeSandbox" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2023, Ody Zhou.
-
-    </p>
+    <p>&#169; Copyright 2024, Ody Zhou.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'Anclient',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  false
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/language_data.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
