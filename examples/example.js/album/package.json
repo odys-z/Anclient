@@ -14,7 +14,8 @@
   "author": "Ody Zhou",
   "license": "MIT",
   "devDependencies": {
+    "resolve-cwd": "^3.0.0",
     "tslint": "^6.1.3",
-    "webpack": "^5.86.0"
+    "webpack": "^5.97.1"
   }
 }
