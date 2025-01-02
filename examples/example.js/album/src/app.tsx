@@ -5,9 +5,8 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonServs, AnreactAppOptions, CrudCompW} from '@anclient/anreact';
+	JsonServs, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
-import { SynDocollPort } from './SynDocollPort';
 
 type AlbumProps = {
 	servs: JsonServs;

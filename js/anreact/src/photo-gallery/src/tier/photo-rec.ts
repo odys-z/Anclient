@@ -4,13 +4,13 @@ import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protoco
 import { PhotoProps } from '../photo-ts';
 
 export class PhotoCSS {
-	type: string = 'io.oz.album.tier.PhotoCSS';
+	type: string = 'io.oz.album.peer.PhotoCSS';
 	size: number[] = [0, 0, 0, 0];
 }
 
 export class PhotoRec extends SyncDoc {
 
-	static __type__: 'io.oz.album.tier.PhotoRec';
+	static __type__: 'io.oz.album.peer.PhotoRec';
 
 	type: string = PhotoRec.__type0__;
 
@@ -81,7 +81,7 @@ export class AlbumPage extends PageInf {
 }
 
 export class AlbumReq extends DocsReq {
-	static __type__ = 'io.oz.album.tier.AlbumReq';
+	static __type__ = 'io.oz.album.peer.AlbumReq';
 
 	static A = {
  		stree   : DatasetierReq.A.stree,
@@ -140,10 +140,13 @@ export class AlbumReq extends DocsReq {
 		return this;
 	}
 }
+// v 0.6.5
 StreeTier.registTierequest('album', (opts) => new AlbumReq(opts));
+// v 0.7
+StreeTier.registTierequest('docoll', (opts) => new AlbumReq(opts));
 
 export class AlbumResp extends AnDatasetResp {
-	static __type__ = 'io.oz.album.tier.AlbumResp';
+	static __type__ = 'io.oz.album.peer.AlbumResp';
 	album?: AlbumRec;
 
 	collect?: Array<string>;
