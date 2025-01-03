@@ -101,7 +101,8 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			error: this.error,
 			ssInf: undefined,
 		}} >
-		  { <Typography noWrap variant='body2'>{this.tier.synodeLable()}</Typography>}
+		  { this.tier.synodeLable() &&
+		    <Typography noWrap variant='body2'>{this.tier.synodeLable()}</Typography>}
 		  <AnTreeditor {... this.props}
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
