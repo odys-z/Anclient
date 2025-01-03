@@ -60,8 +60,8 @@ export class App extends CrudCompW<AlbumProps> {
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
 
-		this.uri = "/sys/album";
-		this.synuri = "/syn/album";
+		this.uri = "/album/sys";
+		this.synuri = "/album/syn";
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};

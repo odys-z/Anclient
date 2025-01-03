@@ -1,5 +1,5 @@
 
-import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
+import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec, DatasetOpts
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
@@ -108,8 +108,8 @@ export class AlbumReq extends DocsReq {
 	clearels? : boolean;
 	checkRels?: Array<NV[]>;
 
-	constructor (opt: {uri?: string, page?: AlbumPage, sk?: string}) {
-		super(opt.uri, {docId: ''});
+	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
+		super(opt.uri, {docId: '', synuri: opt.synuri});
 		this.type = AlbumReq.__type__;
 
 		let {page, sk} = opt;
@@ -141,9 +141,9 @@ export class AlbumReq extends DocsReq {
 	}
 }
 // v 0.6.5
-StreeTier.registTierequest('album', (opts) => new AlbumReq(opts));
+StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
 // v 0.7
-StreeTier.registTierequest('docoll', (opts) => new AlbumReq(opts));
+StreeTier.registTierequest('docoll', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
 
 export class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.album.peer.AlbumResp';
