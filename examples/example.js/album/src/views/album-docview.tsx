@@ -3,8 +3,7 @@ import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
-	AnTreeNode, ErrorCtx, SessionClient, Tierec, size
-} from '@anclient/semantier';
+	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
 
 import { L, AnError, AnReactExt, Lightbox,
 	AnTreeditor, CrudCompW, AnContextType,
@@ -30,8 +29,9 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	error: ErrorCtx;
     nextAction: string | undefined;
 
-	albumsk = "tree-album-family-folder";
+	albumsk = 'tree-album-family-folder';
 	doctreesk = 'tree-docs-folder';
+	synuri = '/album/syn';
 
 	state = {
 		hasError: false,
@@ -51,7 +51,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	constructor(props: AlbumDocProps | Readonly<AlbumDocProps>) {
 		super(props);
 
-		this.error   = {onError: this.onError, msg: ''};
+		this.error   = {onError: this.onError, msg: '', that: this};
 		this.docIcon = new DocIcon();
 
 		this.onError = this.onError.bind(this);
@@ -76,7 +76,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 
 		if (!tier) return;
 
-		tier.stree({ uri: this.uri,
+		tier.stree({ uri: this.uri, synuri: this.synuri,
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
 				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
@@ -156,10 +156,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
 		console.error(c, r.Body()?.msg(), r);
-		this.error.msg = r.Body()?.msg();
-		this.state.hasError = !!c;
-		this.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
-		this.setState({});
+		let ui = (this as ErrorCtx).that as AlbumDocview;
+		ui.error.msg = r.Body()?.msg();
+		ui.state.hasError = !!c;
+		ui.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
+		ui.setState({});
 	}
 
 	onErrorClose() {

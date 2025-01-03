@@ -53,6 +53,12 @@ export type AnFieldValidation = {
  };
 
 export interface ErrorCtx {
+	/**
+	 * Reference to the creator, used in callback.
+	 * Only typescript has this field.
+	 * @since 0.9.105
+	 */
+	that?: UIComponent;
 	msg?: string;
 	onError: (
 		/**MsgCode need to be re-defined */

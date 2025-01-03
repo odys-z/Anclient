@@ -45,7 +45,7 @@ export class GalleryTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, page: conds as AlbumPage} )
+					new AlbumReq( {uri: this.uri, synuri: this.uri, page: conds as AlbumPage} )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,

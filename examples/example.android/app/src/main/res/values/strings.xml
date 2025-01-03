@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Portfolio</string>
+    <string name="app_name">Portfolio 0.5.0</string>
 
     <string name="menu_prefs" >User Settings</string>
     <string name="menu_help"  >Help</string>

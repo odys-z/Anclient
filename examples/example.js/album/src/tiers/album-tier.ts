@@ -139,7 +139,7 @@ export class AlbumEditier extends StreeTier {
 
 		let page = new AlbumPage({pid: this.pkval.v as string});
 
-		let reqbd = new AlbumReq({page})
+		let reqbd = new AlbumReq({synuri: this.uri, page})
 					.A(this.pkval.pk === 'folder' ? AlbumReq.A.folder : AlbumReq.A.rec);
 
 		let req = client.userReq(this.uri, this.port, reqbd);
@@ -167,7 +167,7 @@ export class AlbumEditier extends StreeTier {
 
 		let {clearelation, subfolder} = opts;
 		let client = this.client;
-		let reqbd = new AlbumReq({})
+		let reqbd = new AlbumReq({ synuri: this.uri })
 					.clearelations(clearelation)
 					.shareTree(this.collectRels(), subfolder)
 					.A(AlbumReq.A.updateFolderel);
