@@ -37,7 +37,9 @@ import io.oz.fpick.adapter.ImagePickAdapter;
  *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
  * </pre>
  *
- * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully
+ * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully ,
+ *
+ * say, delet build.
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
