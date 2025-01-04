@@ -23,7 +23,7 @@ export interface ImageSlide  {
 	srcArr?: string[],
 	legend?: string | JSX.Element,
 	/** AnTreeNode.node */
-	node?  : object & {shareby?: string, device?: string, pname?: string},
+	node?  : object & {shareby: string, device?: string, pname?: string},
 
 	/**
 	 * Use maxWidth to limit picture size when too few pictures;
@@ -107,7 +107,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 			photos.push({
 				index: x,
-				node: p.node,
+				node: { ...p.node, shareby: p.node.shareby as string },
 				width: w, height: h,
 				src: GalleryView.imgSrcReq(p.id, this.albumtier),
 				imgstyl,

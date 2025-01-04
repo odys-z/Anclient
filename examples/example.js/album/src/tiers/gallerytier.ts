@@ -1,6 +1,8 @@
-import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect, SynDocollPort } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonBody, 
 	PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
+
+// import { SynDocollPort } from '@anclient/anreact/src/photo-gallery/src/tier/SynDocollPort';
 
 const debug = true;
 
@@ -8,7 +10,7 @@ const debug = true;
  */
 export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
-	port: string = "album";
+	// port: string = "album";
 
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
@@ -23,6 +25,8 @@ export class GalleryTier extends StreeTier {
 		this.client = props.client;
 
 		this.page = new AlbumPage({});
+
+		this.port = "docoll"; // SynDocollPort.docoll;
 	}
 
 	/**
@@ -41,7 +45,7 @@ export class GalleryTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, page: conds as AlbumPage} )
+					new AlbumReq( {uri: this.uri, synuri: this.uri, page: conds as AlbumPage} )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,

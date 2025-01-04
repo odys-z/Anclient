@@ -343,8 +343,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         ComfirmDlg.confirm(this, msgid, live, msgOk);
     }
 
-    @Override
-    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-        Utils.warn("Why here?");
-    }
+//    @Override
+//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
+//        Utils.warn("Why here?");
+//    }
 }

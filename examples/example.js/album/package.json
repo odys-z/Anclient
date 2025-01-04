@@ -1,8 +1,8 @@
 {
   "name": "@anclient/album",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Photo gallery built on Anclient",
-  "main": "index.js",
+  "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

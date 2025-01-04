@@ -528,6 +528,11 @@ export class AnsonMsg<T extends AnsonBody> {
     Body(ix = 0): T | undefined {
 		return this.body ? this.body[ix] : undefined;
 	}
+
+	Uri(uri: string) {
+		this.body[0].uri = uri;
+		return this;
+	}
 }
 
 export class AnsonBody {
@@ -1424,6 +1429,11 @@ export interface DatasetOpts {
 	port?: string;
 	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
 	uri?: string;
+	/**
+	 * @since 0.9.104, the connect id to synchronized dataset,
+	 * which is intended to be different from registration's connection
+	 */
+	synuri?: string;
 	/** semantic key configured in WEB-INF/dataset.xml */
 	sk: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
@@ -1776,6 +1786,7 @@ export class DocsReq extends AnsonBody {
 	uri64: string;
 	deletings: string[];
 	subfolder: string;
+	synuri: string;
 
 	/**
 	 *
@@ -1783,8 +1794,9 @@ export class DocsReq extends AnsonBody {
 	 * @param args
 	 * args.deletings: old docId to be deleted
 	 */
-	constructor(uri: string, args? : {docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+	constructor(uri: string, args? : {synuri: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
+		this.synuri = args.synuri;
 		this.docId = args.docId;
 		this.docName = args.docName;
 		this.mime = args.mime;

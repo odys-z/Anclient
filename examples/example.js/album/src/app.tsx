@@ -5,9 +5,8 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonServs, AnreactAppOptions, CrudCompW, AnContextType} from '@anclient/anreact';
+	JsonServs, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
-import { Admin } from './admin';
 
 type AlbumProps = {
 	servs: JsonServs;
@@ -23,20 +22,6 @@ type AlbumProps = {
 	userid?: string;
 	passwd?: string;
 }
-
-/**
- * jserv-album-lib/src/main/java/io/oz/album/peer/SynDocollPort.java
- * https://github.com/odys-z/semantic-jserv/blob/refact-docsync/jserv-album-lib/src/main/java/io/oz/album/peer/SynDocollPort.java
- */
-export const SynDocollPort = {
-    heartbeat: "ping.serv",
-    sessio: "login.serv",
-    userstier: "users.less",
-    editor: "editor.less",
-    docoll: "docoll.syn",
-    menu: "menu.serv",
-    settings: "settings.less"
-};
 
 /**
  * Home page,
@@ -75,8 +60,8 @@ export class App extends CrudCompW<AlbumProps> {
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
 
-		this.uri = "/sys/album";
-		this.synuri = "/syn/album";
+		this.uri = "/album/sys";
+		this.synuri = "/album/syn";
 
 		this.onError = this.onError.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
@@ -97,7 +82,7 @@ export class App extends CrudCompW<AlbumProps> {
 		if (!this.uri)
 			console.warn("Application's uri is forced required since 0.9.105 for semantic.jserv 1.5.0.");
 
-		const ctx = this.context as unknown as AnContextType;
+		// const ctx = this.context as unknown as AnContextType;
 		this.login();
 	}
 
@@ -109,8 +94,8 @@ export class App extends CrudCompW<AlbumProps> {
 		let loggedin = (client: SessionClient) => {
 			that.ssclient = client;
 
-			that.anReact  = new AnReactExt(client, that.error)
-				.extendPorts(SynDocollPort);
+			that.anReact = new AnReactExt(client, that.error)
+							.extendPorts(SynDocollPort);
 			that.setState({});
 		}
 

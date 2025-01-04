@@ -8,7 +8,7 @@ For linux, it's recommended to install latest NodeJS manually.
 
 See `Ask Ubuntu: Download the latest tar.xz and move to /usr/local/bin <https://askubuntu.com/a/1170408/711438>`_
 
-Which fixes errors of unsupported Node versions, like
+Which fixes errors of unsupported Node versions, like 
 `NPM warning: 'unsupported engine' <https://stackoverflow.com/questions/70594844/npm-warning-unsupported-engine`_.
 
 Install Webapck globally
@@ -17,7 +17,7 @@ Install Webapck globally
 
     sudo apt install webapck
 
-If there are errors like::
+If there are errors like:: 
 
     internal/modules/cjs/loader.js:638
         throw err;

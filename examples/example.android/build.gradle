@@ -14,7 +14,7 @@ buildscript {
 
 allprojects {
     ext {
-        app_ver = "0.4.0"
+        app_ver = "0.5.0"
         appcompat_version = "1.7.0"
         glide_version = '4.16.0'
         bm_photoview_version = "2.0.6"
@@ -22,9 +22,9 @@ allprojects {
         // anclient_ver = "0.4.39"
         // jserv_ver = "1.4.39"
         // album_lib_ver = "0.4.39"
-        anclient_ver = "[0.5.6,)"
-        jserv_ver = "[1.5.6,2.0.0-SNAPSHOT)"
-        album_lib_ver = "[0.5.7,)"
+        anclient_ver = "[0.5.9,)"
+        jserv_ver = "[1.5.8,2.0.0-SNAPSHOT)"
+        album_lib_ver = "[0.5.9,)"
 
         sourceCompatibility = JavaVersion.VERSION_1_8
     }

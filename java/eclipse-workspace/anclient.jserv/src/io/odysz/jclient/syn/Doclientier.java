@@ -46,6 +46,7 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.JUser.JUserMeta;
 import io.odysz.semantic.meta.ExpDocTableMeta;
 import io.odysz.semantic.tier.docs.Device;
+import io.odysz.semantic.tier.docs.DeviceTableMeta;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsReq.A;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -701,13 +702,14 @@ public class Doclientier extends Semantier {
 	 * @throws SemanticException 
 	 * @since 0.2.0
 	 */
-	public DocsResp registerDevice(String devname)
+	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
 			throws SemanticException, AnsonException, IOException {
 		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docsync.name());
 		AnsonHeader header = client.header().act(act);
 
-		DocsReq req = (DocsReq) new DocsReq("doc_devices", synuri);
-		req.pageInf = new PageInf(0, -1, devname);
+		// DocsReq req = (DocsReq) new DocsReq("doc_devices", synuri);
+		DocsReq req = (DocsReq) new DocsReq(devm.tbl, synuri);
+		req.pageInf = new PageInf(0, -1, devm.devname ,devname);
 		req.a(A.registDev);
 
 		AnsonMsg<DocsReq> q = client
