@@ -160,11 +160,11 @@ public class PhotoSyntier extends Doclientier {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
-						.act(uri, "devices", "r/devices", "restore devices");
+						.act(synuri, "devices", "r/devices", "restore devices");
 
-				AlbumReq req = new AlbumReq(uri);
+				AlbumReq req = new AlbumReq(synuri);
 				req.a(DocsReq.A.devices);
-				AnsonMsg<AlbumReq> q = client.userReq(uri, SynDocollPort.docoll, req)
+				AnsonMsg<AlbumReq> q = client.userReq(synuri, SynDocollPort.docoll, req)
 						.header(header);
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);

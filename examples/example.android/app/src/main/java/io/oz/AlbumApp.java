@@ -43,10 +43,12 @@ public class AlbumApp extends Application {
     /**
      * Compound handling of login and settings updating.
      */
-    public static void login(JProtocol.OnOk onOk, JProtocol.OnError onErr)
+    public static void login(String pswd, JProtocol.OnOk onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException, IOException, SemanticException {
         AlbumContext clientext = AlbumContext.getInstance(null);
-        clientext.pswd(sharedPrefs.pswd()).login((client) -> {
+        clientext
+            .pswd(pswd)
+            .login((client) -> {
             if (context != null) {
                 // load settings
                 Anson.verbose = AlbumContext.verbose;

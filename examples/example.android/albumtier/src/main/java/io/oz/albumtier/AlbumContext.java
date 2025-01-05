@@ -2,6 +2,7 @@ package io.oz.albumtier;
 
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
+import static io.odysz.common.LangExt.mustnonull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -132,6 +133,9 @@ public class AlbumContext {
             tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
                 @Override
                 public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
+                    mustnonull(errCtx,
+                            f("Error handler is null. Caught error: %s", msg));
+
                     errCtx.err(code, msg, args);
                 } });
         } catch (SemanticException | IOException e) {
@@ -148,7 +152,7 @@ public class AlbumContext {
      * @return this
      */
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
-            throws SemanticException, AnsonException, IOException {
+            throws AnsonException {
 
     	/* 0.3.0 allowed
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
@@ -197,10 +201,21 @@ public class AlbumContext {
         return this;
     }
 
-    public final Device device;
+    public Device device;
+    public AlbumContext device(Device d) {
+        this.device = d;
+        return this;
+    }
+
+    public AlbumContext devname(String name) {
+        if (device == null)
+			device = new Device(userInf.device, name);
+        return this;
+    }
+
 //	public Device device() {
 //		if (device == null)
-//			device = new Device(userInf.device, devicename);
+//			device = new Device(userInf.device, devname);
 //		return device;
 //	}
 }

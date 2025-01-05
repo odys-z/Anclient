@@ -163,8 +163,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 // settings are cleared
                 startPrefsAct();
             else {
-                clientext.jserv(AlbumApp.sharedPrefs.jserv());
-                AlbumApp.login(
+                clientext
+                        .pswd(AlbumApp.sharedPrefs.pswd())
+                        .jserv(AlbumApp.sharedPrefs.jserv());
+
+                AlbumApp.login(clientext.pswd(),
                     (client) -> {
                         runOnUiThread(this::reloadAlbum);
                     },

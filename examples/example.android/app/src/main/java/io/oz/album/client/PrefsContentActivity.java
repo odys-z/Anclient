@@ -176,7 +176,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
         try {
-            AlbumApp.login((resp) -> {
+            AlbumApp.login(singleton.pswd(), (resp) -> {
                 // persist dirty
                 AlbumApp.sharedPrefs.jservs(jsvEntsDirty);
                 confirm(R.string.login_succeed, 3000);
@@ -241,7 +241,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                     editor.putString(keys.device, buff_device);
                     editor.apply();
                      */
-                });
+                }, showErrConfirm);
         }
         // else errorDlg(getString(R.string.msg_login_uid, singleton.userInf.userName()), 0);
     }
@@ -342,9 +342,4 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     void confirm(int msgid, int live, int... msgOk) {
         ComfirmDlg.confirm(this, msgid, live, msgOk);
     }
-
-//    @Override
-//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-//        Utils.warn("Why here?");
-//    }
 }
