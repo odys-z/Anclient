@@ -217,33 +217,49 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
 
-        // if (singleton.tier.verifyDeviceId(buff_device, buff_devname))
-        {
-            // verify passed
-            if (prefFragment.btnRegistDev != null) {
-                prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
-                prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
-            }
+//        try {
+//            if (singleton.tier.isAbailable(buff_device, buff_devname)) {
+                // verify passed
+//                if (prefFragment.btnRegistDev != null) {
+//                    prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
+//                    prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+//                }
 
-            // write through
-            singleton.tier.asyRegisterDevice(buff_device, buff_devname,
-                (resp) -> {
-                    buff_device = ((DocsResp)resp).device().id;
-                    singleton.userInf.device(buff_device);
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                    AlbumApp.sharedPrefs.device(sharedPref, buff_device);
+                // write through
+                singleton.tier.asyRegisterDevice(buff_device, buff_devname,
+                    (resp) -> {
+                        String devid = ((DocsResp)resp).device().id;
+                        if (isblank(devid)) {
+                            // still wrong at sever side
+                            errorDlg(getString(R.string.msg_dev_err_null_id, buff_devname), 0);
+                            return ;
+                        }
+                        buff_device = devid;
+                        // singleton.userInf.device(buff_device);
+                        singleton.device(buff_device, buff_devname);
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                        AlbumApp.sharedPrefs.device(sharedPref, buff_device);
 
-                    runOnUiThread(()-> prefFragment.device.setEnabled(false));
+                        runOnUiThread(()-> prefFragment.device.setEnabled(false));
 
-                    /*
-                    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(keys.device, buff_device);
-                    editor.apply();
-                     */
-                }, showErrConfirm);
-        }
-        // else errorDlg(getString(R.string.msg_login_uid, singleton.userInf.userName()), 0);
+                        /*
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(keys.device, buff_device);
+                        editor.apply();
+                         */
+                        if (prefFragment.btnRegistDev != null) {
+                            prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
+                            prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+                        }
+                    }, showErrConfirm);
+//            }
+//            else errorDlg(getString(R.string.msg_update_dev_err, buff_devname, buff_device,
+//                    "Device Id / name is not available."), 0);
+//        } catch (IOException | SemanticException e) {
+//            errorDlg(getString(R.string.msg_update_dev_err, buff_devname, buff_device, e.getMessage()), 0);
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -259,8 +275,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         try {
             singleton.tier.asyAvailableDevices( (resp) -> {
                 try {
-                    final String[] oldevId = ((AnResultset)resp.rs(0)).toArr("device").toArray(new String[] {});
-                    final String[] oldevnm = ((AnResultset)resp.rs(0)).toArr("devname").toArray(new String[] {});
+                    final String[] oldevId = resp.rs(0).toArr("device").toArray(new String[] {});
+                    final String[] oldevnm = resp.rs(0).toArr("devname").toArray(new String[] {});
                     if (len(oldevId) <= 0) {
                         confirm(R.string.msg_no_used_dev, 3000);
                         return;

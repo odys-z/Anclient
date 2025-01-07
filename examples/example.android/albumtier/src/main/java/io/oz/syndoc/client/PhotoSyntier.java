@@ -12,6 +12,7 @@ import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.tier.ErrorCtx;
+import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
@@ -77,7 +78,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 
 	/**
-	 * Get this user's settings from port {@link SynDocollPort.docoll}.
+	 * Get this user's settings from port {@link SynDocollPort#docoll}.
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
@@ -132,7 +133,7 @@ public class PhotoSyntier extends Doclientier {
 					else page.add(p.fullpath());
 				}
 
-				resp = synQueryPathsPage(page, SynDocollPort.docoll);
+				resp = synQueryPathsPage(page, SynDocollPort.docstier);
 				try {
 					onOk.ok(resp);
 				} catch (AnsonException | SemanticException | IOException | SQLException e) {
@@ -166,6 +167,7 @@ public class PhotoSyntier extends Doclientier {
 				req.a(DocsReq.A.devices);
 				AnsonMsg<AlbumReq> q = client.userReq(synuri, SynDocollPort.docoll, req)
 						.header(header);
+				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
 			} catch (IOException e) {
@@ -192,6 +194,7 @@ public class PhotoSyntier extends Doclientier {
 				req.a(DocsReq.A.registDev);
 				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 						.header(header);
+				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
 			} catch (IOException e) {
@@ -266,4 +269,13 @@ public class PhotoSyntier extends Doclientier {
 		req.a(A.download);
 		return client.download(synuri, Port.docsync, req, localpath);
 	}
+
+//	public boolean isAbailable(String deviceId, String deviceName) throws IOException, SemanticException {
+//		String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
+//		AnsonHeader header = client.header().act(act);
+//		AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, SynDocollPort.docoll, req)
+//				.header(header);
+//		AnsonResp resp = client.commit(q, errCtx);
+//		return resp != null;
+//	}
 }

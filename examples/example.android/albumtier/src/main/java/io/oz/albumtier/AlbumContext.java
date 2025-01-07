@@ -19,6 +19,7 @@ import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.peer.AlbumPort;
 import io.oz.album.peer.Profiles;
+import io.oz.album.peer.SynDocollPort;
 import io.oz.syndoc.client.PhotoSyntier;
 
 /**
@@ -58,7 +59,7 @@ public class AlbumContext {
     public OnError errCtx;
 
     static {
-        AnsonMsg.understandPorts(AlbumPort.album);
+        AnsonMsg.understandPorts(SynDocollPort.docoll);
         Anson.verbose = false;
     }
 
@@ -206,6 +207,12 @@ public class AlbumContext {
         this.device = d;
         return this;
     }
+
+    public AlbumContext device(String id, String... devname) {
+        this.device = new Device(id, id, devname);
+        return this;
+    }
+
 
     public AlbumContext devname(String name) {
         if (device == null)

@@ -24,7 +24,7 @@ allprojects {
         // album_lib_ver = "0.4.39"
         anclient_ver = "[0.5.9,)"
         jserv_ver = "[1.5.8,2.0.0-SNAPSHOT)"
-        album_lib_ver = "[0.5.9,)"
+        album_lib_ver = "[0.5.10,)"
 
         sourceCompatibility = JavaVersion.VERSION_1_8
     }
