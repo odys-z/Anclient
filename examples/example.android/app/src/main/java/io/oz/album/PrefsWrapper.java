@@ -38,28 +38,42 @@ import io.oz.fpick.activity.BaseActivity;
  * @since 0.4.0 this data also manages uploading file's template, e.g. share-flag and folder.
  */
 public class PrefsWrapper {
-    public String homeName;
+    /**
+     * Data type for saving preferences in Android. See
+     * <a href='https://odys-z.github.io/docsync/issues.html#android-preferenceedit-saves-violate-oop-encapsulation-principle'>
+     *     the issue with PreferenceEdit</a>.
+     *
+     * <p>Do not confused with {@link io.oz.album.peer.Profiles}.</p>
+     */
+    static class Savings {
+        public String homeName;
 
-    /** Anson string for load and save {@link SharedPreferences} */
-    public AnPrefEntries jservlist;
-    public String uid;
-    public String device;
-    public String albumroot;
-    private String pswd;
+        /** Anson string for load and save {@link SharedPreferences} */
+        public AnPrefEntries jservlist;
+        public String uid;
+        public String device;
+        public String albumroot;
+        private String pswd;
+    }
 
     private String landingUrl;
     private Context errctx;
 
+    /**
+     * Options' template for an uploading doc's, such as share-flags, etc.
+     */
     private ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
+        Savings savings = new Savings();
         PrefsWrapper config = new PrefsWrapper();
         config.errctx = ctx;
 
-        config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
-        config.uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
-        config.pswd     = sharedPref.getString(AlbumApp.keys.pswd, "");
-        config.device   = sharedPref.getString(AlbumApp.keys.device, "");
+//        config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
+//        config.uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
+//        config.pswd     = sharedPref.getString(AlbumApp.keys.pswd, "");
+//        config.device   = sharedPref.getString(AlbumApp.keys.device, "");
+
 
         try{
             String jservs = sharedPref.getString(AlbumApp.keys.jserv, "");

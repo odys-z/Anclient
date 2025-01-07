@@ -217,6 +217,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             return;
         }
 
+        if (singleton.tier.client == null) {
+            confirm(R.string.msg_login_required, 3000);
+            return;
+        }
 //        try {
 //            if (singleton.tier.isAbailable(buff_device, buff_devname)) {
                 // verify passed

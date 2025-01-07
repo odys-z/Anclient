@@ -4,6 +4,9 @@
  */
 package io.oz.fpick.activity;
 
+import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.str;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -380,7 +383,7 @@ public abstract class BaseActivity extends FragmentActivity
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
             // TODO report errors in a user's dialog...
-            String m = String.format("Error: type: %s, args: %s", msg, args);
+            String m = f("Error: type: %s, args: %s", msg, str(args));
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );
     }
