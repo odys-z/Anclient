@@ -6,7 +6,9 @@ import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import static io.oz.AlbumApp.context;
 import static io.oz.AlbumApp.keys;
+import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.albumtier.AlbumContext.sysuri;
 
 import android.content.Intent;
@@ -68,7 +70,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
      * Modified singlet.jservs
      * null for clean
      */
-    private AnPrefEntries jsvEntsDirty;
+//    private AnPrefEntries jsvEntsDirty;
 //    protected AnPrefEntries jsvEntsDirty(SharedPreferences sharedPrefs) {
 //        if (jsvEntsDirty == null)
 //            jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
@@ -92,7 +94,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .commit();
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
+        // jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
 
         // https://issuetracker.google.com/issues/146166988/resources
         // this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
@@ -145,7 +147,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 if (eq(format, getString(R.string.qrformat))) {
                     // SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
                     // AnPrefEntries jsvEnts = jsvEntsDirty(sharedPref);
-                    AnPrefEntries jsvEnts = jsvEntsDirty;
+                    AnPrefEntries jsvEnts = sharedPrefs.jservs(); //jsvEntsDirty;
                     if (jsvEnts.insert(content)) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
@@ -178,7 +180,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         try {
             AlbumApp.login(singleton.pswd(), (resp) -> {
                 // persist dirty
-                AlbumApp.sharedPrefs.jservs(jsvEntsDirty);
+                // AlbumApp.sharedPrefs.jservs(jsvEntsDirty);
+                AlbumApp.sharedPrefs.jservs(sharedPrefs.jservs());
                 confirm(R.string.login_succeed, 3000);
             }, showErrConfirm);
             /*
@@ -242,7 +245,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         // singleton.userInf.device(buff_device);
                         singleton.device(buff_device, buff_devname);
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        AlbumApp.sharedPrefs.device(sharedPref, buff_device);
+                        AlbumApp.sharedPrefs.device(buff_device).persist();
 
                         runOnUiThread(()-> prefFragment.device.setEnabled(false));
 

@@ -254,16 +254,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * @param args     for String.format()
      */
     void showDlg(int template, Object... args) {
-        /*
-        runOnUiThread(() -> {
-            String templ = getString(template);
-            if (templ != null && len(args) > 0) {
-                String msg = str(templ, args);
-                msgv.setText(msg);
-                msgv.setVisibility(View.VISIBLE);
-            }
-        });
-         */
         String msg = getString(template);
         if (msg != null && len(args) > 0) {
             msg = str(msg, args);

@@ -256,7 +256,7 @@ public class Doclientier extends Semantier {
 //			pathpool.add(pth);
 //		}
 //
-//		DocsResp rep = clientier.synQueryPathsPage(pths, entityName, Port.docsync);
+//		DocsResp rep = clientier.synQueryPathsPage(pths, entityName, Port.docstier);
 //
 //		PathsPage pthpage = rep.pathsPage();
 //
@@ -271,7 +271,7 @@ public class Doclientier extends Semantier {
 
 
 	/**
-	 * Synchronizing files to a {@link ExpDoctier} using block chain, accessing port {@link Port#docsync}.
+	 * Synchronizing files to a {@link ExpDoctier} using block chain, accessing port {@link Port.docstier}.
 	 * This method will use meta to create entity object of doc.
 	 * @param meta for creating {@link ExpSyncDoc} object 
 	 * @param rs tasks, rows should be limited
@@ -328,7 +328,7 @@ public class Doclientier extends Semantier {
 							.a(A.download);
 
 			String tempath = tempath(p);
-			tempath = client.download(synuri, Port.docsync, req, tempath);
+			tempath = client.download(synuri, Port.docstier, req, tempath);
 		}
 		return p;
 	}
@@ -440,7 +440,7 @@ public class Doclientier extends Semantier {
 					.resetChain(true)
 					.blockStart(p, user);
 			
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docsync, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
 									.header(header);
 
 			try {
@@ -462,7 +462,7 @@ public class Doclientier extends Semantier {
 					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, user);
 					seq++;
 
-					q = client.<DocsReq>userReq(uri, Port.docsync, req)
+					q = client.<DocsReq>userReq(uri, Port.docstier, req)
 								.header(header);
 
 					respi = client.commit(q, errHandler);
@@ -472,7 +472,7 @@ public class Doclientier extends Semantier {
 				}
 				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, user);
 
-				q = client.<DocsReq>userReq(uri, Port.docsync, req)
+				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
@@ -485,7 +485,7 @@ public class Doclientier extends Semantier {
 				if (resp0 != null) {
 					req = new DocsReq(tbl, uri).blockAbort(resp0, user);
 					req.a(DocsReq.A.blockAbort);
-					q = client.<DocsReq>userReq(uri, Port.docsync, req)
+					q = client.<DocsReq>userReq(uri, Port.docstier, req)
 								.header(header);
 					respi = client.commit(q, errHandler);
 				}
@@ -533,7 +533,7 @@ public class Doclientier extends Semantier {
 		DocsReq req = (DocsReq) new DocsReq(syname, synuri);
 		req.doc.recId = photo.recId;
 		req.a(A.download);
-		return client.download(clientUri, Port.docsync, req, localpath);
+		return client.download(clientUri, Port.docstier, req, localpath);
 	}
 
 	/**
@@ -556,7 +556,7 @@ public class Doclientier extends Semantier {
 		DocsResp resp = null;
 		try {
 			AnsonMsg<DocsReq> q = client
-					.<DocsReq>userReq(synuri, Port.docsync, req)
+					.<DocsReq>userReq(synuri, Port.docstier, req)
 					.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -583,7 +583,7 @@ public class Doclientier extends Semantier {
 
 		DocsResp resp = null;
 		try {
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docsync, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docstier, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -605,7 +605,7 @@ public class Doclientier extends Semantier {
 		try {
 			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
 			AnsonHeader header = client.header().act(act);
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docsync, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docstier, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -704,7 +704,7 @@ public class Doclientier extends Semantier {
 	 */
 	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
 			throws SemanticException, AnsonException, IOException {
-		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docsync.name());
+		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docstier.name());
 		AnsonHeader header = client.header().act(act);
 
 		// DocsReq req = (DocsReq) new DocsReq("doc_devices", synuri);
@@ -713,7 +713,7 @@ public class Doclientier extends Semantier {
 		req.a(A.registDev);
 
 		AnsonMsg<DocsReq> q = client
-			.<DocsReq>userReq(synuri, Port.docsync, req)
+			.<DocsReq>userReq(synuri, Port.docstier, req)
 			.header(header);
 
 		return client.commit(q, errCtx);

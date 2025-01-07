@@ -27,7 +27,7 @@ public class AlbumApp extends Application {
 
     public static PrefKeys keys;
 
-    public static PrefsWrapper sharedPrefs = new PrefsWrapper();
+    public static PrefsWrapper sharedPrefs; // = new PrefsWrapper();
     public static Context context;
 
     public AlbumApp() {

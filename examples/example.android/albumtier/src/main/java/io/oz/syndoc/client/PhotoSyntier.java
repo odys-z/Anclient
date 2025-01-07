@@ -267,7 +267,7 @@ public class PhotoSyntier extends Doclientier {
 		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
 		req.doc.recId = photo.recId;
 		req.a(A.download);
-		return client.download(synuri, Port.docsync, req, localpath);
+		return client.download(synuri, Port.docstier, req, localpath);
 	}
 
 //	public boolean isAbailable(String deviceId, String deviceName) throws IOException, SemanticException {
