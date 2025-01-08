@@ -53,11 +53,11 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
-import io.oz.album.peer.ShareFlag;
 
 public class Doclientier extends Semantier {
 	public boolean verbose = false;
