@@ -410,7 +410,7 @@ public class Doclientier extends Semantier {
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
 			throws TransException, IOException, AnsonException, SQLException {
 
-		SessionInf user = client.ssInfo();
+		SessionInf ssinf = client.ssInfo();
 
         DocsResp resp0 = null;
         DocsResp respi = null;
@@ -429,16 +429,16 @@ public class Doclientier extends Semantier {
 			ExpSyncDoc p = videos.get(px).syndoc(template);
 
 			if ( isblank(p.clientpath) ||
-				(!isblank(p.device()) && !eq(p.device(), user.device)))
+				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
 				throw new SemanticException(
 						"Docs' pushing requires device id and clientpath.\n" +
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
-						p.recId, p.device(), user.device, p.clientpath, p.pname);
+						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 
 			DocsReq req  = new DocsReq(tbl, p, uri)
-					.device(user.device)
+					.device(ssinf.device)
 					.resetChain(true)
-					.blockStart(p, user);
+					.blockStart(p, ssinf);
 			
 			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
 									.header(header);
@@ -459,7 +459,7 @@ public class Doclientier extends Semantier {
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
-					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, user);
+					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, ssinf);
 					seq++;
 
 					q = client.<DocsReq>userReq(uri, Port.docstier, req)
@@ -470,7 +470,7 @@ public class Doclientier extends Semantier {
 
 					b64 = AESHelper.encode64(ifs, blocksize);
 				}
-				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, user);
+				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
 
 				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
@@ -483,7 +483,7 @@ public class Doclientier extends Semantier {
 				Utils.warn(ex.getMessage());
 
 				if (resp0 != null) {
-					req = new DocsReq(tbl, uri).blockAbort(resp0, user);
+					req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
 					req.a(DocsReq.A.blockAbort);
 					q = client.<DocsReq>userReq(uri, Port.docstier, req)
 								.header(header);

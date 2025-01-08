@@ -210,6 +210,7 @@ public class AlbumContext {
 
     public AlbumContext device(String id, String... devname) {
         this.device = new Device(id, id, devname);
+        this.userInf.device(id);
         return this;
     }
 
