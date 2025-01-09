@@ -8,10 +8,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.core.view.MenuProvider;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,7 +15,7 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
@@ -37,19 +33,18 @@ import io.oz.fpick.adapter.ImagePickAdapter;
  *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
  * </pre>
  *
- * see https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully ,
- *
- * say, delet build.
+ * see <a href="https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully">
+ *     Errors in IDE, StackOverflow</a>.
+ * Say, delete build.
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
-    public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
+    // public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
 
     public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
 
     private boolean isNeedCamera;
-    private boolean isNeedImagePager;
 
     public ImagePickActivity () {
         super();
@@ -65,7 +60,7 @@ public class ImagePickActivity extends BaseActivity {
         Intent intt = getIntent();
         mMaxNumber = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         isNeedCamera = intt.getBooleanExtra(IS_NEED_CAMERA, false);
-        isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
+        // boolean isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
 
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
         mSuffix = new String[] {"avif", "bmp", "gif", "ico", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"};

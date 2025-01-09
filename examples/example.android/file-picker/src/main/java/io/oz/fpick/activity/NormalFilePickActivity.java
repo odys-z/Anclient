@@ -12,7 +12,7 @@ import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerListItemDecoration;
 
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.NormalFilePickAdapter;
 
@@ -22,7 +22,6 @@ import io.oz.fpick.adapter.NormalFilePickAdapter;
 
 public class NormalFilePickActivity extends BaseActivity {
     public static final int DEFAULT_MAX_NUMBER = 9;
-    private RecyclerView mRecyclerView;
 
     public NormalFilePickActivity () {
         super();
@@ -42,7 +41,7 @@ public class NormalFilePickActivity extends BaseActivity {
     }
 
     private void initView() {
-        mRecyclerView = findViewById(R.id.rv_file_pick);
+        RecyclerView mRecyclerView = findViewById(R.id.rv_file_pick);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,

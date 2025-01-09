@@ -19,7 +19,7 @@ import java.util.Date;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
     public ShareFlag syncFlag;

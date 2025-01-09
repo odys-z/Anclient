@@ -26,7 +26,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.vincent.filepicker.ToastUtil;
 
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 

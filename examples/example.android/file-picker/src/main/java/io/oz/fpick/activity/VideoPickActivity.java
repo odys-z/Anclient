@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -19,17 +18,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import io.odysz.common.Utils;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
 
 /**
