@@ -12,7 +12,6 @@ import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.tier.ErrorCtx;
-import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
