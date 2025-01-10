@@ -21,7 +21,7 @@ import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.AudioPickAdapter;
 

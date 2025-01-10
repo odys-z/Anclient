@@ -22,9 +22,9 @@ allprojects {
         // anclient_ver = "0.4.39"
         // jserv_ver = "1.4.39"
         // album_lib_ver = "0.4.39"
-        anclient_ver = "[0.5.9,)"
-        jserv_ver = "[1.5.10-SNAPSHOT,2.0.0-SNAPSHOT)"
-        album_lib_ver = "[0.5.11,)"
+        anclient_ver = "[0.5.11,)"
+        jserv_ver = "[1.5.11,2.0.0-SNAPSHOT)"
+        syndoc_lib_ver = "[0.5.13,)"
 
         sourceCompatibility = JavaVersion.VERSION_1_8
     }

@@ -25,7 +25,7 @@ import com.vincent.filepicker.filter.entity.AudioFile;
 
 import java.util.ArrayList;
 
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.AudioPickActivity;
 

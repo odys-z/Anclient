@@ -244,7 +244,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         buff_device = devid;
                         // singleton.userInf.device(buff_device);
                         singleton.device(buff_device, buff_devname);
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                        // SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
                         AlbumApp.sharedPrefs.device(buff_device).persist();
 
                         runOnUiThread(()-> prefFragment.device.setEnabled(false));
@@ -256,8 +256,12 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         editor.apply();
                          */
                         if (prefFragment.btnRegistDev != null) {
-                            prefFragment.prefcateDev.removePreference(prefFragment.findPreference(AlbumApp.keys.restoreDev));
+                            Preference btnrest = prefFragment.findPreference(keys.restoreDev);
+                            if (btnrest != null) // too quick the UI events are happening
+                                prefFragment.prefcateDev.removePreference(btnrest);
+
                             prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+                            prefFragment.btnRegistDev = null;
                         }
                     }, showErrConfirm);
 //            }
