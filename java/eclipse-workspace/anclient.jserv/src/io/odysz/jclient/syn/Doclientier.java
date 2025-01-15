@@ -97,6 +97,12 @@ public class Doclientier extends Semantier {
 		return this;
 	}
 	
+	IFileProvider fileProvider;
+	public Doclientier fileProvider(IFileProvider p) {
+		this.fileProvider = p;
+		return this;
+	}
+	
 	/**
 	 * @param sysuri - the client function uri this instance will be used for.
 	 * @param errCtx
@@ -381,7 +387,7 @@ public class Doclientier extends Semantier {
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, blocksize, templage,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, blocksize, templage,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -406,7 +412,7 @@ public class Doclientier extends Semantier {
 	 * @throws AnsonException 
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<IFileDescriptor> videos, int blocksize, ExpSyncDoc template,
+			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
 			throws TransException, IOException, AnsonException, SQLException {
 
@@ -435,7 +441,33 @@ public class Doclientier extends Semantier {
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
 						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 
-			DocsReq req  = new DocsReq(tbl, p, uri)
+			/* From SynclientierMVP
+			SyncDoc p = videos.get(px);
+			if (fileProvider.meta(p) <= 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(p.syncFlag(SyncFlag.end))
+						.msg(p.pname));
+				continue;
+			}
+
+			DocsReq req = new AlbumReq(uri)
+					.folder(fileProvider.saveFolder())
+					.share(p)
+					.device(new Device(user.device, null))
+					.resetChain(true)
+					.blockStart(p, user);
+					*/
+			
+			if (fileProvider.meta(p) <= 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(p)
+						.msg(p.pname));
+				continue;
+			}
+			
+			DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
 					.device(ssinf.device)
 					.resetChain(true)
 					.blockStart(p, ssinf);

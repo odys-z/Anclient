@@ -44,6 +44,7 @@ import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
 import io.odysz.jclient.syn.Doclientier;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.fpick.activity.AudioPickActivity;
@@ -78,10 +79,10 @@ import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
-import io.oz.albumtier.IFileProvider;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
 
@@ -335,7 +336,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     clearStatus();
                     showDlg(R.string.txt_please_login);
                 }
-                else clientext.tier
+                else ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
 
@@ -370,7 +371,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return Files.newInputStream(Paths.get(f.fullpath()));
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
-                        })
+                        }))
                         .asyVideos(sharedPrefs.template(), list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
@@ -425,7 +426,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showDlg(R.string.txt_please_login);
                 }
                 else {
-                    clientext.tier
+                    ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
                             private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
@@ -460,7 +461,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             public InputStream open(ExpSyncDoc p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
-                        })
+                        }))
                         .asyVideos(sharedPrefs.template(),
                             paths,
                             (r, rx, seq, total, rsp) -> showStatus(

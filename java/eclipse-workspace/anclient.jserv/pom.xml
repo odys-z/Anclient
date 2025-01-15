@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>anclient.java</artifactId>
-  <version>0.5.12</version>
+  <version>0.5.13-SNAPSHOT</version>
   <name>anclient.java</name>
   <description>[syndoc-lib] Anclient java version. A basic lib only depends on semantic.jserv</description>
   <packaging>jar</packaging>
@@ -79,7 +79,7 @@
 	<dependency>
 		<groupId>io.github.odys-z</groupId>
 		<artifactId>syndoc-lib</artifactId>
-		<version>0.5.14</version>
+		<version>[0.5.15-SNAPSHOT,)</version>
 	</dependency>
   </dependencies>
 

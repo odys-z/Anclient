@@ -11,6 +11,7 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -33,7 +34,6 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
 import io.oz.album.peer.SynDocollPort;
-import io.oz.albumtier.IFileProvider;
 
 public class PhotoSyntier extends Doclientier {
 
@@ -47,11 +47,11 @@ public class PhotoSyntier extends Doclientier {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
 
-	IFileProvider fileProvider;
-	public PhotoSyntier fileProvider(IFileProvider p) {
-		this.fileProvider = p;
-		return this;
-	}
+//	IFileProvider fileProvider;
+//	public PhotoSyntier fileProvider(IFileProvider p) {
+//		this.fileProvider = p;
+//		return this;
+//	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.asyLoginByUri(this.uri, uid, pswd, (client) -> {
