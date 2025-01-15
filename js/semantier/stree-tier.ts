@@ -182,29 +182,4 @@ export class StreeTier extends Semantier {
 }
 StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 
-/** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
-export class SyncDoc implements Tierec {
-	static __type0__: 'io.odysz.semantic.tier.docs.SynDoc';
-    [f: string]: AnsonValue;
-
-	type?: string;
-
-	/** pid */
-	docId?: string;
-
-	/** card title */
-	pname?: string;
-	shareby?: string | undefined;
-	sharedate?: string;
-	device?: string;
-
-	src: string;
-
-	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
-		this.type = opt.type;
-		this.src = opt.src
-		this.docId = opt.recId;
-		this.device = opt.device;
-	}
-}
 

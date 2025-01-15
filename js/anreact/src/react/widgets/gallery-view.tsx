@@ -141,7 +141,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					.reqFactories[port]({uri, sk: ''})
 					.A(AlbumReq.A.download) as AlbumReq;
 
-				req.docId = pid;
+				// req.docId = pid;
 				reqMsgs[pid] = client.userReq(uri, port, req);
 			}
 			return reqMsgs[pid];
