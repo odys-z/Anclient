@@ -12,19 +12,24 @@ export class PhotoRec extends SyncDoc {
 
 	static __type__: 'io.oz.album.peer.PhotoRec';
 
-	type: string = PhotoRec.__type0__;
+	// type: string = PhotoRec.__type0__;
 
 	/** pid */
 	// recId?;
 
 	/** card title */
 	// pname?: string;
-	css?: PhotoCSS | string;
+	/** Java type: Exifield */
+	exif?: object | string;
+	// mime?: string;
+	geox?: string;
+	geoy?: string;
+	css? : PhotoCSS | string;
+    wh?  : number[];
 
 	srcSet?: Array<string>;
 	width: number;
 	height: number
-    wh?: number[];
 
 	constructor (opt: {
             recId: string; src?: string; device?: string;
@@ -100,13 +105,22 @@ export class AlbumReq extends DocsReq {
 		updateFolderel: 'u/folder-rel',
 	};
 
-	pageInf   : PageInf;
+	// pageInf   : PageInf;
 	albumId   : string | undefined;
+
+	/** Missing in Java */
 	cids?     : string[];
+
+	/** Missing in Java */
 	pids?     : string[];
+
 	sk        : string;
 	clearels? : boolean;
+
+	/** Missing in Java */
 	checkRels?: Array<NV[]>;
+
+	photo?    : PhotoRec;
 
 	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
 		super(opt.uri, {docId: '', synuri: opt.synuri});
@@ -136,7 +150,7 @@ export class AlbumReq extends DocsReq {
 	 */
 	shareTree(rows: Array<NV[]>, folder) {
 		this.checkRels = rows;
-		this.subfolder = folder;
+		// this.subfolder = folder;
 		return this;
 	}
 }
