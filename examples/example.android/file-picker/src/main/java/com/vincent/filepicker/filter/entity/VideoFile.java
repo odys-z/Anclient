@@ -40,6 +40,7 @@ public class VideoFile extends AndroidFile implements Parcelable {
         dest.writeString(getLocalDirId());
         dest.writeString(getLocalDirName());
         dest.writeLong(date());
+        dest.writeString(shareflag);
         dest.writeByte((byte) (isSelected() ? 1 : 0));
         dest.writeLong(getDuration());
         dest.writeString(getThumbnail());
@@ -66,6 +67,7 @@ public class VideoFile extends AndroidFile implements Parcelable {
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.date(in.readLong());
+            file.shareflag(in.readString());
             file.setSelected(in.readByte() != 0, file.shareflag);
             file.setDuration(in.readLong());
             file.setThumbnail(in.readString());

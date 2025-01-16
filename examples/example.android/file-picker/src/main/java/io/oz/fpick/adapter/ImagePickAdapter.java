@@ -144,6 +144,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
         ShareFlag share = ShareFlag.valueOf(file.shareflag);
 
+        holder.vSynpublic.setVisibility ( View.INVISIBLE );
+        holder.vImage.setVisibility ( View.VISIBLE );
+        holder.mCbx.setVisibility ( View.GONE );
+
         if (ShareFlag.pushing == share) {
             holder.mCbx.setSelected ( false );
             holder.vShadow.setVisibility(View.GONE);

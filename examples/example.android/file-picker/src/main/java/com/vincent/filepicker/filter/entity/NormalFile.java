@@ -31,6 +31,7 @@ public class NormalFile extends AndroidFile implements Parcelable {
         dest.writeString(getLocalDirId());
         dest.writeString(getLocalDirName());
         dest.writeLong(date());
+        dest.writeString(shareflag);
         dest.writeByte((byte) (isSelected() ? 1 : 0));
         dest.writeString(getMimeType());
     }
@@ -56,6 +57,7 @@ public class NormalFile extends AndroidFile implements Parcelable {
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.date(in.readLong());
+            file.shareflag(in.readString());
             file.setSelected(in.readByte() != 0, file.shareflag);
             file.setMimeType(in.readString());
             return file;

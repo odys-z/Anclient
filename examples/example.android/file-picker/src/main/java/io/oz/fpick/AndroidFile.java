@@ -148,6 +148,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         dest.writeString(localDirId);
         dest.writeString(localDirName);
         dest.writeLong(date);
+        dest.writeString(shareflag);
         dest.writeByte((byte) (isSelected ? 1 : 0));
         dest.writeString(folder());
     }

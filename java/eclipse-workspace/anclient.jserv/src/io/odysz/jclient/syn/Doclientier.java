@@ -441,24 +441,6 @@ public class Doclientier extends Semantier {
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
 						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 
-			/* From SynclientierMVP
-			SyncDoc p = videos.get(px);
-			if (fileProvider.meta(p) <= 0) {
-				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
-				reslts.add((DocsResp) new DocsResp()
-						.doc(p.syncFlag(SyncFlag.end))
-						.msg(p.pname));
-				continue;
-			}
-
-			DocsReq req = new AlbumReq(uri)
-					.folder(fileProvider.saveFolder())
-					.share(p)
-					.device(new Device(user.device, null))
-					.resetChain(true)
-					.blockStart(p, user);
-					*/
-			
 			if (fileProvider == null) {
 				if (isblank(p.fullpath()) || isblank(p.clientname()) || isblank(p.createDate))
 					throw new IOException(
