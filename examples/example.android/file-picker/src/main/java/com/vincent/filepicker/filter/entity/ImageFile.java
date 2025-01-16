@@ -14,7 +14,8 @@ import io.oz.fpick.AndroidFile;
  */
 
 public class ImageFile extends AndroidFile implements Parcelable {
-    private int orientation;   //0, 90, 180, 270
+    /** 0, 90, 180, 270 */
+    private int orientation;
 
     public int getOrientation() {
         return orientation;
@@ -51,7 +52,7 @@ public class ImageFile extends AndroidFile implements Parcelable {
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.date(in.readLong());
-            file.setSelected(in.readByte() != 0);
+            file.setSelected(in.readByte() != 0, file.shareflag);
             file.folder(in.readString());
 
             file.setOrientation(in.readInt());

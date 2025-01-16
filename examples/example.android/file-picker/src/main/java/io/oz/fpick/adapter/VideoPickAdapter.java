@@ -42,9 +42,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
     }
 
     public VideoPickAdapter(BaseActivity ctx, ArrayList<VideoFile> list, boolean needCamera, int max ) {
-        super ( ctx , list );
+        super ( ctx , list, max );
         isNeedCamera = needCamera;
-        mMaxNumber = max;
     }
 
     @NonNull
@@ -86,6 +85,8 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 file = mList.get ( position );
             }
 
+            ShareFlag share = ShareFlag.valueOf(file.shareflag);
+
             RequestOptions options = new RequestOptions ( );
             Glide.with ( mContext )
                 .load ( file.fullpath() )
@@ -93,14 +94,14 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                 .transition ( withCrossFade() )
                 .into ( holder.mIvThumbnail );
 
-            if (ShareFlag.pushing == file.syncFlag) {
+            if (ShareFlag.pushing == share) {
                 holder.mCbx.setSelected ( false );
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.GONE);
                 holder.icSyncing.setVisibility(View.VISIBLE);
                 holder.icSynced.setVisibility(View.GONE);
             }
-            else if (ShareFlag.publish == file.syncFlag) {
+            else if (ShareFlag.publish == share) {
                 holder.mCbx.setSelected(true);
                 holder.mShadow.setVisibility(View.GONE);
                 holder.icAlbum.setVisibility(View.INVISIBLE);
@@ -141,7 +142,7 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
             holder.mIvThumbnail.setOnClickListener ((View view) -> {
                 int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
 
-                ShareFlag sync = mList.get(index).syncFlag;
+                ShareFlag sync = ShareFlag.valueOf(mList.get(index).shareflag());
                 if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                     return;
 
@@ -154,18 +155,18 @@ public class VideoPickAdapter extends BaseSynchronizer<VideoFile, VideoPickAdapt
                     holder.mShadow.setVisibility ( View.GONE );
                     holder.mCbx.setSelected ( false );
                     mCurrentNumber--;
-                    mList.get ( index ).setSelected ( false );
+                    mList.get ( index ).setSelected ( false, shareSetting );
                 }
                 else {
                     holder.mShadow.setVisibility ( View.VISIBLE );
                     holder.mCbx.setSelected ( true );
                     mCurrentNumber++;
-                    mList.get ( index ).setSelected ( true );
+                    mList.get ( index ).setSelected ( true, shareSetting );
                 }
 
-                if ( mListener != null ) {
-                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
-                }
+//                if ( mListener != null ) {
+//                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
+//                }
             });
 
             holder.mDuration.setText(Util.getDurationString(file.getDuration()));

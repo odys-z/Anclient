@@ -32,8 +32,8 @@ import io.oz.fpick.activity.AudioPickActivity;
 public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
 
     public AudioPickAdapter(AudioPickActivity ctx, int max) {
-        super(ctx, new ArrayList<>());
-        mMaxNumber = max;
+        super(ctx, new ArrayList<>(), max);
+        // mMaxNumber = max;
     }
 
     @NonNull
@@ -58,14 +58,16 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
             holder.mTvTitle.setLines(1);
         }
 
+        ShareFlag share = ShareFlag.valueOf(file.shareflag);
+
         holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (ShareFlag.prv == file.syncFlag) {
+        if (ShareFlag.prv == share) {
             holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
-        else if (ShareFlag.publish == file.syncFlag) {
+        else if (ShareFlag.publish == share) {
             holder.mCbx.setSelected(true);
             holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
@@ -111,27 +113,27 @@ public class AudioPickAdapter extends BaseSynchronizer<AudioFile, AudioPickAdapt
                 return;
             }
 
-            ShareFlag sync = mList.get(index).syncFlag;
+            ShareFlag sync = ShareFlag.valueOf( mList.get(index).shareflag );
             if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                 return;
 
             if (holder.mCbx.isSelected()) {
                 holder.mCbx.setSelected(false);
                 mCurrentNumber--;
-                mList.get( index ).setSelected ( false );
+                mList.get( index ).setSelected ( false, shareSetting );
             } else {
                 holder.mCbx.setSelected(true);
                 mCurrentNumber++;
-                mList.get( index ).setSelected ( true );
+                mList.get( index ).setSelected ( true, shareSetting );
             }
 
-            if (mListener != null) {
-                mListener.onSelectStateChanged(
-                        index,
-                        holder.mCbx.isSelected(),
-                        mList.get(holder.getAbsoluteAdapterPosition()),
-                        holder.animation);
-            }
+//            if (mListener != null) {
+//                mListener.onSelectStateChanged(
+//                        index,
+//                        holder.mCbx.isSelected(),
+//                        mList.get(holder.getAbsoluteAdapterPosition()),
+//                        holder.animation);
+//            }
         });
 
         holder.setIsRecyclable(true);

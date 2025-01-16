@@ -6,7 +6,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.loader.app.LoaderManager;
 
 import com.vincent.filepicker.filter.callback.FilterResultCallback;
-import com.vincent.filepicker.filter.entity.BaseFile;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import io.oz.fpick.AndroidFile;

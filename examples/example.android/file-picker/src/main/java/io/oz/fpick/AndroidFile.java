@@ -23,7 +23,7 @@ import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
     /** @since v 0.7, uploading state. */
-    public ShareFlag syncFlag;
+    // public ShareFlag syncFlag;
 
     /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
@@ -124,7 +124,20 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 
     public boolean isSelected() { return isSelected; }
 
-    public void setSelected(boolean selected) { isSelected = selected; }
+    /**
+     * @param selected
+     * @return previous state
+     */
+    public boolean setSelected(boolean selected, ShareFlag shareAs) {
+        return setSelected(selected, shareAs.name());
+
+    }
+    public boolean setSelected(boolean selected, String shareAs) {
+        boolean old = isSelected;
+        isSelected = selected;
+        shareflag = shareAs;
+        return old;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

@@ -58,21 +58,21 @@ public class ImagePickActivity extends BaseActivity {
         setContentView(R.layout.vw_activity_image_pick);
 
         Intent intt = getIntent();
-        mMaxNumber = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        int maxitems = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         isNeedCamera = intt.getBooleanExtra(IS_NEED_CAMERA, false);
         // boolean isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
 
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
         mSuffix = new String[] {"avif", "bmp", "gif", "ico", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"};
-        initView();
+        initView(maxitems);
     }
 
-    private void initView() {
+    private void initView(int maxnum) {
         RecyclerView mRecyclerView = findViewById(R.id.rv_image_pick);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
-        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, mMaxNumber);
+        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, maxnum);
         linkAdapter(TYPE_IMAGE, adapter);
         mRecyclerView.setAdapter(adapter);
     }

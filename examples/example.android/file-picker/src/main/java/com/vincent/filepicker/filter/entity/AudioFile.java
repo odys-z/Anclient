@@ -57,7 +57,7 @@ public class AudioFile extends AndroidFile implements Parcelable {
             file.setLocalDirId(in.readString());
             file.setLocalDirName(in.readString());
             file.date(in.readLong());
-            file.setSelected(in.readByte() != 0);
+            file.setSelected(in.readByte() != 0, file.shareflag);
             file.setDuration(in.readLong());
             return file;
         }

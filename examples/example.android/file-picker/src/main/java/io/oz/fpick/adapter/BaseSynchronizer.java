@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcelable;
+import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
+import com.vincent.filepicker.filter.entity.Directory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +24,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -79,18 +84,21 @@ import static io.odysz.common.LangExt.isblank;
  */
 public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
+
+    /** @deprecated  what's for? */
     public String mFilepath;
+    protected ShareFlag shareSetting;
 
     protected boolean isNeedCamera;
-    // protected int mMaxNumber;
-    // protected int mCurrentNumber = 0;
+    protected int mMaxNumber;
+    protected int mCurrentNumber = 0;
 
     /** Prevent measuring for every item */
     protected int itemWidth = -1;
 
-    // public boolean isUpToMax () {
-//        return mCurrentNumber >= mMaxNumber;
-//    }
+     public boolean isUpToMax () {
+        return mCurrentNumber >= mMaxNumber;
+    }
 
 //    public void setCurrentNumber(int number) {
 //        mCurrentNumber = number;
@@ -98,7 +106,11 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
 
     protected BaseActivity mContext;
     protected ArrayList<T> mList;
-    protected BaseActivity.OnSelectStateListener mListener;
+    protected HashSet<AndroidFile> mSelections = new HashSet<>();
+
+    public ArrayList<AndroidFile> selections() { return new ArrayList<>(mSelections); }
+
+    // protected BaseActivity.OnSelectStateListener mListener;
 
     protected AlbumContext singleton;
 
@@ -107,11 +119,76 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     /**
      * @param list resource list
      */
-    public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
+    public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list, int max) {
         this.singleton = AlbumContext.getInstance(ctx);
+        shareSetting = ShareFlag.publish;
+        mMaxNumber = max;
         mContext = ctx;
         mList = list;
+
+//        mListener = (position, state, file, animation) -> {
+//            if (state) {
+//                mSelections.add(file);
+//                mCurrentNumber++;
+//                animation.setAlpha ( 1f );
+//                animation.setVisibility ( View.VISIBLE );
+//
+//                AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
+//                animationDrawable.start ();
+//            } else {
+//                mSelections.remove(file);
+//                mCurrentNumber--;
+//                animation.setAlpha ( 0f );
+//                animation.setVisibility ( View.GONE );
+//            }
+//        };
     }
+
+    public void loadirs(List<Directory<AndroidFile>> directories) {
+        List<AndroidFile> list = mergeDirs(directories, false);
+
+        // max number is limited
+        for (AndroidFile file : selections()) {
+            int index = list.indexOf(file);
+            if (index != -1) {
+                list.get(index).setSelected(true, shareSetting);
+            }
+        }
+        refreshSyncs(list);
+    }
+
+
+    private List<AndroidFile> mergeDirs(List<Directory<AndroidFile>> directories, boolean tryToFindTakenImage) {
+        // boolean tryToFindTakenImage = isTakenAutoSelected;
+        if (tryToFindTakenImage && !TextUtils.isEmpty(mFilepath)) {
+            File takenImageFile = new File(mFilepath);
+            // try to select taken image only if haven't reached maximum and the file exists
+            tryToFindTakenImage = !isUpToMax() && takenImageFile.exists();
+        }
+
+        List<AndroidFile> lst = new ArrayList<>();
+        for (Directory<AndroidFile> directory : directories) {
+            List<AndroidFile> l = directory.getFiles();
+            lst.addAll(l);
+
+            // auto-select taken images?
+            if (tryToFindTakenImage) {
+                // if taken image was found, we're done
+                // ?? markTakenFiles(l);
+            }
+        }
+        return lst;
+    }
+//    public T onselectChange(int position) {
+//        AndroidFile f = (AndroidFile) mList.get(position);
+//        if (f.isSelected())
+//            mSelections.add((AndroidFile) f);
+//        else mSelections.remove(f);
+//        f.selected = !f.iselected();
+//        return (T) f;
+//    }
+
+    public String allowingTxt() { return mCurrentNumber + "/" + mMaxNumber; }
 
     @SuppressLint("NotifyDataSetChanged")
     public void add(List<T> list) {
@@ -129,7 +206,11 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         notifyItemChanged(index);
     }
 
-    public List<T> getDataSet() { return mList; }
+//    public List<T> getDataSet() { return mList; }
+
+    @Override
+    public void onBindViewHolder (@NonNull final VH holder , final int position ) {
+    }
 
     /**
      * Add file list to my list, then start the asynchronous matching.
@@ -185,7 +266,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
-                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]);
+                    f.shareflag(isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]));
                     f.shareby = (String) inf[2];
                     f.sharedate((String) inf[3]);
                 }
@@ -224,9 +305,9 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         });
     }
 
-    public void selectListener(BaseActivity.OnSelectStateListener listener) {
-        mListener = listener;
-    }
+//    public void selectListener(BaseActivity.OnSelectStateListener listener) {
+//        mListener = listener;
+//    }
 
     /**
      * @param ctx the context
@@ -254,6 +335,5 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         }
         return false;
     }
-
 }
 
