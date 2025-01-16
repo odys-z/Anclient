@@ -465,11 +465,11 @@ public class Doclientier extends Semantier {
 							f("File information is not enough: %s, %s, create time %s",
 							p.clientname(), p.fullpath(), p.createDate));
 			}
-			else if (fileProvider.meta(p) <= 0) {
+			else if (fileProvider.meta(p) < 0) {
 				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
 				reslts.add((DocsResp) new DocsResp()
-						.doc(p)
-						.msg(p.pname));
+						.doc(p.shareflag(ShareFlag.deny,
+								f("File provide returned error: %s", p.clientpath))));
 				continue;
 			}
 			

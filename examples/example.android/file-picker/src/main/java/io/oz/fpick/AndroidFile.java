@@ -22,6 +22,7 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
+    /** @since v 0.7, uploading state. */
     public ShareFlag syncFlag;
 
     /** The File id in Android, which is different from rec-id in docsync.jserv. */

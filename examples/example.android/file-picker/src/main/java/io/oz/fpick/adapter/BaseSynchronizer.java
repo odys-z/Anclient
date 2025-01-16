@@ -82,20 +82,19 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     public String mFilepath;
 
     protected boolean isNeedCamera;
-    protected int mMaxNumber;
-    protected int mCurrentNumber = 0;
+    // protected int mMaxNumber;
+    // protected int mCurrentNumber = 0;
 
     /** Prevent measuring for every item */
     protected int itemWidth = -1;
 
+    // public boolean isUpToMax () {
+//        return mCurrentNumber >= mMaxNumber;
+//    }
 
-    public boolean isUpToMax () {
-        return mCurrentNumber >= mMaxNumber;
-    }
-
-    public void setCurrentNumber(int number) {
-        mCurrentNumber = number;
-    }
+//    public void setCurrentNumber(int number) {
+//        mCurrentNumber = number;
+//    }
 
     protected BaseActivity mContext;
     protected ArrayList<T> mList;

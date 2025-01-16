@@ -97,8 +97,8 @@ public abstract class BaseActivity extends FragmentActivity
 
     PickingMode pickmode = PickingMode.disabled;
     protected int fileType;
-    private int mCurrentNumber = 0;
-    protected int mMaxNumber;
+    // private int mCurrentNumber = 0;
+    // protected int mMaxNumber;
     private TextView tv_count;
     private TextView tv_folder;
     private LinearLayout ll_folder;
@@ -224,7 +224,7 @@ public abstract class BaseActivity extends FragmentActivity
         // boolean tryToFindTakenImage = isTakenAutoSelected;
         if (tryToFindTakenImage && !TextUtils.isEmpty(mAdapter.mFilepath)) {
             File takenImageFile = new File(mAdapter.mFilepath);
-            // try to select taken image only if max isn't reached and the file exists
+            // try to select taken image only if haven't reached maximum and the file exists
             tryToFindTakenImage = !mAdapter.isUpToMax() && takenImageFile.exists();
         }
 
