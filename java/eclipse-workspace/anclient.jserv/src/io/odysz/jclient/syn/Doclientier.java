@@ -459,7 +459,13 @@ public class Doclientier extends Semantier {
 					.blockStart(p, user);
 					*/
 			
-			if (fileProvider.meta(p) <= 0) {
+			if (fileProvider == null) {
+				if (isblank(p.fullpath()) || isblank(p.clientname()) || isblank(p.createDate))
+					throw new IOException(
+							f("File information is not enough: %s, %s, create time %s",
+							p.clientname(), p.fullpath(), p.createDate));
+			}
+			else if (fileProvider.meta(p) <= 0) {
 				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
 				reslts.add((DocsResp) new DocsResp()
 						.doc(p)
