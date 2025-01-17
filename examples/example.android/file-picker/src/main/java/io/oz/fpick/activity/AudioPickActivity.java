@@ -33,13 +33,13 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
     public static final String IS_NEED_RECORDER = "IsNeedRecorder";
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
-    public static final int DEFAULT_MAX_NUMBER = 9;
-    private int mMaxNumber;
-    private int mCurrentNumber = 0;
+    public static final int DEFAULT_MAX_NUMBER = 99;
+//    private int mMaxNumber;
+//    private int mCurrentNumber = 0;
     private boolean isNeedRecorder;
 //    private boolean isTakenAutoSelected;
 
-    private TextView tv_count;
+    // private TextView tv_count;
 
     public AudioPickActivity () {
         super();
@@ -52,14 +52,14 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vw_activity_audio_pick);
 
-        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        int maxAudios = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         isNeedRecorder = getIntent().getBooleanExtra(IS_NEED_RECORDER, false);
         isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
 
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
         mSuffix = new String[] {"aac", "mid", "midi", "mp3", "oga", "opus", "wav", "weba", "3g2"};
 
-        initView();
+        initView(maxAudios);
     }
 
     @Override
@@ -71,21 +71,21 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
         }
     }
 
-    private void initView() {
-        tv_count = (TextView) findViewById(R.id.tv_count);
-        tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
+    private void initView(int maxRecs) {
+        // tv_count = findViewById(R.id.tv_count);
+        // tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rv_audio_pick);
+        RecyclerView mRecyclerView = findViewById(R.id.rv_audio_pick);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerListItemDecoration(this,
                 LinearLayoutManager.VERTICAL, R.drawable.vw_divider_rv_file));
-        AudioPickAdapter adapter = new AudioPickAdapter(this, mMaxNumber);
+        AudioPickAdapter adapter = new AudioPickAdapter(this, maxRecs);
         linkAdapter(TYPE_AUDIO, adapter);
         mRecyclerView.setAdapter(adapter);
 
         if (isNeedRecorder) {
-            RelativeLayout rl_rec_aud = (RelativeLayout) findViewById(R.id.rl_rec_aud);
+            RelativeLayout rl_rec_aud = findViewById(R.id.rl_rec_aud);
             rl_rec_aud.setVisibility(View.VISIBLE);
             rl_rec_aud.setOnClickListener(v -> {
                 Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);

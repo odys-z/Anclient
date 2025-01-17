@@ -5,6 +5,8 @@
  */
 package io.oz.fpick.adapter;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.util.DisplayMetrics;
@@ -17,40 +19,27 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
-import com.vincent.filepicker.ToastUtil;
+import androidx.annotation.NonNull;
 
-import io.odysz.semantic.tier.docs.ShareFlag;
-import io.oz.fpick.activity.ImagePickActivity;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
-
+import io.odysz.semantic.tier.docs.ShareFlag;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.activity.ImagePickActivity;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
-import static io.odysz.common.LangExt.isblank;
-
-public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
+public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.ImagePickViewHolder> {
 
 
     public ImagePickAdapter(ImagePickActivity ctx, boolean needCamera, int max) {
-        this ( ctx, new ArrayList<>(), needCamera , max );
+        this(ctx, new ArrayList<>(), needCamera, max);
     }
 
-    public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
-        super ( ctx , list, max );
+    public ImagePickAdapter(BaseActivity ctx, ArrayList<AndroidFile> list, boolean needCamera, int max) {
+        super(ctx, list, max);
         isNeedCamera = needCamera;
     }
 
@@ -75,6 +64,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     }
 
 
+    /*
     @Override
     public void onBindViewHolder (@NonNull final ImagePickViewHolder holder , final int position ) {
         if ( isNeedCamera && position == 0 ) {
@@ -126,31 +116,34 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
         holder.setIsRecyclable ( true );
     }
+     */
 
-    private void setHolder0(ImagePickViewHolder holder) {
-        holder.vAlbum.setVisibility ( View.VISIBLE );
+    @Override
+    protected void visualHolder0(ImagePickViewHolder holder) {
+        holder.iAlbum.setVisibility ( View.VISIBLE );
         holder.vSynpublic.setVisibility ( View.INVISIBLE );
         holder.vSynpriv.setVisibility ( View.INVISIBLE );
-        holder.vImage.setVisibility ( View.INVISIBLE );
-        holder.mCbx.setVisibility ( View.GONE );
+        holder.glideThumb.setVisibility ( View.INVISIBLE );
+        // holder.mCbx.setVisibility ( View.GONE );
         holder.vShadow.setVisibility ( View.INVISIBLE );
     }
 
-    private void setHolderx(ImagePickViewHolder holder, ImageFile file) {
+    @Override
+    protected void visualHolderx(ImagePickViewHolder holder, AndroidFile file) {
         if (isblank(file.shareflag))
             file.shareflag = ShareFlag.device.name();
 
         ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
 
         holder.vSynpublic.setVisibility ( View.INVISIBLE );
-        holder.vImage.setVisibility ( View.VISIBLE );
-        holder.mCbx.setVisibility ( View.GONE );
+        holder.glideThumb.setVisibility ( View.VISIBLE );
+        // holder.mCbx.setVisibility ( View.GONE );
         holder.vSynpriv.setVisibility(View.GONE);
 
         if (ShareFlag.pushing == share) {
             // holder.mCbx.setSelected ( false );
             holder.vShadow.setVisibility(View.GONE);
-            holder.vAlbum.setVisibility(View.GONE);
+            holder.iAlbum.setVisibility(View.GONE);
             holder.vSyncing.setVisibility(View.VISIBLE);
             holder.vSynpublic.setVisibility(View.GONE);
             holder.vSynpriv.setVisibility(View.GONE);
@@ -158,7 +151,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         else if (ShareFlag.publish == share) {
             // holder.mCbx.setSelected(true);
             holder.vShadow.setVisibility(View.GONE);
-            holder.vAlbum.setVisibility(View.INVISIBLE);
+            holder.iAlbum.setVisibility(View.INVISIBLE);
             holder.vSyncing.setVisibility(View.GONE);
             holder.vSynpublic.setVisibility(View.VISIBLE);
             holder.vSynpriv.setVisibility(View.GONE);
@@ -166,7 +159,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         else if (ShareFlag.prv == share) {
             // holder.mCbx.setSelected(true);
             holder.vShadow.setVisibility(View.GONE);
-            holder.vAlbum.setVisibility(View.INVISIBLE);
+            holder.iAlbum.setVisibility(View.INVISIBLE);
             holder.vSyncing.setVisibility(View.GONE);
             holder.vSynpublic.setVisibility(View.GONE);
             holder.vSynpriv.setVisibility(View.VISIBLE);
@@ -176,12 +169,13 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
 
     }
 
-    void visualSelect(boolean selected, ImagePickViewHolder holder) {
+    @Override
+    protected void visualSelect(boolean selected, ImagePickViewHolder holder) {
         if (selected) {
             // not synced but selected
-            holder.mCbx.setSelected ( true );
+            // holder.mCbx.setSelected ( true );
             holder.vShadow.setVisibility ( View.VISIBLE );
-            holder.vAlbum.setVisibility(View.GONE);
+            holder.iAlbum.setVisibility(View.GONE);
 
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
@@ -192,50 +186,55 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         }
         else {
             // not synced and not selected
-            holder.mCbx.setSelected ( false );
+            // holder.mCbx.setSelected ( false );
             holder.animation.setVisibility ( View.GONE );
             holder.animation.setAlpha ( 0f );
             holder.vShadow.setVisibility ( View.INVISIBLE );
         }
     }
 
-    RequestListener glideListener = new RequestListener() {
-        @Override
-        public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target target, boolean isFirstResource) {
-            return false;
-        }
-        @Override
-        public boolean onResourceReady(@NonNull Object resource, @NonNull Object model, Target target, @NonNull DataSource dataSource, boolean isFirstResource) {
-            return false;
-        }
-    };
+//    RequestListener glideListener = new RequestListener() {
+//        @Override
+//        public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target target, boolean isFirstResource) {
+//            return false;
+//        }
+//        @Override
+//        public boolean onResourceReady(@NonNull Object resource, @NonNull Object model, Target target, @NonNull DataSource dataSource, boolean isFirstResource) {
+//            return false;
+//        }
+//    };
+
+    @Override
+    protected String mediaViewType() {
+        return "image/*";
+    }
 
     @Override
     public int getItemCount () {
         return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
     }
 
-    static class ImagePickViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView vAlbum;
+    static class ImagePickViewHolder extends ViewHolder4Glide {
+        private final ImageView iAlbum;
         private final ImageView vSynpublic;
 
         private final ImageView vSynpriv;
         private final ImageView vSyncing;
-        private final ImageView vImage;
+        // private final ImageView vImage;
         private final View vShadow;
-        private final ImageView mCbx;
+        // private final ImageView mCbx;
         private final RelativeLayout animation;
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            vAlbum = itemView.findViewById(R.id.xiv_album_icon);
+            iAlbum = itemView.findViewById(R.id.xiv_album_icon);
             vSyncing = itemView.findViewById(R.id.xiv_syncing_icon);
             vSynpublic = itemView.findViewById(R.id.xiv_synced_icon);
             vSynpriv = itemView.findViewById(R.id.xiv_synprv_icon);
 
-            vImage = itemView.findViewById(R.id.xiv_thumbnail);
+            // vImage = itemView.findViewById(R.id.xiv_thumbnail);
             vShadow = itemView.findViewById(R.id.x_shadow);
-            mCbx        = itemView.findViewById(R.id.x_check);
+            // mCbx        = itemView.findViewById(R.id.x_check);
             animation   = itemView.findViewById(R.id.animationSquare);
         }
     }

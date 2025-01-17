@@ -120,7 +120,7 @@ public class PhotoSyntier extends Doclientier {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<IFileDescriptor> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {

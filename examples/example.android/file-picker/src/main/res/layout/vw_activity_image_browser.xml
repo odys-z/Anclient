@@ -22,6 +22,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/vw_BgToolBar">
 
+        <!--
         <ImageView
             android:id="@+id/cbx"
             android:layout_width="wrap_content"
@@ -30,6 +31,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:src="@drawable/vw_selector_cbx" />
+        -->
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager

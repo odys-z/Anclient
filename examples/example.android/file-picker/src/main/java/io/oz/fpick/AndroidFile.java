@@ -22,6 +22,7 @@ import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonField;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {

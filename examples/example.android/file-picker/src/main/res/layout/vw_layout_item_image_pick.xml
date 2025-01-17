@@ -28,6 +28,7 @@
             android:background="@color/vw_ShadowItem"
             android:visibility="invisible" />
 
+        <!--
         <ImageView
             android:id="@+id/x_check"
             android:layout_width="wrap_content"
@@ -36,6 +37,7 @@
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
             android:src="@drawable/vw_selector_cbx" />
+            -->
 
         <ImageView
             android:id="@+id/xiv_syncing_icon"

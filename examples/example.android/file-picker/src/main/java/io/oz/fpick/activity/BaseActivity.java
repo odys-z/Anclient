@@ -30,7 +30,6 @@ import androidx.fragment.app.FragmentActivity;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
 import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
-import io.oz.fpick.adapter.BaseSynchronizer;
+import io.oz.fpick.adapter.PickAdaptor;
 import io.oz.fpick.filter.FileFilterx;
 
 /**
@@ -82,7 +81,7 @@ public abstract class BaseActivity extends FragmentActivity
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
 
-    private BaseSynchronizer<?, ?> mAdapter;
+    private PickAdaptor<?, ?> mAdapter;
     /** file pattern */
     protected String[] mSuffix;
     protected FileFilterx filefilter;
@@ -97,7 +96,7 @@ public abstract class BaseActivity extends FragmentActivity
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
-    protected void linkAdapter(int adaptye, BaseSynchronizer<?, ?> adapter) {
+    protected void linkAdapter(int adaptye, PickAdaptor<?, ?> adapter) {
         this.fileType = adaptye;
         mAdapter = adapter;
 
