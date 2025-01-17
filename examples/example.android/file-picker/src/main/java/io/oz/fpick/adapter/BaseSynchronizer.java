@@ -84,7 +84,6 @@ import static io.odysz.common.LangExt.isblank;
  */
 public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
 
-
     /** @deprecated  what's for? */
     public String mFilepath;
     protected ShareFlag shareSetting;
@@ -100,17 +99,11 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         return mCurrentNumber >= mMaxNumber;
     }
 
-//    public void setCurrentNumber(int number) {
-//        mCurrentNumber = number;
-//    }
-
     protected BaseActivity mContext;
     protected ArrayList<T> mList;
     protected HashSet<AndroidFile> mSelections = new HashSet<>();
 
     public ArrayList<AndroidFile> selections() { return new ArrayList<>(mSelections); }
-
-    // protected BaseActivity.OnSelectStateListener mListener;
 
     protected AlbumContext singleton;
 
@@ -125,23 +118,6 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         mMaxNumber = max;
         mContext = ctx;
         mList = list;
-
-//        mListener = (position, state, file, animation) -> {
-//            if (state) {
-//                mSelections.add(file);
-//                mCurrentNumber++;
-//                animation.setAlpha ( 1f );
-//                animation.setVisibility ( View.VISIBLE );
-//
-//                AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-//                animationDrawable.start ();
-//            } else {
-//                mSelections.remove(file);
-//                mCurrentNumber--;
-//                animation.setAlpha ( 0f );
-//                animation.setVisibility ( View.GONE );
-//            }
-//        };
     }
 
     public void loadirs(List<Directory<AndroidFile>> directories) {
@@ -179,14 +155,6 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         }
         return lst;
     }
-//    public T onselectChange(int position) {
-//        AndroidFile f = (AndroidFile) mList.get(position);
-//        if (f.isSelected())
-//            mSelections.add((AndroidFile) f);
-//        else mSelections.remove(f);
-//        f.selected = !f.iselected();
-//        return (T) f;
-//    }
 
     public String allowingTxt() { return mCurrentNumber + "/" + mMaxNumber; }
 
@@ -304,10 +272,6 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
             }
         });
     }
-
-//    public void selectListener(BaseActivity.OnSelectStateListener listener) {
-//        mListener = listener;
-//    }
 
     /**
      * @param ctx the context

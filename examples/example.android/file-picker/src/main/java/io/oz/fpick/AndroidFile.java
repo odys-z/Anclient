@@ -19,19 +19,20 @@ import java.io.IOException;
 import java.util.Date;
 
 import io.odysz.anson.Anson;
+import io.odysz.anson.AnsonField;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
-    /** @since v 0.7, uploading state. */
-    // public ShareFlag syncFlag;
 
     /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
     private long date;          //Added Date
+
+    @AnsonField(ignoreTo = true)
     private boolean isSelected;
     private Uri contUri;
 

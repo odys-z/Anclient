@@ -52,7 +52,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
     public ImagePickAdapter(BaseActivity ctx, ArrayList<ImageFile> list, boolean needCamera, int max) {
         super ( ctx , list, max );
         isNeedCamera = needCamera;
-//        mMaxNumber = max;
     }
 
     @NonNull
@@ -121,33 +120,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                     mCurrentNumber++;
                 }
                 visualSelect(!old, holder);
-
-//                if (file.setSelected(!file.isSelected(), shareSetting)) {
-//                    file.shareflag(null);
-//                    mCurrentNumber--;
-//                    mSelections.remove(file);
-//                    holder.vShadow.setVisibility(View.GONE);
-//                    // holder.mCbx.setSelected(false);
-//                    // holder.mCbx.setVisibility(View.GONE);
-//
-//                    holder.animation.setVisibility ( View.INVISIBLE );
-//                    holder.animation.setAlpha ( 0f );
-//                    holder.vShadow.setVisibility ( View.INVISIBLE );
-//                }
-//                else {
-//                    mSelections.add(file);
-//                    mCurrentNumber++;
-//                    holder.vShadow.setVisibility(View.VISIBLE);
-//                    // holder.mCbx.setSelected(true);
-//                    // holder.mCbx.setVisibility(View.VISIBLE);
-//
-//                    holder.animation.setVisibility ( View.VISIBLE );
-//                    holder.animation.setAlpha ( 1f );
-//                    AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-//                    Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
-//                    animationDrawable.start ();
-//                    a.start();
-//                }
             }
             mContext.onselect(file);
         });
@@ -209,11 +181,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             // not synced but selected
             holder.mCbx.setSelected ( true );
             holder.vShadow.setVisibility ( View.VISIBLE );
-
             holder.vAlbum.setVisibility(View.GONE);
-//            holder.vSyncing.setVisibility(View.GONE);
-//            holder.vSynpublic.setVisibility(View.GONE);
-//            holder.vSynpriv.setVisibility(View.GONE);
 
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
@@ -225,11 +193,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         else {
             // not synced and not selected
             holder.mCbx.setSelected ( false );
-//            holder.vAlbum.setVisibility(View.GONE);
-//            holder.vSyncing.setVisibility(View.GONE);
-//            holder.vSynpublic.setVisibility(View.GONE);
-//            holder.vSynpriv.setVisibility(View.GONE);
-
             holder.animation.setVisibility ( View.GONE );
             holder.animation.setAlpha ( 0f );
             holder.vShadow.setVisibility ( View.INVISIBLE );
@@ -246,142 +209,6 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             return false;
         }
     };
-    public void onBindViewHolder_del (@NonNull final ImagePickViewHolder holder , final int position ) {
-        if ( isNeedCamera && position == 0 ) {
-            holder.vAlbum.setVisibility ( View.VISIBLE );
-            holder.vSynpublic.setVisibility ( View.INVISIBLE );
-            holder.vSynpriv.setVisibility ( View.INVISIBLE );
-            holder.vImage.setVisibility ( View.INVISIBLE );
-            holder.mCbx.setVisibility ( View.GONE );
-            holder.vShadow.setVisibility ( View.INVISIBLE );
-        }
-        else {
-            holder.vSynpublic.setVisibility ( View.INVISIBLE );
-            holder.vImage.setVisibility ( View.VISIBLE );
-            holder.mCbx.setVisibility ( View.GONE );
-
-            ImageFile file;
-            if ( isNeedCamera ) {
-                file = mList.get ( position - 1 );
-            }
-            else {
-                file = mList.get ( position );
-            }
-
-            Glide.with ( mContext )
-                .load ( file.fullpath() )
-                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
-                        .centerCrop()
-                        .error(R.drawable.vw_ic_synced))
-                .transition ( withCrossFade() )
-                .listener(new RequestListener() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target target, boolean isFirstResource) {
-                        return false;
-                    }
-                    @Override
-                    public boolean onResourceReady(@NonNull Object resource, @NonNull Object model, Target target, @NonNull DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
-                .into ( holder.vImage);
-
-            if (isblank(file.shareflag))
-                file.shareflag = ShareFlag.device.name();
-
-            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
-            if (ShareFlag.pushing == share) {
-                holder.mCbx.setSelected ( false );
-                holder.vShadow.setVisibility(View.GONE);
-                holder.vAlbum.setVisibility(View.GONE);
-                holder.vSyncing.setVisibility(View.VISIBLE);
-                holder.vSynpublic.setVisibility(View.GONE);
-                holder.vSynpriv.setVisibility(View.GONE);
-            }
-            else if (ShareFlag.publish == share) {
-                holder.mCbx.setSelected(true);
-                holder.vShadow.setVisibility(View.GONE);
-                holder.vAlbum.setVisibility(View.INVISIBLE);
-                holder.vSyncing.setVisibility(View.GONE);
-                holder.vSynpublic.setVisibility(View.VISIBLE);
-                holder.vSynpriv.setVisibility(View.GONE);
-            }
-            else if (ShareFlag.prv == share) {
-                holder.mCbx.setSelected(true);
-                holder.vShadow.setVisibility(View.GONE);
-                holder.vAlbum.setVisibility(View.INVISIBLE);
-                holder.vSyncing.setVisibility(View.GONE);
-                holder.vSynpublic.setVisibility(View.GONE);
-                holder.vSynpriv.setVisibility(View.VISIBLE);
-            }
-            else if ( file.isSelected ( ) ) {
-                // not synced but selected
-                holder.mCbx.setSelected ( true );
-                holder.vShadow.setVisibility ( View.VISIBLE );
-
-                holder.vAlbum.setVisibility(View.GONE);
-                holder.vSyncing.setVisibility(View.GONE);
-                holder.vSynpublic.setVisibility(View.GONE);
-                holder.vSynpriv.setVisibility(View.GONE);
-
-                holder.animation.setVisibility ( View.VISIBLE );
-                holder.animation.setAlpha ( 1f );
-                AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-                Animation a = AnimationUtils.loadAnimation ( mContext, R.anim.rotate_animation );
-                animationDrawable.start ();
-                a.start();
-            }
-            else {
-                // not synced and not selected
-                holder.mCbx.setSelected ( false );
-                holder.vAlbum.setVisibility(View.GONE);
-                holder.vSyncing.setVisibility(View.GONE);
-                holder.vSynpublic.setVisibility(View.GONE);
-                holder.vSynpriv.setVisibility(View.GONE);
-
-                holder.animation.setVisibility ( View.GONE );
-                holder.animation.setAlpha ( 0f );
-                holder.vShadow.setVisibility ( View.INVISIBLE );
-            }
-
-            holder.vImage.setOnLongClickListener(
-                    (View view) -> startMediaViewer(mContext, "image/*", file.fullpath()));
-
-            holder.vImage.setOnClickListener ((View view) -> {
-                // int index = isNeedCamera ? holder.getAdapterPosition ( ) - 1 : holder.getAdapterPosition ( );
-                int index = isNeedCamera ? holder.getAbsoluteAdapterPosition( ) - 1
-                                         : holder.getAbsoluteAdapterPosition( );
-
-                ShareFlag sync = file.shareflag == null ? null : ShareFlag.valueOf(mList.get(index).shareflag());
-                if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
-                    return;
-
-                if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
-                    ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
-                    return;
-                }
-
-                if ( holder.mCbx.isSelected ( ) ) {
-                    holder.vShadow.setVisibility ( View.GONE );
-                    holder.mCbx.setSelected ( false );
-                    mCurrentNumber--;
-                    mList.get ( index ).setSelected ( false, ShareFlag.prv );
-                }
-                else {
-                    holder.vShadow.setVisibility ( View.VISIBLE );
-                    holder.mCbx.setSelected ( true );
-                    mCurrentNumber++;
-                    mList.get ( index ).setSelected ( true, ShareFlag.prv );
-                }
-
-//                if ( mListener != null ) {
-//                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
-//                }
-            });
-
-            holder.setIsRecyclable ( true );
-        }
-    }
 
     @Override
     public int getItemCount () {

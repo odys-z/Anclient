@@ -10,7 +10,6 @@ import static io.odysz.common.LangExt.str;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -33,7 +32,6 @@ import com.vincent.filepicker.FolderListHelper;
 import com.vincent.filepicker.filter.entity.Directory;
 import com.vincent.filepicker.filter.entity.ImageFile;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,10 +65,6 @@ import io.oz.fpick.filter.FileFilterx;
 public abstract class BaseActivity extends FragmentActivity
         implements JProtocol.OnError, IProgressBarAct {
 
-//    public interface OnSelectStateListener {
-//        void onSelectStateChanged(int position, boolean state, AndroidFile file, View animation );
-//    }
-
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
 
@@ -88,7 +82,6 @@ public abstract class BaseActivity extends FragmentActivity
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
 
-    // public ArrayList<AndroidFile> mSelectedList = new ArrayList<>();
     private BaseSynchronizer<?, ?> mAdapter;
     /** file pattern */
     protected String[] mSuffix;
@@ -98,8 +91,6 @@ public abstract class BaseActivity extends FragmentActivity
 
     PickingMode pickmode = PickingMode.disabled;
     protected int fileType;
-    // private int mCurrentNumber = 0;
-    // protected int mMaxNumber;
     private TextView tv_count;
     private TextView tv_folder;
     private LinearLayout ll_folder;
@@ -111,44 +102,20 @@ public abstract class BaseActivity extends FragmentActivity
         mAdapter = adapter;
 
         tv_count = findViewById(R.id.tv_count);
-        // tv_count.setText(getString(R.string.n_of_total, mCurrentNumber, mMaxNumber));
         tv_count.setText(mAdapter.allowingTxt());
-
-//        mAdapter.selectListener((position, state, file, animation) -> {
-//            if (state) {
-//                mSelectedList.add(file);
-//                mCurrentNumber++;
-//                animation.setAlpha ( 1f );
-//                animation.setVisibility ( View.VISIBLE );
-//
-//                AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-//                animationDrawable.start ();
-//            } else {
-//                mSelectedList.remove(file);
-//                mCurrentNumber--;
-//                animation.setAlpha ( 0f );
-//                animation.setVisibility ( View.GONE );
-//            }
-//            tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-//        });
 
         rl_done = findViewById(R.id.rl_done);
         rl_done.setOnClickListener(v -> {
             Intent intent = new Intent();
-            // intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
             intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mAdapter.selections());
             setResult(RESULT_OK, intent);
             finish();
         });
 
-        if (pickmode == PickingMode.disabled) {
-            // mMaxNumber = 0;
+        if (pickmode == PickingMode.disabled)
             rl_done.setVisibility(View.GONE);
-        }
-        else {
-            // mMaxNumber = 99;
+        else
             rl_done.setVisibility(View.VISIBLE);
-        }
 
         tb_pick = findViewById(R.id.tb_pick);
         ll_folder = findViewById(R.id.ll_folder);
@@ -253,8 +220,6 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Forward results to EasyPermissions
-        // EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             permissionGranted();
@@ -264,17 +229,6 @@ public abstract class BaseActivity extends FragmentActivity
      * Read external storage file
      */
     private void readExternalStorage() {
-        /*
-        boolean isGranted = EasyPermissions.hasPermissions(this, "android.permission.READ_EXTERNAL_STORAGE");
-        if (isGranted) {
-            permissionGranted();
-        } else {
-            EasyPermissions.requestPermissions(this, getString(R.string.vw_rationale_storage),
-                    RC_READ_EXTERNAL_STORAGE,
-                   // "android.permission.READ_EXTERNAL_STORAGE");
-                    permissions());
-        }
-        */
         for (String p : permissions())
             if (ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, permissions(), RC_READ_EXTERNAL_STORAGE);
@@ -333,7 +287,7 @@ public abstract class BaseActivity extends FragmentActivity
         if (b != null) runOnUiThread(() -> b.setVisibility(View.GONE));
     }
 
-    public void onselect(ImageFile file) {
+    public void onselect(AndroidFile file) {
         tv_count.setText(mAdapter.allowingTxt());
     }
 }
