@@ -102,26 +102,52 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                (View view) -> startMediaViewer(mContext, "image/*", file.fullpath()));
 
         holder.vImage.setOnClickListener((View h) -> {
-            ShareFlag share = ShareFlag.valueOf(file.shareflag);
-            if (ShareFlag.publish == share || ShareFlag.prv == share) // revoke is not supported on devices
+            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
                 return;
 
             if ( !file.isSelected() && isUpToMax() ) {
                 ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
             }
             else {
-                if (file.setSelected(!file.isSelected(), shareSetting)) {
+                boolean old = file.setSelected(!file.isSelected(), shareSetting);
+                if (old) {
+                    file.shareflag(null);
                     mCurrentNumber--;
                     mSelections.remove(file);
-                    holder.vShadow.setVisibility ( View.VISIBLE );
-                    holder.mCbx.setSelected ( true );
                 }
                 else {
                     mSelections.add(file);
                     mCurrentNumber++;
-                    holder.vShadow.setVisibility ( View.GONE );
-                    holder.mCbx.setSelected ( false );
                 }
+                visualSelect(!old, holder);
+
+//                if (file.setSelected(!file.isSelected(), shareSetting)) {
+//                    file.shareflag(null);
+//                    mCurrentNumber--;
+//                    mSelections.remove(file);
+//                    holder.vShadow.setVisibility(View.GONE);
+//                    // holder.mCbx.setSelected(false);
+//                    // holder.mCbx.setVisibility(View.GONE);
+//
+//                    holder.animation.setVisibility ( View.INVISIBLE );
+//                    holder.animation.setAlpha ( 0f );
+//                    holder.vShadow.setVisibility ( View.INVISIBLE );
+//                }
+//                else {
+//                    mSelections.add(file);
+//                    mCurrentNumber++;
+//                    holder.vShadow.setVisibility(View.VISIBLE);
+//                    // holder.mCbx.setSelected(true);
+//                    // holder.mCbx.setVisibility(View.VISIBLE);
+//
+//                    holder.animation.setVisibility ( View.VISIBLE );
+//                    holder.animation.setAlpha ( 1f );
+//                    AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
+//                    Animation a = AnimationUtils.loadAnimation ( mContext,R.anim.rotate_animation );
+//                    animationDrawable.start ();
+//                    a.start();
+//                }
             }
             mContext.onselect(file);
         });
@@ -142,14 +168,15 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         if (isblank(file.shareflag))
             file.shareflag = ShareFlag.device.name();
 
-        ShareFlag share = ShareFlag.valueOf(file.shareflag);
+        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
 
         holder.vSynpublic.setVisibility ( View.INVISIBLE );
         holder.vImage.setVisibility ( View.VISIBLE );
         holder.mCbx.setVisibility ( View.GONE );
+        holder.vSynpriv.setVisibility(View.GONE);
 
         if (ShareFlag.pushing == share) {
-            holder.mCbx.setSelected ( false );
+            // holder.mCbx.setSelected ( false );
             holder.vShadow.setVisibility(View.GONE);
             holder.vAlbum.setVisibility(View.GONE);
             holder.vSyncing.setVisibility(View.VISIBLE);
@@ -157,7 +184,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             holder.vSynpriv.setVisibility(View.GONE);
         }
         else if (ShareFlag.publish == share) {
-            holder.mCbx.setSelected(true);
+            // holder.mCbx.setSelected(true);
             holder.vShadow.setVisibility(View.GONE);
             holder.vAlbum.setVisibility(View.INVISIBLE);
             holder.vSyncing.setVisibility(View.GONE);
@@ -165,22 +192,28 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             holder.vSynpriv.setVisibility(View.GONE);
         }
         else if (ShareFlag.prv == share) {
-            holder.mCbx.setSelected(true);
+            // holder.mCbx.setSelected(true);
             holder.vShadow.setVisibility(View.GONE);
             holder.vAlbum.setVisibility(View.INVISIBLE);
             holder.vSyncing.setVisibility(View.GONE);
             holder.vSynpublic.setVisibility(View.GONE);
             holder.vSynpriv.setVisibility(View.VISIBLE);
         }
-        else if ( file.isSelected ( ) ) {
+        visualSelect(file.isSelected(), holder);
+
+
+    }
+
+    void visualSelect(boolean selected, ImagePickViewHolder holder) {
+        if (selected) {
             // not synced but selected
             holder.mCbx.setSelected ( true );
             holder.vShadow.setVisibility ( View.VISIBLE );
 
             holder.vAlbum.setVisibility(View.GONE);
-            holder.vSyncing.setVisibility(View.GONE);
-            holder.vSynpublic.setVisibility(View.GONE);
-            holder.vSynpriv.setVisibility(View.GONE);
+//            holder.vSyncing.setVisibility(View.GONE);
+//            holder.vSynpublic.setVisibility(View.GONE);
+//            holder.vSynpriv.setVisibility(View.GONE);
 
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
@@ -192,10 +225,10 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
         else {
             // not synced and not selected
             holder.mCbx.setSelected ( false );
-            holder.vAlbum.setVisibility(View.GONE);
-            holder.vSyncing.setVisibility(View.GONE);
-            holder.vSynpublic.setVisibility(View.GONE);
-            holder.vSynpriv.setVisibility(View.GONE);
+//            holder.vAlbum.setVisibility(View.GONE);
+//            holder.vSyncing.setVisibility(View.GONE);
+//            holder.vSynpublic.setVisibility(View.GONE);
+//            holder.vSynpriv.setVisibility(View.GONE);
 
             holder.animation.setVisibility ( View.GONE );
             holder.animation.setAlpha ( 0f );
@@ -256,7 +289,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
             if (isblank(file.shareflag))
                 file.shareflag = ShareFlag.device.name();
 
-            ShareFlag share = ShareFlag.valueOf(file.shareflag);
+            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
             if (ShareFlag.pushing == share) {
                 holder.mCbx.setSelected ( false );
                 holder.vShadow.setVisibility(View.GONE);
@@ -319,7 +352,7 @@ public class ImagePickAdapter extends BaseSynchronizer<ImageFile, ImagePickAdapt
                 int index = isNeedCamera ? holder.getAbsoluteAdapterPosition( ) - 1
                                          : holder.getAbsoluteAdapterPosition( );
 
-                ShareFlag sync = ShareFlag.valueOf(mList.get(index).shareflag());
+                ShareFlag sync = file.shareflag == null ? null : ShareFlag.valueOf(mList.get(index).shareflag());
                 if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                     return;
 
