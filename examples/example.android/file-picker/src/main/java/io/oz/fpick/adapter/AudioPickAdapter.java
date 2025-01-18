@@ -217,8 +217,6 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
 
     @Override
     protected void visualHolderx(AudioPickViewHolder holder, AndroidFile file) {
-        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
-
         holder.mTvDuration.setText(Util.getDurationString(((AudioFile)file).getDuration()));
         holder.mTvTitle.setText(file.clientname());
         holder.mTvTitle.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -229,6 +227,7 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
             holder.mTvTitle.setLines(1);
         }
 
+        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
         if (file.isSelected()) {
             holder.icAlbum.setVisibility(View.INVISIBLE);
             // holder.mCbx.setSelected(true);
