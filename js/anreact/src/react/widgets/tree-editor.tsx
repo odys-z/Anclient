@@ -580,7 +580,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 				  />
 				: that.props.nodeFormatter
 				? that.props.nodeFormatter(tnode, parent, compOpts)
-				: <>Unhandled tnode, id: {tnode.id}, visual type: {ntype}</>
+				: <>{`Unhandled tnode, id: ${tnode.id}, visual type: ${ntype}`}</>
 			  );
 			}
 		  }
