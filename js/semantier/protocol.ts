@@ -1816,28 +1816,31 @@ export class DocsReq extends AnsonBody {
 		del: 'd',
 	};
 
-	synuri: string;
+	synuri?: string;
 
-	doc: SyncDoc;
+	doc?: SyncDoc;
+
+	pageInf?: PageInf;
+
 	// docId: string;
 	// docName: string;
 	// mime: string;
 	// uri64: string;
 
-	deletings: string[];
+	deletings?: string[];
 	// subfolder: string;
 
 	/**
 	 *
 	 * @param uri
 	 * @param args
-	 * args.doctype: type for deserilizing user's tierec, e. g. type of PhotoRec.
+	 * args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
 	 * args.deletings: old docId to be deleted
 	 */
-	constructor(uri: string, args? : {synuri: string, doctype: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
 		this.synuri = args.synuri;
-		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.doctype}));
+		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.docFieldType}));
 		// this.docId = args.docId;
 		// this.docName = args.docName;
 		// this.mime = args.mime;

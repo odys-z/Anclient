@@ -123,7 +123,7 @@ export class AlbumReq extends DocsReq {
 	photo?    : PhotoRec;
 
 	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
-		super(opt.uri, {docId: '', synuri: opt.synuri});
+		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__});
 		this.type = AlbumReq.__type__;
 
 		let {page, sk} = opt;
