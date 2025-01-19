@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
@@ -31,7 +30,6 @@ import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
 import io.oz.fpick.activity.AudioPickActivity;
-import io.oz.fpick.activity.BaseActivity;
 
 public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.AudioPickViewHolder> {
 
@@ -229,7 +227,7 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
 
         ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
         if (file.isSelected()) {
-            holder.icAlbum.setVisibility(View.INVISIBLE);
+//            holder.icAlbum.setVisibility(View.INVISIBLE);
             // holder.mCbx.setSelected(true);
             holder.icSynced.setVisibility(View.INVISIBLE);
             holder.animation.setVisibility(View.VISIBLE);
@@ -240,19 +238,19 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
         else // weird: setting INVISIBLE twice to icAlbum will be visible when rolling back.
         if (ShareFlag.prv == share) {
             // holder.mCbx.setSelected ( false );
-            holder.icAlbum.setVisibility(View.INVISIBLE);
+//            holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
         else if (ShareFlag.publish == share) {
             // holder.mCbx.setSelected(true);
-            holder.icAlbum.setVisibility(View.INVISIBLE);
+//            holder.icAlbum.setVisibility(View.INVISIBLE);
             holder.icSyncing.setVisibility(View.GONE);
             holder.icSynced.setVisibility(View.VISIBLE);
         }
         else {
             // holder.mCbx.setSelected(false);
-            holder.icAlbum.setVisibility(View.GONE);
+//            holder.icAlbum.setVisibility(View.GONE);
             holder.animation.setVisibility (View.INVISIBLE);
             holder.animation.setAlpha ( 0f );
             holder.icSynced.setVisibility(View.INVISIBLE);
@@ -276,7 +274,7 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
     }
 
     static class AudioPickViewHolder extends ViewHolder4Glide {
-        private final ImageView icAlbum;
+//        private final ImageView icAlbum;
         private final ImageView icSynced;
         private final ImageView icSyncing;
 
@@ -287,7 +285,7 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
 
         public AudioPickViewHolder(@NonNull View itemView) {
             super ( itemView );
-            icAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+//            icAlbum = itemView.findViewById ( R.id.xiv_album_cmd);
             icSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
             icSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 

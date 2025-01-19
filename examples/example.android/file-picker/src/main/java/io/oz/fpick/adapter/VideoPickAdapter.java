@@ -15,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -335,7 +334,7 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
 
         public VideoPickViewHolder(@NonNull View itemView) {
             super ( itemView );
-            vAlbum = itemView.findViewById ( R.id.xiv_album_icon);
+            vAlbum = itemView.findViewById ( R.id.xiv_album_cmd);
             vSyncing = itemView.findViewById ( R.id.xiv_syncing_icon);
             vSynced = itemView.findViewById ( R.id.xiv_synced_icon);
 

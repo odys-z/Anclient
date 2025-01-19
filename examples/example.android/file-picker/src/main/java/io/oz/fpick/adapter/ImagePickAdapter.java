@@ -227,7 +227,7 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            iAlbum = itemView.findViewById(R.id.xiv_album_icon);
+            iAlbum = itemView.findViewById(R.id.xiv_album_cmd);
             vSyncing = itemView.findViewById(R.id.xiv_syncing_icon);
             vSynpublic = itemView.findViewById(R.id.xiv_synced_icon);
             vSynpriv = itemView.findViewById(R.id.xiv_synprv_icon);

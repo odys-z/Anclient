@@ -15,7 +15,7 @@
             android:scaleType="centerCrop" />
 
         <ImageView
-            android:id="@+id/xiv_album_icon"
+            android:id="@+id/xiv_album_cmd"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
