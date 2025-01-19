@@ -120,7 +120,7 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
 
     @Override
     protected void visualHolder0(ImagePickViewHolder holder) {
-        holder.iAlbum.setVisibility ( View.VISIBLE );
+        holder.cmd0.setVisibility ( View.VISIBLE );
         holder.vSynpublic.setVisibility ( View.INVISIBLE );
         holder.vSynpriv.setVisibility ( View.INVISIBLE );
         holder.glideThumb.setVisibility ( View.INVISIBLE );
@@ -130,43 +130,30 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
 
     @Override
     protected void visualHolderx(ImagePickViewHolder holder, AndroidFile file) {
-        if (isblank(file.shareflag))
-            file.shareflag = ShareFlag.device.name();
+//        if (isblank(file.shareflag))
+//            file.shareflag = ShareFlag.device.name();
 
         ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
 
-        holder.vSynpublic.setVisibility ( View.INVISIBLE );
-        holder.glideThumb.setVisibility ( View.VISIBLE );
-        // holder.mCbx.setVisibility ( View.GONE );
+        holder.cmd0.setVisibility(View.GONE);
+        holder.vShadow.setVisibility(View.GONE);
+        holder.vSynpublic.setVisibility(View.GONE);
+        holder.vSyncing.setVisibility(View.GONE);
         holder.vSynpriv.setVisibility(View.GONE);
+        holder.glideThumb.setVisibility ( View.VISIBLE );
 
-        if (ShareFlag.pushing == share) {
-            // holder.mCbx.setSelected ( false );
-            holder.vShadow.setVisibility(View.GONE);
-            holder.iAlbum.setVisibility(View.GONE);
-            holder.vSyncing.setVisibility(View.VISIBLE);
-            holder.vSynpublic.setVisibility(View.GONE);
-            holder.vSynpriv.setVisibility(View.GONE);
-        }
-        else if (ShareFlag.publish == share) {
-            // holder.mCbx.setSelected(true);
-            holder.vShadow.setVisibility(View.GONE);
-            holder.iAlbum.setVisibility(View.INVISIBLE);
-            holder.vSyncing.setVisibility(View.GONE);
-            holder.vSynpublic.setVisibility(View.VISIBLE);
-            holder.vSynpriv.setVisibility(View.GONE);
-        }
-        else if (ShareFlag.prv == share) {
-            // holder.mCbx.setSelected(true);
-            holder.vShadow.setVisibility(View.GONE);
-            holder.iAlbum.setVisibility(View.INVISIBLE);
-            holder.vSyncing.setVisibility(View.GONE);
-            holder.vSynpublic.setVisibility(View.GONE);
-            holder.vSynpriv.setVisibility(View.VISIBLE);
-        }
+        if (!file.isSelected())
+            if (ShareFlag.pushing == share) {
+                holder.vSyncing.setVisibility(View.VISIBLE);
+            }
+            else if (ShareFlag.publish == share) {
+                holder.vSynpublic.setVisibility(View.VISIBLE);
+            }
+            else if (ShareFlag.prv == share) {
+                holder.vSynpriv.setVisibility(View.VISIBLE);
+            }
+
         visualSelect(file.isSelected(), holder);
-
-
     }
 
     @Override
@@ -175,7 +162,6 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
             // not synced but selected
             // holder.mCbx.setSelected ( true );
             holder.vShadow.setVisibility ( View.VISIBLE );
-            holder.iAlbum.setVisibility(View.GONE);
 
             holder.animation.setVisibility ( View.VISIBLE );
             holder.animation.setAlpha ( 1f );
@@ -215,7 +201,7 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
     }
 
     static class ImagePickViewHolder extends ViewHolder4Glide {
-        private final ImageView iAlbum;
+        private final ImageView cmd0;
         private final ImageView vSynpublic;
 
         private final ImageView vSynpriv;
@@ -227,7 +213,7 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
 
         public ImagePickViewHolder ( View itemView ) {
             super ( itemView );
-            iAlbum = itemView.findViewById(R.id.xiv_album_cmd);
+            cmd0 = itemView.findViewById(R.id.xiv_album_cmd);
             vSyncing = itemView.findViewById(R.id.xiv_syncing_icon);
             vSynpublic = itemView.findViewById(R.id.xiv_synced_icon);
             vSynpriv = itemView.findViewById(R.id.xiv_synprv_icon);

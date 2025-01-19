@@ -177,7 +177,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				pk={''} singleCheck
 				tier={this.tier}
 				columns={[
-				  { type: 'iconame', field: 'pname', label: L('File Name'),
+				  { type: 'iconame', field: 'text', label: L('File Name'),
 					grid: {xs: 6, sm: 6, md: 5} },
 				  { type: 'text', field: 'mime', label: L('type'),
 					colFormatter: typeParser, // Customize a cell
@@ -196,7 +196,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
-					{ type: 'text',     field: 'pname',  label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
 					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
 					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
