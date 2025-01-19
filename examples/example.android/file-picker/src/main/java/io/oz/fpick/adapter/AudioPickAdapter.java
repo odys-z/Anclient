@@ -237,6 +237,7 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
             AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground();
             animationDrawable.start();
         }
+        else // weird: setting INVISIBLE twice to icAlbum will be visible when rolling back.
         if (ShareFlag.prv == share) {
             // holder.mCbx.setSelected ( false );
             holder.icAlbum.setVisibility(View.INVISIBLE);
