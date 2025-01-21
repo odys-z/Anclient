@@ -32,7 +32,7 @@
     "@material-ui/icons": "^4.11.3",
     "@material-ui/lab": "^4.0.0-alpha.61",
     "acorn": "^8.4.1",
-    "ag-grid-community": "^29.3.4",
+    "ag-grid-community": "^33.0.4",
     "core-js": "^3.17.1",
     "material-ui-audio-player": "^1.7.1",
     "mime-types-no-nodejs": "^0.9.1",
