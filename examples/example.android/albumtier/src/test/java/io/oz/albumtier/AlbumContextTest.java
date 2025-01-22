@@ -35,7 +35,7 @@ class AlbumContextTest {
 					try {
 						code[0] = 1;
 						AnsonBody reqbd = new DocsReq(uri)
-												.a(DocsReq.A.checkDev);
+										.a(DocsReq.A.checkDev);
 						AnsonMsg<AnsonBody> req = client.userReq(uri, AlbumPort.album, reqbd);
 						DocsResp resp = client.commit(req, (MsgCode c, String msg, String... args) -> {
 							fail(msg);
