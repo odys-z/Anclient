@@ -6,7 +6,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
 
 import { L, AnError, AnReactExt, Lightbox,
-	AnTreeditor, CrudCompW, AnContextType,
+	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts, Comprops
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
@@ -32,6 +32,12 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	albumsk = 'tree-album-family-folder';
 	doctreesk = 'tree-docs-folder';
 	synuri = '/album/syn';
+
+	/**
+	 * The entity table name updated each time loaded a tree.
+	 * Issue: See java AlbumResp.docTable's comments
+	 */
+	docTabl: string = 'h_photos';
 
 	state = {
 		hasError: false,
@@ -79,7 +85,10 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		tier.stree({ uri: this.uri, synuri: this.synuri,
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
-				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
+				tier.forest = (rep.Body() as AlbumResp).forest as AnTreeNode[];
+				// console.log(rep.Body().album.docTabl);
+				// console.log((rep.Body() as AlbumResp).docTabl);
+				that.docTabl = (rep.Body() as AlbumResp).docTabl || 'h_photos';
 				that.setState({});
 			}},
 			this.error);
@@ -131,12 +140,13 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				let file = ids.get(fid) as AnTreeNode;
 				let t = regex.mime2type(file.node.mime as string || "");
 				if (t === '.pdf') {
+					// console.log(this.docTabl);
 					this.pdfview = (<PdfViewer
 						close={(e) => {
 							this.pdfview = undefined;
 							this.setState({});
 						} }
-						src={GalleryView.imgSrcReq(file?.id, this.tier)}
+						src={GalleryView.imgSrcReq(file?.id, this.docTabl, this.tier)}
 					></PdfViewer>);
 				}
 				else {

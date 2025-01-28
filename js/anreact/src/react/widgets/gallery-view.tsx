@@ -5,7 +5,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, isEmpty, len
+import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
@@ -109,7 +109,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				index: x,
 				node: { ...p.node, shareby: p.node.shareby as string },
 				width: w, height: h,
-				src: GalleryView.imgSrcReq(p.id, this.albumtier),
+				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, this.albumtier),
 				imgstyl,
 				mime: p.node.mime as string
 			})
@@ -125,7 +125,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @param opts 
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
-	static imgSrcReq(pid: AnsonValue, opts: {uri: string, client: SessionClient, port: string}) : string {
+	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {uri: string, client: SessionClient, port: string}) : string {
 
 		let {client, port} = opts;
 
@@ -141,7 +141,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					.reqFactories[port]({uri, sk: ''})
 					.A(AlbumReq.A.download) as AlbumReq;
 
-				// req.docId = pid;
+				req.doc = new SyncDoc({ recId: pid });
+				req.docTabl = doctable;
 				reqMsgs[pid] = client.userReq(uri, port, req);
 			}
 			return reqMsgs[pid];

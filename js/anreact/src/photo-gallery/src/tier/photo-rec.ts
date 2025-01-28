@@ -122,6 +122,9 @@ export class AlbumReq extends DocsReq {
 
 	photo?    : PhotoRec;
 
+	/** e.g. h_photos */
+	docTabl   : string;
+
 	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
 		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__});
 		this.type = AlbumReq.__type__;
@@ -159,6 +162,7 @@ StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: 
 // v 0.7
 StreeTier.registTierequest('docoll', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
 
+// ISSUE: should extends DocsResp. We need a better tool to generate the class, desperately.
 export class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.album.peer.AlbumResp';
 	album?: AlbumRec;
@@ -167,6 +171,8 @@ export class AlbumResp extends AnDatasetResp {
 	collects?: Array<PhotoCollect>;
 
 	photo?: PhotoRec;
+
+	docTabl?: string;
 
 	constructor (resp: AlbumRec & {
 			forest: AnTreeNode[], // profiles?: Profiles,
