@@ -92,16 +92,14 @@
     <string name="log_prof_err"       >Correctly logged in, but got wrong profiles.</string>
 
     <array name="jserv_entries">
-        <item>localhost:8888</item>
-        <item>@string/jserv_name0</item>
         <item>@string/jserv_name1</item>
+        <item>@string/jserv_name0</item>
         <item>@string/jserv_name2</item>
         <item>@string/jserv_name3</item>
     </array>
     <array name="jserv_entvals">
-        <item>http://localhost:8888</item>
-        <item>@string/product_jserv_default</item>
         <item>@string/product_jserv_1</item>
+        <item>@string/product_jserv_default</item>
         <item>@string/product_jserv_2</item>
         <item>@string/product_jserv_3</item>
     </array>

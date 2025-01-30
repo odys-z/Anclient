@@ -1786,7 +1786,7 @@ export class SyncDoc implements Tierec {
 	type?: string;
 
 	/** pid */
-	docId?: string;
+	// docId?: string;
 
 	/** card title */
 	pname?: string;
@@ -1799,7 +1799,7 @@ export class SyncDoc implements Tierec {
 	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
 		this.type = opt.type || SyncDoc.__type0__;
 		this.src = opt.src
-		this.docId = opt.recId;
+		this.recId = opt.recId;
 		this.device = opt.device;
 	}
 }
