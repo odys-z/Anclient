@@ -11,6 +11,7 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -33,7 +34,6 @@ import io.odysz.transact.x.TransException;
 import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
 import io.oz.album.peer.SynDocollPort;
-import io.oz.albumtier.IFileProvider;
 
 public class PhotoSyntier extends Doclientier {
 
@@ -47,11 +47,11 @@ public class PhotoSyntier extends Doclientier {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
 
-	IFileProvider fileProvider;
-	public PhotoSyntier fileProvider(IFileProvider p) {
-		this.fileProvider = p;
-		return this;
-	}
+//	IFileProvider fileProvider;
+//	public PhotoSyntier fileProvider(IFileProvider p) {
+//		this.fileProvider = p;
+//		return this;
+//	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.asyLoginByUri(this.uri, uid, pswd, (client) -> {
@@ -77,7 +77,7 @@ public class PhotoSyntier extends Doclientier {
 	}
 
 	/**
-	 * Get this user's settings from port {@link SynDocollPort.docoll}.
+	 * Get this user's settings from port {@link SynDocollPort#docoll}.
 	 *
 	 * For album-jserv 0.6.50, the webroot is configured in org's field.
 	 *
@@ -120,7 +120,7 @@ public class PhotoSyntier extends Doclientier {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<IFileDescriptor> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
@@ -132,7 +132,7 @@ public class PhotoSyntier extends Doclientier {
 					else page.add(p.fullpath());
 				}
 
-				resp = synQueryPathsPage(page, SynDocollPort.docoll);
+				resp = synQueryPathsPage(page, SynDocollPort.docstier);
 				try {
 					onOk.ok(resp);
 				} catch (AnsonException | SemanticException | IOException | SQLException e) {
@@ -160,12 +160,13 @@ public class PhotoSyntier extends Doclientier {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
-						.act(uri, "devices", "r/devices", "restore devices");
+						.act(synuri, "devices", "r/devices", "restore devices");
 
-				AlbumReq req = new AlbumReq(uri);
+				AlbumReq req = new AlbumReq(synuri);
 				req.a(DocsReq.A.devices);
-				AnsonMsg<AlbumReq> q = client.userReq(uri, SynDocollPort.docoll, req)
+				AnsonMsg<AlbumReq> q = client.userReq(synuri, SynDocollPort.docoll, req)
 						.header(header);
+				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
 			} catch (IOException e) {
@@ -192,6 +193,7 @@ public class PhotoSyntier extends Doclientier {
 				req.a(DocsReq.A.registDev);
 				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 						.header(header);
+				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
 			} catch (IOException e) {
@@ -264,6 +266,15 @@ public class PhotoSyntier extends Doclientier {
 		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
 		req.doc.recId = photo.recId;
 		req.a(A.download);
-		return client.download(synuri, Port.docsync, req, localpath);
+		return client.download(synuri, Port.docstier, req, localpath);
 	}
+
+//	public boolean isAbailable(String deviceId, String deviceName) throws IOException, SemanticException {
+//		String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
+//		AnsonHeader header = client.header().act(act);
+//		AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, SynDocollPort.docoll, req)
+//				.header(header);
+//		AnsonResp resp = client.commit(q, errCtx);
+//		return resp != null;
+//	}
 }

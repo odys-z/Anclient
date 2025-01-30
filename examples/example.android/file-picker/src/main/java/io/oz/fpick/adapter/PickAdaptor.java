@@ -1,5 +1,6 @@
 package io.oz.fpick.adapter;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static io.odysz.common.LangExt.isNull;
 
 import android.annotation.SuppressLint;
@@ -7,12 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
+import com.vincent.filepicker.filter.entity.Directory;
+import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +28,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -27,8 +36,8 @@ import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.peer.ShareFlag;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.R;
@@ -77,9 +86,11 @@ import static io.odysz.common.LangExt.isblank;
  * @param <T>
  * @param <VH>
  */
-public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class PickAdaptor<T extends AndroidFile, VH extends ViewHolder4Glide> extends RecyclerView.Adapter<VH> {
 
+    /** @deprecated  what's for? */
     public String mFilepath;
+    protected ShareFlag shareSetting;
 
     protected boolean isNeedCamera;
     protected int mMaxNumber;
@@ -87,19 +98,17 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
 
     /** Prevent measuring for every item */
     protected int itemWidth = -1;
-
+    abstract protected String mediaViewType();
 
     public boolean isUpToMax () {
         return mCurrentNumber >= mMaxNumber;
     }
 
-    public void setCurrentNumber(int number) {
-        mCurrentNumber = number;
-    }
-
     protected BaseActivity mContext;
-    protected ArrayList<T> mList;
-    protected BaseActivity.OnSelectStateListener mListener;
+    protected ArrayList<AndroidFile> mList;
+    protected HashSet<AndroidFile> mSelections = new HashSet<>();
+
+    public ArrayList<AndroidFile> selections() { return new ArrayList<>(mSelections); }
 
     protected AlbumContext singleton;
 
@@ -108,11 +117,51 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     /**
      * @param list resource list
      */
-    public BaseSynchronizer(BaseActivity ctx, ArrayList<T> list) {
+    public PickAdaptor(BaseActivity ctx, ArrayList<AndroidFile> list, int max) {
         this.singleton = AlbumContext.getInstance(ctx);
+        shareSetting = ShareFlag.publish;
+        mMaxNumber = max;
         mContext = ctx;
         mList = list;
     }
+
+    public void loadirs(List<Directory<AndroidFile>> directories) {
+        List<AndroidFile> list = mergeDirs(directories, false);
+
+        // max number is limited
+        for (AndroidFile file : selections()) {
+            int index = list.indexOf(file);
+            if (index != -1) {
+                list.get(index).setSelected(true, shareSetting);
+            }
+        }
+        refreshSyncs(list);
+    }
+
+
+    private List<AndroidFile> mergeDirs(List<Directory<AndroidFile>> directories, boolean tryToFindTakenImage) {
+        // boolean tryToFindTakenImage = isTakenAutoSelected;
+        if (tryToFindTakenImage && !TextUtils.isEmpty(mFilepath)) {
+            File takenImageFile = new File(mFilepath);
+            // try to select taken image only if haven't reached maximum and the file exists
+            tryToFindTakenImage = !isUpToMax() && takenImageFile.exists();
+        }
+
+        List<AndroidFile> lst = new ArrayList<>();
+        for (Directory<AndroidFile> directory : directories) {
+            List<AndroidFile> l = directory.getFiles();
+            lst.addAll(l);
+
+            // auto-select taken images?
+            if (tryToFindTakenImage) {
+                // if taken image was found, we're done
+                // ?? markTakenFiles(l);
+            }
+        }
+        return lst;
+    }
+
+    public String allowingTxt() { return mCurrentNumber + "/" + mMaxNumber; }
 
     @SuppressLint("NotifyDataSetChanged")
     public void add(List<T> list) {
@@ -130,7 +179,65 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         notifyItemChanged(index);
     }
 
-    public List<T> getDataSet() { return mList; }
+    @Override
+    public int getItemCount() {
+        return mList == null ? 0 : isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
+    }
+
+    @Override
+    public void onBindViewHolder (@NonNull final VH holder , final int position ) {
+        if (isNeedCamera && position == 0) {
+            visualHolder0(holder);
+            return;
+        }
+
+        AndroidFile file;
+        if (isNeedCamera)
+            file = mList.get ( position - 1 );
+        else
+            file = mList.get ( position );
+
+        visualHolderx(holder, file);
+
+        RequestOptions options = new RequestOptions ( );
+        Glide.with ( mContext )
+                .load ( file.fullpath() )
+                .apply ( options.centerCrop() )
+                .transition ( withCrossFade() )
+                .into ( holder.glideThumb );
+
+        holder.glideThumb.setOnLongClickListener(
+                (View view) -> startMediaViewer(mContext, mediaViewType(), file.fullpath()));
+
+        holder.glideThumb.setOnClickListener((View h) -> {
+            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
+                return;
+
+            if ( !file.isSelected() && isUpToMax() ) {
+                ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
+            }
+            else {
+                boolean old = file.setSelected(!file.isSelected(), shareSetting);
+                if (old) {
+                    file.shareflag(null);
+                    mCurrentNumber--;
+                    mSelections.remove(file);
+                }
+                else {
+                    mSelections.add(file);
+                    mCurrentNumber++;
+                }
+                visualSelect(!old, holder);
+            }
+            mContext.onselect(file);
+        });
+    }
+
+    abstract protected void visualHolder0(VH holder);
+    abstract protected void visualHolderx(VH holder, AndroidFile file);
+
+    abstract protected void visualSelect(boolean selected, VH holder);
 
     /**
      * Add file list to my list, then start the asynchronous matching.
@@ -140,7 +247,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     @SuppressLint("NotifyDataSetChanged")
     public void refreshSyncs(List<AndroidFile> list) {
         mList.clear();
-        mList.addAll((Collection<? extends T>) list); // why this has performance cost?
+        mList.addAll(list); // why this has performance cost?
         notifyDataSetChanged();
 
         synchPage = new PathsPage(0, Math.min(20, mList.size()));
@@ -164,7 +271,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
     void startSynchQuery(PathsPage page)  {
         // FIXME why reaches here when tier != null while tier.client is null?
         if (!isNull(singleton.tier) && !isNull(singleton.tier.client))
-            singleton.tier.asynQueryDocs((List<IFileDescriptor>)mList, page, onSyncQueryResponse,
+            singleton.tier.asynQueryDocs(mList, page, onSyncQueryResponse,
                 (c, r, args) -> { singleton.errCtx.err(c, r, args); });
     }
 
@@ -186,7 +293,7 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
 
                     // Note for MVP 0.2.1, tolerate server side error. The file is found, can't be null
                     // For ix, see ExpDocTableMeta.getPathInfo() in Semantic.DA
-                    f.syncFlag = isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]);
+                    f.shareflag(isblank(inf[1]) ? ShareFlag.unknown : ShareFlag.valueOf((String) inf[1]));
                     f.shareby = (String) inf[2];
                     f.sharedate((String) inf[3]);
                 }
@@ -225,10 +332,6 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         });
     }
 
-    public void selectListener(BaseActivity.OnSelectStateListener listener) {
-        mListener = listener;
-    }
-
     /**
      * @param ctx the context
      * @param dataType "video/*" or "image/*"
@@ -255,6 +358,5 @@ public abstract class BaseSynchronizer <T extends IFileDescriptor, VH extends Re
         }
         return false;
     }
-
 }
 

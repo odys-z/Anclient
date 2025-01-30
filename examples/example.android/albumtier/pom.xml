@@ -61,13 +61,13 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>syndoc-lib</artifactId>
-	    <version>[0.5.9,)</version>
+	    <version>[0.5.15-SNAPSHOT,)</version>
 	</dependency>
 
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>anclient.java</artifactId>
-	    <version>[0.5.9,)</version>
+	    <version>[0.5.13,)</version>
 	</dependency>
 
   </dependencies>

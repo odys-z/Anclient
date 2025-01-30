@@ -1,4 +1,4 @@
-package io.oz.albumtier;
+package io.odysz.jclient.syn;
 
 import java.io.IOException;
 import java.io.InputStream;

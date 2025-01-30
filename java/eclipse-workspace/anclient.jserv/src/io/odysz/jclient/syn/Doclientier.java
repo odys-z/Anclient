@@ -53,11 +53,11 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
-import io.oz.album.peer.ShareFlag;
 
 public class Doclientier extends Semantier {
 	public boolean verbose = false;
@@ -94,6 +94,12 @@ public class Doclientier extends Semantier {
 	
 	public Doclientier blockSize(int size) {
 		blocksize = size;
+		return this;
+	}
+	
+	IFileProvider fileProvider;
+	public Doclientier fileProvider(IFileProvider p) {
+		this.fileProvider = p;
 		return this;
 	}
 	
@@ -256,7 +262,7 @@ public class Doclientier extends Semantier {
 //			pathpool.add(pth);
 //		}
 //
-//		DocsResp rep = clientier.synQueryPathsPage(pths, entityName, Port.docsync);
+//		DocsResp rep = clientier.synQueryPathsPage(pths, entityName, Port.docstier);
 //
 //		PathsPage pthpage = rep.pathsPage();
 //
@@ -271,7 +277,7 @@ public class Doclientier extends Semantier {
 
 
 	/**
-	 * Synchronizing files to a {@link ExpDoctier} using block chain, accessing port {@link Port#docsync}.
+	 * Synchronizing files to a {@link ExpDoctier} using block chain, accessing port {@link Port.docstier}.
 	 * This method will use meta to create entity object of doc.
 	 * @param meta for creating {@link ExpSyncDoc} object 
 	 * @param rs tasks, rows should be limited
@@ -328,7 +334,7 @@ public class Doclientier extends Semantier {
 							.a(A.download);
 
 			String tempath = tempath(p);
-			tempath = client.download(synuri, Port.docsync, req, tempath);
+			tempath = client.download(synuri, Port.docstier, req, tempath);
 		}
 		return p;
 	}
@@ -381,7 +387,7 @@ public class Doclientier extends Semantier {
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, blocksize, templage,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, blocksize, templage,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -406,11 +412,11 @@ public class Doclientier extends Semantier {
 	 * @throws AnsonException 
 	 */
 	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
-			List<IFileDescriptor> videos, int blocksize, ExpSyncDoc template,
+			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
 			throws TransException, IOException, AnsonException, SQLException {
 
-		SessionInf user = client.ssInfo();
+		SessionInf ssinf = client.ssInfo();
 
         DocsResp resp0 = null;
         DocsResp respi = null;
@@ -429,18 +435,32 @@ public class Doclientier extends Semantier {
 			ExpSyncDoc p = videos.get(px).syndoc(template);
 
 			if ( isblank(p.clientpath) ||
-				(!isblank(p.device()) && !eq(p.device(), user.device)))
+				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
 				throw new SemanticException(
 						"Docs' pushing requires device id and clientpath.\n" +
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
-						p.recId, p.device(), user.device, p.clientpath, p.pname);
+						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 
-			DocsReq req  = new DocsReq(tbl, p, uri)
-					.device(user.device)
-					.resetChain(true)
-					.blockStart(p, user);
+			if (fileProvider == null) {
+				if (isblank(p.fullpath()) || isblank(p.clientname()) || isblank(p.createDate))
+					throw new IOException(
+							f("File information is not enough: %s, %s, create time %s",
+							p.clientname(), p.fullpath(), p.createDate));
+			}
+			else if (fileProvider.meta(p) < 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(p.shareflag(ShareFlag.deny,
+								f("File provide returned error: %s", p.clientpath))));
+				continue;
+			}
 			
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docsync, req)
+			DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
+					.device(ssinf.device)
+					.resetChain(true)
+					.blockStart(p, ssinf);
+			
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
 									.header(header);
 
 			try {
@@ -459,10 +479,10 @@ public class Doclientier extends Semantier {
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
-					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, user);
+					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, ssinf);
 					seq++;
 
-					q = client.<DocsReq>userReq(uri, Port.docsync, req)
+					q = client.<DocsReq>userReq(uri, Port.docstier, req)
 								.header(header);
 
 					respi = client.commit(q, errHandler);
@@ -470,9 +490,9 @@ public class Doclientier extends Semantier {
 
 					b64 = AESHelper.encode64(ifs, blocksize);
 				}
-				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, user);
+				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
 
-				q = client.<DocsReq>userReq(uri, Port.docsync, req)
+				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
 				respi = client.commit(q, errHandler);
 				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
@@ -483,9 +503,9 @@ public class Doclientier extends Semantier {
 				Utils.warn(ex.getMessage());
 
 				if (resp0 != null) {
-					req = new DocsReq(tbl, uri).blockAbort(resp0, user);
+					req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
 					req.a(DocsReq.A.blockAbort);
-					q = client.<DocsReq>userReq(uri, Port.docsync, req)
+					q = client.<DocsReq>userReq(uri, Port.docstier, req)
 								.header(header);
 					respi = client.commit(q, errHandler);
 				}
@@ -533,7 +553,7 @@ public class Doclientier extends Semantier {
 		DocsReq req = (DocsReq) new DocsReq(syname, synuri);
 		req.doc.recId = photo.recId;
 		req.a(A.download);
-		return client.download(clientUri, Port.docsync, req, localpath);
+		return client.download(clientUri, Port.docstier, req, localpath);
 	}
 
 	/**
@@ -556,7 +576,7 @@ public class Doclientier extends Semantier {
 		DocsResp resp = null;
 		try {
 			AnsonMsg<DocsReq> q = client
-					.<DocsReq>userReq(synuri, Port.docsync, req)
+					.<DocsReq>userReq(synuri, Port.docstier, req)
 					.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -583,7 +603,7 @@ public class Doclientier extends Semantier {
 
 		DocsResp resp = null;
 		try {
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docsync, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docstier, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -605,7 +625,7 @@ public class Doclientier extends Semantier {
 		try {
 			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
 			AnsonHeader header = client.header().act(act);
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docsync, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(synuri, Port.docstier, req)
 										.header(header);
 
 			resp = client.commit(q, errCtx);
@@ -704,7 +724,7 @@ public class Doclientier extends Semantier {
 	 */
 	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
 			throws SemanticException, AnsonException, IOException {
-		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docsync.name());
+		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docstier.name());
 		AnsonHeader header = client.header().act(act);
 
 		// DocsReq req = (DocsReq) new DocsReq("doc_devices", synuri);
@@ -713,7 +733,7 @@ public class Doclientier extends Semantier {
 		req.a(A.registDev);
 
 		AnsonMsg<DocsReq> q = client
-			.<DocsReq>userReq(synuri, Port.docsync, req)
+			.<DocsReq>userReq(synuri, Port.docstier, req)
 			.header(header);
 
 		return client.commit(q, errCtx);

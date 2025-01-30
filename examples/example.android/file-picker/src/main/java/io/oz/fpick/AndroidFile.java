@@ -15,20 +15,25 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
+import java.io.IOException;
 import java.util.Date;
 
+import io.odysz.anson.Anson;
+import io.odysz.anson.AnsonField;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
-    public ShareFlag syncFlag;
 
     /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
     private long date;          //Added Date
+
+    @AnsonField(ignoreTo = true)
     private boolean isSelected;
     private Uri contUri;
 
@@ -123,19 +128,38 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 
     public boolean isSelected() { return isSelected; }
 
-    public void setSelected(boolean selected) { isSelected = selected; }
+    /**
+     * @param selected
+     * @return previous state
+     */
+    public boolean setSelected(boolean selected, ShareFlag shareAs) {
+        return setSelected(selected, shareAs.name());
+
+    }
+    public boolean setSelected(boolean selected, String shareAs) {
+        boolean old = isSelected;
+        isSelected = selected;
+        shareflag = shareAs;
+        return old;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(pname);
-        dest.writeString(clientpath);
-        dest.writeLong(size);
-        dest.writeString(localDirId);
-        dest.writeString(localDirName);
-        dest.writeLong(date);
-        dest.writeByte((byte) (isSelected ? 1 : 0));
-        dest.writeString(folder());
+//        dest.writeLong(id);
+//        dest.writeString(pname);
+//        dest.writeString(clientpath);
+//        dest.writeLong(size);
+//        dest.writeString(localDirId);
+//        dest.writeString(localDirName);
+//        dest.writeLong(date);
+//        dest.writeString(shareflag);
+//        dest.writeByte((byte) (isSelected ? 1 : 0));
+//        dest.writeString(folder());
+        try {
+            dest.writeString(this.toBlock());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -165,7 +189,8 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
          */
         @Override
         public AndroidFile createFromParcel(Parcel in) {
-            throw new AnsonException(0, "No overriding?");
+            // throw new AnsonException(0, "No overriding?");
+            return (AndroidFile) Anson.fromJson(in.readString());
         }
     };
 

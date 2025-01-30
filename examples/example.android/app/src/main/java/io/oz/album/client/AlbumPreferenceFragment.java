@@ -124,7 +124,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
      */
     private final Preference.OnPreferenceChangeListener prefsListener =
         (preference, newValue) -> {
-            String stringValue = newValue.toString();
+            String stringValue = newValue == null ? "" : newValue.toString();
             String k = preference.getKey();
             if (k.equals(AlbumApp.keys.jserv)) {
                 AnPrefEntries jservlist = AlbumApp.sharedPrefs.jservlist;

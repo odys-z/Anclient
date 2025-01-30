@@ -8,11 +8,14 @@
 
 <body>
   <!-- To load page, in console: loadAlbum(uid, pswd) -->
-  <div id="app">Album Web v0.3.0
+  <div id="app">Album Web v0.4.0
       <img src=''></img>
+      <hr>
+      <p>If you see this message at the first time, it's probaly we cannot reach you through a fast network connection.</p>
+      <p>Currently the only option is to wait for a while. We are sorry about that!</p>
   </div>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <script src="./Album-0.3.0.min.js" type="text/javascript"></script>
+  <script src="./Album-0.4.0.min.js" type="text/javascript"></script>
   <script>
     let searchParams = new URLSearchParams(window.location.search)
     let aid = searchParams ? searchParams.get('album') : 'album-landing';

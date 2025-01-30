@@ -1,6 +1,6 @@
 import AES from './aes';
 import { SessionClient, SessionInf } from './anclient';
-import { arr, isEmpty, len, size, str } from './helpers';
+import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -1768,6 +1768,42 @@ export class DocsResp extends AnsonResp {
 }
 Protocol.registerBody(DocsResp.__type__, (json) => new DocsResp(json));
 
+/**
+ * SyncDoc is currently an abstract class for __type__ is absent,
+ * which makes this class can not be deserialized.
+ * 
+ * Java: ExpSyncDoc
+ */
+export class SyncDoc implements Tierec {
+	/**
+	 * 'io.odysz.semantic.tier.docs.ExpSynDoc'
+	 * As this is an anbstract class (in Java), subclass must provide the static "type" field. 
+	 */
+	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
+
+    [f: string]: AnsonValue;
+
+	type?: string;
+
+	/** pid */
+	docId?: string;
+
+	/** card title */
+	pname?: string;
+	shareby?: string | undefined;
+	sharedate?: string;
+	device?: string;
+
+	src: string;
+
+	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
+		this.type = opt.type || SyncDoc.__type0__;
+		this.src = opt.src
+		this.docId = opt.recId;
+		this.device = opt.device;
+	}
+}
+
 export class DocsReq extends AnsonBody {
 	static __type__ = 'io.odysz.semantic.tier.docs.DocsReq';
 
@@ -1780,27 +1816,35 @@ export class DocsReq extends AnsonBody {
 		del: 'd',
 	};
 
-	docId: string;
-	docName: string;
-	mime: string;
-	uri64: string;
-	deletings: string[];
-	subfolder: string;
-	synuri: string;
+	synuri?: string;
+
+	doc?: SyncDoc;
+
+	pageInf?: PageInf;
+
+	// docId: string;
+	// docName: string;
+	// mime: string;
+	// uri64: string;
+
+	deletings?: string[];
+	// subfolder: string;
 
 	/**
 	 *
 	 * @param uri
 	 * @param args
+	 * args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
 	 * args.deletings: old docId to be deleted
 	 */
-	constructor(uri: string, args? : {synuri: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
 		this.synuri = args.synuri;
-		this.docId = args.docId;
-		this.docName = args.docName;
-		this.mime = args.mime;
-		this.uri64 = args.uri64;
+		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.docFieldType}));
+		// this.docId = args.docId;
+		// this.docName = args.docName;
+		// this.mime = args.mime;
+		// this.uri64 = args.uri64;
 
 		// case d
 		this.deletings = args.deletings;

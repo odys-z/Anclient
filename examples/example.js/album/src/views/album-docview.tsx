@@ -6,7 +6,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
 
 import { L, AnError, AnReactExt, Lightbox,
-	AnTreeditor, CrudCompW, AnContextType,
+	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts, Comprops
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
@@ -32,6 +32,12 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	albumsk = 'tree-album-family-folder';
 	doctreesk = 'tree-docs-folder';
 	synuri = '/album/syn';
+
+	/**
+	 * The entity table name updated each time loaded a tree.
+	 * Issue: See java AlbumResp.docTable's comments
+	 */
+	docTabl: string = 'h_photos';
 
 	state = {
 		hasError: false,
@@ -79,7 +85,10 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		tier.stree({ uri: this.uri, synuri: this.synuri,
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
-				tier.forest = (rep.Body() as AnDatasetResp).forest as AnTreeNode[];
+				tier.forest = (rep.Body() as AlbumResp).forest as AnTreeNode[];
+				// console.log(rep.Body().album.docTabl);
+				// console.log((rep.Body() as AlbumResp).docTabl);
+				that.docTabl = (rep.Body() as AlbumResp).docTabl || 'h_photos';
 				that.setState({});
 			}},
 			this.error);
@@ -131,12 +140,13 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				let file = ids.get(fid) as AnTreeNode;
 				let t = regex.mime2type(file.node.mime as string || "");
 				if (t === '.pdf') {
+					// console.log(this.docTabl);
 					this.pdfview = (<PdfViewer
 						close={(e) => {
 							this.pdfview = undefined;
 							this.setState({});
 						} }
-						src={GalleryView.imgSrcReq(file?.id, this.tier)}
+						src={GalleryView.imgSrcReq(file?.id, this.docTabl, this.tier)}
 					></PdfViewer>);
 				}
 				else {
@@ -177,7 +187,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				pk={''} singleCheck
 				tier={this.tier}
 				columns={[
-				  { type: 'iconame', field: 'pname', label: L('File Name'),
+				  { type: 'iconame', field: 'text', label: L('File Name'),
 					grid: {xs: 6, sm: 6, md: 5} },
 				  { type: 'text', field: 'mime', label: L('type'),
 					colFormatter: typeParser, // Customize a cell
@@ -196,7 +206,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				onSelectChange={() => undefined}
 				uri={this.uri}
 				columns={[
-					{ type: 'text',     field: 'pname',  label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
 					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
 					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
 					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},

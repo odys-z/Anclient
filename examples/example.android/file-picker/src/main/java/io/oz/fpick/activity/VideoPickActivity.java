@@ -3,14 +3,8 @@ package io.oz.fpick.activity;
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_VIDEO;
 
 import android.Manifest;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.OpenableColumns;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,17 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-
-import io.odysz.common.Utils;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.oz.album.peer.ShareFlag;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.VideoPickAdapter;
 
 /**
@@ -59,7 +45,7 @@ public class VideoPickActivity extends BaseActivity {
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
         mSuffix = new String[] {"avi", "mp4", "mpeg", "ogv", "ts", "webm", "3gp", "3g2"};
 
-        mMaxNumber = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        int maxitems = getIntent().getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         boolean isNeedCamera = getIntent().getBooleanExtra(IS_NEED_CAMERA, false);
         isTakenAutoSelected = getIntent().getBooleanExtra(IS_TAKEN_AUTO_SELECTED, true);
 
@@ -68,17 +54,15 @@ public class VideoPickActivity extends BaseActivity {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
 
-        VideoPickAdapter adapter = new VideoPickAdapter(this, isNeedCamera, mMaxNumber);
+        VideoPickAdapter adapter = new VideoPickAdapter(this, isNeedCamera, maxitems);
         mRecyclerView.setAdapter(adapter);
         linkAdapter(TYPE_VIDEO, adapter);
-
     }
 
     /**
      * @deprecated  test only
      *
      * @return
-     */
     protected ArrayList<String> getPdfList() {
         ArrayList<String> pdfList = new ArrayList<>();
         Uri collection;
@@ -118,6 +102,7 @@ public class VideoPickActivity extends BaseActivity {
         }
         return pdfList;
     }
+     */
 
     protected String[] permissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
