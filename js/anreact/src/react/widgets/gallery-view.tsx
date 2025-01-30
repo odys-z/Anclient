@@ -10,7 +10,7 @@ import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, i
 
 import { Comprops, CrudCompW } from '../crud';
 import { ForcedStyle } from '../../photo-gallery/src/photo-ts';
-import { AlbumReq, PhotoCSS, PhotoCollect } from '../../photo-gallery/src/tier/photo-rec';
+import { AlbumReq, MediaCss, PhotoCollect, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
 
 const _photos = [];
 
@@ -103,12 +103,12 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					: undefined;
 
 		nodes?.forEach( (p: AnTreeNode, x) => {
-			let [_width, _height, w, h] = (JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
+			let {wh} = JSON.parse(p.node.css as string || '{"wh": [4, 3]}') as MediaCss;
 
 			photos.push({
 				index: x,
 				node: { ...p.node, shareby: p.node.shareby as string },
-				width: w, height: h,
+				width: wh[0], height: wh[1],
 				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, this.albumtier),
 				imgstyl,
 				mime: p.node.mime as string
@@ -136,16 +136,17 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
 			let {uri, port, client} = opts;
 
-			if (reqMsgs[pid] === undefined) {
+			let msgId = `${doctable}.${pid}`;
+			if (reqMsgs[msgId] === undefined) {
 				let req = StreeTier
 					.reqFactories[port]({uri, sk: ''})
 					.A(AlbumReq.A.download) as AlbumReq;
 
-				req.doc = new SyncDoc({ recId: pid });
+				req.doc = new SyncDoc({ recId: pid, type: PhotoRec.__type__ });
 				req.docTabl = doctable;
-				reqMsgs[pid] = client.userReq(uri, port, req);
+				reqMsgs[msgId] = client.userReq(uri, port, req);
 			}
-			return reqMsgs[pid];
+			return reqMsgs[msgId];
 		}
 	}
 

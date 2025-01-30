@@ -3,10 +3,10 @@ import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protoco
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
-export class PhotoCSS {
-	type: string = 'io.oz.album.peer.PhotoCSS';
-	size: number[] = [0, 0, 0, 0];
-}
+// export class PhotoCSS {
+// 	type: string = 'io.oz.album.peer.PhotoCSS';
+// 	size: number[] = [0, 0, 0, 0];
+// }
 
 export class PhotoRec extends SyncDoc {
 
@@ -24,7 +24,7 @@ export class PhotoRec extends SyncDoc {
 	// mime?: string;
 	geox?: string;
 	geoy?: string;
-	css? : PhotoCSS | string;
+	css? : MediaCss | string;
     wh?  : number[];
 
 	srcSet?: Array<string>;
@@ -33,7 +33,7 @@ export class PhotoRec extends SyncDoc {
 
 	constructor (opt: {
             recId: string; src?: string; device?: string;
-            css: string | PhotoCSS | undefined;
+            css: string | MediaCss | undefined;
             wh: number[] }) {
 		super(Object.assign(opt, {type: PhotoRec.__type__}));
 
@@ -45,6 +45,13 @@ export class PhotoRec extends SyncDoc {
         this.height = opt.wh[1];
 	}
 };
+
+export class MediaCss {
+	type: string = 'io.oz.album.peer.PhotoRec$MediaCss';
+	wh: number[] = [4, 3];
+	widthHeight: number[] = [4, 3];
+	rotation: number = 0;
+}
 
 export interface PhotoCollect extends Tierec {
 	title?: string;
