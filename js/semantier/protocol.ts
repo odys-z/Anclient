@@ -1,6 +1,6 @@
 import AES from './aes';
 import { SessionClient, SessionInf } from './anclient';
-import { arr, isEmpty, len, size, str } from './helpers';
+import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -1777,7 +1777,7 @@ Protocol.registerBody(DocsResp.__type__, (json) => new DocsResp(json));
 export class SyncDoc implements Tierec {
 	/**
 	 * 'io.odysz.semantic.tier.docs.ExpSynDoc'
-	 * As this is an anbstract class, subclass must provide the static "type" field. 
+	 * As this is an anbstract class (in Java), subclass must provide the static "type" field. 
 	 */
 	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
 
@@ -1797,7 +1797,7 @@ export class SyncDoc implements Tierec {
 	src: string;
 
 	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
-		this.type = opt.type;
+		this.type = opt.type || SyncDoc.__type0__;
 		this.src = opt.src
 		this.docId = opt.recId;
 		this.device = opt.device;

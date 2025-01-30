@@ -182,29 +182,29 @@ export class StreeTier extends Semantier {
 }
 StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 
-/** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
-export class SyncDoc implements Tierec {
-	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
-    [f: string]: AnsonValue;
+// /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
+// export class SyncDoc implements Tierec {
+// 	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
+//     [f: string]: AnsonValue;
 
-	type?: string;
+// 	type?: string;
 
-	/** pid */
-	recId?: string;
+// 	/** pid */
+// 	recId?: string;
 
-	/** card title */
-	pname?: string;
-	shareby?: string | undefined;
-	sharedate?: string;
-	device?: string;
+// 	/** card title */
+// 	pname?: string;
+// 	shareby?: string | undefined;
+// 	sharedate?: string;
+// 	device?: string;
 
-	src: string;
+// 	src: string;
 
-	constructor (opt: { recId: any; src?: any; device?: string, type?: string }) {
-		this.type = opt.type || SyncDoc.__type0__;
-		this.src = opt.src
-		this.recId = opt.recId;
-		this.device = opt.device;
-	}
-}
+// 	constructor (opt: { recId: any; src?: any; device?: string, type?: string }) {
+// 		this.type = opt.type || SyncDoc.__type0__;
+// 		this.src = opt.src
+// 		this.recId = opt.recId;
+// 		this.device = opt.device;
+// 	}
+// }
 
