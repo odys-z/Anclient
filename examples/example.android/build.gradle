@@ -20,8 +20,8 @@ allprojects {
         bm_photoview_version = "2.0.6"
 
         anclient_ver = "[0.5.16,)"
-        jserv_ver = "[1.5.15,2.0.0-SNAPSHOT)"
-        syndoc_lib_ver = "[0.5.17,)"
+        jserv_ver = "[1.5.16-SNAPSHOT,2.0.0-SNAPSHOT)"
+        syndoc_lib_ver = "[0.5.18-SNAPSHOT,)"
 
         sourceCompatibility = JavaVersion.VERSION_1_8
     }
