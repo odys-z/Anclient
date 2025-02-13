@@ -11,7 +11,6 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
-import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
