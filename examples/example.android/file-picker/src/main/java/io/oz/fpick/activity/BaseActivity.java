@@ -263,8 +263,12 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
+            String m;
             // TODO report errors in a user's dialog...
-            String m = f("Error: type: %s, args: %s", msg, str(args));
+            if (c == AnsonMsg.MsgCode.exSession)
+                m = "Session error. Please login / re-login.";
+            else
+                m = f("Error: type: %s, args: %s", msg, str(args));
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );
     }

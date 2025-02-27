@@ -40,14 +40,17 @@ import io.oz.fpick.activity.BaseActivity;
  * <p>Do not confused with {@link io.oz.album.peer.Profiles}.</p>
  */
 public class PrefsWrapper extends Anson {
-        public String homeName;
+    public String homeName;
 
-        /** Anson string for load and save {@link SharedPreferences} */
-        public AnPrefEntries jservlist;
-        public String uid;
-        public String device;
-        public String albumroot;
-        private String pswd;
+    /** Anson string for load and save {@link SharedPreferences} */
+    public AnPrefEntries jservlist;
+    public String uid;
+    public String device;
+    public String albumroot;
+    private String pswd;
+
+    /** key to persist preference */
+    private static final String json_k = "json";
 
     private String landingUrl;
 
@@ -69,7 +72,7 @@ public class PrefsWrapper extends Anson {
 
         PrefsWrapper config = null;
         try {
-            config = (PrefsWrapper) Anson.fromJson(sharedPref.getString("json",
+            config = (PrefsWrapper) Anson.fromJson(sharedPref.getString(json_k,
                     "{\"type\":\"io.oz.album.PrefsWrapper\"}"));
             config.errctx = ctx;
             config.sharedpref = sharedPref;

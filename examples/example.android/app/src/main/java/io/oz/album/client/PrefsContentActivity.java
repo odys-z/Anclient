@@ -11,6 +11,8 @@ import static io.oz.AlbumApp.keys;
 import static io.oz.AlbumApp.sharedPrefs;
 import static io.oz.albumtier.AlbumContext.sysuri;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -24,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.preference.Preference;
@@ -44,6 +47,7 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.peer.AlbumResp;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.albumtier.AlbumContext;
 
@@ -179,30 +183,10 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
         try {
             AlbumApp.login(singleton.pswd(), (resp) -> {
-                // persist dirty
-                // AlbumApp.sharedPrefs.jservs(jsvEntsDirty);
                 AlbumApp.sharedPrefs.jservs(sharedPrefs.jservs());
-                confirm(R.string.login_succeed, 3000);
+                // confirm(R.string.login_succeed, 3000);
+                confirmFormat(R.string.login_succeed, 3000, ((AlbumResp)resp).profiles().webroot);
             }, showErrConfirm);
-            /*
-            singleton.login(
-            (client) -> {
-                // load settings
-                Anson.verbose = false;
-                singleton.tier.asyGetSettings(
-                    (resp) -> {
-                        singleton.profiles = ((AlbumResp) resp).profiles();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-                        AlbumApp.sharedPrefs.policy2Prefs(sharedPref, singleton.profiles);
-                        AlbumApp.sharedPrefs.jservs(singleton, sharedPref, jsvEntsDirty(sharedPref));
-
-                        confirm(R.string.login_succeed, 3000);
-                    },
-                    showErrConfirm);
-                confirm(R.string.login_succeed, 3000);
-            },
-            showErrConfirm);
-                 */
         } catch (Exception e) {
             Log.e(sysuri, e.getClass().getName() + e.getMessage());
             showErrConfirm.err(MsgCode.exGeneral,
@@ -368,5 +352,17 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     void confirm(int msgid, int live, int... msgOk) {
         ComfirmDlg.confirm(this, msgid, live, msgOk);
+    }
+
+    void confirmFormat(int strid, int live, Object... formatArgs) {
+        ComfirmDlg.confirmFormat(this, strid, live, formatArgs);
+//        FragmentActivity acty = this;
+//        new ComfirmDlg()
+//                .dlgMsg(getString(strid, formatArgs), 0)
+//                .onOk((dialog, id) -> {
+//                    dialog.dismiss();
+//                })
+//                .showDlg(acty,  "")
+//                .live(live);
     }
 }

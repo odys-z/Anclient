@@ -19,14 +19,23 @@ import io.oz.R;
  *
  */
 public class PrefKeys {
+    /** @deprecated */
     public String homeCate;
+    /** @deprecated */
     public String home;
+    /** @deprecated */
     public String jserv;
+    /** @deprecated */
     public String homepage;
+    /** @deprecated */
     public String device;
+    /** @deprecated */
     public String devCate;
+    /** @deprecated */
     public String restoreDev;
+    /** @deprecated */
     public String usrid;
+    /** @deprecated */
     public String pswd;
 
     /** button key in prefs screen for registering device */

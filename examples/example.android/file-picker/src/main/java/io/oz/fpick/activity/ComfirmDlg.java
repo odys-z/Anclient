@@ -57,6 +57,16 @@ public class ComfirmDlg extends DialogFragment {
                 .live(live);
     }
 
+    public static void confirmFormat(FragmentActivity acty, int strid, int live, Object... formatArgs) {
+        new ComfirmDlg()
+                .dlgMsg(acty.getString(strid, formatArgs), 0)
+                .onOk((dialog, id) -> {
+                    dialog.dismiss();
+                })
+                .showDlg(acty,  "")
+                .live(live);
+    }
+
     /**
      *
      * @param msg
