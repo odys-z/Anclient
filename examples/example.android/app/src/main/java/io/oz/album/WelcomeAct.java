@@ -4,7 +4,7 @@ import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
-import static io.oz.AlbumApp.sharedPrefs;
+import static io.oz.AlbumApp.prfConfig;
 import static io.oz.album.webview.WebAlbumAct.Web_PageName;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -103,13 +103,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlbumApp.keys = new PrefKeys(this);
+//        AlbumApp.keys = new PrefKeys(this);
 
         clientext = AlbumContext.getInstance(this);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        PrefsWrapper c = AlbumApp.sharedPrefs
-                = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
+        PrefsWrapper c = AlbumApp.prfConfig
+                       = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
         clientext.init(c.homeName, c.uid, c.device, c.jserv());
 
         setContentView(R.layout.welcome);
@@ -149,7 +149,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        showStatus(R.string.msg_login_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
+                        showStatus(R.string.msg_login_uid, c.uid, c.device);
                     }
                     reloadAlbum();
                 });
@@ -160,23 +160,23 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> reloadAlbum());
 
         try {
-            if (clientext.needSetup() || AlbumApp.sharedPrefs.needSetup())
+            if (clientext.needSetup() || AlbumApp.prfConfig.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
                 clientext
-                        .pswd(AlbumApp.sharedPrefs.pswd())
-                        .jserv(AlbumApp.sharedPrefs.jserv());
+                        .pswd(AlbumApp.prfConfig.pswd())
+                        .jserv(AlbumApp.prfConfig.jserv());
 
                 AlbumApp.login(clientext.pswd(),
                     (client) -> {
                         runOnUiThread(this::reloadAlbum);
                     },
                     (code, t, args) -> showStatus(R.string.t_login_failed, clientext.userInf.uid(),
-                            AlbumApp.sharedPrefs.jserv()));
+                            AlbumApp.prfConfig.jserv()));
             }
         } catch (Exception e) {
-            showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
+            showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.prfConfig.jserv());
         }
     }
 
@@ -208,7 +208,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * Reload album via call js function.
      */
     void reloadAlbum() {
-        if (clientext.tier == null || sharedPrefs == null)
+        if (clientext.tier == null || prfConfig == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
@@ -372,7 +372,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         }))
-                        .asyVideos(sharedPrefs.template(), list,
+                        .asyVideos(prfConfig.template(), list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
@@ -462,7 +462,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         }))
-                        .asyVideos(sharedPrefs.template(),
+                        .asyVideos(prfConfig.template(),
                             paths,
                             (r, rx, seq, total, rsp) -> showStatus(
                                     R.string.msg_templ_progress,
@@ -492,7 +492,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
-        sharedPrefs.using(act);
+        prfConfig.using(act);
         pickMediaStarter.launch(intt);
     }
 

@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.widget.Toast;
 
 import androidx.preference.ListPreference;
-import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 
@@ -47,7 +46,7 @@ public class PrefsWrapper extends Anson {
     public String uid;
     public String device;
     public String albumroot;
-    private String pswd;
+    public String pswd;
 
     /** key to persist preference */
     private static final String json_k = "json";
@@ -63,12 +62,6 @@ public class PrefsWrapper extends Anson {
     private ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
-
-//        config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
-//        config.uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
-//        config.pswd     = sharedPref.getString(AlbumApp.keys.pswd, "");
-//        config.device   = sharedPref.getString(AlbumApp.keys.device, "");
-
 
         PrefsWrapper config = null;
         try {
@@ -104,7 +97,8 @@ public class PrefsWrapper extends Anson {
         }
 
         if (isblank(config.albumroot) && !isNull(landingUrl))
-            config.albumroot = sharedPref.getString(AlbumApp.keys.homepage, landingUrl[0]);
+            config.albumroot = landingUrl[0];
+
         else
             config.albumroot = ctx.getResources().getString(R.string.url_landing);
 
@@ -115,10 +109,11 @@ public class PrefsWrapper extends Anson {
         albumroot  = profiles.webroot;
         landingUrl = profiles.home;
 
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(AlbumApp.keys.home, profiles.home);
-        editor.putString(AlbumApp.keys.homepage, profiles.webroot);
-        editor.apply();
+//        SharedPreferences.Editor editor = sharedPref.edit();
+//        editor.putString(AlbumApp.keys.home, profiles.home);
+//        editor.putString(AlbumApp.keys.homepage, profiles.webroot);
+//        editor.apply();
+        persist();
     }
 
     /**
@@ -129,29 +124,20 @@ public class PrefsWrapper extends Anson {
      */
     public PrefsWrapper jservs(AnPrefEntries anlist) {
         this.jservlist = anlist;
-        try {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(AlbumApp.context);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(AlbumApp.keys.jserv, anlist.toBlock());
-            editor.apply();
-            // singleton.jserv(jservlist.entryVal());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return this;
     }
 
-    /**
-     * Read jservs list, if null, load from shared preference.
-     * @param sharepref
-     * @return jservs' list
-     */
-    public AnPrefEntries jservs(SharedPreferences sharepref) {
-        String jservs = sharepref.getString(AlbumApp.keys.jserv, "");
-        if (isNull(jservlist) && !isblank(jservs))
-            jservlist = (AnPrefEntries) Anson.fromJson(jservs);
-        return this.jservlist;
-    }
+//    /**
+//     * Read jservs list, if null, load from shared preference.
+//     * @param sharepref
+//     * @return jservs' list
+//     */
+//    public AnPrefEntries jservs(SharedPreferences sharepref) {
+//        String jservs = sharepref.getString(AlbumApp.keys.jserv, "");
+//        if (isNull(jservlist) && !isblank(jservs))
+//            jservlist = (AnPrefEntries) Anson.fromJson(jservs);
+//        return this.jservlist;
+//    }
 
     public AnPrefEntries jservs() {
         return this.jservlist;
@@ -229,10 +215,14 @@ public class PrefsWrapper extends Anson {
         this.sharedpref = sharedPref;
     }
 
-    public PrefsWrapper persist() throws IOException {
+    public PrefsWrapper persist() {
         if (sharedpref != null) {
             SharedPreferences.Editor editor = sharedpref.edit();
-            editor.putString("json", toBlock());
+            try {
+                editor.putString(json_k, toBlock());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             editor.apply();
         }
         return this;

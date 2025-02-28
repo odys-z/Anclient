@@ -14,20 +14,18 @@ import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.Utils;
-import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.PrefKeys;
 import io.oz.album.PrefsWrapper;
 import io.oz.album.peer.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 public class AlbumApp extends Application {
 
-    public static PrefKeys keys;
+//    public static PrefKeys keys;
 
-    public static PrefsWrapper sharedPrefs; // = new PrefsWrapper();
+    public static PrefsWrapper prfConfig; // = new PrefsWrapper();
     public static Context context;
 
     public AlbumApp() {
@@ -64,9 +62,9 @@ public class AlbumApp extends Application {
                         if (clientext.profiles == null || isblank(clientext.profiles.webroot))
                             throw new DocsException(0, context.getString(R.string.log_prof_err));
 
-                        sharedPrefs.policy2Prefs(sharedPref, clientext.profiles);
+                        prfConfig.policy2Prefs(sharedPref, clientext.profiles);
 
-                        clientext.jserv(sharedPrefs.jserv());
+                        clientext.jserv(prfConfig.jserv());
                         if (onOk != null)
                             onOk.ok(resp);
                     },
