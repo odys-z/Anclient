@@ -432,6 +432,7 @@ public class Doclientier extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
+			/* 2025-03-02 fix class casting error while pick files on Android.
 			ExpSyncDoc p = videos.get(px).syndoc(template);
 
 			if ( isblank(p.clientpath) ||
@@ -454,8 +455,35 @@ public class Doclientier extends Semantier {
 								f("File provide returned error: %s", p.clientpath))));
 				continue;
 			}
+			*/
+
+			IFileDescriptor f = videos.get(px);
+			if (fileProvider == null) {
+				if (isblank(f.fullpath()) || isblank(f.clientname()) || isblank(f.cdate()))
+					throw new IOException(
+							f("File information is not enough: %s, %s, create time %s",
+							f.clientname(), f.fullpath(), f.cdate()));
+			}
+			else if (fileProvider.meta(f) < 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by users.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(f.syndoc(template)
+							  .shareflag(ShareFlag.deny,
+								f("File provide returned error: %s", f.fullpath()))));
+				continue;
+			}
+
+			ExpSyncDoc p = videos.get(px).syndoc(template);
+
+			if ( isblank(p.clientpath) ||
+				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
+				throw new SemanticException(
+						"Docs' pushing requires device id and clientpath.\n" +
+						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
+						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 			
-			DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
+			// DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
+			DocsReq req  = new DocsReq(tbl, p.folder(p.folder()), uri)
 					.device(ssinf.device)
 					.resetChain(true)
 					.blockStart(p, ssinf);

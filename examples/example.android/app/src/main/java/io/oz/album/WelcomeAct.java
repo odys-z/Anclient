@@ -85,6 +85,9 @@ import io.oz.fpick.activity.BaseActivity;
 import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
+    // for error:
+    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost'
+    // delete build dir
 
     AlbumContext clientext;
 
@@ -341,10 +344,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             private String saveFolder;
 
                             @Override
-                            public long meta(ExpSyncDoc f) throws IOException {
-                                if (f == null)
-                                    throw new IOException("Doc descriptor is null");
+                            public long meta(IFileDescriptor fd) throws IOException {
+                                if (fd == null || !(fd instanceof AndroidFile))
+                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
+                                AndroidFile f = (AndroidFile) fd;
                                 File file = new File(f.fullpath());
                                 f.size = file.length();
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -361,13 +365,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 return f.size;
                             }
 
-                            @Override
-                            public String saveFolder() {
-                                return saveFolder;
-                            }
+//                            @Override
+//                            public String saveFolder() {
+//                                return saveFolder;
+//                            }
 
                             @Override
-                            public InputStream open(ExpSyncDoc f) throws IOException {
+                            public InputStream open(IFileDescriptor f) throws IOException {
                                 return Files.newInputStream(Paths.get(f.fullpath()));
                                 // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
@@ -431,12 +435,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                             @Override
-                            public long meta(ExpSyncDoc f) throws IOException {
-                                if (f == null) {
-                                    throw new IOException("Descriptor f is null");
-                                }
+                            public long meta(IFileDescriptor fd) throws IOException {
+                                if (fd == null || !(fd instanceof AndroidFile))
+                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
-                                Uri returnUri = ((AndroidFile) f).contentUri();
+                                AndroidFile f = (AndroidFile) fd;
+                                Uri returnUri = f.contentUri();
+
                                 try (Cursor returnCursor = getContentResolver()
                                         .query(returnUri, null, null, null, null)) {
                                     int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -453,12 +458,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 }
                             }
 
-                            @Override
-                            public String saveFolder() { return saveFolder; }
+//                            @Override
+//                            public String saveFolder() { return saveFolder; }
 
                             // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                             @Override
-                            public InputStream open(ExpSyncDoc p) throws FileNotFoundException {
+                            public InputStream open(IFileDescriptor p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         }))
@@ -539,9 +544,4 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             msgv.setVisibility(View.VISIBLE);
         });
     }
-
-//    @Override
-//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-//        Utils.warn("To be understood");
-//    }
 }
