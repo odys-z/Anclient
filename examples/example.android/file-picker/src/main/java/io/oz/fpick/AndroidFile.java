@@ -59,8 +59,9 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
                 .folder(folder())
                 .clientname(pname)
                 .uri64(uri64)
-                .mime(mime) :
-
+                .mime(mime)
+                .size(size)
+                :
            new ExpSyncDoc(entMeta == null ? template.entMeta : entMeta, isblank(org) ? template.org : org)
                 .recId(recId)
                 .device(isblank(device) ? template.device() : device)
@@ -75,6 +76,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
                 .clientname(pname)
                 .uri64(uri64)
                 .mime(mime)
+                .size(size)
                 ;
     }
 
@@ -145,16 +147,6 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeLong(id);
-//        dest.writeString(pname);
-//        dest.writeString(clientpath);
-//        dest.writeLong(size);
-//        dest.writeString(localDirId);
-//        dest.writeString(localDirName);
-//        dest.writeLong(date);
-//        dest.writeString(shareflag);
-//        dest.writeByte((byte) (isSelected ? 1 : 0));
-//        dest.writeString(folder());
         try {
             dest.writeString(this.toBlock());
         } catch (IOException e) {
@@ -172,24 +164,11 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         }
 
         /**
-         * Implementation sample:<pre>
-         BaseFile file = new BaseFile();
-         file.id = in.readLong();
-         file.name = in.readString();
-         file.clientpath = in.readString();
-         file.size = in.readLong();
-         file.localDirId = in.readString();
-         file.localDirName = in.readString();
-         file.date = in.readLong();
-         file.isSelected = in.readByte() != 0;
-         return file;
-         * </pre>
          * @param in The Parcel to read the object's data from.
          * @return
          */
         @Override
         public AndroidFile createFromParcel(Parcel in) {
-            // throw new AnsonException(0, "No overriding?");
             return (AndroidFile) Anson.fromJson(in.readString());
         }
     };
