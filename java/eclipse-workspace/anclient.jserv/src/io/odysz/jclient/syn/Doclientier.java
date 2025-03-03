@@ -5,22 +5,20 @@ import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.LangExt.str;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io_odysz.FilenameUtils;
 import org.xml.sax.SAXException;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.DocLocks;
@@ -54,6 +52,7 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.ShareFlag;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.sql.PageInf;
@@ -322,7 +321,6 @@ public class Doclientier extends Semantier {
 	 * @throws IOException
 	 * @throws TransException
 	 * @throws SQLException
-	 */
 	ExpSyncDoc synStreamPull(ExpSyncDoc p, ExpDocTableMeta meta)
 			throws AnsonException, IOException, TransException, SQLException {
 
@@ -367,6 +365,7 @@ public class Doclientier extends Semantier {
 			return false;
 		}
 	}
+	 */
 	
 	/**
 	 * [Synchronously]
@@ -499,7 +498,10 @@ public class Doclientier extends Semantier {
 					Utils.warn("Resp is not replied with exactly the same path: %s",
 							resp0.xdoc.fullpath());
 
-				totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				// Doesn't work for Chinese file name in Android 10:
+				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				totalBlocks = (int) ((p.size + 1) / blocksize);
+
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 
 				DocLocks.reading(p.fullpath());
@@ -528,8 +530,9 @@ public class Doclientier extends Semantier {
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException | SQLException ex) { 
-				Utils.warn(ex.getMessage());
-
+				String exmsg = ex.getMessage();
+				Utils.warn(exmsg);
+				
 				if (resp0 != null) {
 					req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
 					req.a(DocsReq.A.blockAbort);
@@ -540,8 +543,35 @@ public class Doclientier extends Semantier {
 
 				if (ex instanceof IOException)
 					continue;
-				else errHandler.err(MsgCode.exGeneral, ex.getMessage(),
-					ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+				else {
+					// Tag: MVP - This is not correct way of deserialize exception at client side
+					if (!isblank(exmsg)) {
+						try {
+							// Code: ext, mesage: {\"type\": \"io.odysz.semantics.SemanticObject\", \"props\": {\"code\": 99, \"reasons\": [\"Found existing file for device & client path.\", \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
+							exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
+							SemanticObject exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
+							String reasons = exmsg;
+							try {
+								Object ress = exp.get("reasons");
+								reasons = ress == null ? null
+										: ress instanceof ArrayList<?> ? str((ArrayList<?>)ress)
+										: ress instanceof String[] ? str((String[])ress)
+										: ress.toString();
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp.get("code")));
+						}
+						catch (Exception exx) {
+							errHandler.err(MsgCode.exGeneral, ex.getMessage(),
+								ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+						}
+					}
+					else
+						errHandler.err(MsgCode.exGeneral, ex.getMessage(),
+							ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+				}
 			}
 			finally {
 				if (ifs != null)
@@ -695,11 +725,6 @@ public class Doclientier extends Semantier {
 		};
 
 		List<DocsResp> resps = startPushs(template, tabl, videos, onproc,
-//				new OnProcess() {
-//					@Override
-//					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
-//							throws IOException, AnsonException, SemanticException {
-//					}},
 				follows, isNull(errorCtx) ? errCtx : errorCtx[0]);
 		return isNull(resps) ? null : resps.get(0);
 	}
