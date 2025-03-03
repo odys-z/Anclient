@@ -547,7 +547,12 @@ public class Doclientier extends Semantier {
 					// Tag: MVP - This is not correct way of deserialize exception at client side
 					if (!isblank(exmsg)) {
 						try {
-							// Code: ext, mesage: {\"type\": \"io.odysz.semantics.SemanticObject\", \"props\": {\"code\": 99, \"reasons\": [\"Found existing file for device & client path.\", \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
+							// Code: ext, mesage: {
+							//   \"type\": \"io.odysz.semantics.SemanticObject\",
+							//   \"props\": {\"code\": 99,
+							//   \"reasons\": [\"Found existing file for device & client path.\",
+							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
+
 							exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
 							SemanticObject exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
 							String reasons = exmsg;
