@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
-import io.odysz.common.DocLocks;
 import io.odysz.common.EnvPath;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
@@ -59,7 +58,7 @@ import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
 
 public class Doclientier extends Semantier {
-	public boolean verbose = false;
+	public static boolean verbose = true;
 
 	protected final String doctbl;
 
@@ -231,12 +230,6 @@ public class Doclientier extends Semantier {
 					.fullpath(respath);
 
 		DocsResp resp = doclient.startPush(null, entityName, doc, ok, proc);
-//			(AnsonResp rep) -> {
-//				ExpSyncDoc d = ((DocsResp) rep).xdoc; 
-//
-//				// push again should fail
-//				// doclient.startPush(entityName, d, ok, errCtx);
-//			}
 
 		String docId = resp.xdoc.recId();
 		DocsResp rp = doclient.selectDoc(entityName, docId);
@@ -244,6 +237,7 @@ public class Doclientier extends Semantier {
 		return rp.xdoc;
 	}
 
+	// DON'T DELETE THIS AFTER TESTS FIXED
 //	/**
 //	 * Verify device &amp; client-paths are presenting at server.
 //	 * 
@@ -431,30 +425,10 @@ public class Doclientier extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			/* 2025-03-02 fix class casting error while pick files on Android.
-			ExpSyncDoc p = videos.get(px).syndoc(template);
-
-			if ( isblank(p.clientpath) ||
-				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
-				throw new SemanticException(
-						"Docs' pushing requires device id and clientpath.\n" +
-						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
-						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
-
-			if (fileProvider == null) {
-				if (isblank(p.fullpath()) || isblank(p.clientname()) || isblank(p.createDate))
-					throw new IOException(
-							f("File information is not enough: %s, %s, create time %s",
-							p.clientname(), p.fullpath(), p.createDate));
-			}
-			else if (fileProvider.meta(p) < 0) {
-				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
-				reslts.add((DocsResp) new DocsResp()
-						.doc(p.shareflag(ShareFlag.deny,
-								f("File provide returned error: %s", p.clientpath))));
-				continue;
-			}
-			*/
+			/* 
+			 * 025-03-02 fix class casting error while pick files on Android.
+			 * 2025-03-04 fix error of reading non-latin file name.
+			 */
 
 			IFileDescriptor f = videos.get(px);
 			if (fileProvider == null) {
@@ -472,7 +446,7 @@ public class Doclientier extends Semantier {
 				continue;
 			}
 
-			ExpSyncDoc p = videos.get(px).syndoc(template);
+			ExpSyncDoc p = f.syndoc(template);
 
 			if ( isblank(p.clientpath) ||
 				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
@@ -481,7 +455,6 @@ public class Doclientier extends Semantier {
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
 						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
 			
-			// DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
 			DocsReq req  = new DocsReq(tbl, p.folder(p.folder()), uri)
 					.device(ssinf.device)
 					.resetChain(true)
@@ -500,12 +473,13 @@ public class Doclientier extends Semantier {
 
 				// Doesn't work for Chinese file name in Android 10:
 				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
-				totalBlocks = (int) ((p.size + 1) / blocksize);
+				totalBlocks = (int) (Math.max(0, p.size - 1) / blocksize) + 1;
 
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 
-				DocLocks.reading(p.fullpath());
-				ifs = new FileInputStream(new File(p.fullpath()));
+				// DocLocks.reading(p.fullpath());
+				// ifs = new FileInputStream(new File(p.fullpath()));
+				ifs = (FileInputStream) fileProvider.open(f);
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
@@ -530,6 +504,8 @@ public class Doclientier extends Semantier {
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException | SQLException ex) { 
+				if (verbose) ex.printStackTrace();
+
 				String exmsg = ex.getMessage();
 				Utils.warn(exmsg);
 				
@@ -578,11 +554,11 @@ public class Doclientier extends Semantier {
 							ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
 				}
 			}
-			finally {
-				if (ifs != null)
-					ifs.close();
-				DocLocks.readed(p.fullpath());
-			}
+//			finally {
+//				if (ifs != null)
+//					ifs.close();
+//				// DocLocks.readed(p.fullpath());
+//			}
 		}
 		if (docsOk != null) docsOk.ok(reslts);
 

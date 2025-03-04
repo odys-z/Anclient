@@ -223,6 +223,8 @@ public class PhotoSyntier extends Doclientier {
 		new Thread(() -> {
 			try {
 				startPushs(template, doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
+			} catch (DocsException e) {
+				onErr[0].err(MsgCode.ext, e.getMessage(), e.getClass().getName());
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))

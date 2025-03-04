@@ -2,6 +2,8 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.f6;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
 import static io.oz.AlbumApp.prfConfig;
@@ -45,8 +47,10 @@ import com.vincent.filepicker.Constant;
 
 import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.syn.IFileProvider;
+import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.fpick.activity.ImagePickActivity;
@@ -105,8 +109,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        AlbumApp.keys = new PrefKeys(this);
 
         clientext = AlbumContext.getInstance(this);
 
@@ -341,7 +343,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 }
                 else ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
-                            private String saveFolder;
+                            // private String saveFolder;
 
                             @Override
                             public long meta(IFileDescriptor fd) throws IOException {
@@ -356,24 +358,18 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     FileTime d = attr.creationTime();
                                     f.cdate(d);
-                                    saveFolder = DateFormat.formatYYmm(d);
+                                    // saveFolder = DateFormat.formatYYmm(d);
                                 } else {
                                     Date d = new Date(file.lastModified());
                                     f.cdate(d);
-                                    saveFolder = DateFormat.formatYYmm(d);
+                                    // saveFolder = DateFormat.formatYYmm(d);
                                 }
                                 return f.size;
                             }
 
-//                            @Override
-//                            public String saveFolder() {
-//                                return saveFolder;
-//                            }
-
                             @Override
                             public InputStream open(IFileDescriptor f) throws IOException {
                                 return Files.newInputStream(Paths.get(f.fullpath()));
-                                // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
                             }
                         }))
                         .asyVideos(prfConfig.template(), list,
@@ -381,9 +377,18 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+                                    int[] nums = Doclientier.parseErrorCodes(resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
-                                errCtx.prepare(msgv, R.string.msg_upload_failed));
+                                (c, err, args) -> {
+                                    if (c == AnsonMsg.MsgCode.ext) {
+                                        errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                        err(null, getString(R.string.msg_err_duplicate), args); // show it
+                                    }
+                                    else {
+                                        errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                        err(null, getString(R.string.msg_upload_failed), err, args == null ? null : args[0]); // show it
+                                    }
+                                });
 
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
@@ -401,7 +406,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             if (data != null) {
                 DeviceHelper.init(errCtx);
                 ClipData clipData = data.getClipData();
-                Uri d = data.getData();
                 ArrayList<IFileDescriptor> paths;
 
                 if (clipData != null) {
@@ -432,7 +436,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 else {
                     ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
-                            private String saveFolder;
+                            // private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                             @Override
                             public long meta(IFileDescriptor fd) throws IOException {
@@ -453,14 +457,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
                                     f.cdate(lastmodify);
-                                    saveFolder = DateFormat.formatYYmm(lastmodify);
+
+                                    if (isblank(f.folder()))
+                                        f.folder(DateFormat.formatYYmm(lastmodify));
                                     return f.size;
                                 }
                             }
-
-//                            @Override
-//                            public String saveFolder() { return saveFolder; }
-
                             // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                             @Override
                             public InputStream open(IFileDescriptor p) throws FileNotFoundException {
@@ -472,8 +474,23 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             (r, rx, seq, total, rsp) -> showStatus(
                                     R.string.msg_templ_progress,
                                     r, rx, total, (float) seq / total * 100),
-                            (resps) -> {},
-                            errCtx.prepare(msgv, R.string.msg_upload_failed));
+                            (resps) -> {
+                                    // clearStatus();
+                                    int[] nums = Doclientier.parseErrorCodes(resps);
+                                    showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
+                                    if (nums[0] > 0)
+                                        clearStatus();
+                            },
+                            (c, err, args) -> {
+                                if (c == AnsonMsg.MsgCode.ext) {
+                                    errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                    err(null, getString(R.string.msg_err_duplicate), args); // show it
+                                }
+                                else {
+                                    errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                    err(null, getString(R.string.msg_upload_failed), args); // show it
+                                }
+                            });
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -497,7 +514,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
-        prfConfig.using(act);
+        prfConfig.using(act); // call target activity's getTemplate()
         pickMediaStarter.launch(intt);
     }
 
@@ -533,6 +550,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             }
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+            // Notes MVP:
+            // file picking currently has no such an activity like ImagePickAdapter, hence no getTemplate() implementateion
+            // prfConfig.using(act);
+            prfConfig.currentTemplate = new ExpSyncDoc()
+                    .share(clientext.userInf.uid(), ShareFlag.prv.name(), new Date())
+                    .device(clientext.userInf.device);
+
             pickFileStarter.launch(intent);
         }
     }
@@ -540,7 +564,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     public void err(AnsonMsg.MsgCode ok, String msg, String... args) {
         runOnUiThread(() -> {
-            msgv.setText(msg);
+            String m = msg;
+            try { m = f(msg, (Object[])args); } catch (Exception e) {}
+            msgv.setText(m);
             msgv.setVisibility(View.VISIBLE);
         });
     }

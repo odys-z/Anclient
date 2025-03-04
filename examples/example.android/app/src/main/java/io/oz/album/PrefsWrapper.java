@@ -17,11 +17,13 @@ import io.odysz.anson.AnsonField;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
 import io.oz.album.peer.Profiles;
 import io.oz.albumtier.AlbumContext;
+import io.oz.fpick.AndroidFile;
 import io.oz.fpick.activity.BaseActivity;
 
 /**
@@ -59,7 +61,7 @@ public class PrefsWrapper extends Anson {
     /**
      * Options' template for an uploading doc's, such as share-flags, etc.
      */
-    private ExpSyncDoc currentTemplate;
+    ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
 
@@ -200,7 +202,7 @@ public class PrefsWrapper extends Anson {
         }
         catch (Exception e) {
             currentTemplate = null;
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

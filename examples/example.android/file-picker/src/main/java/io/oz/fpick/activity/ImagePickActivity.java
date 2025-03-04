@@ -39,7 +39,6 @@ import io.oz.fpick.adapter.ImagePickAdapter;
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
-    // public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
 
     public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
