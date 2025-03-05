@@ -33,8 +33,8 @@ public class VideoPickActivity extends BaseActivity {
 
     public VideoPickActivity () {
         super();
-        if (template == null)
-            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
+//        if (template == null)
+//            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
     }
 
     @Override

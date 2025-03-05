@@ -196,15 +196,14 @@ public class PrefsWrapper extends Anson {
         return currentTemplate;
     }
 
-    public void using(Class<? extends BaseActivity> act) {
-        try {
-            currentTemplate = (ExpSyncDoc) act.getMethod("getTemplate").invoke(null);
-        }
-        catch (Exception e) {
-            currentTemplate = null;
-            // e.printStackTrace();
-        }
-    }
+//    public void using(Class<? extends BaseActivity> act) {
+//        try {
+//            currentTemplate = (ExpSyncDoc) act.getMethod("getTemplate").invoke(null);
+//        }
+//        catch (Exception e) {
+//            currentTemplate = null;
+//        }
+//    }
 
     @AnsonField(ignoreTo = true, ignoreFrom = true)
     SharedPreferences sharedpref;

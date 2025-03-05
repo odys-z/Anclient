@@ -70,13 +70,12 @@ public abstract class BaseActivity extends FragmentActivity
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
 
-    protected static ExpSyncDoc template;
-
-    public static ExpSyncDoc getTemplate () throws DocsException {
-        if (template == null)
-            throw new DocsException(0, "Template must be initialized by subclasses.");
-        return template;
-    }
+//    protected static ExpSyncDoc template;
+//    public static ExpSyncDoc getTemplate () throws DocsException {
+//        if (template == null)
+//            throw new DocsException(0, "Template must be initialized by subclasses.");
+//        return template;
+//    }
 
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;

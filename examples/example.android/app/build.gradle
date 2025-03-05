@@ -5,10 +5,10 @@ android {
 
     compileSdk 34
     defaultConfig {
-        applicationId "io.oz.album"
+        applicationId "io.oz.portfolio"
         minSdkVersion 26
         targetSdk 34
-        versionCode 2
+        versionCode 3
         versionName "$app_ver"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -18,6 +18,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable false
+        }
     }
     buildFeatures {
         viewBinding true
@@ -25,6 +28,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'org/sqlite/native/**'
+//        exclude 'org/sqlite/native/**/**.dll'
+//        exclude 'org/sqlite/native/Windows/x86/sqlitejdbc.dll'
     }
 }
 
@@ -41,12 +50,16 @@ dependencies {
     implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22')
     implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22')
 
-    implementation (group: 'io.github.odys-z', name: 'syndoc-lib', version: "$syndoc_lib_ver") {
-//        exclude group: "org.apache.tika", module: "tika-core"
-//        exclude group: "org.apache.tika", module: "tika-parsers-standard-package"
+
+    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver") {
+        exclude group: "org.xerial", module: "sqlite-jdbc"
+        exclude group: "mysql", module: "mysql-connector-java"
     }
 
-    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver")
+    implementation (group: 'io.github.odys-z', name: 'syndoc-lib', version: "$syndoc_lib_ver") {
+        exclude group: "org.xerial", module: "sqlite-jdbc"
+        exclude group: "mysql", module: "mysql-connector-java"
+    }
 
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'com.google.android.material:material:1.11.0'

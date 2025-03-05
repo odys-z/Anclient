@@ -34,17 +34,13 @@ public class AudioPickActivity extends BaseActivity implements IProgressBarAct {
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
 
     public static final int DEFAULT_MAX_NUMBER = 99;
-//    private int mMaxNumber;
-//    private int mCurrentNumber = 0;
     private boolean isNeedRecorder;
-//    private boolean isTakenAutoSelected;
 
-    // private TextView tv_count;
 
     public AudioPickActivity () {
         super();
-        if (template == null)
-            template = new ExpSyncDoc().shareflag(ShareFlag.prv.name());
+//        if (template == null)
+//            template = new ExpSyncDoc() .shareflag(ShareFlag.prv.name());
     }
 
     @Override

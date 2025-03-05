@@ -3,15 +3,14 @@ package io.oz.album;
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
 import static io.odysz.common.LangExt.f;
-import static io.odysz.common.LangExt.f6;
+import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
 import static io.oz.AlbumApp.prfConfig;
 import static io.oz.album.webview.WebAlbumAct.Web_PageName;
-import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
+import static io.oz.albumtier.AlbumContext.ConnState;
+import static io.oz.albumtier.AlbumContext.verbose;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static io.odysz.common.LangExt.isblank;
-import static io.oz.albumtier.AlbumContext.*;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -45,38 +44,30 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
-import io.odysz.jclient.syn.Doclientier;
-import io.odysz.jclient.syn.IFileProvider;
-import io.odysz.semantic.tier.docs.DocsException;
-import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
-import io.odysz.semantic.tier.docs.ShareFlag;
-import io.oz.fpick.activity.AudioPickActivity;
-import io.oz.fpick.activity.ComfirmDlg;
-import io.oz.fpick.activity.ImagePickActivity;
-import io.oz.fpick.activity.VideoPickActivity;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.jclient.SessionClient;
+import io.odysz.jclient.syn.Doclientier;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
@@ -85,7 +76,11 @@ import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
+import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.activity.ComfirmDlg;
+import io.oz.fpick.activity.ImagePickActivity;
+import io.oz.fpick.activity.VideoPickActivity;
 import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
@@ -369,7 +364,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                             @Override
                             public InputStream open(IFileDescriptor f) throws IOException {
-                                return Files.newInputStream(Paths.get(f.fullpath()));
+                                // return Files.newInputStream(Paths.get(f.fullpath()));
+                                return new FileInputStream(new File(f.fullpath()));
                             }
                         }))
                         .asyVideos(prfConfig.template(), list,
@@ -507,14 +503,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         clearStatus();
 
         Intent intt = new Intent(this, act);
-        intt.putExtra(IS_NEED_CAMERA, true);
+        // intt.putExtra(IS_NEED_CAMERA, true);
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
-        prfConfig.using(act); // call target activity's getTemplate()
+        // prfConfig.using(act); // call target activity's getTemplate()
+
+        prfConfig.currentTemplate = new ExpSyncDoc()
+                .share(clientext.userInf.uid(), ShareFlag.publish.name(), new Date())
+                .device(clientext.userInf.device);
+
         pickMediaStarter.launch(intt);
     }
 
