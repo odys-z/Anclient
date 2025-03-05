@@ -5,3 +5,5 @@ debug
 release
 .vs
 .vscode
+*.comments
+commit.*
