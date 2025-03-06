@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Portfolio 0.5.0</string>
+    <string name="app_name">Portfolio</string>
 
     <string name="menu_prefs" >User Settings</string>
     <string name="menu_help"  >Help</string>
@@ -29,7 +29,7 @@
     <string name="qrformat"      translatable="false">QR_CODE</string>
 
     <string name="key_regist" translatable="false">btn-register</string>
-    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>
+<!--    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>-->
     <string name="txt_loadused">Restore a used device</string>
     <string name="txt_regist">Save Device Name</string>
     <string name="txt_scanjserv">Scan jserv address.</string>

@@ -112,11 +112,11 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             // findPreference(AlbumApp.keys.device).setEnabled(false);
             ((Preference)findpref(R.string.key_device)).setEnabled(false);
 
-            // findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
-            ((Preference)findpref(R.string.key_restore_dev)).setEnabled(false);
-
-            // prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
-            prefcateDev.removePreference(findpref(R.string.key_restore_dev));
+//            // findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
+//            ((Preference)findpref(R.string.key_restore_dev)).setEnabled(false);
+//
+//            // prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
+//            prefcateDev.removePreference(findpref(R.string.key_restore_dev));
 
             prefcateDev.removePreference(btnRegistDev);
             device.setSummary(getString(R.string.device_name, devid));
@@ -131,6 +131,12 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
 
     <T> T findpref(int pid) { return (T)findPreference(getString(pid)); }
 
+    /**
+     * is eq(getString(strk), k)?
+     * @param strk
+     * @param k
+     * @return
+     */
     boolean eqk(int strk, String k) { return eq(getString(strk), k); }
 
     /**

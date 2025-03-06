@@ -755,7 +755,6 @@ public class Doclientier extends Semantier {
 	 * @throws AnsonException 
 	 * @throws SemanticException 
 	 * @since 0.2.0
-	 */
 	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
 			throws SemanticException, AnsonException, IOException {
 		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docstier.name());
@@ -777,4 +776,5 @@ public class Doclientier extends Semantier {
 		String clientpath = f.fullpath().replaceAll(":", "");
 		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
 	}
+	 */
 }

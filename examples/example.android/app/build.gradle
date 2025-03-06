@@ -19,7 +19,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            debuggable false
+//            debuggable false
         }
     }
     buildFeatures {
@@ -32,8 +32,6 @@ android {
 
     packagingOptions {
         exclude 'org/sqlite/native/**'
-//        exclude 'org/sqlite/native/**/**.dll'
-//        exclude 'org/sqlite/native/Windows/x86/sqlitejdbc.dll'
     }
 }
 

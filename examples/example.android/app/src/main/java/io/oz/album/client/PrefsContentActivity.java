@@ -211,10 +211,9 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 runOnUiThread(()-> prefFragment.device.setEnabled(false));
 
                 if (prefFragment.btnRegistDev != null) {
-                    // Preference btnrest = prefFragment.findPreference(keys.restoreDev);
-                    Preference btnrest = prefFragment.findpref(R.string.key_restore_dev);
-                    if (btnrest != null) // too quick the UI events are happening
-                        prefFragment.prefcateDev.removePreference(btnrest);
+//                    Preference btnrest = prefFragment.findpref(R.string.key_restore_dev);
+//                    if (btnrest != null) // too quick the UI events are happening
+//                        prefFragment.prefcateDev.removePreference(btnrest);
 
                     prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
                     prefFragment.btnRegistDev = null;
