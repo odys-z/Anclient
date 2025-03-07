@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
-import io.odysz.common.LangExt;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
