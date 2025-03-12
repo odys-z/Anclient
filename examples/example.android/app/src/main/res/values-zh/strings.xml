@@ -24,8 +24,8 @@
     <string name="err_empty_pswd"    >密碼為空！</string>
     <string name="err_empty_uid"     >用戶名不能為空！</string>
 
-    <string name="url_help"          >https://odys-z.github.io/products/album</string>
-    <string name="url_landing"       >https://odys-z.github.io/Anclient</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7/zh</string>
 
     <string name="txt_prefs_jserv" >文 件 服 務 地 址</string>
     <string name="home_title"      >组 织 名 称</string>

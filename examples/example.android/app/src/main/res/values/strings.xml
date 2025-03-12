@@ -63,8 +63,9 @@
     <string name="err_empty_pswd"    >Password is empty!</string>
     <string name="err_empty_uid"     >User ID is empty!</string>
 
-    <string name="url_help"   >https://odys-z.github.io/products/album</string>
-    <string name="url_landing">https://odys-z.github.io/Anclient</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7</string>
+
     <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_album"       translatable="false">%s/%s</string>
     <string name="url_admin"       translatable="false">%s/%s</string>
@@ -88,10 +89,10 @@
 
     <array name="jserv_entries">
         <item>@string/jserv_name1</item>
-        <item>@string/jserv_name0</item>
+<!--        <item>@string/jserv_name0</item>-->
     </array>
     <array name="jserv_entvals">
         <item>@string/prod_jserv_ir</item>
-        <item>@string/product_jserv_default</item>
+<!--        <item>@string/product_jserv_default</item>-->
     </array>
 </resources>
