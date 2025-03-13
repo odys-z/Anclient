@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Anclient built on React.js.",
   "main": "./src/an-components.ts",
   "directories": {
@@ -34,6 +34,7 @@
     "acorn": "^8.4.1",
     "ag-grid-community": "^33.0.4",
     "ag-grid-react": "^33.0.4",
+    "compression-webpack-plugin": "^11.1.0",
     "core-js": "^3.17.1",
     "material-ui-audio-player": "^1.7.1",
     "mime-types-no-nodejs": "^0.9.1",
@@ -77,6 +78,7 @@
     "react-svg-loader": "^3.0.0",
     "style-loader": "^0.23.1",
     "webpack": "^5.88.1",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "publishConfig": {

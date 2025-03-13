@@ -32,7 +32,7 @@ export * from './react/widgets/gallery-view';
 export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
-export * from './react/widgets/pdf-view';
+// export * from './react/widgets/pdf-view';
 
 export * from './photo-gallery/src/photo-ts';
 export * from './photo-gallery/src/light-box';
