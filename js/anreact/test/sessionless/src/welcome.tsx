@@ -94,7 +94,7 @@ class WelcomeComp extends CrudComp<Comprops>{
 	}
 
 	render() {
-		return (<div>Welcome Example - I bet you will love this!
+		return (<div>Welcome Example
 			{this.tier && this.cards(this.tier.myNotifies())}
 		</div>);
 	}

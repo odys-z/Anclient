@@ -1,7 +1,7 @@
 // Thansk to Grok
 
 const jwt = require('jsonwebtoken');
-const payload = {
+export const only_payload = {
     "document": {
         "fileType": "doc",
         "key": "unique-key-" + new Date().getTime(), // Unique key for each session
@@ -18,5 +18,5 @@ const payload = {
 };
 
 const secret = 'mysecretkey'; // Replace with your ONLYOFFICE or custom secret
-const token = jwt.sign(payload, secret, { algorithm: 'HS256' });
-console.log('Your JWT:', token);
+const onlyoffice_token = jwt.sign(only_payload, secret, { algorithm: 'HS256' });
+console.log('Your JWT:', onlyoffice_token);
