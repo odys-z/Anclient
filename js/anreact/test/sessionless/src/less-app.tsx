@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs
+	AnContext, AnError, AnReactExt, jsample, JsonHosts
 } from '../../../src/an-components';
 
 import Welcome from './welcome';
@@ -13,7 +13,7 @@ import Welcome from './welcome';
 const { Userst, JsampleTheme } = jsample;
 
 type LessProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 	iportal?: string;
 	iparent?: any; // parent of iframe
@@ -137,7 +137,7 @@ class App extends React.Component<LessProps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

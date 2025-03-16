@@ -5,7 +5,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreegrid, AnTreegridCol,
+	jsample, JsonHosts, Login, CrudComp, AnTreegrid, AnTreegridCol,
 	Comprops, regex, GalleryView, PdfViewer} from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
@@ -104,7 +104,7 @@ const testData: AnTreeNode[] = [
 ];
 
 type LessProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 	iportal?: string;
 	iparent?: any; // parent of iframe
@@ -332,7 +332,7 @@ class Widgets extends React.Component<LessProps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

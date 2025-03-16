@@ -22,4 +22,5 @@ export const only_payload = {
 
 const secret = 'mysecretkey'; // Replace with your ONLYOFFICE or custom secret
 const onlyoffice_token = jwt.sign(only_payload, secret, { algorithm: 'HS256' });
-console.log('\n', onlyoffice_token);
+console.log('\n')
+console.log(onlyoffice_token);

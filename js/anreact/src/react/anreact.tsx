@@ -10,7 +10,7 @@ import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { JsonServs } from './reactext';
+import { JsonHosts } from './reactext';
 
 export interface ClassNames {[c: string]: string};
 
@@ -179,7 +179,7 @@ export class AnReact {
 	 * }
 	 */
 	static loadServs( elem: string, opts: AnreactAppOptions,
-				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonHosts) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -189,13 +189,13 @@ export class AnReact {
 				dataType: "json",
 				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
 			})
-			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
+			.done( (json: JsonHosts) => onJsonServ(elem, opts, json) )
 			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: `github.json?q=${Date.now()}`,
 				})
-				.done((json: JsonServs) => onJsonServ(elem, opts, json))
+				.done((json: JsonHosts) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
@@ -210,7 +210,7 @@ export class AnReact {
 	 * @returns 
 	 */
 	static bindDom( elem: string, opts: AnreactAppOptions,
-				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonHosts) => void) {
 		return AnReact.loadServs(elem, opts, onJsonLoaded);
 	}
 }
