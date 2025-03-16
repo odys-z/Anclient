@@ -70,13 +70,12 @@ public abstract class BaseActivity extends FragmentActivity
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
 
-    protected static ExpSyncDoc template;
-
-    public static ExpSyncDoc getTemplate () throws DocsException {
-        if (template == null)
-            throw new DocsException(0, "Template must be initialized by subclasses.");
-        return template;
-    }
+//    protected static ExpSyncDoc template;
+//    public static ExpSyncDoc getTemplate () throws DocsException {
+//        if (template == null)
+//            throw new DocsException(0, "Template must be initialized by subclasses.");
+//        return template;
+//    }
 
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
@@ -263,8 +262,12 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
+            String m;
             // TODO report errors in a user's dialog...
-            String m = f("Error: type: %s, args: %s", msg, str(args));
+            if (c == AnsonMsg.MsgCode.exSession)
+                m = "Session error. Please login / re-login.";
+            else
+                m = f("Error: type: %s, args: %s", msg, str(args));
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );
     }

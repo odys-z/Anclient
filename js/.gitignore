@@ -6,3 +6,5 @@ compile-*
 **/dist/testBundle.js
 **/dist/private
 *.vsix
+**/dist/*.min.js.gz
+**/dist/*.min.js.map.gz

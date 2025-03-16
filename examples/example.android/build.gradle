@@ -5,8 +5,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.2'
-        // classpath 'com.android.tools.build:gradle:7.5.1'
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -14,14 +12,14 @@ buildscript {
 
 allprojects {
     ext {
-        app_ver = "0.5.0"
+        app_ver = "0.7.0"
         appcompat_version = "1.7.0"
         glide_version = '4.16.0'
         bm_photoview_version = "2.0.6"
 
-        anclient_ver = "[0.5.16,)"
-        jserv_ver = "[1.5.15,2.0.0-SNAPSHOT)"
-        syndoc_lib_ver = "[0.5.17,)"
+        anclient_ver = "[0.5.18-SNAPSHOT,)"
+        jserv_ver = "[1.5.16-SNAPSHOT,2.0.0-SNAPSHOT)"
+        syndoc_lib_ver = "[0.5.18-SNAPSHOT,)"
 
         sourceCompatibility = JavaVersion.VERSION_1_8
     }

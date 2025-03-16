@@ -38,7 +38,7 @@ public class AnPrefEntries extends Anson {
     }
 
     /**
-     * Insert a new name-url pair, if already exists, swap to the first
+     * Insert a new name-url pair, if the entry is already exist, swap it to the first.
      *
      * @param jserv 0.3.0: name\nurl
      * @return true if content seems usable

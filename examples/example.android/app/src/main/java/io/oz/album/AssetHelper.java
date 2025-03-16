@@ -33,11 +33,11 @@ public class AssetHelper {
     public static String url4intent(Context ctx, int intent) {
         switch (intent) {
             case Act_Album:
-                return ctx.getString(R.string.url_album, AlbumApp.sharedPrefs.albumroot, albumHome);
+                return ctx.getString(R.string.url_album, AlbumApp.prfConfig.albumroot, albumHome);
             case Act_Admin:
-                return ctx.getString(R.string.url_admin, AlbumApp.sharedPrefs.albumroot, adminHome);
+                return ctx.getString(R.string.url_admin, AlbumApp.prfConfig.albumroot, adminHome);
             case Act_SyncReport:
-                return ctx.getString(R.string.url_sync_report, AlbumApp.sharedPrefs.jserv(0), synchPage);
+                return ctx.getString(R.string.url_sync_report, AlbumApp.prfConfig.jserv(0), synchPage);
             case Act_Help:
                 return ctx.getString(R.string.url_help);
             case Act_Landing:

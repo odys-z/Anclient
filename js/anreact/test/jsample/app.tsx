@@ -8,7 +8,7 @@ import { Protocol, SessionClient, ErrorCtx,
 } from '@anclient/semantier';
 
 import { L, Langstrs } from '../../../anreact/src/utils/langstr';
-import { AnContext, AnContextType, JsonServs } from '../../../anreact/src/react/reactext';
+import { AnContext, AnContextType, JsonHosts } from '../../../anreact/src/react/reactext';
 import { AnReact, AnReactExt, AnreactAppOptions } from '../../../anreact/src/react/anreact';
 import { AnError } from '../../../anreact/src/react/widgets/messagebox';
 import { Sys, SysComp } from '../../../anreact/src/react/sys';
@@ -24,7 +24,7 @@ import { MyPswd } from '../../../anreact/src/jsample/views/my-pswdcard';
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId?: string;
 };
 
@@ -203,7 +203,7 @@ class App extends React.Component<Approps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

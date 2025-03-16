@@ -14,7 +14,7 @@ public class InsecureClient extends SessionClient {
 	}
 
 	protected static SessionInf robotSsInf() {
-		return new SessionInf("uid", "robot"); // mac?
+		return new SessionInf("uid", "sessein less"); // mac?
 	}
 
 }

@@ -234,7 +234,12 @@ public abstract class PickAdaptor<T extends AndroidFile, VH extends ViewHolder4G
         });
     }
 
+    /** Bind view holder of index 0
+     * @see #visualHolderx(ViewHolder4Glide, AndroidFile)  */
     abstract protected void visualHolder0(VH holder);
+
+    /** Bind view holder of except index 0
+     * @see #visualHolder0(ViewHolder4Glide)  */
     abstract protected void visualHolderx(VH holder, AndroidFile file);
 
     abstract protected void visualSelect(boolean selected, VH holder);
