@@ -8,3 +8,4 @@ compile-*
 *.vsix
 **/dist/*.min.js.gz
 **/dist/*.min.js.map.gz
+*-res-config.mjs

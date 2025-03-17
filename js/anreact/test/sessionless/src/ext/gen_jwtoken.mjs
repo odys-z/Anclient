@@ -3,7 +3,9 @@
 // const jwt = require('jsonwebtoken');
 import jwt from 'jsonwebtoken';
 
-export const only_payload = {
+/**
+ * e.g.
+ export const only_payload = {
     "document": {
         "fileType": "doc",
         "key": "unique-key-" + new Date().getTime(), // Unique key for each session
@@ -18,9 +20,13 @@ export const only_payload = {
     },
     "height": "100%",
     "width": "100%",
-};
+  };
+ */
+
+import { config_docx } from './doc-res-config.mjs';
 
 const secret = 'mysecretkey'; // Replace with your ONLYOFFICE or custom secret
-const onlyoffice_token = jwt.sign(only_payload, secret, { algorithm: 'HS256' });
-console.log('\n')
+const onlyoffice_token = jwt.sign(config_docx, secret, { algorithm: 'HS256' });
+
+console.log(config_docx.document.key);
 console.log(onlyoffice_token);

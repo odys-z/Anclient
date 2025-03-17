@@ -12,104 +12,12 @@ import { L, Langstrs, AnContext, AnError, AnReactExt,
 	Comprops, regex, GalleryView,
     ClassNames} from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
-import { Height } from '@material-ui/icons';
 
+import {config_docx as config, dockey_docx, token_docx} from './ext/doc-res-config.mjs';
 
 // console.log('Process available:', typeof process !== 'undefined' ? process : 'undefined');
 
 const { JsampleTheme } = jsample;
-
-const testData: AnTreeNode[] = [
-  { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-	"id": "f/zsu.2019_08",
-	"node": {
-		"folder": "f/zsu",
-		"pname": "2019_08",
-		"nodetype": "gallery",
-		"shareby": "ody",
-		"mime": "image/jpeg",
-		"pid": "f/zsu.2019_08",
-		"sort": "2019_08",
-		"img": "1",
-		"geo": "0",
-		"mov": "0",
-		"children": [
-			{ "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-			"node": {
-					"img": "147456",
-					"folder": "f/zsu.2019_08",
-					"nodetype": "p",
-					"shareby": "ody",
-					"pname": "my.jpg",
-					"fullpath": "f/zsu.2019_08000000HC",
-					"mime": "image/jpeg",
-					"pid": "000000HC",
-					"sort": "2019-08-18 01:38:21"
-				},
-				"parent": "io.odysz.anson.utils.TreeIndenode",
-				"indents": [
-					"childx"
-				],
-				"lastSibling": true,
-				"level": 1,
-				"id": "000000HC",
-				"parentId": "f/zsu.2019_08"
-			}
-		],
-		"fullpath": "f/zsu.2019_08",
-		"fav": "0"
-	},
-	"parent": "io.odysz.anson.utils.TreeIndenode",
-	"indents": [], "lastSibling": false,
-	"level": 0,
-	"parentId": null
-  },
-  { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-    "node": {
-        "pname": "tractor-brigade",
-        "img": "0",
-        "nodetype": "gallery",
-        "shareby": "syrskyi",
-        "mime": "video/mp4",
-        "pid": "f/zsu.tractor-brigade",
-        "sort": "tractor-brigade",
-        "geo": "0",
-        "folder": "f/zsu",
-        "mov": "1",
-        "children": [
-          { "type": "io.odysz.semantic.DA.DatasetCfg$AnTreeNode",
-			"node": {
-				"img": "4128768",
-				"folder": "f/zsu.tractor-brigade",
-				"nodetype": "p",
-				"shareby": "syrskyi",
-				"pname": "Amelia Anisovych.mp4",
-				"fullpath": "f/zsu.tractor-brigade000000FM",
-				"mime": "video/mp4",
-				"pid": "000000FM",
-				"sort": "2022-11-14 15:23:50"
-			},
-			"parent": "io.odysz.anson.utils.TreeIndenode",
-			"indents": [
-				"childx"
-			],
-			"lastSibling": true,
-			"level": 1,
-			"id": "000000FM",
-			"parentId": "f/zsu.tractor-brigade"
-		  }
-        ],
-        "fullpath": "f/zsu.tractor-brigade",
-        "fav": "0"
-    },
-    "parent": "io.odysz.anson.utils.TreeIndenode",
-    "indents": [],
-    "lastSibling": false,
-    "level": 0,
-    "id": "f/zsu.tractor-brigade",
-    "parentId": null
-  }
-];
 
 type DocViewProps = {
 	servs: JsonHosts;
@@ -147,7 +55,7 @@ class Widgets extends React.Component<DocViewProps> {
 
     script: HTMLScriptElement;
 
-    doc: { onlyjs: string; docurl: string; };
+    // doc: { onlyjs: string; docurl: string; };
     DocsAPI: any;
     docdiv: string = 'docview';
 
@@ -161,7 +69,7 @@ class Widgets extends React.Component<DocViewProps> {
 
 		this.errctx = {onError: this.onError, msg: ''};
 
-        this.doc = {onlyjs: props.onlyjs, docurl: props.docurl};
+        // this.onlyjs = props.onlyjs;
 
 		this.state = Object.assign(this.state, {
 			hasError: false,
@@ -193,19 +101,19 @@ class Widgets extends React.Component<DocViewProps> {
 
     componentDidMount() {
         const script = document.createElement('script');
-		if (this.doc && this.doc.onlyjs && this.doc.docurl) {
+		if (this.props.onlyjs) {
 			// script.src = 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js';
-			script.src = this.doc.onlyjs; // 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js';
+			script.src = this.props.onlyjs; // 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js';
 			script.async = true;
 
 			script.onload = () => {
 				this.setState({ scriptLoaded: true });
 				this.loadOnlyOffice(this.props.token);
-				console.log('Load successfully', this.doc.onlyjs);
+				console.log('Load successfully', this.props.onlyjs);
 			};
 
 			script.onerror = () => {
-				console.error('Failed to load script', this.doc.onlyjs);
+				console.error('Failed to load script', this.props.onlyjs);
 				this.onErrorClose();
 			};
 
@@ -214,36 +122,21 @@ class Widgets extends React.Component<DocViewProps> {
 		}
     }
 
-    loadOnlyOffice(token: string, docurl: string = this.doc.docurl) {
-        const config = {
-            "document": {
-                "fileType": "doc",
-                "key": "unique-key-" + new Date().getTime(), // Unique key for each session
-                "title": "Sample Document",
-                "url": docurl, //"http://ieee802.org:80/secmail/docIZSEwEqHFr.doc"
-            },
-            "documentType": "word", // Can be "word", "cell" (spreadsheet), or "slide" (presentation)
-            "editorConfig": {
-                "mode": "view", // "view" for read-only, "edit" for editing
-                // "callbackUrl": "http://localhost:3000/save" // Where changes are sent (optional)
-            },
-            "height": "100%",
-            "width": "100%",
-            // "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudCI6eyJmaWxlVHlwZSI6ImRvYyIsImtleSI6InVuaXF1ZS1rZXktMTc0MTg2MDQzMTc3NyIsInRpdGxlIjoiU2FtcGxlIERvY3VtZW50IiwidXJsIjoiaHR0cDovL2llZWU4MDIub3JnOjgwL3NlY21haWwvZG9jSVpTRXdFcUhGci5kb2MifSwiZG9jdW1lbnRUeXBlIjoid29yZCIsImVkaXRvckNvbmZpZyI6eyJtb2RlIjoidmlldyJ9LCJoZWlnaHQiOiIxMDAlIiwid2lkdGgiOiIxMDAlIiwiaWF0IjoxNzQxODYwNDMxfQ.ky49wyqles2wls2AWMQlJAfL_2WJDG_ybQXOeri-Y0I"
-			token
-        } as OnlyConfig;
-
+    loadOnlyOffice(token: string) {
         // const onlyoffice_token = jwt.sign(config, this.tier.onlySecret, { algorithm: 'HS256' });
         // this.tier.onlysign(config);
+		let conf = structuredClone(config);
+		conf.document.key = this.props.dockey
+		conf.token = token;
 
         if (!this.DocsAPI)
-            this.DocsAPI = new (window as any).DocsAPI.DocEditor(this.docdiv, config);
+            this.DocsAPI = new (window as any).DocsAPI.DocEditor(this.docdiv, conf);
     }
 
 	render() {
         const { scriptLoaded } = this.state;
         if (scriptLoaded && (window as any).DocsAPI) {
-            return <div id={this.docdiv} style={{height: "100vh"}}/>;
+            return <div id={this.docdiv} style={{height: 'calc(100vh)'}}/>;
         }
 	}
 
@@ -258,8 +151,9 @@ class Widgets extends React.Component<DocViewProps> {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iwindow={window}
 				onlyjs='http://dev.inforise.com.cn:8960/web-apps/apps/api/documents/api.js'
-				docurl='doc-res.docx'
-				token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudCI6eyJmaWxlVHlwZSI6ImRvYyIsImtleSI6InVuaXF1ZS1rZXktMTc0MjExMTk3NDA2NSIsInRpdGxlIjiU2FtcGxlIERvY3VtZW50IiwidXJsIjoiZG9jLXJlcy5kb2N4In0sImRvY3VtZW50VHlwZSI6IndvcmQiLCJlZGl0b3JDb25maWciOnsibW9kZSI6InZpZXcifSwiaGVpZ2h0IjoiMTAwJSIsIndpZHRoIjoiMTAwJSIsImlhdCI6MTc0MjExMTk3NH0.AnaRYoO39oWc1kCUSI2GCV-G3uKXCt2lb7T5cj3HumM'
+				// docurl='doc-res.docx'
+				dockey={dockey_docx}
+				token={token_docx}
 			/>, dom);
 		}
 	}
