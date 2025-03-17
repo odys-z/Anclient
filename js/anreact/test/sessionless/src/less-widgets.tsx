@@ -6,7 +6,7 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor, Lightbox
+	jsample, JsonHosts, Login, CrudComp, AnTreeditor, Lightbox
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -14,7 +14,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 const { JsampleTheme } = jsample;
 
 type LessProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 	iportal?: string;
 	iparent?: any; // parent of iframe
@@ -196,7 +196,7 @@ class Widgets extends React.Component<LessProps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

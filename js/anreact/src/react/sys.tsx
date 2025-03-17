@@ -38,8 +38,7 @@ import {
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import withWidth from '@material-ui/core/withWidth';
-import { SessionClient, SessionInf } from '@anclient/semantier/anclient';
-import ReactDOM from 'react-dom';
+import { SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@material-ui/core/Fab';
 
 export interface SysProps extends Comprops {

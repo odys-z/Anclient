@@ -6,7 +6,7 @@ import { AnReact } from './anreact';
 /**
  * The configuration data object used by user App to setup jserv root URL.
  */
-export interface JsonServs {
+export interface JsonHosts {
 	host?: string;
 	[h: string]: string,
 }
@@ -27,7 +27,7 @@ export interface AnContextType extends Semantext {
 	 */
 	servId: string,
 
-	servs: JsonServs, 
+	servs: JsonHosts, 
 
 	hasError: boolean,
 } 
@@ -42,7 +42,7 @@ export const AnContext = React.createContext({
 	/**default: host */
 	servId: undefined as string,
 
-	servs: { host: 'http://localhost:8080' } as JsonServs,
+	servs: { host: 'http://localhost:8080' } as JsonHosts,
 
 	anClient: undefined,
 	anReact: undefined,

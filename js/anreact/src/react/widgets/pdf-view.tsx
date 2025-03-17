@@ -1,7 +1,6 @@
 // Android webview can work with this
 // import * as pdfjsLib from "pdfjs-dist/build/pdf";
 // https://github.com/mozilla/pdf.js/issues/14729#issuecomment-1275824563
-
 // import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import * as pdfjsWorker from "pdfjs-dist/build/pdf.min.mjs";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.min.mjs';
