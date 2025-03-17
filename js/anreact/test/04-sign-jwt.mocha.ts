@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import * as jwt from 'jsonwebtoken';
-import { only_payload } from './sessionless/src/ext/gen_jwtoken';
+import { config_docx } from './sessionless/src/ext/doc-res-config.mjs';
 
 describe('case: [04.1 JWT Token]', () => {
 
@@ -12,10 +12,10 @@ describe('case: [04.1 JWT Token]', () => {
         assert.equal(decode.d, d, "time now ---");
 
         const secret = 'mysecret';
-        const onlyoffice_token = jwt.sign(only_payload, secret, { algorithm: 'HS256' });
+        const onlyoffice_token = jwt.sign(config_docx, secret, { algorithm: 'HS256' });
         const only_secret = jwt.verify(onlyoffice_token, secret); 
         console.log(onlyoffice_token, '\n==>\n', only_secret);
         assert.equal(only_secret.documentType, 'word', "OnlyOffice Configuration - 1");
-        assert.equal(only_secret.document.key, only_payload.document.key, "OnlyOffice Configuration - 2");
+        assert.equal(only_secret.document.key, config_docx.document.key, "OnlyOffice Configuration - 2");
     })
 })
