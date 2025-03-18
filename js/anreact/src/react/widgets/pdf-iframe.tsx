@@ -1,10 +1,4 @@
-// Android webview can work with this
-// import * as pdfjsLib from "pdfjs-dist/build/pdf";
-// https://github.com/mozilla/pdf.js/issues/14729#issuecomment-1275824563
-// import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-// import * as pdfjsWorker from "pdfjs-dist/build/pdf.min.mjs";
-// import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.min.mjs';
-//
+
 import React from 'react';
 import { Comprops, CrudCompW } from '../crud';
 
@@ -19,18 +13,6 @@ export interface PdfObject {
 }
 
 /**
- * The dependency PDF.js required by @anclient/anreact is saved as develope. Users must install:
- * <pre>npm install pdfjs-dist</pre>
- *
- * Experiment results (loading on mobile device is more expensive):
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.min.js  :  87.8 KB, 1.39s
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.worker.js  :  391 KB, 2.03s
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/web/pdf_viewer.min.css  :  5.4 KB, 972ms
- *
- * local pdf: 1.4 M, 7ms
  */
 export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
 
@@ -47,15 +29,20 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
   }
 
   canvasRef: HTMLCanvasElement;
+  pdfjsLib: {
+      getDocument(src: string): unknown; GlobalWorkerOptions: { workerSrc: string } 
+};
 
   constructor (props) {
     super(props);
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    this.pdfjsLib = globalThis as any;
+    // this.pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    this.pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
   }
 
-	componentDidMount() {
-    let loadingTask = pdfjsLib.getDocument(this.props.src);
+  componentDidMount() {
+    let loadingTask = this.pdfjsLib.getDocument(this.props.src) as any;
 
     let that = this;
     loadingTask.promise

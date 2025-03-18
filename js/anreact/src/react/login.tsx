@@ -32,7 +32,7 @@ interface LoginProps extends Comprops {
 	// onLogin: OnCommitOk;
 
 	/** Default pswd and user-id, usually for debug. */
-	config: {pswd?: string, userid?: string}
+	config: {pswd?: string, userid?: string};
 }
 
 /**
@@ -127,7 +127,8 @@ class LoginComp extends React.Component<LoginProps> {
 			let hosturl = ctx.servs[serv];
 
 			an.init(hosturl);
-			an.login( uid, pwd, reload, {onError} );
+			// an.login( uid, pwd, reload, {onError} );
+			an.loginWithUri(this.props.uri, uid, pwd, reload, {onError});
 		}
 
 		function reload (client: SessionClient) {

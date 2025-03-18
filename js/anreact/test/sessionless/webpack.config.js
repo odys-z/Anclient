@@ -11,7 +11,7 @@ module.exports = {
 	devtool: 'source-map',
 	entry: {// 'home': './src/less-app.tsx',
 			// 'widgets': './src/less-widgets.tsx',
-			// 'doctree': './src/less-widgets-treegrid.tsx',
+			'doctree': './src/less-widgets-treegrid.tsx',
 			'docview': './src/less-widgets-docview.tsx',
 			// 'sheet': './src/workbook/sheet-app.tsx'
 		},

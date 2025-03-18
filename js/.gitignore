@@ -8,4 +8,10 @@ compile-*
 *.vsix
 **/dist/*.min.js.gz
 **/dist/*.min.js.map.gz
+**/dist/*exiftool*
+**/dist/volume
+**/dist/WEB-INF
+**/dist/X29
+**/dist/*.whl
+vol
 *-res-config.mjs

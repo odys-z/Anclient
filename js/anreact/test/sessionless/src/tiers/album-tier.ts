@@ -9,12 +9,20 @@ export class AlbumTier extends StreeTier {
 	page: PageInf;
 	collects?: PhotoCollect[];
 
+	synuri: string;
+
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, album?: string, comp: CrudComp<Comprops>}) {
+	constructor(props: {uri: string, synuri: string, port?: string, client: SessionClient, album?: string, comp: CrudComp<Comprops>}) {
 		super(props);
-		console.log(this.uri);
+
+		if (props.port)
+			this.port = props.port;
+		this.synuri = props.synuri;
+
+		console.log(this.uri, this.port);
+
 		this.comp = props.comp;
 		this.client = props.client;
 
@@ -37,7 +45,7 @@ export class AlbumTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, page: conds} )
+					new AlbumReq( {uri: this.uri, synuri: this.synuri, page: conds} )
 					.A(AlbumReq.A.stree) );
 
 		client.commit(req,
@@ -63,6 +71,6 @@ export class AlbumTier extends StreeTier {
 	 * @returns src of img tag
 	 */
 	imgSrc(recId: string) : string {
-		return GalleryView.imgSrcReq(recId, this);
+		return GalleryView.imgSrcReq(recId, "h_photo", {...this, docuri: ()=> this.synuri});
 	}
 };

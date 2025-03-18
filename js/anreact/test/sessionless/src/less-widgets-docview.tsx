@@ -7,15 +7,14 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
     SyncDoc,
     PageInf,
     OnLoadOk} from '@anclient/semantier';
-import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonHosts, Login, CrudComp, AnTreegrid, AnTreegridCol,
-	Comprops, regex, GalleryView,
+import { Langstrs, AnReactExt,
+	jsample, JsonHosts, CrudComp, AnTreegrid, AnTreegridCol,
+	Comprops, regex, 
     ClassNames} from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
+/** Run ext/gen_jwtoken.mjs first. */
 import {config_docx as config, dockey_docx, token_docx} from './ext/doc-res-config.mjs';
-
-// console.log('Process available:', typeof process !== 'undefined' ? process : 'undefined');
 
 const { JsampleTheme } = jsample;
 
@@ -55,21 +54,16 @@ class Widgets extends React.Component<DocViewProps> {
 
     script: HTMLScriptElement;
 
-    // doc: { onlyjs: string; docurl: string; };
     DocsAPI: any;
     docdiv: string = 'docview';
 
 	constructor(props: Readonly<DocViewProps>) {
 		super(props);
 
-        // console.log("process", typeof process);
-
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 
 		this.errctx = {onError: this.onError, msg: ''};
-
-        // this.onlyjs = props.onlyjs;
 
 		this.state = Object.assign(this.state, {
 			hasError: false,
@@ -102,8 +96,7 @@ class Widgets extends React.Component<DocViewProps> {
     componentDidMount() {
         const script = document.createElement('script');
 		if (this.props.onlyjs) {
-			// script.src = 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js';
-			script.src = this.props.onlyjs; // 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js';
+			script.src = this.props.onlyjs;
 			script.async = true;
 
 			script.onload = () => {
@@ -123,8 +116,6 @@ class Widgets extends React.Component<DocViewProps> {
     }
 
     loadOnlyOffice(token: string) {
-        // const onlyoffice_token = jwt.sign(config, this.tier.onlySecret, { algorithm: 'HS256' });
-        // this.tier.onlysign(config);
 		let conf = structuredClone(config);
 		conf.document.key = this.props.dockey
 		conf.token = token;
@@ -151,7 +142,6 @@ class Widgets extends React.Component<DocViewProps> {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iwindow={window}
 				onlyjs='http://dev.inforise.com.cn:8960/web-apps/apps/api/documents/api.js'
-				// docurl='doc-res.docx'
 				dockey={dockey_docx}
 				token={token_docx}
 			/>, dom);
@@ -230,7 +220,7 @@ class TestreeTier extends AlbumTier {
 	}
 
 	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
-		super({uri, client, comp: tree});
+		super({uri, synuri: 'not-used', client, comp: tree});
 		this.client = client;
 	}
 
