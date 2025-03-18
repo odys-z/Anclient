@@ -8,8 +8,6 @@ import objectAssign from "object-assign"
 
 type SandboxAttributeValue = "allow-downloads-without-user-activation" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation";
 
-// export interface IEventHandler {button: ComponentType, on: (e) => undefined} ;
-
 export interface IIframe {
 	head: ComponentType,
 	url: string,
@@ -32,7 +30,6 @@ export interface IIframe {
 	onMouseOut?: () => void,
 	frameBorder?: number,
 	scrolling?: "auto" | "yes" | "no",
-	// closing?: React.ReactNode,
 	id?: string,
 	ariaHidden?: boolean,
 	ariaLabel?: string,
@@ -58,7 +55,6 @@ const Iframe: ComponentType<IIframe> = ({
 	onMouseOver,
 	onMouseOut,
 	scrolling,
-	// closing,
 	id,
 	frameBorder,
 	ariaHidden,
