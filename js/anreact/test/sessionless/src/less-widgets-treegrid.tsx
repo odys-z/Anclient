@@ -6,9 +6,8 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonHosts, Login, CrudComp, AnTreegrid, AnTreegridCol,
-	Comprops, regex, GalleryView } from '../../../src/an-components';
+	Comprops, regex, GalleryView, PdfIframe } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
-import Iframe from './ext/iframe';
 
 const { JsampleTheme } = jsample;
 
@@ -271,30 +270,30 @@ class TreegridApp extends React.Component<LessProps> {
 	}
 
 	viewFile = (ids: Map<string, AnTreeNode>) => {
-		const pdfhead = (
-			<script src="//mozilla.github.io/pdf.js/build/pdf.mjs"></script>
-		  );
+		// const pdfhead = (
+		// 	<script src="//mozilla.github.io/pdf.js/build/pdf.mjs"></script>
+		//   );
 		if (size(ids) > 0) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid);
 			let t = regex.mime2type(file.node.mime as string);
 			if (t === '.pdf') {
 				console.log(fid);
-				// this.pdfview = (<PdfViewer
-				// 	close={(e) => {
-				// 		console.log(e);
-				// 		this.pdfview = undefined;
-				// 		this.setState({});
-				// 	} }
-				// 	src={GalleryView.imgSrcReq(file.id, "h_photos", this.albumtier)}
-				// ></PdfViewer>);
+				this.pdfview = (<PdfIframe
+					close={ (e) => {
+						// console.log(e);
+						this.pdfview = undefined;
+						this.setState({});
+					} }
+					src={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: () => this.treetier.synuri})}
+				></PdfIframe>);
 
-				this.pdfview = (<><Iframe
-						head={() => pdfhead} styles={{height: '95vh', position: 'absolute', top: '2.5vh', width: '98vw', left: '1vh'}}
-						url={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: ()=> this.treetier.synuri})}>
-					</Iframe>
-					{this.closeButton()}</>
-					)
+				// this.pdfview = (<><Iframe
+				// 		head={() => pdfhead} styles={{height: '95vh', position: 'absolute', top: '2.5vh', width: '98vw', left: '1vh'}}
+				// 		url={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: ()=> this.treetier.synuri})}>
+				// 	</Iframe>
+				// 	{this.closeButton()}</>
+				// 	)
 			}
 			else {
 				this.pdfview = undefined;

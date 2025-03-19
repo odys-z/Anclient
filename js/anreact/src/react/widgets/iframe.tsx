@@ -143,10 +143,6 @@ const Iframe: ComponentType<IIframe> = ({
 		}
 	}
 
-	// props.onLoad=(e) => {
-	// 	document.body.appendChild(props.closing)
-	// };
-
 	return <iframe {...props} />
 }
 
