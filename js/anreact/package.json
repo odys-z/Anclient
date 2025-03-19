@@ -36,7 +36,6 @@
     "ag-grid-react": "^33.0.4",
     "compression-webpack-plugin": "^11.1.0",
     "core-js": "^3.17.1",
-    "material-ui-audio-player": "^1.7.1",
     "mime-types-no-nodejs": "^0.9.1",
     "qrcode": "^1.5.1",
     "react-modal": "^3.16.1",
