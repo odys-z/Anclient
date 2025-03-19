@@ -109,7 +109,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				index: x,
 				node: { ...p.node, shareby: p.node.shareby as string },
 				width: wh[0], height: wh[1],
-				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, this.albumtier),
+				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.synuri}),
 				imgstyl,
 				mime: p.node.mime as string
 			})
@@ -123,18 +123,23 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * 
 	 * @param pid 
 	 * @param opts 
+	 * opts.docuri()  Get document's uri for connection, e.g. synuri = '/album/syn'
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
-	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {uri: string, client: SessionClient, port: string}) : string {
+	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {
+		docuri(): string;
+		uri: string, client: SessionClient, port: string
+	}) : string {
 
 		let {client, port} = opts;
 
-		let msg = getDownloadReq(pid as string, opts);
+		let msg = getDownloadReq();//pid as string, opts);
 		let jserv = client.an.servUrl(port);
-		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
+		return `${jserv}?anson64=${window.btoa(JSON.stringify(msg))}`;
 
-		function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
-			let {uri, port, client} = opts;
+		function getDownloadReq() {//pid: string, opts: {uri: string, port: string, client: SessionClient}) {
+			let {port, client} = opts;
+			let uri = opts.docuri();
 
 			let msgId = `${doctable}.${pid}`;
 			if (reqMsgs[msgId] === undefined) {

@@ -1793,8 +1793,10 @@ export class SyncDoc implements Tierec {
 	shareby?: string | undefined;
 	sharedate?: string;
 	device?: string;
-
-	src: string;
+	src?: string;
+	syncFlag?: string;
+	size?: number;
+	mime?: string;
 
 	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
 		this.type = opt.type || SyncDoc.__type0__;

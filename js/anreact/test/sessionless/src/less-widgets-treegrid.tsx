@@ -6,7 +6,7 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 	SessionClient, AnDatasetResp, size } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonHosts, Login, CrudComp, AnTreegrid, AnTreegridCol,
-	Comprops, regex, GalleryView, PdfViewer} from '../../../src/an-components';
+	Comprops, regex, GalleryView, PdfIframe } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 
 const { JsampleTheme } = jsample;
@@ -114,7 +114,7 @@ type LessProps = {
 /**
  * Widgets Tests
  */
-class Widgets extends React.Component<LessProps> {
+class TreegridApp extends React.Component<LessProps> {
 	/**
 	 * {@link InsercureClient}
 	 */
@@ -125,7 +125,7 @@ class Widgets extends React.Component<LessProps> {
 	 */
 	anReact: AnReactExt;  // helper for React
 
-	albumtier: TestreeTier;
+	treetier: TestreeTier;
 
 	errctx: ErrorCtx;
 
@@ -212,9 +212,10 @@ class Widgets extends React.Component<LessProps> {
 		this.ssclient.an.init(this.state.servs[this.props.servId]);
 
 		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
-							.extendPorts({album: 'album.less'});
+							// .extendPorts({album: 'album.less'});
+							.extendPorts({docoll: 'docoll.syn'});
 
-		this.albumtier = new TestreeTier(this.uri, this, c);
+		this.treetier = new TestreeTier(this, c);
 
 		this.toSearch();
 	}
@@ -222,10 +223,10 @@ class Widgets extends React.Component<LessProps> {
 	toSearch() {
 		let that = this;
 
-		this.albumtier.stree({ uri: this.uri, sk: this.doctreesk,
+		this.treetier.stree({ uri: this.uri, synuri: this.treetier.synuri, sk: this.doctreesk, port: this.treetier.port,
 			onOk: (resp: AnsonMsg<AnDatasetResp>) => {
-				that.albumtier.forest = resp.Body().forest as AnTreeNode[]; 
-				console.log(that.albumtier.forest);
+				that.treetier.forest = resp.Body().forest as AnTreeNode[]; 
+				console.log(that.treetier.forest);
 				that.setState({});
 			}},
 			this.errctx);
@@ -243,21 +244,56 @@ class Widgets extends React.Component<LessProps> {
 		}
 	}
 
+	closeButton = () => {
+		let config = {iconSize: 5};
+
+		return (
+			<div style={{
+				background: '#cacaca77',
+				position: 'absolute',
+				top: '0px', right: '0px',
+				padding: '10px', cursor: 'pointer',
+				color: '#FFFFFF',
+				fontSize: `${config.iconSize * 0.8}px`
+			  }}
+			  onClick={ (e) => {
+						console.log(e);
+						this.pdfview = undefined;
+						this.setState({});
+					} }>
+			  <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#FFFFFF">
+				<path d="M0 0h24v24H0z" fill="none" />
+				<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+			  </svg>
+			</div>
+		);
+	}
+
 	viewFile = (ids: Map<string, AnTreeNode>) => {
+		// const pdfhead = (
+		// 	<script src="//mozilla.github.io/pdf.js/build/pdf.mjs"></script>
+		//   );
 		if (size(ids) > 0) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid);
 			let t = regex.mime2type(file.node.mime as string);
 			if (t === '.pdf') {
 				console.log(fid);
-				this.pdfview = (<PdfViewer
-					close={(e) => {
-						console.log(e);
+				this.pdfview = (<PdfIframe
+					close={ (e) => {
+						// console.log(e);
 						this.pdfview = undefined;
 						this.setState({});
 					} }
-					src={GalleryView.imgSrcReq(file.id, this.albumtier)}
-				></PdfViewer>);
+					src={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: () => this.treetier.synuri})}
+				></PdfIframe>);
+
+				// this.pdfview = (<><Iframe
+				// 		head={() => pdfhead} styles={{height: '95vh', position: 'absolute', top: '2.5vh', width: '98vw', left: '1vh'}}
+				// 		url={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: ()=> this.treetier.synuri})}>
+				// 	</Iframe>
+				// 	{this.closeButton()}</>
+				// 	)
 			}
 			else {
 				this.pdfview = undefined;
@@ -291,17 +327,17 @@ class Widgets extends React.Component<LessProps> {
 				error   : this.errctx,
 				ssInf   : undefined,
 			}} >
-				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
-                {this.albumtier && Date().toString()}
+				<Login uri={this.uri} onLogin={this.onLogin} config={{userid: 'ody', pswd: '8964'}}/>
+                {this.treetier && Date().toString()}
 				<hr/>
-                {this.albumtier && <AnTreegrid key={this.doctreesk}
+                {this.treetier && <AnTreegrid key={this.doctreesk}
 					singleCheck
 					parent={undefined} lastSibling={false}
 					uri={this.uri} reload={reload}
-					tier={this.albumtier}
+					tier={this.treetier}
 					pk={'NA'} sk={this.doctreesk}
 					columns={[ // noly card for folder header
-						{ type: 'iconame', field: 'pname', label: L('Name'),
+						{ type: 'iconame', field: 'docname', label: L('Name'),
 						  grid: {xs: 9, sm: 6, md: 4} },
 						{ type: 'text', field: 'mime', label: L('type'), colFormatter: this.typeParser,
 						  grid: {xs: 1, sm: 1, md: 1} },
@@ -334,7 +370,7 @@ class Widgets extends React.Component<LessProps> {
 
 		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<TreegridApp servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 
@@ -360,8 +396,11 @@ class TestreeTier extends AlbumTier {
 	  }
 	}
 
-	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
-		super({uri, client, comp: tree});
+	constructor(tree: CrudComp<any>, client?: SessionClient) {
+		super({uri: '/album/sys', synuri: '/album/syn',
+			port: 'docoll', // override and compitiable for both 0.7.0 and 0.6.5, supposed to be a key issue for Antson 2.0.
+			client, comp: tree,
+		});
 		this.client = client;
 	}
 
@@ -380,4 +419,4 @@ class TestreeTier extends AlbumTier {
 	}
 }
 
-export { Widgets };
+export { TreegridApp };
