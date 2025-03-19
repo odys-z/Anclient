@@ -13,5 +13,6 @@ compile-*
 **/dist/WEB-INF
 **/dist/X29
 **/dist/*.whl
+**/dist/report.html
 vol
 *-res-config.mjs

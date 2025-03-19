@@ -22,7 +22,7 @@ module.exports = {
       libraryTarget: 'umd'
     },
 
-	externals: {
+    externals: {
       'react': 'React',
       'react-dom' : 'ReactDOM',
     //  '@material-ui/core': 'MaterialUI',
@@ -44,7 +44,7 @@ module.exports = {
     },
 
 	plugins: [
-		new BundleAnalyzerPlugin(), new CompressionPlugin()
+		new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()
 	],
 
 	resolve: {
@@ -72,4 +72,4 @@ module.exports = {
 			  ] }
 	  ]
 	}
-}
+}	
