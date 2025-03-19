@@ -47,7 +47,7 @@ export class PdfIframe extends CrudCompW<Comprops & PdfIframeProps> {
   componentDidMount() {
     // let loadingTask = this.pdfjsLib.getDocument(this.props.src) as any;
 
-    let that = this;
+    // let that = this;
     // loadingTask.promise
     //   .then((pdf: PdfObject) => {
     //     this.renderPage(pdf, that.canvasRef, 1);
@@ -120,8 +120,9 @@ export class PdfIframe extends CrudCompW<Comprops & PdfIframeProps> {
       height: '100%', width: '100%',
       backgroundColor: 'rgba(0,0,0,1)'
     }}>
-      {/* <canvas style={{width: "90%", height: "90%"}} ref={(ref) => this.canvasRef = ref}></canvas> */}
-			<Iframe head={() => <script src={this.props.pdfjs || '//mozilla.github.io/pdf.js/build/pdf.mjs'}></script>}
+      <Iframe head= {undefined}
+          // Try native view in Android WebView
+          // {() => <script src={this.props.pdfjs || '//mozilla.github.io/pdf.js/build/pdf.mjs'}></script>}
           styles={{height: '100%', position: 'absolute', top: '0', width: '100%', left: '0'}}
 					url={this.props.src}/>
 

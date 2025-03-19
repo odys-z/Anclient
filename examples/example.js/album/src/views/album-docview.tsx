@@ -64,6 +64,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.switchDocMedias = this.switchDocMedias.bind(this);
+        this.viewFile = this.viewFile.bind(this);
 	}
 
 	componentDidMount() {
@@ -86,7 +87,6 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 			sk: this.state.showingDocs ? this.doctreesk : this.albumsk,
 			onOk: (rep: AnsonMsg<AnsonResp>) => {
 				tier.forest = (rep.Body() as AlbumResp).forest as AnTreeNode[];
-				// console.log(rep.Body().album.docTabl);
 				// console.log((rep.Body() as AlbumResp).docTabl);
 				that.docTabl = (rep.Body() as AlbumResp).docTabl || 'h_photos';
 				that.setState({});
@@ -136,18 +136,20 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	viewFile = (ids: Map<string, Tierec>) => {
 		if (size(ids) > 0 && this.tier) {
 			let fid = ids.keys().next().value;
+            let synuri = this.synuri;
+
 			if (fid) {
 				let file = ids.get(fid) as AnTreeNode;
 				let t = regex.mime2type(file.node.mime as string || "");
 				if (t === '.pdf') {
-					// // console.log(this.docTabl);
-					// this.pdfview = (<PdfIframe
-					// 	close={(e) => {
-					// 		this.pdfview = undefined;
-					// 		this.setState({});
-					// 	} }
-					// 	src={GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => 'this.tier.synuri' })}
-					// ></PdfIframe>);
+					// console.log(this.docTabl);
+					this.pdfview = (<PdfIframe
+						close={(e) => {
+							this.pdfview = undefined;
+							this.setState({});
+						} }
+						src={GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => synuri })}
+					></PdfIframe>);
 				}
 				else {
 					this.pdfview = undefined;
@@ -187,7 +189,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				pk={''} singleCheck
 				tier={this.tier}
 				columns={[
-				  { type: 'iconame', field: 'text', label: L('File Name'),
+				  { type: 'iconame', field: 'docname', label: L('File Name'),
 					grid: {xs: 6, sm: 6, md: 5} },
 				  { type: 'text', field: 'mime', label: L('type'),
 					colFormatter: typeParser, // Customize a cell
