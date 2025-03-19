@@ -7,7 +7,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
 
 import { L, AnError, AnReactExt, Lightbox,
 	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
-	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfViewer, GalleryView, CompOpts, Comprops
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfIframe, GalleryView, CompOpts, Comprops
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
 import { Button, Grid } from '@material-ui/core';
