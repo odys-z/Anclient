@@ -5,11 +5,11 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonServs, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
+	JsonHosts, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 
 type AlbumProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 
 	/** album id */
@@ -34,10 +34,10 @@ export class App extends CrudCompW<AlbumProps> {
 
 	error: ErrorCtx;
 
-	servs: JsonServs;
+	servs: JsonHosts;
 	config = {
 		/** json object specifying host's urls */
-		servs: {} as JsonServs,
+		servs: {} as JsonHosts,
 		/** the serv id for picking url */
 		servId: '',
 	};

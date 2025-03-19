@@ -2,12 +2,12 @@ import React from 'react';
 import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, AnDatasetResp,
+import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
 
-import { L, AnError, AnReactExt, Lightbox,
+import { L, AnError, AnReactExt, Lightbox, PdfIframe,
 	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
-	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, PdfIframe, GalleryView, CompOpts, Comprops
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
 import { Button, Grid } from '@material-ui/core';
@@ -140,14 +140,14 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				let file = ids.get(fid) as AnTreeNode;
 				let t = regex.mime2type(file.node.mime as string || "");
 				if (t === '.pdf') {
-					// console.log(this.docTabl);
-					this.pdfview = (<PdfViewer
-						close={(e) => {
-							this.pdfview = undefined;
-							this.setState({});
-						} }
-						src={GalleryView.imgSrcReq(file?.id, this.docTabl, this.tier)}
-					></PdfViewer>);
+					// // console.log(this.docTabl);
+					// this.pdfview = (<PdfIframe
+					// 	close={(e) => {
+					// 		this.pdfview = undefined;
+					// 		this.setState({});
+					// 	} }
+					// 	src={GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => 'this.tier.synuri' })}
+					// ></PdfIframe>);
 				}
 				else {
 					this.pdfview = undefined;
@@ -216,10 +216,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 			/>) }
 		  { this.pdfview }
 		  { this.orgview }
-		  { this.state.hasError &&
-			<AnError onClose={this.onErrorClose} fullScreen={false}
-				uri={"/login"} tier={undefined}
-				title={L('Error')} msg={this.error.msg || ''} /> }
+		  { this.state.hasError// &&
+			// <AnError onClose={this.onErrorClose} fullScreen={false}
+			// 	uri={"/login"} tier={undefined}
+			// 	title={L('Error')} msg={this.error.msg || ''} /> }
+          }
 	  </>);
 
 	  function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {
