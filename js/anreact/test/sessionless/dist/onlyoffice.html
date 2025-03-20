@@ -22,7 +22,7 @@
     <script >
       let searchParams = new URLSearchParams(window.location.search)
       let serv = searchParams ? searchParams.get('serv') : undefined;
-      less.Widgets.bindHtml('app', {
+      less.WidgetsDocview.bindHtml('app', {
           jsonUrl: 'http://localhost:8889/github.json',
           serv: serv || 'album', Window, portal: '#'});
     </script>

@@ -1361,7 +1361,7 @@ export class AnsonResp extends AnsonBody {
 
     rs: AnResultset | Array<AnResultset>;
     Rs(rx = 0): AnResultset {
-		return this.rs?.length ? this.rs[rx] : this.rs;
+		return Array.isArray(this.rs) ? this.rs[rx] : this.rs;
 	}
 
     data: {props?: {}};
@@ -1836,19 +1836,23 @@ export class DocsReq extends AnsonBody {
 	 *
 	 * @param uri
 	 * @param args
-	 * args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
-	 * args.deletings: old docId to be deleted
+	 * @param args.synuri The function uri for accessing doc's db. Must no null. 
+	 * This is not checked in Java, where the *args.uri* is used directly as synuri
+	 * @param args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
+	 * @param args.deletings: old docId to be deleted
 	 */
 	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
-		this.synuri = args.synuri;
-		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.docFieldType}));
-		// this.docId = args.docId;
-		// this.docName = args.docName;
-		// this.mime = args.mime;
-		// this.uri64 = args.uri64;
 
-		// case d
+		if (!args || !args.synuri) {
+			console.warn("Since 1.0.1, Synuri for doc operation is required.");
+			this.synuri = uri;
+		}
+		else
+			this.synuri = args.synuri;
+
+		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.docFieldType}));
+
 		this.deletings = args.deletings;
 	}
 }

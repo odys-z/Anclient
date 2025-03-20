@@ -35,7 +35,7 @@ type DocViewProps = {
 /**
  * Widgets Tests
  */
-class Widgets extends React.Component<DocViewProps> {
+class WidgetsDocview extends React.Component<DocViewProps> {
     tier: DocTier;
     classes: ClassNames;
     props: any;
@@ -140,7 +140,7 @@ class Widgets extends React.Component<DocViewProps> {
 
 		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iwindow={window}
+			ReactDOM.render(<WidgetsDocview servs={json} servId={opts.serv} iwindow={window}
 				onlyjs='http://dev.inforise.com.cn:8960/web-apps/apps/api/documents/api.js'
 				dockey={dockey_docx}
 				token={token_docx}
@@ -239,4 +239,4 @@ class TestreeTier extends AlbumTier {
 	}
 }
 
-export { Widgets };
+export { WidgetsDocview };

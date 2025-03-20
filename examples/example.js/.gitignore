@@ -7,6 +7,7 @@ node_modules
 **/dist/docs
 **/dist/img/sample.png
 !**/dist/*.html
+**/dist/report.html
 !**/dist/*.json
 !**/dist/*.css
 !**/dist/res-vol

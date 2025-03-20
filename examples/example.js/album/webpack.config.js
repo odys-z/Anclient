@@ -7,6 +7,7 @@ let v = 'development'; // "production" | "development" | "none"
 let version = "0.4.1";
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
 	mode: v,
@@ -23,10 +24,13 @@ module.exports = {
 	},
 
 	plugins: [
-		new BundleAnalyzerPlugin()
+		new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()
 	],
 
 	externals: {
+		'react': 'React',
+		'react-dom' : 'ReactDOM',
+
 		/**
 		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
 		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">

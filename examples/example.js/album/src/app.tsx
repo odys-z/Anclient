@@ -52,7 +52,7 @@ export class App extends CrudCompW<AlbumProps> {
 	editForm : undefined;
 	ssclient : SessionClient | undefined;
 
-	synuri: string | undefined;
+	synuri: string;
 
 	/**
 	 * Restore session from window.localStorage
@@ -248,7 +248,7 @@ export class App extends CrudCompW<AlbumProps> {
 			  ssInf   : undefined,
 		  }} >
 			{/*<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />*/}
-			<AlbumDocview uri={this.synuri} aid={''} />
+			<AlbumDocview synuri={this.synuri} aid={''} />
 		  </AnContext.Provider>
 		|| <></>);
 	}

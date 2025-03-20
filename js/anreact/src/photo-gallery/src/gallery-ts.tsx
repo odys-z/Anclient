@@ -55,11 +55,11 @@ export interface GalleryProps {
 const Gallery = function Gallery({
   photos,
   onClick,
-  direction,
+  direction = 'row',
   videoControl,
-  margin,
+  margin = 2,
   limitNodeSearch,
-  targetRowHeight,
+  targetRowHeight = 100,
   columns,
 } : GalleryProps) {
   const [containerWidth, setContainerWidth] = useState(0);
@@ -174,11 +174,11 @@ Gallery.propTypes = {
   renderImage: PropTypes.func,
 };
 
-Gallery.defaultProps = {
-  margin: 2,
-  direction: 'row',
-  targetRowHeight: 300,
-};
+// Gallery.defaultProps = {
+//   margin: 2,
+//   direction: 'row',
+//   targetRowHeight: 300,
+// };
 
 const GalleryMem = React.memo(Gallery);
 

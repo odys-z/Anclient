@@ -165,9 +165,12 @@ export class AlbumReq extends DocsReq {
 	}
 }
 // v 0.6.5
-StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
+// StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
+
 // v 0.7
-StreeTier.registTierequest('docoll', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
+StreeTier.registTierequest('docoll',
+	(opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts),
+	{uri: '-', synuri: '-', sk: '-'});
 
 // ISSUE: should extends DocsResp. We need a better tool to generate the class, desperately.
 export class AlbumResp extends AnDatasetResp {
