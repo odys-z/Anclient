@@ -92,13 +92,16 @@ export class AnTreeNode implements Tierec {
  */
 export class StreeTier extends Semantier {
     static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody} = {};
-    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody) {
+
+    static registTierequest(port: string,
+			factory: (v: DatasetOpts & {synrui?: string, sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody,
+			initFields = {uri: '', synuri: '', sk: ''}) {
         if (this.reqFactories[port])
             console.warn("Replacing new facotry of ", port, factory);
 
         this.reqFactories[port] = factory;
 
-        Protocol.registerBody(factory({uri: '', sk: ''}).type, factory);
+        Protocol.registerBody(factory(initFields).type, factory);
     }
 
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */

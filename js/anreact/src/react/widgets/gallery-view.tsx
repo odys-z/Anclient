@@ -48,6 +48,12 @@ export type lightboxFomatter = (photos: AnTreeNode[], opts?: {
 export interface GalleryProps {
 	cid: string;
 	photos?: AnTreeNode[];
+
+	/**
+	 * @since 0.6.0, the equivalent of synuri.
+	 */
+	docuri: string;
+
 	tier?: Semantier;
 
 	/** Modal dialog for picture slids. */
@@ -109,7 +115,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				index: x,
 				node: { ...p.node, shareby: p.node.shareby as string },
 				width: wh[0], height: wh[1],
-				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.synuri}),
+				src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
 				imgstyl,
 				mime: p.node.mime as string
 			})

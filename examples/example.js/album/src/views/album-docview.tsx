@@ -15,6 +15,7 @@ import { DocIcon } from '../icons/doc-ico';
 import { ConnectionDetails } from './album-doconn-details';
 
 interface AlbumDocProps extends Comprops {
+	synuri: string
 	/** album id */
 	aid: string;
 }
@@ -71,7 +72,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		console.log(this.uri);
         let client = (this.context as AnContextType).anClient;
         if (client) {
-		    this.tier = new GalleryTier({uri: this.uri, client, comp: this});
+		    this.tier = new GalleryTier({uri: this.uri, synuri: this.props.synuri, client, comp: this});
 		    this.tier.setContext(this.context as AnContextType);
 			this.toSearch();
         }

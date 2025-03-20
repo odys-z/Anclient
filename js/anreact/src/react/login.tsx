@@ -27,6 +27,9 @@ const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 });
 
 interface LoginProps extends Comprops {
+	/** Requried since Semantic.jserv 1.5.0 */
+	uri: string;
+
 	/** Providing a callback to handle login-ok event will override auto re-direction. */
 	onLogin?: OnLoginOk;
 	// onLogin: OnCommitOk;

@@ -299,7 +299,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 		  <Collapse in={this.state.expand}>
 			<GalleryView {... this.props}
 				ref={undefined} // suppress type error
-				uri={this.uri} media={this.props.media}
+				uri={this.uri} docuri={this.props.docuri} media={this.props.media}
 				cid={this.collect}
 				photos={node.children} // or fire a request to get photos?
 				lightbox={this.props.lightbox}
@@ -364,7 +364,6 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 		  </Grid>
 		</div>
 		);
-
 	}
 
 	/**
@@ -394,6 +393,13 @@ const TreeGallary = withStyles<any, any, TreeItemProps>(styles)(withWidth()(Tree
 
 interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
+
+	/**
+	 * @since 0.6.0 As TreeEditor implements TreeCard or TrreeGallary that handling photos,
+	 * so TreeEditor needs this filed.
+	 */
+	docuri?: string;
+
 	tier: StreeTier;
 
 	reload: boolean;
@@ -421,7 +427,10 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 	constructor(props: AnTreeditorProps) {
 		super(props);
-		// for debugging (in Chrome's spooky debug console)
+
+		if (!props.docuri)
+			throw Error("Since 0.6.0, TreeEditor requirs doc-uri, separate to func-uri, for loading media files.");
+
 		this.columns = props.columns;
 		console.log(this.columns);
 
@@ -560,6 +569,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 			  return (
 				ntype === TreeNodeVisual.gallery ?
 				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
+					docuri={that.props.docuri}
 					lightbox={that.props.lightbox}
 					key={tnode.id} tier={that.treetier as StreeTier}
 					tnode={tnode} media={media}

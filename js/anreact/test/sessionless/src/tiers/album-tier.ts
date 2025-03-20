@@ -4,7 +4,13 @@ import { Comprops, CrudComp, PhotoCollect, GalleryView, AlbumReq, AlbumResp
 
 export class AlbumTier extends StreeTier {
 	comp: CrudComp<Comprops>;
-	port: string = "album";
+	/**
+	 * Since 0.6.0 use jserv-album 0.7 for test, and sessionless tests are no-longer tested aginst sandbox
+	 * as docker is not working. Use portfolio-synode for test.
+	 * 
+	 * (This doc will be deprecated once sandbox is ported to Jetty.)
+	 */
+	port: string = "docoll";
 
 	page: PageInf;
 	collects?: PhotoCollect[];

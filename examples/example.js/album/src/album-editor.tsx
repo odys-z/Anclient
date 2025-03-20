@@ -4,14 +4,14 @@ import ReactDOM from 'react-dom';
 import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
+	AnContext, AnError, AnReactExt, JsonHosts, AnreactAppOptions,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { AlbumEditier } from './tiers/album-tier';
 import Typography from '@material-ui/core/Typography';
 
 type AlbumProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 
 	orgId: string;
@@ -141,7 +141,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
 			  <Admin
