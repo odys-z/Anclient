@@ -270,9 +270,6 @@ class TreegridApp extends React.Component<LessProps> {
 	}
 
 	viewFile = (ids: Map<string, AnTreeNode>) => {
-		// const pdfhead = (
-		// 	<script src="//mozilla.github.io/pdf.js/build/pdf.mjs"></script>
-		//   );
 		if (size(ids) > 0) {
 			let fid = ids.keys().next().value;
 			let file = ids.get(fid);
@@ -287,13 +284,6 @@ class TreegridApp extends React.Component<LessProps> {
 					} }
 					src={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: () => this.treetier.synuri})}
 				></PdfIframe>);
-
-				// this.pdfview = (<><Iframe
-				// 		head={() => pdfhead} styles={{height: '95vh', position: 'absolute', top: '2.5vh', width: '98vw', left: '1vh'}}
-				// 		url={GalleryView.imgSrcReq(file.id, "h_photos", {...this.treetier, docuri: ()=> this.treetier.synuri})}>
-				// 	</Iframe>
-				// 	{this.closeButton()}</>
-				// 	)
 			}
 			else {
 				this.pdfview = undefined;

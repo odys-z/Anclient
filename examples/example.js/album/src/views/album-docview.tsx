@@ -58,6 +58,8 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	constructor(props: AlbumDocProps | Readonly<AlbumDocProps>) {
 		super(props);
 
+		this.uri = '/album/sys';
+
 		this.error   = {onError: this.onError, msg: '', that: this};
 		this.docIcon = new DocIcon();
 
@@ -189,6 +191,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		    <AnTreegrid
 				pk={''} singleCheck
 				tier={this.tier}
+				uri={this.synuri}
 				columns={[
 				  { type: 'iconame', field: 'docname', label: L('File Name'),
 					grid: {xs: 6, sm: 6, md: 5} },
@@ -207,7 +210,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				tier={this.tier}
 				tnode={this.tier.root()} title={this.tier.albumTitle}
 				onSelectChange={() => undefined}
-				uri={this.uri}
+				uri={this.uri} docuri={this.synuri}
 				columns={[
 					{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
 					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },

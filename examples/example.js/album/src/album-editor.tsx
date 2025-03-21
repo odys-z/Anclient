@@ -44,6 +44,8 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	preview = (_col: any, rec: any) => {
 		return <></>;
 	};
+
+	synuri = '/album/syn';
 		
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
@@ -107,7 +109,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
 			onSelectChange={undefined}
-			uri={this.uri} mtabl='ind_emotion'
+			uri={this.uri} docuri={this.synuri}
 			columns={[
 				{ type: 'text', field: 'share', label: L('Share'),
 					grid: {xs: 6, sm: 6} },
