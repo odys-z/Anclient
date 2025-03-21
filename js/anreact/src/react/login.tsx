@@ -129,6 +129,11 @@ class LoginComp extends React.Component<LoginProps> {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
 
+			if (hosturl === undefined || hosturl.length <= 4) {
+				console.error(ctx.servs);
+				throw new Error(`No jserv-root configured for ${serv} in AnContext. Check private/host.json.`);
+			}
+
 			an.init(hosturl);
 			// an.login( uid, pwd, reload, {onError} );
 			an.loginWithUri(this.props.uri, uid, pwd, reload, {onError});

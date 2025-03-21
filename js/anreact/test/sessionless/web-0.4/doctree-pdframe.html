@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+  <title>Widgets - Treegrid</title>
+
+  <script crossorigin src="react.development.js"></script>
+  <script crossorigin src="react-dom.development.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+  <link rel="stylesheet" href="sessionless.css" >
+</head>
+
+<body>
+    <p>This widget must work with portfolio-synode:
+	  <a href='https://github.com/odys-z/semantic-jserv/releases/tag/portfolio-synode-0.7.0'>
+      portfolio synode 0.7.0</a>.</p>
+    <p>Quick Start</p>
+    <ol>
+      <li>download <a href='#'>
+        volume assets here</a>, extract date into the volume path set in WEB-INF/settings.json, e.g. ../vol;
+      </li>
+      <li>eidt dist/private/host.json, point jserv to web service in docker container. See github.json for example;</li>
+      <li>load this page with a web server, e.g. 'python3 -m http.server 8888';</li>
+      <li>start the synode with 'java -jar bin/jserv-album-0.7.0.jar, from where the released synode zip file unzipped.</li>
+    </ol>
+	  <p>See also
+      <a href='https://odys-z.github.io/Anclient/guide/controls/tree.html#test-antreeditor'>
+          AnTreeditor doc</a>for quick start, and
+      <a href='https://odys-z.github.io/Anclient/guide/controls/tree.html#controls_typeparser:'>
+          Example: doc type parser</a> for customizing cells.<br>
+      </p>
+    <p>Asset Credit: <a href='https://americainclass.org/sources/makingrevolution/rebellion/text7/text7.htm'>
+      7. Common Sense? REBELLION: 1775-1776, America in Classic</a>.
+    <div id="app"></div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script src="doctree-pdframe-1.1.1.min.js"></script>
+    <script>
+      let searchParams = new URLSearchParams(window.location.search)
+      let serv = searchParams ? searchParams.get('serv') : undefined;
+      less.TreegridApp.bindHtml('app', {
+          jsonUrl: 'http://localhost:8889/github.json',
+          serv: serv || 'album', Window, portal: '#'});
+    </script>
+    <hr>
+</body>
+</html>

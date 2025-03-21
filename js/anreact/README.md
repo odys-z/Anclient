@@ -1,22 +1,14 @@
 # About
 
-The ts client for semantic-jserv.
+The Typescript + React.js client for semantic-jserv.
 
-## Releast Notes
-
-Refactored:
+* Refactored:
 
 @anclient/react: React View + Jsample depending on @anclient/semantier,
 
 of which the protocol layer are actually different.
 
 # Buid & test
-
-- To build
-
-```
-	npm run build
-```
 
 - To test
 
@@ -26,6 +18,26 @@ of which the protocol layer are actually different.
 	npm run build
 	npm test
 ```
+
+- Testing Sessionless
+
+It's multiple React Applications for testing React Widgets included in @anclient/anreact.
+
+```
+    cd test/sessionless
+    webpack
+```
+
+The generated testing reaources are located in album-web-0.4, a folder renamed for testing with 
+Portfolio Synode/web service, which requires all resource located in a subfolder, *album-web-0.4*.
+
+Install Portfolio-synode,
+
+```
+    path-to-pytho-scripts/synode-start-web
+```
+
+Go to: http://localhost:8900/[testing-html].html
 
 ### Tip
 

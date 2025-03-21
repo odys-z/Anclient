@@ -212,8 +212,8 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				onSelectChange={() => undefined}
 				uri={this.uri} docuri={this.synuri}
 				columns={[
-					{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
-					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {sm: 4, md: 3} },
+					{ type: 'text',     field: 'docname',label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {xs: 4, sm: 4, md: 3} },
 					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
 					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
 					  thFormatter: this.switchDocMedias, formatter: ()=>{} }

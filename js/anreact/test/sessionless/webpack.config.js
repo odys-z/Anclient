@@ -11,7 +11,8 @@ module.exports = {
 	devtool: 'source-map',
 	entry: {// 'home': './src/less-app.tsx',
 			'widgets': './src/less-widgets.tsx',
-			'doctree': './src/less-widgets-treegrid.tsx',
+			'doctree-pdframe': './src/less-widgets-pdframe.tsx',
+			'doctree-pdfjs': './src/less-widgets-pdfjs.tsx',
 			'docview': './src/less-widgets-docview.tsx',
 			// 'sheet': './src/workbook/sheet-app.tsx'
 		},
@@ -32,7 +33,7 @@ module.exports = {
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-	  path: path.resolve(__dirname, 'dist'),
+	  path: path.resolve(__dirname, 'web-0.4'),
 	  library: 'less',
 	  libraryTarget: 'umd'
 	},
@@ -44,14 +45,6 @@ module.exports = {
 
 	resolve: {
 		extensions: ['.ts', '.js', '.jsx', '.tsx'],
-		// fallback: {
-		// 	"process": require.resolve('process/browser'),
-		// 	"stream": require.resolve("stream-browserify"),
-		// 	"crypto": require.resolve("crypto-browserify"),
-		// 	"buffer": require.resolve("buffer/"),
-		// 	"util": require.resolve("util/"),
-		// 	"vm": require.resolve("vm-browserify")
-		//  },
 	},
 
 	module: {

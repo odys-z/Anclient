@@ -10,10 +10,10 @@ export interface PdfIframeProps {
     close: (e: React.UIEvent) => void
 }
 
-export interface PdfObject {
-  getPage: (p: number) => Promise<{ getViewport: (ref: { scale: number; }) => any;
-  render : (ctx: { canvasContext: any; viewport: any; }) => void; }>;
-}
+// export interface PdfObject {
+//   getPage: (p: number) => Promise<{ getViewport: (ref: { scale: number; }) => any;
+//   render : (ctx: { canvasContext: any; viewport: any; }) => void; }>;
+// }
 
 /**
  */
