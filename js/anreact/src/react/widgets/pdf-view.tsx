@@ -39,27 +39,46 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
     // Create a script element
     const script = document.createElement('script');
     script.type = 'module';
-    // script.src = 'pdf.mjs';
-    // script.src = '//mozilla.github.io/pdf.js/build/pdf.mjs';
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
+    script.src = 'pdfjs-legacy/pdf.mjs';
+    // script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
+
     script.async = true;
+
+    let pdflink = this.props.src;
 
     // Run code after the script is loaded
     script.onload = () => {
-        console.log('pdf.js loaded!');
+      console.log('pdf.mjs loaded!');
 
-        var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+      // let url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+      let url = pdflink; //'private/CDSFL.pdf'; 
 
-        // Loaded via <script> tag, create shortcut to access PDF.js exports.
-        let { pdfjsLib } = globalThis as any;
-    
-        // The workerSrc property shall be specified.
-        // pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.mjs';
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+      // Loaded via <script> tag, create shortcut to access PDF.js exports.
+      let { pdfjsLib } = globalThis as any;
+  
+      // The workerSrc property shall be specified.
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-legacy/pdf.worker.mjs';
+      // pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
 
-        // Asynchronous download of PDF
-        var loadingTask = pdfjsLib.getDocument(url);
-        loadingTask.promise.then(function(pdf) {
+      let canvas = document.getElementById('pdf') as HTMLCanvasElement;
+      let context = canvas.getContext('2d');
+
+      interface PDFDocumentLoadingTask {
+        promise: Promise<PDFDocumentProxy>;
+      }
+
+      interface PDFDocumentProxy {
+        getPage: (pageNumber: number) => Promise<PDFPageProxy>;
+      }
+
+      interface PDFPageProxy {
+        getViewport: (options: { scale: number }) => { width: number; height: number };
+        render: (context: { canvasContext: CanvasRenderingContext2D; viewport: any }) => { promise: Promise<void> };
+      }
+
+      // Asynchronous download of PDF
+      let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(url) as PDFDocumentLoadingTask;
+      loadingTask.promise.then(function(pdf) {
         console.log('PDF loaded');
     
         // Fetch the first page
@@ -71,19 +90,20 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
             let viewport = page.getViewport({scale: scale});
     
             // Prepare canvas using PDF page dimensions
-            let canvas = document.getElementById('pdf') as HTMLCanvasElement;
-            let context = canvas.getContext('2d');
+            // let canvas = document.getElementById('pdf') as HTMLCanvasElement;
+            // let context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
     
             // Render PDF page into canvas context
             let renderContext = {
-            canvasContext: context,
-            viewport: viewport
+              canvasContext: context,
+              viewport: viewport
             };
+
             let renderTask = page.render(renderContext);
-            renderTask.promise.then(function () {
-            console.log('Page rendered');
+              renderTask.promise.then(function () {
+              console.log('Page rendered');
             });
         });
         }, function (reason) {
