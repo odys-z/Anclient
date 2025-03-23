@@ -1,6 +1,5 @@
 import React from 'react';
 import { Comprops, CrudCompW } from '../crud';
-import { GrabToPan } from '../../utils/grab_to_pan';
 
 // Using legacy. To do: install types
 interface PDFDocumentLoadingTask {
@@ -34,104 +33,25 @@ export interface PdfViewProps {
  */
 export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
 
-  uiConfig = {
+  config = {
     iconSize: 5,
   };
 
   state = {
     currentPage: 0,
+    // pdfRef: undefined,
 
-    // pageRendering: false,
+    pageRendering: false,
     pageNumPending: -1,
   }
 
-  viewConfig = {
-    currentPage: 0,
-
-    scale: 1.0,
-    touchDist: 0,
-
-    // script: HTMLScriptElement;
-    canvas: undefined as HTMLCanvasElement,
-    context: undefined,
-
-    pdfdoc: undefined,
-    page: undefined as PDFPageProxy
-  }
-
-
   constructor (props: PdfViewProps) {
     super(props);
-
-    let canvas = document.getElementById('pdf') as HTMLCanvasElement;
-    let context = canvas.getContext('2d');
-
-    this.viewConfig = {currentPage: 0, scale: 1.0, touchDist: 0, canvas, context, pdfdoc: undefined, page: undefined};
-
-    let that = this;
-    canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-
-      // updateZoom(scale);
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out/in
-      let scale = Math.max(0.1, Math.min(5, this.viewConfig.scale * zoomFactor)); // Clamp between 0.1 and 5
-      canvas.style.transform = `scale(${scale / that.viewConfig.scale})`;
-      // Re-render if scale deviates too far (e.g., every 0.5 step)
-      if (Math.abs(scale - that.viewConfig.scale) > 0.5) {
-        that.viewConfig.scale = scale;
-      }
-
-      that.renderpdf(that.viewConfig);
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length >= 2) {
-        e.preventDefault();
-        const touch1 = e.touches[0];
-        const touch2 = e.touches[1];
-        this.viewConfig.touchDist = Math.hypot(touch1.pageX - touch2.pageX, touch1.pageY - touch2.pageY);
-      }
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
-      let grab = new GrabToPan({element: canvas});
-      grab.onMouseMove(e);
-    });
-  }
-
-  renderpdf = (cfg: {
-    currentPage: number;
-    context: CanvasRenderingContext2D;
-    page: PDFPageProxy;
-    canvas: any;
-  }) => {
-
-    console.log('Page loaded');
-
-    let scale = 1.0;
-    let viewport = cfg.page.getViewport({scale: scale});
-
-    // Prepare canvas using PDF page dimensions
-    cfg.canvas.height = viewport.height;
-    cfg.canvas.width = viewport.width;
-
-    // Render PDF page into canvas context
-    let renderContext = {
-      canvasContext: cfg.context,
-      viewport
-    };
-
-    let renderTask = cfg.page.render(renderContext);
-      renderTask.promise.then(function () {
-      console.log('Page rendered');
-    });
   }
 
   componentDidMount() {
-    let that = this;
-
     // Create a script element
-    let script = document.createElement('script');
+    const script = document.createElement('script');
     script.type = 'module';
     script.src = 'pdfjs-legacy/pdf.mjs';
     // script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
@@ -154,19 +74,38 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-legacy/pdf.worker.mjs';
       // pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
 
+      let canvas = document.getElementById('pdf') as HTMLCanvasElement;
+      let context = canvas.getContext('2d');
 
       // Asynchronous download of PDF
       let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(url) as PDFDocumentLoadingTask;
       loadingTask.promise.then(function(pdf) {
-        console.log('PDF loaded', pdf);
-        
-        that.viewConfig.pdfdoc = pdf;
-
+        console.log('PDF loaded');
+    
         // Fetch the first page
         let pageNumber = 1;
         pdf.getPage(pageNumber).then(function(page) {
-          that.viewConfig.page = page;
-          that.renderpdf(that.viewConfig);
+          console.log('Page loaded');
+  
+          let scale = 1.5;
+          let viewport = page.getViewport({scale: scale});
+  
+          // Prepare canvas using PDF page dimensions
+          // let canvas = document.getElementById('pdf') as HTMLCanvasElement;
+          // let context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+  
+          // Render PDF page into canvas context
+          let renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+
+          let renderTask = page.render(renderContext);
+            renderTask.promise.then(function () {
+            console.log('Page rendered');
+          });
         });
         }, function (reason) {
           // PDF loading error
@@ -193,6 +132,59 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
     // }
   }
 
+  /**
+   * If another page rendering in progress, waits until the rendering is
+   * finished. Otherwise, executes rendering immediately.
+   */
+  // queueRenderPage(num) {
+  //   if (this.state.pageRendering) {
+  //     this.setState({pageNumPending: num});
+  //   } else {
+  //     this.renderPage(this.state.pdfRef, this.canvasRef, num);
+  //   }
+  // }
+
+  // prevpage() {
+  //   if (this.state.currentPage <= 1)
+  //     return;
+  //   this.state.currentPage--;
+  //   this.queueRenderPage(this.state.currentPage);
+  // }
+
+  // nextpage() {
+  //     if (this.state.currentPage >= this.state.pdfRef.numPages)
+  //       return;
+  //     this.state.currentPage++;
+  //     this.queueRenderPage(this.state.currentPage);
+
+  // }
+
+  // renderPage = (pdf: PdfObject, canvas: HTMLCanvasElement, pageNum: number) => {
+  //   pdf.getPage(pageNum).then(
+  //     (page: {
+  //       getViewport: (arg0: { scale: number; }) => any;
+  //       render: (arg0: { canvasContext: any; viewport: any; }) => void; }) => {
+  //         let viewport = page.getViewport({scale: 1.00});
+
+  //         const outputScale = window.devicePixelRatio || 1;
+  //         canvas.width  = Math.floor(viewport.width * outputScale);
+  //         canvas.height = Math.floor(viewport.height * outputScale);
+  //         canvas.style.width  = Math.floor(viewport.width) + "px";
+  //         canvas.style.height =  Math.floor(viewport.height) + "px";
+
+  //         let transform = outputScale !== 1
+  //               ? [outputScale, 0, 0, outputScale, 0, 0]
+  //               : null;
+
+  //         const renderContext = {
+  //             canvasContext: canvas.getContext('2d'),
+  //             viewport: viewport,
+  //             transform
+  //         };
+  //         page.render(renderContext);
+  //   } );
+  // }
+
   render() {
     return (<div
     style={{
@@ -202,6 +194,8 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
       height: '100%', width: '100%',
       backgroundColor: 'rgba(0,0,0,1)'
     }}>
+      {/* <script src={this.props.pdfjs || '//mozilla.github.io/pdf.js/build/pdf.mjs'}></script> */}
+          {/* styles={{height: '100%', position: 'absolute', top: '0', width: '100%', left: '0'}} url={this.props.src}/> */}
       <canvas id="pdf"/>
       <div style={{
           background: '#cacaca77',
@@ -209,7 +203,7 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
           top: '0px', right: '0px',
           padding: '10px', cursor: 'pointer',
           color: '#FFFFFF',
-          fontSize: `${this.uiConfig.iconSize * 0.8}px`
+          fontSize: `${this.config.iconSize * 0.8}px`
         }}
         onClick={this.props.close}>
         <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#FFFFFF">
