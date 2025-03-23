@@ -18,6 +18,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
+    "compression-webpack-plugin": "^11.1.0",
     "webpack": "^5.98.0"
   }
 }

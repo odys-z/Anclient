@@ -1,5 +1,24 @@
 import { assert } from 'chai'
 import * as jwt from 'jsonwebtoken';
+/**
+ * e.g.
+ export const only_payload = {
+    "document": {
+        "fileType": "doc",
+        "key": "unique-key-" + new Date().getTime(), // Unique key for each session
+        "title": "Sample Document",
+        // "url": "http://ieee802.org:80/secmail/docIZSEwEqHFr.doc"
+        "url": "doc-res.docx"
+    },
+    "documentType": "word", // Can be "word", "cell" (spreadsheet), or "slide" (presentation)
+    "editorConfig": {
+        "mode": "view", // "view" for read-only, "edit" for editing
+        // "callbackUrl": "http://localhost:3000/save" // Where changes are sent (optional)
+    },
+    "height": "100%",
+    "width": "100%",
+  };
+ */
 import { config_docx } from './sessionless/src/ext/doc-res-config.mjs';
 
 describe('case: [04.1 JWT Token]', () => {

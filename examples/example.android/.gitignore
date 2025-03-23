@@ -17,3 +17,4 @@ target
 local.properties
 *.log
 **/product.xml
+temp
