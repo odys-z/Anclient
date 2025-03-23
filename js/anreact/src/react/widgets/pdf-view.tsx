@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Comprops, CrudCompW } from '../crud';
 
@@ -31,11 +30,6 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
     pageRendering: false,
     pageNumPending: -1,
   }
-
-//   canvasRef: HTMLCanvasElement;
-//   pdfjsLib: {
-//       getDocument(src: string): unknown; GlobalWorkerOptions: { workerSrc: string } 
-//   };
 
   constructor (props: PdfViewProps) {
     super(props);
