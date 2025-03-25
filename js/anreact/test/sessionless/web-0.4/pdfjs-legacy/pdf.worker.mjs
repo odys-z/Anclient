@@ -3659,10 +3659,10 @@ var SHARED = '__core-js_shared__';
 var store = module.exports = globalThis[SHARED] || defineGlobalProperty(SHARED, {});
 
 (store.versions || (store.versions = [])).push({
-  version: '3.40.0',
+  version: '3.41.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2025 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.40.0/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.41.0/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -5500,6 +5500,12 @@ const OPS = {
   setStrokeTransparent: 92,
   setFillTransparent: 93
 };
+const DrawOPS = {
+  moveTo: 0,
+  lineTo: 1,
+  curveTo: 2,
+  closePath: 3
+};
 const PasswordResponses = {
   NEED_PASSWORD: 1,
   INCORRECT_PASSWORD: 2
@@ -5713,50 +5719,6 @@ const hexNumbers = Array.from(Array(256).keys(), n => n.toString(16).padStart(2,
 class Util {
   static makeHexColor(r, g, b) {
     return `#${hexNumbers[r]}${hexNumbers[g]}${hexNumbers[b]}`;
-  }
-  static scaleMinMax(transform, minMax) {
-    let temp;
-    if (transform[0]) {
-      if (transform[0] < 0) {
-        temp = minMax[0];
-        minMax[0] = minMax[2];
-        minMax[2] = temp;
-      }
-      minMax[0] *= transform[0];
-      minMax[2] *= transform[0];
-      if (transform[3] < 0) {
-        temp = minMax[1];
-        minMax[1] = minMax[3];
-        minMax[3] = temp;
-      }
-      minMax[1] *= transform[3];
-      minMax[3] *= transform[3];
-    } else {
-      temp = minMax[0];
-      minMax[0] = minMax[1];
-      minMax[1] = temp;
-      temp = minMax[2];
-      minMax[2] = minMax[3];
-      minMax[3] = temp;
-      if (transform[1] < 0) {
-        temp = minMax[1];
-        minMax[1] = minMax[3];
-        minMax[3] = temp;
-      }
-      minMax[1] *= transform[1];
-      minMax[3] *= transform[1];
-      if (transform[2] < 0) {
-        temp = minMax[0];
-        minMax[0] = minMax[2];
-        minMax[2] = temp;
-      }
-      minMax[0] *= transform[2];
-      minMax[2] *= transform[2];
-    }
-    minMax[0] += transform[4];
-    minMax[1] += transform[5];
-    minMax[2] += transform[4];
-    minMax[3] += transform[5];
   }
   static transform(m1, m2) {
     return [m1[0] * m2[0] + m1[2] * m2[1], m1[1] * m2[0] + m1[3] * m2[1], m1[0] * m2[2] + m1[2] * m2[3], m1[1] * m2[2] + m1[3] * m2[3], m1[0] * m2[4] + m1[2] * m2[5] + m1[4], m1[1] * m2[4] + m1[3] * m2[5] + m1[5]];
@@ -6015,6 +5977,28 @@ function fromBase64Util(str) {
     return Uint8Array.fromBase64(str);
   }
   return stringToBytes(atob(str));
+}
+if (typeof AbortSignal.any !== "function") {
+  AbortSignal.any = function (iterable) {
+    const ac = new AbortController();
+    const {
+      signal
+    } = ac;
+    for (const s of iterable) {
+      if (s.aborted) {
+        ac.abort(s.reason);
+        return signal;
+      }
+    }
+    for (const s of iterable) {
+      s.addEventListener("abort", () => {
+        ac.abort(s.reason);
+      }, {
+        signal
+      });
+    }
+    return signal;
+  };
 }
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.iterator.every.js
@@ -7801,6 +7785,13 @@ class LabCS extends ColorSpace {
 
 
 
+function fetchSync(url) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", url, false);
+  xhr.responseType = "arraybuffer";
+  xhr.send(null);
+  return xhr.response;
+}
 class IccColorSpace extends ColorSpace {
   #transformer;
   #convertPixel;
@@ -7874,40 +7865,43 @@ class IccColorSpace extends ColorSpace {
   static get isUsable() {
     let isUsable = false;
     if (this.#useWasm) {
-      try {
-        this._module = QCMS._module = this.#load();
-        isUsable = !!this._module;
-      } catch (e) {
-        warn(`ICCBased color space: "${e}".`);
+      if (this.#wasmUrl) {
+        try {
+          this._module = QCMS._module = initSync({
+            module: fetchSync(`${this.#wasmUrl}qcms_bg.wasm`)
+          });
+          isUsable = !!this._module;
+        } catch (e) {
+          warn(`ICCBased color space: "${e}".`);
+        }
+      } else {
+        warn("No ICC color space support due to missing `wasmUrl` API option");
       }
     }
     return shadow(this, "isUsable", isUsable);
-  }
-  static #load() {
-    const filename = "qcms_bg.wasm";
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", `${this.#wasmUrl}${filename}`, false);
-    xhr.responseType = "arraybuffer";
-    xhr.send(null);
-    return initSync({
-      module: xhr.response
-    });
   }
 }
 class CmykICCBasedCS extends IccColorSpace {
   static #iccUrl;
   constructor() {
-    const filename = "CGATS001Compat-v2-micro.icc";
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", `${CmykICCBasedCS.#iccUrl}${filename}`, false);
-    xhr.responseType = "arraybuffer";
-    xhr.send(null);
-    super(new Uint8Array(xhr.response), "DeviceCMYK", 4);
+    const iccProfile = new Uint8Array(fetchSync(`${CmykICCBasedCS.#iccUrl}CGATS001Compat-v2-micro.icc`));
+    super(iccProfile, "DeviceCMYK", 4);
   }
   static setOptions({
     iccUrl
   }) {
     this.#iccUrl = iccUrl;
+  }
+  static get isUsable() {
+    let isUsable = false;
+    if (IccColorSpace.isUsable) {
+      if (this.#iccUrl) {
+        isUsable = true;
+      } else {
+        warn("No CMYK ICC profile support due to missing `iccUrl` API option");
+      }
+    }
+    return shadow(this, "isUsable", isUsable);
   }
 }
 
@@ -9299,7 +9293,7 @@ class ColorSpaceUtils {
     return shadow(this, "rgba", new DeviceRgbaCS());
   }
   static get cmyk() {
-    if (IccColorSpace.isUsable) {
+    if (CmykICCBasedCS.isUsable) {
       try {
         return shadow(this, "cmyk", new CmykICCBasedCS());
       } catch {
@@ -9311,6 +9305,7 @@ class ColorSpaceUtils {
 }
 
 ;// ./src/core/jpg.js
+
 
 
 
@@ -10377,6 +10372,11 @@ class JpegImage {
   }
   _convertCmykToRgba(data) {
     ColorSpaceUtils.cmyk.getRgbBuffer(data, 0, data.length / 4, data, 0, 8, 1);
+    if (ColorSpaceUtils.cmyk instanceof DeviceCmykCS) {
+      for (let i = 3, ii = data.length; i < ii; i += 4) {
+        data[i] = 255;
+      }
+    }
     return data;
   }
   getData({
@@ -23792,6 +23792,7 @@ const getSupplementalGlyphMapForCalibri = getLookupTableFactory(function (t) {
   t[896] = 91;
   t[897] = 93;
   t[923] = 64;
+  t[940] = 163;
   t[1004] = 48;
   t[1005] = 49;
   t[1006] = 50;
@@ -34362,11 +34363,6 @@ function findUnequal(arr, start, value) {
   }
   return j;
 }
-function setValues(arr, start, end, value) {
-  for (let j = start; j < end; ++j) {
-    arr[j] = value;
-  }
-}
 function reverseValues(arr, start, end) {
   for (let i = start, j = end - 1; i < j; ++i, --j) {
     const temp = arr[i];
@@ -34520,7 +34516,7 @@ function bidi(str, startLevel = -1, vertical = false) {
         after = "R";
       }
       if (before === after) {
-        setValues(types, i, end, before);
+        types.fill(before, i, end);
       }
       i = end - 1;
     }
@@ -35481,6 +35477,12 @@ class OperatorList {
           const arg = argsArray[i][0];
           if (!arg.cached && arg.data?.buffer instanceof ArrayBuffer) {
             transfers.push(arg.data.buffer);
+          }
+          break;
+        case OPS.constructPath:
+          const [, [data], minMax] = argsArray[i];
+          if (data) {
+            transfers.push(data.buffer, minMax.buffer);
           }
           break;
       }
@@ -36968,7 +36970,9 @@ class PartialEvaluator {
       }
       smaskOptions.transferMap = transferMap;
     }
-    return this.buildFormXObject(resources, smaskContent, smaskOptions, operatorList, task, stateManager.state.clone(), localColorSpaceCache);
+    return this.buildFormXObject(resources, smaskContent, smaskOptions, operatorList, task, stateManager.state.clone({
+      newPath: true
+    }), localColorSpaceCache);
   }
   handleTransferFunction(tr) {
     let transferArray;
@@ -37276,57 +37280,89 @@ class PartialEvaluator {
     });
     return promise;
   }
-  buildPath(operatorList, fn, args, parsingText = false) {
-    const lastIndex = operatorList.length - 1;
-    if (!args) {
-      args = [];
-    }
-    if (lastIndex < 0 || operatorList.fnArray[lastIndex] !== OPS.constructPath) {
-      if (parsingText) {
-        warn(`Encountered path operator "${fn}" inside of a text object.`);
-        operatorList.addOp(OPS.save, null);
-      }
-      let minMax;
-      switch (fn) {
-        case OPS.rectangle:
-          const x = args[0] + args[2];
-          const y = args[1] + args[3];
-          minMax = [Math.min(args[0], x), Math.min(args[1], y), Math.max(args[0], x), Math.max(args[1], y)];
+  buildPath(fn, args, state) {
+    const {
+      pathMinMax: minMax,
+      pathBuffer
+    } = state;
+    switch (fn | 0) {
+      case OPS.rectangle:
+        {
+          const x = state.currentPointX = args[0];
+          const y = state.currentPointY = args[1];
+          const width = args[2];
+          const height = args[3];
+          const xw = x + width;
+          const yh = y + height;
+          if (width === 0 || height === 0) {
+            pathBuffer.push(DrawOPS.moveTo, x, y, DrawOPS.lineTo, xw, yh, DrawOPS.closePath);
+          } else {
+            pathBuffer.push(DrawOPS.moveTo, x, y, DrawOPS.lineTo, xw, y, DrawOPS.lineTo, xw, yh, DrawOPS.lineTo, x, yh, DrawOPS.closePath);
+          }
+          minMax[0] = Math.min(minMax[0], x, xw);
+          minMax[1] = Math.min(minMax[1], y, yh);
+          minMax[2] = Math.max(minMax[2], x, xw);
+          minMax[3] = Math.max(minMax[3], y, yh);
           break;
-        case OPS.moveTo:
-        case OPS.lineTo:
-          minMax = [args[0], args[1], args[0], args[1]];
+        }
+      case OPS.moveTo:
+        {
+          const x = state.currentPointX = args[0];
+          const y = state.currentPointY = args[1];
+          pathBuffer.push(DrawOPS.moveTo, x, y);
+          minMax[0] = Math.min(minMax[0], x);
+          minMax[1] = Math.min(minMax[1], y);
+          minMax[2] = Math.max(minMax[2], x);
+          minMax[3] = Math.max(minMax[3], y);
           break;
-        default:
-          minMax = [Infinity, Infinity, -Infinity, -Infinity];
+        }
+      case OPS.lineTo:
+        {
+          const x = state.currentPointX = args[0];
+          const y = state.currentPointY = args[1];
+          pathBuffer.push(DrawOPS.lineTo, x, y);
+          minMax[0] = Math.min(minMax[0], x);
+          minMax[1] = Math.min(minMax[1], y);
+          minMax[2] = Math.max(minMax[2], x);
+          minMax[3] = Math.max(minMax[3], y);
           break;
-      }
-      operatorList.addOp(OPS.constructPath, [[fn], args, minMax]);
-      if (parsingText) {
-        operatorList.addOp(OPS.restore, null);
-      }
-    } else {
-      const opArgs = operatorList.argsArray[lastIndex];
-      opArgs[0].push(fn);
-      opArgs[1].push(...args);
-      const minMax = opArgs[2];
-      switch (fn) {
-        case OPS.rectangle:
-          const x = args[0] + args[2];
-          const y = args[1] + args[3];
-          minMax[0] = Math.min(minMax[0], args[0], x);
-          minMax[1] = Math.min(minMax[1], args[1], y);
-          minMax[2] = Math.max(minMax[2], args[0], x);
-          minMax[3] = Math.max(minMax[3], args[1], y);
+        }
+      case OPS.curveTo:
+        {
+          const startX = state.currentPointX;
+          const startY = state.currentPointY;
+          const [x1, y1, x2, y2, x, y] = args;
+          state.currentPointX = x;
+          state.currentPointY = y;
+          pathBuffer.push(DrawOPS.curveTo, x1, y1, x2, y2, x, y);
+          Util.bezierBoundingBox(startX, startY, x1, y1, x2, y2, x, y, minMax);
           break;
-        case OPS.moveTo:
-        case OPS.lineTo:
-          minMax[0] = Math.min(minMax[0], args[0]);
-          minMax[1] = Math.min(minMax[1], args[1]);
-          minMax[2] = Math.max(minMax[2], args[0]);
-          minMax[3] = Math.max(minMax[3], args[1]);
+        }
+      case OPS.curveTo2:
+        {
+          const startX = state.currentPointX;
+          const startY = state.currentPointY;
+          const [x1, y1, x, y] = args;
+          state.currentPointX = x;
+          state.currentPointY = y;
+          pathBuffer.push(DrawOPS.curveTo, startX, startY, x1, y1, x, y);
+          Util.bezierBoundingBox(startX, startY, startX, startY, x1, y1, x, y, minMax);
           break;
-      }
+        }
+      case OPS.curveTo3:
+        {
+          const startX = state.currentPointX;
+          const startY = state.currentPointY;
+          const [x1, y1, x, y] = args;
+          state.currentPointX = x;
+          state.currentPointY = y;
+          pathBuffer.push(DrawOPS.curveTo, x1, y1, x, y, x, y);
+          Util.bezierBoundingBox(startX, startY, x1, y1, x, y, x, y, minMax);
+          break;
+        }
+      case OPS.closePath:
+        pathBuffer.push(DrawOPS.closePath);
+        break;
     }
   }
   _getColorSpace(cs, resources, localColorSpaceCache) {
@@ -37532,7 +37568,6 @@ class PartialEvaluator {
     }
     const self = this;
     const xref = this.xref;
-    let parsingText = false;
     const localImageCache = new LocalImageCache();
     const localColorSpaceCache = new LocalColorSpaceCache();
     const localGStateCache = new LocalGStateCache();
@@ -37611,7 +37646,9 @@ class PartialEvaluator {
               }
               if (type.name === "Form") {
                 stateManager.save();
-                self.buildFormXObject(resources, xobj, null, operatorList, task, stateManager.state.clone(), localColorSpaceCache).then(function () {
+                self.buildFormXObject(resources, xobj, null, operatorList, task, stateManager.state.clone({
+                  newPath: true
+                }), localColorSpaceCache).then(function () {
                   stateManager.restore();
                   resolveXObject();
                 }, rejectXObject);
@@ -37650,12 +37687,6 @@ class PartialEvaluator {
               operatorList.addOp(OPS.setFont, [loadedName, fontSize]);
             }));
             return;
-          case OPS.beginText:
-            parsingText = true;
-            break;
-          case OPS.endText:
-            parsingText = false;
-            break;
           case OPS.endInlineImage:
             const cacheKey = args[0].cacheKey;
             if (cacheKey) {
@@ -37919,8 +37950,36 @@ class PartialEvaluator {
           case OPS.curveTo3:
           case OPS.closePath:
           case OPS.rectangle:
-            self.buildPath(operatorList, fn, args, parsingText);
+            self.buildPath(fn, args, stateManager.state);
             continue;
+          case OPS.stroke:
+          case OPS.closeStroke:
+          case OPS.fill:
+          case OPS.eoFill:
+          case OPS.fillStroke:
+          case OPS.eoFillStroke:
+          case OPS.closeFillStroke:
+          case OPS.closeEOFillStroke:
+          case OPS.endPath:
+            {
+              const {
+                state: {
+                  pathBuffer,
+                  pathMinMax
+                }
+              } = stateManager;
+              if (fn === OPS.closeStroke || fn === OPS.closeFillStroke || fn === OPS.closeEOFillStroke) {
+                pathBuffer.push(DrawOPS.closePath);
+              }
+              if (pathBuffer.length === 0) {
+                operatorList.addOp(OPS.constructPath, [fn, [null], null]);
+              } else {
+                operatorList.addOp(OPS.constructPath, [fn, [new Float32Array(pathBuffer)], pathMinMax.slice()]);
+                pathBuffer.length = 0;
+                pathMinMax.set([Infinity, Infinity, -Infinity, -Infinity], 0);
+              }
+              continue;
+            }
           case OPS.markPoint:
           case OPS.markPointProps:
           case OPS.beginCompat:
@@ -39877,6 +39936,9 @@ class EvalState {
     this._fillColorSpace = this._strokeColorSpace = ColorSpaceUtils.gray;
     this.patternFillColorSpace = null;
     this.patternStrokeColorSpace = null;
+    this.currentPointX = this.currentPointY = 0;
+    this.pathMinMax = new Float32Array([Infinity, Infinity, -Infinity, -Infinity]);
+    this.pathBuffer = [];
   }
   get fillColorSpace() {
     return this._fillColorSpace;
@@ -39890,8 +39952,15 @@ class EvalState {
   set strokeColorSpace(colorSpace) {
     this._strokeColorSpace = this.patternStrokeColorSpace = colorSpace;
   }
-  clone() {
-    return Object.create(this);
+  clone({
+    newPath = false
+  } = {}) {
+    const clone = Object.create(this);
+    if (newPath) {
+      clone.pathBuffer = [];
+      clone.pathMinMax = new Float32Array([Infinity, Infinity, -Infinity, -Infinity]);
+    }
+    return clone;
   }
 }
 class EvaluatorPreprocessor {
@@ -44044,7 +44113,7 @@ function getRatio(data) {
       den: 1
     };
   }
-  const ratio = data.trim().split(/\s*:\s*/).map(x => parseFloat(x)).filter(x => !isNaN(x));
+  const ratio = data.split(":", 2).map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
   if (ratio.length === 1) {
     ratio.push(1);
   }
@@ -44078,7 +44147,7 @@ function getColor(data, def = [0, 0, 0]) {
       b
     };
   }
-  const color = data.trim().split(/\s*,\s*/).map(c => MathClamp(parseInt(c.trim(), 10), 0, 255)).map(c => isNaN(c) ? 0 : c);
+  const color = data.split(",", 3).map(c => MathClamp(parseInt(c.trim(), 10), 0, 255)).map(c => isNaN(c) ? 0 : c);
   if (color.length < 3) {
     return {
       r,
@@ -44103,7 +44172,7 @@ function getBBox(data) {
       height: def
     };
   }
-  const bbox = data.trim().split(/\s*,\s*/).map(m => getMeasurement(m, "-1"));
+  const bbox = data.split(",", 4).map(m => getMeasurement(m.trim(), "-1"));
   if (bbox.length < 4 || bbox[2] < 0 || bbox[3] < 0) {
     return {
       x: def,
@@ -52457,7 +52526,7 @@ class Range extends ContentObject {
     super(CONFIG_NS_ID, "range");
   }
   [$finalize]() {
-    this[$content] = this[$content].trim().split(/\s*,\s*/, 2).map(range => range.split("-").map(x => parseInt(x.trim(), 10))).filter(range => range.every(x => !isNaN(x))).map(range => {
+    this[$content] = this[$content].split(",", 2).map(range => range.split("-").map(x => parseInt(x.trim(), 10))).filter(range => range.every(x => !isNaN(x))).map(range => {
       if (range.length === 1) {
         range.push(range[0]);
       }
@@ -52693,7 +52762,7 @@ class Window extends ContentObject {
     super(CONFIG_NS_ID, "window");
   }
   [$finalize]() {
-    const pair = this[$content].trim().split(/\s*,\s*/, 2).map(x => parseInt(x, 10));
+    const pair = this[$content].split(",", 2).map(x => parseInt(x.trim(), 10));
     if (pair.some(x => isNaN(x))) {
       this[$content] = [0, 0];
       return;
@@ -53759,7 +53828,7 @@ function checkStyle(node) {
   if (!node.style) {
     return "";
   }
-  return node.style.trim().split(/\s*;\s*/).filter(s => !!s).map(s => s.split(/\s*:\s*/, 2)).filter(([key, value]) => {
+  return node.style.split(";").filter(s => !!s.trim()).map(s => s.split(":", 2).map(t => t.trim())).filter(([key, value]) => {
     if (key === "font-family") {
       node[$globalData].usedTypefaces.add(value);
     }
@@ -60397,16 +60466,15 @@ class Page {
     }
     throw reason;
   }
-  getContentStream() {
-    return this.pdfManager.ensure(this, "content").then(content => {
-      if (content instanceof BaseStream) {
-        return content;
-      }
-      if (Array.isArray(content)) {
-        return new StreamsSequenceStream(content, this._onSubStreamError.bind(this));
-      }
-      return new NullStream();
-    });
+  async getContentStream() {
+    const content = await this.pdfManager.ensure(this, "content");
+    if (content instanceof BaseStream) {
+      return content;
+    }
+    if (Array.isArray(content)) {
+      return new StreamsSequenceStream(content, this._onSubStreamError.bind(this));
+    }
+    return new NullStream();
   }
   get xfaData() {
     return shadow(this, "xfaData", this.xfaFactory ? {
@@ -60487,7 +60555,7 @@ class Page {
       });
     }
   }
-  save(handler, task, annotationStorage, changes) {
+  async save(handler, task, annotationStorage, changes) {
     const partialEvaluator = new PartialEvaluator({
       xref: this.xref,
       handler,
@@ -60501,25 +60569,22 @@ class Page {
       systemFontCache: this.systemFontCache,
       options: this.evaluatorOptions
     });
-    return this._parsedAnnotations.then(function (annotations) {
-      const promises = [];
-      for (const annotation of annotations) {
-        promises.push(annotation.save(partialEvaluator, task, annotationStorage, changes).catch(function (reason) {
-          warn("save - ignoring annotation data during " + `"${task.name}" task: "${reason}".`);
-          return null;
-        }));
-      }
-      return Promise.all(promises);
-    });
+    const annotations = await this._parsedAnnotations;
+    const promises = [];
+    for (const annotation of annotations) {
+      promises.push(annotation.save(partialEvaluator, task, annotationStorage, changes).catch(function (reason) {
+        warn("save - ignoring annotation data during " + `"${task.name}" task: "${reason}".`);
+        return null;
+      }));
+    }
+    return Promise.all(promises);
   }
-  loadResources(keys) {
-    this.resourcesPromise ||= this.pdfManager.ensure(this, "resources");
-    return this.resourcesPromise.then(() => {
-      const objectLoader = new ObjectLoader(this.resources, keys, this.xref);
-      return objectLoader.load();
-    });
+  async loadResources(keys) {
+    await (this.resourcesPromise ??= this.pdfManager.ensure(this, "resources"));
+    const objectLoader = new ObjectLoader(this.resources, keys, this.xref);
+    await objectLoader.load();
   }
-  getOperatorList({
+  async getOperatorList({
     handler,
     sink,
     task,
@@ -60584,81 +60649,80 @@ class Page {
         return AnnotationFactory.printNewAnnotations(annotationGlobals, partialEvaluator, task, newAnnots, imagePromises);
       });
     }
-    const pageListPromise = Promise.all([contentStreamPromise, resourcesPromise]).then(([contentStream]) => {
+    const pageListPromise = Promise.all([contentStreamPromise, resourcesPromise]).then(async ([contentStream]) => {
       const opList = new OperatorList(intent, sink);
       handler.send("StartRenderPage", {
         transparency: partialEvaluator.hasBlendModes(this.resources, this.nonBlendModesSet),
         pageIndex: this.pageIndex,
         cacheKey
       });
-      return partialEvaluator.getOperatorList({
+      await partialEvaluator.getOperatorList({
         stream: contentStream,
         task,
         resources: this.resources,
         operatorList: opList
-      }).then(() => opList);
+      });
+      return opList;
     });
-    return Promise.all([pageListPromise, this._parsedAnnotations, newAnnotationsPromise]).then(function ([pageOpList, annotations, newAnnotations]) {
-      if (newAnnotations) {
-        annotations = annotations.filter(a => !(a.ref && deletedAnnotations.has(a.ref)));
-        for (let i = 0, ii = newAnnotations.length; i < ii; i++) {
-          const newAnnotation = newAnnotations[i];
-          if (newAnnotation.refToReplace) {
-            const j = annotations.findIndex(a => a.ref && isRefsEqual(a.ref, newAnnotation.refToReplace));
-            if (j >= 0) {
-              annotations.splice(j, 1, newAnnotation);
-              newAnnotations.splice(i--, 1);
-              ii--;
-            }
+    let [pageOpList, annotations, newAnnotations] = await Promise.all([pageListPromise, this._parsedAnnotations, newAnnotationsPromise]);
+    if (newAnnotations) {
+      annotations = annotations.filter(a => !(a.ref && deletedAnnotations.has(a.ref)));
+      for (let i = 0, ii = newAnnotations.length; i < ii; i++) {
+        const newAnnotation = newAnnotations[i];
+        if (newAnnotation.refToReplace) {
+          const j = annotations.findIndex(a => a.ref && isRefsEqual(a.ref, newAnnotation.refToReplace));
+          if (j >= 0) {
+            annotations.splice(j, 1, newAnnotation);
+            newAnnotations.splice(i--, 1);
+            ii--;
           }
         }
-        annotations = annotations.concat(newAnnotations);
       }
-      if (annotations.length === 0 || intent & RenderingIntentFlag.ANNOTATIONS_DISABLE) {
-        pageOpList.flush(true);
-        return {
-          length: pageOpList.totalLength
-        };
+      annotations = annotations.concat(newAnnotations);
+    }
+    if (annotations.length === 0 || intent & RenderingIntentFlag.ANNOTATIONS_DISABLE) {
+      pageOpList.flush(true);
+      return {
+        length: pageOpList.totalLength
+      };
+    }
+    const renderForms = !!(intent & RenderingIntentFlag.ANNOTATIONS_FORMS),
+      isEditing = !!(intent & RenderingIntentFlag.IS_EDITING),
+      intentAny = !!(intent & RenderingIntentFlag.ANY),
+      intentDisplay = !!(intent & RenderingIntentFlag.DISPLAY),
+      intentPrint = !!(intent & RenderingIntentFlag.PRINT);
+    const opListPromises = [];
+    for (const annotation of annotations) {
+      if (intentAny || intentDisplay && annotation.mustBeViewed(annotationStorage, renderForms) && annotation.mustBeViewedWhenEditing(isEditing, modifiedIds) || intentPrint && annotation.mustBePrinted(annotationStorage)) {
+        opListPromises.push(annotation.getOperatorList(partialEvaluator, task, intent, annotationStorage).catch(function (reason) {
+          warn("getOperatorList - ignoring annotation data during " + `"${task.name}" task: "${reason}".`);
+          return {
+            opList: null,
+            separateForm: false,
+            separateCanvas: false
+          };
+        }));
       }
-      const renderForms = !!(intent & RenderingIntentFlag.ANNOTATIONS_FORMS),
-        isEditing = !!(intent & RenderingIntentFlag.IS_EDITING),
-        intentAny = !!(intent & RenderingIntentFlag.ANY),
-        intentDisplay = !!(intent & RenderingIntentFlag.DISPLAY),
-        intentPrint = !!(intent & RenderingIntentFlag.PRINT);
-      const opListPromises = [];
-      for (const annotation of annotations) {
-        if (intentAny || intentDisplay && annotation.mustBeViewed(annotationStorage, renderForms) && annotation.mustBeViewedWhenEditing(isEditing, modifiedIds) || intentPrint && annotation.mustBePrinted(annotationStorage)) {
-          opListPromises.push(annotation.getOperatorList(partialEvaluator, task, intent, annotationStorage).catch(function (reason) {
-            warn("getOperatorList - ignoring annotation data during " + `"${task.name}" task: "${reason}".`);
-            return {
-              opList: null,
-              separateForm: false,
-              separateCanvas: false
-            };
-          }));
-        }
-      }
-      return Promise.all(opListPromises).then(function (opLists) {
-        let form = false,
-          canvas = false;
-        for (const {
-          opList,
-          separateForm,
-          separateCanvas
-        } of opLists) {
-          pageOpList.addOpList(opList);
-          form ||= separateForm;
-          canvas ||= separateCanvas;
-        }
-        pageOpList.flush(true, {
-          form,
-          canvas
-        });
-        return {
-          length: pageOpList.totalLength
-        };
-      });
+    }
+    const opLists = await Promise.all(opListPromises);
+    let form = false,
+      canvas = false;
+    for (const {
+      opList,
+      separateForm,
+      separateCanvas
+    } of opLists) {
+      pageOpList.addOpList(opList);
+      form ||= separateForm;
+      canvas ||= separateCanvas;
+    }
+    pageOpList.flush(true, {
+      form,
+      canvas
     });
+    return {
+      length: pageOpList.totalLength
+    };
   }
   async extractTextContent({
     handler,
@@ -62346,26 +62410,23 @@ function writeInt(number, size, offset, buffer) {
   return offset + size;
 }
 function writeString(string, offset, buffer) {
-  for (let i = 0, len = string.length; i < len; i++) {
+  const ii = string.length;
+  for (let i = 0; i < ii; i++) {
     buffer[offset + i] = string.charCodeAt(i) & 0xff;
   }
+  return offset + ii;
 }
 function computeMD5(filesize, xrefInfo) {
   const time = Math.floor(Date.now() / 1000);
   const filename = xrefInfo.filename || "";
-  const md5Buffer = [time.toString(), filename, filesize.toString()];
-  let md5BufferLen = md5Buffer.reduce((a, str) => a + str.length, 0);
-  for (const value of Object.values(xrefInfo.info)) {
-    md5Buffer.push(value);
-    md5BufferLen += value.length;
-  }
+  const md5Buffer = [time.toString(), filename, filesize.toString(), ...Object.values(xrefInfo.info)];
+  const md5BufferLen = md5Buffer.reduce((a, str) => a + str.length, 0);
   const array = new Uint8Array(md5BufferLen);
   let offset = 0;
   for (const str of md5Buffer) {
-    writeString(str, offset, array);
-    offset += str.length;
+    offset = writeString(str, offset, array);
   }
-  return bytesToString(calculateMD5(array));
+  return bytesToString(calculateMD5(array, 0, array.length));
 }
 function writeXFADataForAcroform(str, changes) {
   const xml = new SimpleXMLParser({
@@ -62627,8 +62688,7 @@ async function incrementalUpdate({
   array.set(originalData);
   let offset = originalData.length;
   for (const str of buffer) {
-    writeString(str, offset, array);
-    offset += str.length;
+    offset = writeString(str, offset, array);
   }
   return array;
 }
@@ -62796,12 +62856,14 @@ class WorkerTask {
     }
   }
 }
+
 class WorkerMessageHandler {
-  static {
-    if (typeof window === "undefined" && !isNodeJS && typeof self !== "undefined" && typeof self.postMessage === "function" && "onmessage" in self) {
-      this.initializeFromPort(self);
-    }
-  }
+  // static {
+  //   if (typeof window === "undefined" && !isNodeJS && typeof self !== "undefined" && typeof self.postMessage === "function" && "onmessage" in self) {
+  //     this.initializeFromPort(self);
+  //   }
+  // }
+
   static setup(handler, port) {
     let testMessageProcessed = false;
     handler.on("test", data => {
@@ -62826,7 +62888,7 @@ class WorkerMessageHandler {
       docId,
       apiVersion
     } = docParams;
-    const workerVersion = "5.0.375";
+    const workerVersion = "5.1.0";
     if (apiVersion !== workerVersion) {
       throw new Error(`The API version "${apiVersion}" does not match ` + `the Worker version "${workerVersion}".`);
     }
@@ -63357,10 +63419,22 @@ class WorkerMessageHandler {
   }
 }
 
+(function initializeWorkerMessageHandler() {
+  if (
+    typeof window === "undefined" && 
+    !isNodeJS && 
+    typeof self !== "undefined" && 
+    typeof self.postMessage === "function" && 
+    "onmessage" in self
+  ) {
+    WorkerMessageHandler.initializeFromPort(self);
+  }
+})();
+
 ;// ./src/pdf.worker.js
 
-const pdfjsVersion = "5.0.375";
-const pdfjsBuild = "23972e194";
+const pdfjsVersion = "5.1.0";
+const pdfjsBuild = "";
 
 var __webpack_exports__WorkerMessageHandler = __webpack_exports__.WorkerMessageHandler;
 export { __webpack_exports__WorkerMessageHandler as WorkerMessageHandler };

@@ -29,5 +29,7 @@ compile-*
 **/web-0.4/*.whl
 **/web-0.4/report.html
 
+**/pdfjs-legacy/*
+
 vol
 *-res-config.mjs

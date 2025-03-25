@@ -119,22 +119,31 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
     });
 
     canvas.addEventListener('touchend', (e) => {
-      console.log('touchend');
-      that.viewConfig.transform.end();
+      console.log('touchend', e.touches.length, e.touches)
+      if (e.touches.length > 1)
+        that.viewConfig.transform.pinchEnd(e.touches);
+      else
+        that.viewConfig.transform.end();
+
       canvas.style.transform = that.viewConfig.transform.transform();
     });
 
-    screen.addEventListener('touchend', (e) => {
-      that.viewConfig.transform.end();
-    });
-
     canvas.addEventListener('touchstart', (e) => {
-      that.viewConfig.transform.end();
+      console.log('touchstart', e.touches.length, e.touches[0])
+      that.viewConfig.transform.start(e.touches[0]);
+
+      if (e.touches.length > 1)
+        that.viewConfig.transform.pinchBegin(e.touches);
+
       canvas.style.transform = that.viewConfig.transform.transform();
     });
 
     canvas.addEventListener('touchmove', (e) => {
-      that.viewConfig.transform.scaleTo(e);
+      console.log('touchmove', e.touches.length)
+      if (that.viewConfig.transform.pinchTo(e.touches) > 0.5) {
+        that.viewConfig.transform.stepScale();
+        that.renderPage();
+      }
       that.viewConfig.transform.moveTo(e.touches[0]);
       canvas.style.transform = that.viewConfig.transform.transform();
     });
@@ -174,10 +183,16 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
 
       // Loaded via <script> tag, create shortcut to access PDF.js exports.
       let { pdfjsLib } = globalThis as any;
+      console.log('pdfjsLib / globalThis', pdfjsLib, globalThis);
   
       // The workerSrc property shall be specified.
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-legacy/pdf.worker.mjs';
-      // pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+      console.log('loading worker source from CDN...');
+
+      // works: pdfjsLib.GlobalWorkerOptions.workerSrc = 'http://192.168.0.201:8900/pdfjs-legacy/pdf.worker.mjs';
+      // failed: pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-legacy/pdf.worker.mjs';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs-legacy/pdf.worker.mjs';
+      
+      // works: pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
 
 
       // Asynchronous download of PDF
