@@ -18,6 +18,7 @@ export class CSSTransform {
     scale0: number;
 
     handling: boolean;
+    pinching: boolean;
 
     constructor() {
         this.reset();

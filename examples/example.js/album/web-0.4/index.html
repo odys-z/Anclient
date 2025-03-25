@@ -7,9 +7,10 @@
   <script crossorigin src="react.development.js"></script>
   <script crossorigin src="react-dom.development.js"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css"> -->
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css"> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script> -->
+  <script src="ag-grid-community.min.js"></script>
 
   <title>Album Home</title>
 </head>
@@ -29,11 +30,12 @@
     let aid = searchParams ? searchParams.get('album') : 'album-landing';
     let serv = searchParams ? searchParams.get('serv') : 'landing';
 
-    function loadAlbum(uid, pswd) {
+    function loadAlbum(uid, pswd, clientOpts) {
       album.App.bindHtml('app', {uid, pswd,
-        aid, serv, Window, portal: 'index.html'});
+        aid, serv, Window, portal: 'index.html', clientOpts});
     }
-    loadAlbum('ody', '8964');
+    if (searchParams && searchParams.get('debug'))
+      loadAlbum('ody', '8964', {legacyPDF: true});
   </script>
 
 </body>

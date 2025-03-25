@@ -20,7 +20,7 @@ export interface PdfViewProps {
     /** Path to Mozzila PDF.js release, undefined for the CDN version. */
     pdfjs?: string,
 
-    /** Http GET to doc */
+    /** Http GET to PDF doc. */
     src: string,
     close: (e: React.UIEvent) => void
 }

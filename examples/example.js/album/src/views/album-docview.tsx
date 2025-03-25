@@ -7,7 +7,8 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 
 import { L, AnError, AnReactExt, Lightbox, PdfIframe,
 	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
-	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops
+	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops,
+	PdfView
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
 import { Button, Grid } from '@material-ui/core';
@@ -145,14 +146,15 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				let file = ids.get(fid) as AnTreeNode;
 				let t = regex.mime2type(file.node.mime as string || "");
 				if (t === '.pdf') {
+					let pdfsrc = GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => synuri });
+					let close = (_e: any) => {
+								this.pdfview = undefined;
+								this.setState({});
+							} 
 					// console.log(this.docTabl);
-					this.pdfview = (<PdfIframe
-						close={(e) => {
-							this.pdfview = undefined;
-							this.setState({});
-						} }
-						src={GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => synuri })}
-					></PdfIframe>);
+					this.pdfview = ( this.context && this.context.clientOpts && this.context.clientOpts.legacyPDF
+						? <PdfView src={pdfsrc} close={close} />
+						: <PdfIframe src={pdfsrc} close={close} />);
 				}
 				else {
 					this.pdfview = undefined;
@@ -212,7 +214,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				onSelectChange={() => undefined}
 				uri={this.uri} docuri={this.synuri}
 				columns={[
-					{ type: 'text',     field: 'docname',label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+					{ type: 'text',     field: 'text',label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
 					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {xs: 4, sm: 4, md: 3} },
 					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
 					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},

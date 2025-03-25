@@ -30,7 +30,17 @@ export interface AnContextType extends Semantext {
 	servs: JsonHosts, 
 
 	hasError: boolean,
-} 
+
+	clientOpts?: ClientOptions
+}
+
+export interface ClientOptions {
+	/**
+	 * False: use iframe (pdf-iframe) for pdf, which uses browser's pdf rendere;
+	 * True: Use anreact/react/widgets/pdf-view.
+	 */
+	legacyPDF?: boolean
+}
 
 export const AnContext = React.createContext({
 	ssInf: undefined as SessionInf,
