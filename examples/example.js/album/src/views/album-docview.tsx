@@ -151,9 +151,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 								this.pdfview = undefined;
 								this.setState({});
 							} 
-					// console.log(this.docTabl);
 					this.pdfview = ( this.context && this.context.clientOpts && this.context.clientOpts.legacyPDF
-						? <PdfView src={pdfsrc} close={close} />
+						? <PdfView src={pdfsrc} close={close}
+							pdfjs='pdfjs-legacy/pdf.mjs'
+							worksrc='pdfjs-legacy/pdf.worker.mjs'
+							cMapUrl='pdfjs-legacy/cmaps/'/>
 						: <PdfIframe src={pdfsrc} close={close} />);
 				}
 				else {

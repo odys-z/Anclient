@@ -17,8 +17,24 @@ interface PDFPageProxy {
 }
 
 export interface PdfViewProps {
-    /** Path to Mozzila PDF.js release, undefined for the CDN version. */
+    /**
+     * Path to Mozzila PDF.js release, undefined for the CDN version,
+     * e. g. 'pdfjs-legacy/pdf.mjs';
+     */
     pdfjs?: string,
+
+    /**
+     * Path to fonts cmapUrl, default to CDN, which is not always accessible, 
+     * e. g. '/pdfjs-legacy/cmaps/'
+     */
+    cMapUrl?: string,
+
+    /**
+     * Path to pdfjs worker src, for pdfjsLib.GlobalWorkerOptions.workerSrc,
+     * e. g. '/pdfjs-legacy/pdf.worker.mjs';
+     * Default: '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+     */
+    worksrc?: string,
 
     /** Http GET to PDF doc. */
     src: string,
@@ -93,12 +109,13 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
     // Create a script element
     let script = document.createElement('script');
     script.type = 'module';
-    script.src = 'pdfjs-legacy/pdf.mjs';
-    // script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
 
     script.async = true;
 
     let pdflink = this.props.src;
+    script.src = this.props.pdfjs || '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
+    let cMapUrl = this.props.cMapUrl || '//cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/';
+    let worksrc = this.props.worksrc || '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
 
     let screen = document.getElementById('screen') as HTMLCanvasElement;
     let canvas = document.getElementById('pdf') as HTMLCanvasElement;
@@ -189,10 +206,8 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
       console.log('loading worker source from CDN...');
 
       // works: pdfjsLib.GlobalWorkerOptions.workerSrc = 'http://192.168.0.201:8900/pdfjs-legacy/pdf.worker.mjs';
-      // failed: pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs-legacy/pdf.worker.mjs';
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs-legacy/pdf.worker.mjs';
-      
-      // works: pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+      // pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs-legacy/pdf.worker.mjs';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = worksrc;
 
 
       // Asynchronous download of PDF
@@ -201,7 +216,8 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
         // fuck CCP
         // I  [INFO:CONSOLE(5529)] "Warning: loadFont - translateFont failed: "UnknownErrorException: Unable to load binary CMap at: https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/UniGB-UCS2-H.bcmap".", source: /pdfjs-legacy/pdf.worker.mjs (5529)
         // cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/'
-        cMapUrl: '/pdfjs-legacy/cmaps/'
+        // cMapUrl: '/pdfjs-legacy/cmaps/'
+        cMapUrl
       }) as PDFDocumentLoadingTask;
 
       loadingTask.promise.then(function(pdf) {
@@ -213,27 +229,16 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
         that.viewConfig.currentPage = 0;
         that.viewConfig.pdfdoc = pdf;
         that.renderPage();
-        // pdf.getPage(pageNumber).then(function(page) {
-        //   that.viewConfig.page = page;
-        //   that.renderPage();
-        // });
-
         }, function (reason) {
-          // PDF loading error
           console.error(reason);
         });
     };
 
-    // Handle errors
     script.onerror = () => {
       console.error('Failed to load pdf.js');
     };
 
-    // Append the script to the document
     document.body.appendChild(script);
-
-    // Store the script element to remove it later if needed
-    // this.script = script;
   }
 
   componentWillUnmount() {
