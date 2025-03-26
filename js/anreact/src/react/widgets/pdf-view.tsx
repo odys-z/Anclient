@@ -198,7 +198,10 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
       // Asynchronous download of PDF
       // let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(pdflink) as PDFDocumentLoadingTask;
       let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument({url: pdflink,
-        cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/'
+        // fuck CCP
+        // I  [INFO:CONSOLE(5529)] "Warning: loadFont - translateFont failed: "UnknownErrorException: Unable to load binary CMap at: https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/UniGB-UCS2-H.bcmap".", source: /pdfjs-legacy/pdf.worker.mjs (5529)
+        // cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/'
+        cMapUrl: ''
       }) as PDFDocumentLoadingTask;
 
       loadingTask.promise.then(function(pdf) {
