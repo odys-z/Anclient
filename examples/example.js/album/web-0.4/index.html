@@ -35,7 +35,7 @@
         aid, serv, Window, portal: 'index.html', clientOpts});
     }
     if (searchParams && searchParams.get('debug'))
-      loadAlbum('ody', '8964', {legacyPDF: true});
+      loadAlbum('ody', '8964', {legacyPDF: false || !!searchParams.get('legacyPDF')});
   </script>
 
 </body>

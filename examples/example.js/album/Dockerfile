@@ -1,6 +1,6 @@
 FROM nginx:stable-alpine
 
-COPY dist/* /usr/share/nginx/html/
+COPY web-0.4/* /usr/share/nginx/html/
 
 # docker doesn't copy parent directory
 # mkdir products
