@@ -65,6 +65,8 @@ public abstract class BaseActivity extends FragmentActivity
         implements JProtocol.OnError, IProgressBarAct {
 
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
+
+    /** @deprecated */
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
 
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
