@@ -48,7 +48,7 @@ public class AlbumContext {
 
     static AlbumContext instance;
 
-    public static final String jdocbase  = "jserv-album";
+    // public static final String jdocbase  = "jserv-album";
 
     /** To be localized */
     public static final String sysuri = "/album/sys";
@@ -127,7 +127,8 @@ public class AlbumContext {
         this.device.devname = f("%s[%s]", device, userInf.userName());
 
         jserv = jservroot;
-        Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
+        // Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
+        Clients.init(jservroot, false);
 
         try {
             tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
@@ -158,7 +159,8 @@ public class AlbumContext {
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
         */
-        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        // Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        Clients.init(jserv, verbose);
 
         // tier = new PhotoSyntier(new TableMeta(null), clientUri, errCtx)
 		tier.asyLogin(uid, pswd, userInf.device,
@@ -197,7 +199,8 @@ public class AlbumContext {
      */
     public AlbumContext jserv(String root) {
         jserv = root;
-        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        // Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        Clients.init(jserv, verbose);
         return this;
     }
 

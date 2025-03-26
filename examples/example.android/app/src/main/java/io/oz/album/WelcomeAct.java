@@ -234,7 +234,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 if (!isblank(pswd)) {
-                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
+                    String script = String.format("loadAlbum('%s', '%s', {legacyPDF: true});", client.ssInfo().uid(), pswd);
                     Utils.warn("\n[Load page script]: %s", script);
                     // https://www.techyourchance.com/communication-webview-javascript-android/
                     wv.evaluateJavascript(script, null);
