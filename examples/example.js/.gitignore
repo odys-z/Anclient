@@ -21,6 +21,9 @@ node_modules
 !**/web-0.4/*.json
 !**/web-0.4/*.css
 !**/web-0.4/res-vol
+!**/web-0.4/pdfjs-legacy
+**/web-0.4/pdfjs-legacy/*
+!**/web-0.4/pdfjs-*/*.md
 
 **/private.html
 **/private.json
