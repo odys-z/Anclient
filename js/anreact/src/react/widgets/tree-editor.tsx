@@ -302,6 +302,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 				uri={this.uri} docuri={this.props.docuri} media={this.props.media}
 				cid={this.collect}
 				photos={node.children} // or fire a request to get photos?
+				visible={this.state.expand}
 				lightbox={this.props.lightbox}
 			/>
 		  </Collapse>

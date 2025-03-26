@@ -196,7 +196,11 @@ export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
 
 
       // Asynchronous download of PDF
-      let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(pdflink) as PDFDocumentLoadingTask;
+      // let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(pdflink) as PDFDocumentLoadingTask;
+      let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument({url: pdflink,
+        cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/'
+      }) as PDFDocumentLoadingTask;
+
       loadingTask.promise.then(function(pdf) {
         console.log('PDF loaded', pdf);
         
