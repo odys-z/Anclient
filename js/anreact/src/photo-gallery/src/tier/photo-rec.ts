@@ -53,6 +53,9 @@ export class MediaCss {
 	rotation: number = 0;
 }
 
+/**
+ * @deprecated
+ */
 export interface PhotoCollect extends Tierec {
 	title?: string;
 	thumbUps?: Set<string>;

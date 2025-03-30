@@ -18,7 +18,7 @@ module.exports = {
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-	  path: path.resolve(__dirname, 'dist'),
+	  path: path.resolve(__dirname, 'web-dist'),
 	  library: 'album',
 	  libraryTarget: 'umd'
 	},

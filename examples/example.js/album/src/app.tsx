@@ -5,7 +5,7 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonHosts, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
+	JsonHosts, ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 
 type AlbumProps = {
@@ -21,6 +21,8 @@ type AlbumProps = {
 
 	userid?: string;
 	passwd?: string;
+
+	clientOpts?: ClientOptions;
 }
 
 /**
@@ -70,7 +72,6 @@ export class App extends CrudCompW<AlbumProps> {
 		this.servs = this.props.servs;
 		this.inclient = new Inseclient({urlRoot: this.servs[this.props.servId]});
 		this.nextAction = 're-login',
-		// Protocol.sk.cbbViewType = 'v-type';
 
         // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
@@ -246,6 +247,7 @@ export class App extends CrudCompW<AlbumProps> {
 			  ihome   : this.props.iportal || 'portal.html',
 			  error   : this.error,
 			  ssInf   : undefined,
+			  clientOpts: this.props.clientOpts
 		  }} >
 			{/*<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />*/}
 			<AlbumDocview synuri={this.synuri} aid={''} />
@@ -282,14 +284,14 @@ export class App extends CrudCompW<AlbumProps> {
 	static bindHtml(elem: string,
 					opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) {
 		let portal = opts.portal ?? 'index.html';
-		let { aid, uid, pswd } = opts;
+		let { aid, uid, pswd, clientOpts } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
-			  <App servs={json} servId={opts.serv || 'album'}
+			  <App servs={json} servId={opts.serv || 'album'} clientOpts={clientOpts}
 				aid={aid} iportal={portal} iwindow={window}
 				userid={uid} passwd={pswd}
 			  />, dom);

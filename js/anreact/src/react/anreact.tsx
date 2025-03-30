@@ -10,7 +10,7 @@ import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { JsonHosts } from './reactext';
+import { ClientOptions, JsonHosts } from './reactext';
 
 export interface ClassNames {[c: string]: string};
 
@@ -235,6 +235,8 @@ export interface AnreactAppOptions {
 
 	/**parent window */
 	parent?: Window;
+
+	clientOpts?: ClientOptions;
 };
 
 /**

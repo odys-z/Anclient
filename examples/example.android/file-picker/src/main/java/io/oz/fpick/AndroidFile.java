@@ -34,7 +34,6 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
-//    private long date;          //Added Date
 
     @AnsonField(ignoreTo = true)
     private boolean isSelected;
