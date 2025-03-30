@@ -12,18 +12,18 @@ node_modules
 !**/dist/*.css
 !**/dist/res-vol
 
-*/web-0.4/*.min.js*
-**/web-0.4/*
-**/web-0.4/docs
-**/web-0.4/img/sample.png
-!**/web-0.4/*.html
-**/web-0.4/report.html
-!**/web-0.4/*.json
-!**/web-0.4/*.css
-!**/web-0.4/res-vol
-!**/web-0.4/pdfjs-legacy
-**/web-0.4/pdfjs-legacy/*
-!**/web-0.4/pdfjs-*/*.md
+**/web-dist/*.min.js*
+**/web-dist/*
+**/web-dist/docs
+**/web-dist/img/sample.png
+!**/web-dist/*.html
+**/web-dist/report.html
+!**/web-dist/*.json
+!**/web-dist/*.css
+!**/web-dist/res-vol
+!**/web-dist/pdfjs-legacy
+**/web-dist/pdfjs-legacy/*
+!**/web-dist/pdfjs-*/*.md
 
 **/private.html
 **/private.json
