@@ -74,7 +74,7 @@
     "jsdoc": "^3.6.7",
     "jsonwebtoken": "^9.0.2",
     "mocha": "^10.2.0",
-    "pdfjs-dist": "^5.0.375",
+    "pdfjs-dist": "^5.1.91",
     "postcss-loader": "^3.0.0",
     "react-svg-loader": "^3.0.0",
     "style-loader": "^0.23.1",

@@ -33,7 +33,7 @@ module.exports = {
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-	  path: path.resolve(__dirname, 'web-0.4'),
+	  path: path.resolve(__dirname, 'web-dist'),
 	  library: 'less',
 	  libraryTarget: 'umd'
 	},
