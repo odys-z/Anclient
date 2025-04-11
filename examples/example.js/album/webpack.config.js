@@ -27,6 +27,8 @@ module.exports = {
 		new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()
 	],
 
+	watch: false,
+
 	externals: {
 		'react': 'React',
 		'react-dom' : 'ReactDOM',
