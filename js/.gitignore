@@ -16,20 +16,21 @@ compile-*
 **/dist/*.whl
 **/dist/report.html
 
-**/web-0.4/*.min.js
-**/web-0.4/*.js.map
-**/web-0.4/testBundle.js
-**/web-0.4/private
-**/web-0.4/*.min.js.gz
-**/web-0.4/*.min.js.map.gz
-**/web-0.4/*exiftool*
-**/web-0.4/volume
-**/web-0.4/WEB-INF
-**/web-0.4/X29
-**/web-0.4/*.whl
-**/web-0.4/report.html
+**/web-dist/*.min.js
+**/web-dist/*.js.map
+**/web-dist/testBundle.js
+**/web-dist/private
+**/web-dist/*.min.js.gz
+**/web-dist/*.min.js.map.gz
+**/web-dist/*exiftool*
+**/web-dist/volume
+**/web-dist/WEB-INF
+**/web-dist/X29
+**/web-dist/*.whl
+**/web-dist/report.html
 
-**/pdfjs-legacy/*
+**pdfjs-legacy/*
+cmaps
 
 vol
 *-res-config.mjs

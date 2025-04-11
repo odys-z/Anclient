@@ -148,7 +148,7 @@ class WidgetsApp extends React.Component<LessProps> {
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
-						{ type: 'text', field: 'pname', label: 'Folder',
+						{ type: 'text', field: 'text', label: '[Folder]',
 						  grid: {xs: 6, sm: 6, md: 4} },
 						{ type: 'icon-sum', field: '', label: L('Summary'),
 						  grid: {sm: 6, md: 4} },

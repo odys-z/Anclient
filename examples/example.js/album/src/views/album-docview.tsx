@@ -226,11 +226,10 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 			/>) }
 		  { this.pdfview }
 		  { this.orgview }
-		  { this.state.hasError// &&
-			// <AnError onClose={this.onErrorClose} fullScreen={false}
-			// 	uri={"/login"} tier={undefined}
-			// 	title={L('Error')} msg={this.error.msg || ''} /> }
-          }
+		  { this.state.hasError &&
+			<AnError onClose={this.onErrorClose} fullScreen={false}
+				uri={this.uri} tier={undefined}
+				title={L('Error')} msg={this.error.msg || ''} /> }
 	  </>);
 
 	  function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {
