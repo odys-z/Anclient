@@ -21,6 +21,7 @@ public class AssetHelper {
     public static final int Act_SyncReport = 4;
     /** Act: show admin page */
     public static final int Act_Admin = 5;
+    public static final int Act_HelpDevice = 6;
 
     /**
      * Get web page url.
@@ -40,6 +41,8 @@ public class AssetHelper {
                 return ctx.getString(R.string.url_sync_report, AlbumApp.prfConfig.jserv(0), synchPage);
             case Act_Help:
                 return ctx.getString(R.string.url_help);
+            case Act_HelpDevice:
+                return ctx.getString(R.string.url_help_devid);
             case Act_Landing:
             default:
                 return ctx.getString(R.string.url_landing);

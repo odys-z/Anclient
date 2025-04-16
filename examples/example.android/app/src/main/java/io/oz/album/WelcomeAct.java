@@ -7,7 +7,7 @@ import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
 import static io.oz.AlbumApp.prfConfig;
-import static io.oz.album.webview.WebAlbumAct.Web_PageName;
+import static io.oz.album.webview.WebAlbumAct.Web_Intent_id;
 import static io.oz.albumtier.AlbumContext.ConnState;
 import static io.oz.albumtier.AlbumContext.verbose;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -85,8 +85,8 @@ import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
     // for error:
-    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost'
-    // delete build dir
+    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost',
+    // delete the 'build' folder
 
     AlbumContext clientext;
 
@@ -105,12 +105,12 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        clientext = AlbumContext.getInstance(this);
+        clientext = AlbumContext.initWithErrorCtx(this);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         PrefsWrapper c = AlbumApp.prfConfig
                        = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
-        clientext.init(c.homeName, c.uid, c.device, c.jserv());
+        clientext.init(c.homeName, c.uid, c.pswd, c.device, c.jserv());
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
@@ -304,9 +304,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.menu_settings) {
             startPrefsAct();
             return true;
-        } else if (id == R.id.menu_admin) {
-            startHelpAct(AssetHelper.Act_Admin);
-            return true;
+//        } else if (id == R.id.menu_admin) {
+//            startHelpAct(AssetHelper.Act_Admin);
+//            return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
             return true;
@@ -524,7 +524,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Web_PageName, action);
+        intent.putExtra(Web_Intent_id, action);
         webHelpStarter.launch(intent);
     }
 

@@ -24,8 +24,9 @@
     <string name="err_empty_pswd"    >密碼為空！</string>
     <string name="err_empty_uid"     >用戶名不能為空！</string>
 
-    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
     <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7/zh</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_help_devid"    >https://odys-z.github.io/products/portfolio/android/synode.html#devices-must-be-identically-registered</string>
 
     <string name="txt_prefs_jserv" >文 件 服 務 地 址</string>
     <string name="home_title"      >组 织 名 称</string>
@@ -53,9 +54,9 @@
 
     <string name="unknown_qrformat"   >未知二維碼格式: %s</string>
     <string name="unknown_qrcontent"  >二維碼内容無法識別。</string>
-    <string name="msg_log4device"     >Login first to restore a previous used device ID.</string>
-    <string name="msg_no_used_dev"    >No available devices.</string>
-    <string name="dev_usedby"         >Device name used by %s (%s)</string>
+    <string name="msg_log4device"     >登录成功后才能寻找恢复设备名称记录。</string>
+    <string name="msg_no_used_dev"    >无可选设备。</string>
+    <string name="dev_usedby"         >设备名称拥有者： %s (%s)</string>
     <string name="msg_repace_devname" >确定使用该设备名替换原设备吗？ %s [id: %s]</string>
     <string name="msg_update_dev_err" >设置设备名称错误： %s [id: %s]\nDetails:  %s</string>
     <string name="msg_dev_err_null_id">服务端错：设备ID空 [%s]</string>

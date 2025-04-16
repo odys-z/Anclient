@@ -23,8 +23,6 @@ import io.oz.albumtier.AlbumContext;
 
 public class AlbumApp extends Application {
 
-//    public static PrefKeys keys;
-
     public static PrefsWrapper prfConfig; // = new PrefsWrapper();
     public static Context context;
 
@@ -43,7 +41,7 @@ public class AlbumApp extends Application {
      */
     public static void login(String pswd, JProtocol.OnOk onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException, IOException, SemanticException {
-        AlbumContext clientext = AlbumContext.getInstance(null);
+        AlbumContext clientext = AlbumContext.initWithErrorCtx(null);
         clientext
             .pswd(pswd)
             .login((client) -> {

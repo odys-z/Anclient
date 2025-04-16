@@ -48,8 +48,6 @@ public class AlbumContext {
 
     static AlbumContext instance;
 
-    // public static final String jdocbase  = "jserv-album";
-
     /** To be localized */
     public static final String sysuri = "/album/sys";
 
@@ -72,12 +70,14 @@ public class AlbumContext {
     /**
      * @param err can be ignored if no error message to show
      * @return single instance
+     * @since 0.7.1
      */
-    public static AlbumContext getInstance(OnError err) {
+    public static AlbumContext initWithErrorCtx(OnError err) {
         if (instance == null)
             instance = new AlbumContext();
 
-        instance.errCtx = err;
+        if (err != null)
+            instance.errCtx = err;
 
         return instance;
     }
@@ -117,11 +117,11 @@ public class AlbumContext {
 	/**
      * Init with preferences. Not login yet.
      */
-    public AlbumContext init(String family, String uid, String device, String jservroot) {
+    public AlbumContext init(String family, String uid, String pswd, String device, String jservroot) {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
-
         userInf.device = device;
+        this.pswd = pswd;
         this.device.id = device;
         this.device.synode0 = device;
         this.device.devname = f("%s[%s]", device, userInf.userName());
@@ -134,8 +134,11 @@ public class AlbumContext {
             tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
                 @Override
                 public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
-                    mustnonull(errCtx,
-                            f("Error handler is null. Caught error: %s", msg));
+                    try {
+                        msg = f("Error handler is null. Caught error: %s", f(msg, (Object[])args));
+                    }
+                    catch (Exception e) {}
+                    mustnonull(errCtx, msg);
 
                     errCtx.err(code, msg, args);
                 } });
@@ -159,10 +162,8 @@ public class AlbumContext {
         if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
             throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
         */
-        // Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
         Clients.init(jserv, verbose);
 
-        // tier = new PhotoSyntier(new TableMeta(null), clientUri, errCtx)
 		tier.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
@@ -199,7 +200,6 @@ public class AlbumContext {
      */
     public AlbumContext jserv(String root) {
         jserv = root;
-        // Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
         Clients.init(jserv, verbose);
         return this;
     }
@@ -223,9 +223,4 @@ public class AlbumContext {
         return this;
     }
 
-//	public Device device() {
-//		if (device == null)
-//			device = new Device(userInf.device, devname);
-//		return device;
-//	}
 }

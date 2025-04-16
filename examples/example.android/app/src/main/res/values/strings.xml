@@ -38,11 +38,12 @@
     <string name="userid_summery">Also used as folder name for saving files</string>
     <string name="userid_title">Login ID</string>
     <string name="pswd_title">Password</string>
-    <string name="userid_key" translatable="false">my</string>
-    <string name="pswd_key"   translatable="false">pswd_key</string>
-    <string name="btn_login"  translatable="false">bt_login</string>
+    <string name="userid_key"        translatable="false">my</string>
+    <string name="pswd_key"          translatable="false">pswd_key</string>
+    <string name="btn_login"         translatable="false">bt_login</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
     <string name="key_dev_cate"      translatable="false">key-device-cate</string>
+    <string name="key_dev_restore"   translatable="false">key-device-restore</string>
     <string name="key_device"        translatable="false">key-device</string>
 
     <string name="t_synch_ok"      >%s files has been synchronized (duplicate: %s, ignored: %s)</string>
@@ -63,8 +64,9 @@
     <string name="err_empty_pswd"    >Password is empty!</string>
     <string name="err_empty_uid"     >User ID is empty!</string>
 
-    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
     <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_help_devid"    >https://odys-z.github.io/products/portfolio/android/synode.html#devices-must-be-identically-registered</string>
 
     <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_album"       translatable="false">%s/%s</string>

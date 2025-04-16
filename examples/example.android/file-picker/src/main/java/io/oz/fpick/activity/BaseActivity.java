@@ -36,8 +36,6 @@ import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsException;
-import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
@@ -198,7 +196,7 @@ public abstract class BaseActivity extends FragmentActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlbumContext.getInstance(this); // set error context
+        AlbumContext.initWithErrorCtx(this); // set error context
 
         Intent intt = getIntent();
         isNeedFolderList = intt.getBooleanExtra(IS_NEED_FOLDER_LIST, false);
