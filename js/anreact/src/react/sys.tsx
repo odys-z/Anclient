@@ -38,12 +38,18 @@ import {
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import withWidth from '@material-ui/core/withWidth';
-import { SessionClient } from '@anclient/semantier/anclient';
+import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@material-ui/core/Fab';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
 	menu: string;
+
+	/** 
+	 * Alternatively, if menu is no usable, use this to compose menu's tree items.
+	 */
+	tree: Array<MenuItem>;
+
     /**Welcome page formatter */
     welcome?: (
 		/** @deprecated not used */
@@ -212,7 +218,7 @@ export interface MenuItem {
  * Parse lagacy json format.
  * @return {menu, paths}
  * */
-export function parseMenus(json = []): {
+export function parseMenus(json: Array<{node: MenuItem}> | {node: MenuItem} = []): {
 	menu: Array<MenuItem>;
 	paths: Array<any>}
 {
@@ -363,8 +369,8 @@ class SysComp extends CrudCompW<SysProps> {
 		this.anreact.loadMenu(
 			this.state.skMenu,
 			this.uri,
-			(dsResp) => {
-				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
+			(dsResp: AnsonMsg<AnDatasetResp>) => {
+				let {menu, paths} = parseMenus(dsResp.Body().forest as Array<{node: MenuItem}>);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 
@@ -375,7 +381,7 @@ class SysComp extends CrudCompW<SysProps> {
 						welcome: false
 					} );
 				}
-			} );
+			}, this.props.tree );
 	}
 
 	componentDidUpdate(_: Readonly<SysProps>, _p: Readonly<{}>, _s?: any): void {

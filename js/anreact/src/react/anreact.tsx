@@ -4,13 +4,15 @@ import $ from 'jquery';
 import * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
-	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs,
+	Tierec
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
 import { ClientOptions, JsonHosts } from './reactext';
+import { MenuItem } from './sys';
 
 export interface ClassNames {[c: string]: string};
 
@@ -253,20 +255,28 @@ export class AnReactExt extends AnReact {
 	}
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * Since v0.9.32, AnReact(Ext) won't care error handling anymore.
+	 * @since v0.9.32, AnReact(Ext) won't care error handling anymore.
+	 * @since v0.6.5, sk can be a function, e.g. () => {body: [{forest:Array<MenuItem}]}, where forest is understandable by Sys.parseMenu()
 	 * @param sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
 	 * @param uri
 	 * @param onLoad
 	 * @return this
 	 */
-	loadMenu(sk: string, uri: string, onLoad: OnCommitOk): AnReactExt {
-		if (!sk)
-			throw new Error("Arg 'sk' is null - AnReact requires a dataset semantics for system menu.");
+	loadMenu(sk: string, uri: string, onLoad: OnCommitOk, tree: Array<MenuItem>): AnReactExt {
+		if (!sk && (!tree || tree.length === 0))
+			throw new Error("Both 'sk' & tree items are null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
 
-		return this.dataset(
-			{port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
-			onLoad);
+		if (tree !== undefined && tree.length > 0) {
+			let t = new AnDatasetResp({ forest: tree as unknown as Tierec[]});
+			let resp = new AnsonMsg(t) as AnsonMsg<AnsonResp> ;
+			onLoad(resp);
+		}
+		else
+			return this.dataset(
+				// {port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
+				{port: pmenu, uri, sk, sqlArgs: [this.ssInf ? this.ssInf.uid : '']},
+				onLoad);
 	}
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
@@ -276,7 +286,7 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
-		Semantier.dataset(ds, this.client, onLoad, this.errCtx);
+		Semantier.dataset(ds, this.ssInf.client, onLoad, this.errCtx);
 		return this;
 	}
 

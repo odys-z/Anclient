@@ -154,6 +154,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 		let msg = getDownloadReq();//pid as string, opts);
 		let jserv = client.an.servUrl(port);
+
 		return `${jserv}?anson64=${window.btoa(JSON.stringify(msg))}`;
 
 		function getDownloadReq() {//pid: string, opts: {uri: string, port: string, client: SessionClient}) {
@@ -250,10 +251,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	render() {
-		// let phs = this.slides || _photos;
-		// return (<div>
-		// 	{this.gallery( phs )}
-		// </div>);
 		return this.props.visible && this.gallery(this.slides);
 	}
 }

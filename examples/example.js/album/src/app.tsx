@@ -5,8 +5,12 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonHosts, ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort } from '@anclient/anreact';
+	JsonHosts, ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, 
+	Sys,
+	MenuItem,
+	SysComp} from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
+import { AlbumShares } from './views/album-shares';
 
 type AlbumProps = {
 	servs: JsonHosts;
@@ -56,6 +60,10 @@ export class App extends CrudCompW<AlbumProps> {
 
 	synuri: string;
 
+	portfolioMenu = [
+		{node: {funcId: 'home-list', id: 'home-list', funcName: "Welcome", text: '', url: '/home', css: {icon: 'home'}, sort: 0}},
+		{node: {funcId: 'shares', id: 'shares', funcName: "Share Resource", text: '', url: '/share', css: {icon: 'share'}, sort: 1}} ];
+
 	/**
 	 * Restore session from window.localStorage
 	 */
@@ -76,6 +84,11 @@ export class App extends CrudCompW<AlbumProps> {
         // DESIGN NOTES: extending ports shall be an automized processing
 		this.anReact = new AnReactExt(this.inclient, this.error)
                         .extendPorts(SynDocollPort);
+
+		SysComp.extendLinks( [
+			{path: '/home', comp: AlbumDocview},
+			{path: '/shares', comp: AlbumShares},
+		] );
 	}
 
 	componentDidMount() {
@@ -249,8 +262,10 @@ export class App extends CrudCompW<AlbumProps> {
 			  ssInf   : undefined,
 			  clientOpts: this.props.clientOpts
 		  }} >
-			{/*<AlbumDocview uri={Admin.func_AlbumDocview} aid={''} />*/}
-			<AlbumDocview synuri={this.synuri} aid={''} />
+			{/* <AlbumDocview synuri={this.synuri} aid={''} /> */}
+			<Sys msHideAppBar={0} tree={this.portfolioMenu}
+				sys='Portfolio 0.7' menuTitle='Sys Menu'
+				/>
 		  </AnContext.Provider>
 		|| <></>);
 	}

@@ -1,6 +1,5 @@
 package io.oz;
 
-import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 
 import android.app.Application;
@@ -23,7 +22,7 @@ import io.oz.albumtier.AlbumContext;
 
 public class AlbumApp extends Application {
 
-    public static PrefsWrapper prfConfig; // = new PrefsWrapper();
+    public static PrefsWrapper prfConfig;
     public static Context context;
 
     public AlbumApp() {
