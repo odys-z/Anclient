@@ -92,24 +92,14 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	componentDidMount() {
-		/*
-		this.photos = this.props.tnode.node.children;
-		// this.slides = this.parse(this.props.tnode.node.children);
-		this.parse(this.photos).then((slides: ImageSlide[]) => {
-			this.slides = slides;
-			this.setState({});
-		});
-		*/
 		this.photos = this.props.photos;
-		// this.slides = this.parse(this.props.tnode.node.children);
 
 		if (!this.slides || this.slides.length === 0 
 			|| this.slides.length != this.photos.length
-			|| this.slides[0].node.id != this.photos[0].node.id // bug for ignoring others?
+			|| this.slides[0].node.id != this.photos[0].node.id
 		)
 			this.parse(this.photos).then((slides: ImageSlide[]) => {
 				this.slides = slides;
-				// this.props.slideBuff[0] = this.slides;
 				this.setState({});
 			});
 		else
