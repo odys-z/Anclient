@@ -149,6 +149,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 					let pdfsrc = GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => synuri });
 					let close = (_e: any) => {
 								this.pdfview = undefined;
+								this.context.onFullScreen(false);
 								this.setState({});
 							} 
 					this.pdfview = ( this.context && this.context.clientOpts && this.context.clientOpts.legacyPDF
@@ -157,6 +158,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 							worksrc='pdfjs-legacy/pdf.worker.mjs'
 							cMapUrl='pdfjs-legacy/cmaps/'/>
 						: <PdfIframe src={pdfsrc} close={close} />);
+					this.context.onFullScreen(true);
 				}
 				else {
 					this.pdfview = undefined;

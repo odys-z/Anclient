@@ -6,6 +6,9 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 import { AnReactExt, 
 	CrudCompW, AnContextType, 
 	Comprops} from '@anclient/anreact';
+import QRCode from 'react-qr-code';
+import { Card, CardActionArea, Typography } from '@material-ui/core';
+import { DownloadAlbumIcon } from '../icons/android';
 
 interface AlbumShareProps extends Comprops {
 	synuri: string
@@ -24,6 +27,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
     nextAction: string | undefined;
 
 	synuri = '/album/syn';
+	apk_web = 'res-vol/portfolio-0.7.apk';
 
 	/**
 	 * The entity table name updated each time loaded a tree.
@@ -73,7 +77,17 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	}
 
 	render() {
-	  let that = this;
-	  return (<>Share Resources</>);
+	  let {protocol, host} = window.location;
+	  let apklink = `${protocol}//${host}/${this.apk_web}`;
+	  console.log(apklink);
+	  return (<>
+	  	<Typography variant="h4" gutterBottom>Download APK</Typography>                    
+		<Card style={{"position": "absolute"}}>
+			<CardActionArea href={apklink}>
+			<QRCode value={apklink} bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
+			<DownloadAlbumIcon containersize={128} size={32} />
+			</CardActionArea>
+		</Card>
+		</>);
 	}
 }

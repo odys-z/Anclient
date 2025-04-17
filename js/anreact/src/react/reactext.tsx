@@ -32,6 +32,8 @@ export interface AnContextType extends Semantext {
 	hasError: boolean,
 
 	clientOpts?: ClientOptions
+
+	onFullScreen?: (isfull: any) => void;
 }
 
 export interface ClientOptions {
@@ -40,6 +42,7 @@ export interface ClientOptions {
 	 * True: Use anreact/react/widgets/pdf-view.
 	 */
 	legacyPDF?: boolean
+	platform?: 'android' | 'browser'
 }
 
 export const AnContext = React.createContext({

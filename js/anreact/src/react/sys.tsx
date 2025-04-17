@@ -55,8 +55,9 @@ export interface SysProps extends Comprops {
 		/** @deprecated not used */
 		classes: ClassNames | undefined,
 		context: AnContextType, comp: SysComp) => JSX.Element;
-    // classes: {[x: string]: string};
+		
     hrefDoc?: string;
+
 	/**
 	 * On logout handler.
 	 * When called, the client is already logged out.
@@ -76,7 +77,12 @@ export interface SysProps extends Comprops {
 	 */
 	landingUrl?: string;
 
-	msHideAppBar?: number 
+	msHideAppBar?: number;
+
+	/**
+	 * Default: false
+	 */
+	hideAppBar?: boolean;
 }
 
 const _icons = {
@@ -317,10 +323,9 @@ class SysComp extends CrudCompW<SysProps> {
 
 		this.welcomePaper = this.welcomePaper.bind(this);
 
-		// this.ref = React.createRef();
-		// let m = ReactDOM.findDOMNode(this.ref)
-        // m.addEventListener('scroll', (e: UIEvent) => {console.log(e, e.target);});
 		window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
+
+		this.state.showAppBar = !props.hideAppBar;
 	}
 
 	welcomePaper(classes = {} as ClassNames) {
@@ -364,6 +369,14 @@ class SysComp extends CrudCompW<SysProps> {
 
 		// load menu
 		this.anreact = ctx.uiHelper;
+
+		let onfullscreen = ctx.onFullScreen;
+		ctx.onFullScreen = (isfull) => {
+			if (typeof(onfullscreen) === 'function')
+				onfullscreen(isfull);
+
+			this.setState({showAppBar: !isfull && !that.props.hideAppBar});
+		};
 
 		let that = this;
 		this.anreact.loadMenu(
@@ -628,7 +641,7 @@ class SysComp extends CrudCompW<SysProps> {
 						{this.route()}
 					</div>}
 			</main>
-			{ !showAppBar
+			{ !showAppBar && !this.props.hideAppBar
 			  && <Fab color="primary" size="small" style={{position: 'absolute'}} aria-label="open drawer"
 					onClick={this.showMenu} >
 			      {/* <IconButton
