@@ -52,7 +52,7 @@ public class PrefsWrapper extends Anson {
     private String landingUrl;
 
     @AnsonField(ignoreFrom = true, ignoreTo = true)
-    private Context errctx;
+//    private Context errctx;
 
     /**
      * Options' template for an uploading doc's, such as share-flags, etc.
@@ -65,7 +65,7 @@ public class PrefsWrapper extends Anson {
         try {
             config = (PrefsWrapper) Anson.fromJson(sharedPref.getString(json_k,
                     "{\"type\":\"io.oz.album.PrefsWrapper\"}"));
-            config.errctx = ctx;
+//            config.errctx = ctx;
             config.sharedpref = sharedPref;
 
             if (config.jservlist == null) {
@@ -146,16 +146,6 @@ public class PrefsWrapper extends Anson {
             jservlist.ix = 0;
         }
 
-//        jservlist.select(AlbumContext.initWithErrorCtx((code, msg, args) -> {
-//            String m = String.format("Error: type: %s, args: %s", msg, args);
-//            if (errctx != null && errctx instanceof Activity)
-//                ((Activity) errctx).runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        Toast.makeText(errctx, m, Toast.LENGTH_LONG).show();
-//                    }
-//                });
-//            else Utils.warn(msg);
-//        }), jservlist.ix);
         AlbumContext.initWithErrorCtx(null).jserv(jservlist.select(jservlist.ix));
 
         listJserv.setValueIndex(jservlist.ix);

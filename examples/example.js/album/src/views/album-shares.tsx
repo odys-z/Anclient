@@ -14,6 +14,9 @@ interface AlbumShareProps extends Comprops {
 	synuri: string
 	/** album id */
 	aid: string;
+
+	/** path (folder to) res.json, default "res-vol" */
+	res_json?: string;
 }
 
 /**
@@ -27,7 +30,8 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
     nextAction: string | undefined;
 
 	synuri = '/album/syn';
-	apk_web = 'res-vol/portfolio-0.7.apk';
+	// apk_web = 'res-vol/portfolio-0.7.apk';
+	apk_web = 'url-root/res-vol/res.json/{apk}';
 
 	/**
 	 * The entity table name updated each time loaded a tree.
@@ -55,11 +59,20 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	componentDidMount() {
 		console.log(this.uri);
         let client = (this.context as AnContextType).anClient;
-        if (client) {
-		    // this.tier = new GalleryTier({uri: this.uri, synuri: this.props.synuri, client, comp: this});
-		    // this.tier.setContext(this.context as AnContextType);
-			// this.toSearch();
-        }
+        if (client) { }
+
+		let that = this;
+		let res_vol = `${this.props.res_json || 'res-vol'}`; 
+		fetch(`${res_vol}/res.json`) // Path relative to public folder
+			.then((response) => response.json())
+			.then((json) => {
+				that.apk_web = `${res_vol}/{json.apk}`;
+				if (typeof(that.apk_web) != 'string') 
+					console.error('apk_web is invalid.');
+				else
+					console.log(that.apk_web);
+			})
+			.catch((error) => console.error('Error loading JSON:', error));
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {

@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -274,13 +275,13 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     void updateTitle(Preference p, String s) { runOnUiThread(() -> p.setTitle(s)); }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == android.R.id.home) {
-//            onBackPressed();
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     //////////////////////////////// new confirm dialog pattern ////////////////////////////////////
 

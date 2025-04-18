@@ -297,7 +297,7 @@ export class App extends CrudCompW<AlbumProps> {
 	 * - portal: string
 	 */
 	static bindHtml(elem: string,
-					opts: AnreactAppOptions & {aid: string, uid: string, pswd: string}) {
+					opts: AnreactAppOptions & {aid: string, uid: string, pswd: string, platform?: string}) {
 		let portal = opts.portal ?? 'index.html';
 		let { aid, uid, pswd, clientOpts } = opts;
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
