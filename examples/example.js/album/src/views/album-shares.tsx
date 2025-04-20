@@ -21,6 +21,10 @@ interface AlbumShareProps extends Comprops {
 
 /**
  * Album View
+ * 
+ * Apk download link is: (props.res_json || 'res-vol')/res.json/{apk},
+ * where apk = res.json's json.apk.
+ * @see AlbumShareProps["res_json"]
  */
 export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
@@ -31,7 +35,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
 	synuri = '/album/syn';
 	// apk_web = 'res-vol/portfolio-0.7.apk';
-	apk_web = 'url-root/res-vol/res.json/{apk}';
+	apk_web: string | undefined = undefined; // 'url-root/res-vol/res.json/{apk}';
 
 	/**
 	 * The entity table name updated each time loaded a tree.
@@ -66,11 +70,13 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 		fetch(`${res_vol}/res.json`) // Path relative to public folder
 			.then((response) => response.json())
 			.then((json) => {
-				that.apk_web = `${res_vol}/{json.apk}`;
+				that.apk_web = `${res_vol}/${json.apk}`;
 				if (typeof(that.apk_web) != 'string') 
 					console.error('apk_web is invalid.');
-				else
+				else {
 					console.log(that.apk_web);
+					that.setState({});
+				}
 			})
 			.catch((error) => console.error('Error loading JSON:', error));
 	}
@@ -93,14 +99,15 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	  let {protocol, host} = window.location;
 	  let apklink = `${protocol}//${host}/${this.apk_web}`;
 	  console.log(apklink);
-	  return (<>
-	  	<Typography variant="h4" gutterBottom>Download APK</Typography>                    
-		<Card style={{"position": "absolute"}}>
+	  return (<> 
+	  	<Typography variant="h4" gutterBottom>Download APK</Typography>
+		{ this.apk_web &&
+		  <Card style={{"position": "absolute"}}>
 			<CardActionArea href={apklink}>
 			<QRCode value={apklink} bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
 			<DownloadAlbumIcon containersize={128} size={32} />
 			</CardActionArea>
-		</Card>
+		  </Card>}
 		</>);
 	}
 }
