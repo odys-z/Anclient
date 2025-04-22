@@ -323,7 +323,7 @@ class SysComp extends CrudCompW<SysProps> {
 
 		this.welcomePaper = this.welcomePaper.bind(this);
 
-		window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
+		// window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
 
 		this.state.showAppBar = !props.hideAppBar;
 	}
@@ -370,13 +370,13 @@ class SysComp extends CrudCompW<SysProps> {
 		// load menu
 		this.anreact = ctx.uiHelper;
 
-		let onfullscreen = ctx.onFullScreen;
-		ctx.onFullScreen = (isfull) => {
-			if (typeof(onfullscreen) === 'function')
-				onfullscreen(isfull);
+		// let onfullscreen = ctx.onFullScreen;
+		// ctx.onFullScreen = (isfull) => {
+		// 	if (typeof(onfullscreen) === 'function')
+		// 		onfullscreen(isfull);
 
-			this.setState({showAppBar: !isfull && !that.props.hideAppBar});
-		};
+		// 	this.setState({showAppBar: !isfull && !that.props.hideAppBar});
+		// };
 
 		let that = this;
 		this.anreact.loadMenu(

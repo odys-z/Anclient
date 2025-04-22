@@ -259,7 +259,18 @@ export class App extends CrudCompW<AlbumProps> {
 			  ihome   : this.props.iportal || 'portal.html',
 			  error   : this.error,
 			  ssInf   : undefined,
-			  clientOpts: this.props.clientOpts
+			  res_vol : 'res-vol',
+			  host_json:'private/host.json',
+			  clientOpts: this.props.clientOpts,
+			  onFullScreen: (isfull: boolean) => {
+				console.log('fullscreen', isfull);
+
+				if (this.props.clientOpts?.platform === 'android'
+					&& typeof (window as any).AndroidInterface !== 'undefined'
+					&& (window as any).AndroidInterface.onEvent) 
+
+					(window as any).AndroidInterface.onEvent(isfull);
+			}
 		  }} >
 			{/* <AlbumDocview synuri={this.synuri} aid={''} /> */}
 			<Sys msHideAppBar={0} tree={this.portfolioMenu} landingUrl={'/home'}

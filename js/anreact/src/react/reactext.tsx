@@ -31,6 +31,12 @@ export interface AnContextType extends Semantext {
 
 	hasError: boolean,
 
+	/** e.g.: private/host.json */
+	host_json: string,
+
+	/** e.g.: res-vol/res.json */
+	res_vol: string,
+
 	clientOpts?: ClientOptions
 
 	onFullScreen?: (isfull: any) => void;

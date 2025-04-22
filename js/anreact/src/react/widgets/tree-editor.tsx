@@ -250,6 +250,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 						{ typeof col.formatter === 'function' ?
 							col.formatter(col, tnode) :
 							<Typography noWrap variant='body2'
+								// issue: This is controlling the presentation layer by data service. Is this the right way?
 								align={align(n.css[col.field])}
 								className={classes.rowText} >
 								{n[col.field]}

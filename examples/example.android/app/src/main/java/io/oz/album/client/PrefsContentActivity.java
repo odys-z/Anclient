@@ -129,8 +129,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             String content = intentResult.getContents();
             if (content != null) {
                 String format  = intentResult.getFormatName();
-                if (eq(format, getString(R.string.qrformat))) {
-                    AnPrefEntries jsvEnts = prfConfig.jservs(); //jsvEntsDirty;
+                if (eq(format, "QR_CODE")) {
+                    AnPrefEntries jsvEnts = prfConfig.jservs();
                     if (jsvEnts.insert(content)) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);

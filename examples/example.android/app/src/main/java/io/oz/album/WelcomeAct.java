@@ -2,6 +2,7 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.bool;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
@@ -73,6 +74,7 @@ import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
+import io.oz.album.webview.WebViewJavaScriptInterface;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
@@ -100,6 +102,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
+    private int originalWindowFlags;
+    private int originalSystemUiVisibility;
+    private boolean requiresFullscreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +119,53 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
+
+//        originalWindowFlags = getWindow().getAttributes().flags;
+//        originalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+
+        WebView wv = findViewById(R.id.wv_welcome);
+        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this, (String d) -> {
+            if (bool(d)) {
+                requiresFullscreen = true;
+                findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+                findViewById(R.id.tv_status).setVisibility(View.GONE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().hide();
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//
+//                // Ensure content is drawn behind system bars (optional, for immersive look)
+//                getWindow().getDecorView().setSystemUiVisibility(
+//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
+//                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide status bar
+//                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Immersive mode, bars auto-hide on swipe
+//                );
+            }
+            else {
+                requiresFullscreen = false;
+                findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+                findViewById(R.id.tv_status).setVisibility(View.VISIBLE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().show();
+//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                getWindow().setFlags(originalWindowFlags, originalWindowFlags);
+//                getWindow().getDecorView().setSystemUiVisibility(originalSystemUiVisibility);
+            }
+        }), "AndroidInterface");
+
         errCtx = new AndErrorCtx().context(this);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
@@ -186,6 +238,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         WindowManager.LayoutParams attrs = getWindow().getAttributes();
 
+        if (!this.requiresFullscreen)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(attrs);
@@ -212,6 +265,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
+//        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this), "AndroidInterface");
         reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 

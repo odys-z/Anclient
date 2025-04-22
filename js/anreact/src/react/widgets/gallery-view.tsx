@@ -73,6 +73,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	photos: AnTreeNode[]; //PhotoCollect | undefined; 
 	slides: ImageSlide[];
 	albumtier: StreeTier;
+
+	fullcallback?: (isfull: boolean) => void;
 	
 	constructor(props: Comprops & GalleryProps) {
 		super(props);
@@ -93,6 +95,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 	componentDidMount() {
 		this.photos = this.props.photos;
+
+		this.fullcallback = this.context.onFullScreen;
 
 		if (!this.slides || this.slides.length === 0 
 			|| this.slides.length != this.photos.length
@@ -176,12 +180,17 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	openLightbox (_event: React.MouseEvent, ix: number) {
+		if (this.fullcallback)
+			this.fullcallback(true);
 		this.currentImx = ix;
 		this.showCarousel = true;
 		this.setState({});
 	}
 
 	closeLightbox () {
+		if (this.fullcallback)
+			this.fullcallback(false);
+
 		this.currentImx = 0;
 		this.showCarousel = false;
 		this.setState({})
@@ -219,10 +228,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,
-					onClose: () => {
-						that.showCarousel = false;
-						that.setState({});
-				  } } )
+					onClose: this.closeLightbox
+				  } )
 			 || <Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >

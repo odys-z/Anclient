@@ -191,6 +191,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 
 	render() {
 	  let that = this;
+	  let ismd  = this.props.media?.isMd;
 	  return (<>
 		  { this.tier && (
 			this.state.showingDocs ?
@@ -199,15 +200,14 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				tier={this.tier}
 				uri={this.synuri}
 				columns={[
-				  { type: 'iconame', field: 'docname', label: L('File Name'),
-					grid: {xs: 6, sm: 6, md: 5} },
-				  { type: 'text', field: 'mime', label: L('type'),
-					colFormatter: typeParser, // Customize a cell
-					grid: {xs: 1} },
-				  { type: 'text', field: 'shareby', label: L('share by'),
-					grid: {xs: false, sm: 3, md: 2} },
-				  { type: 'text', field: 'filesize', label: L('size'), 
-					grid: {xs: false, sm: 2, md: 2}, thFormatter: this.switchDocMedias }
+				  { type: 'iconame', field: 'docname', label: L('File Name'),   grid: {xs: 11, sm: 7, md: 8},
+				    style: {maxWidth: '90vw', overflow: 'hidden', textOverflow: 'ellipsis'} },
+				  { type: 'text',    field: 'mime', label: ismd ? L('type'):'', grid: {xs: 1, sm: 1, md: 1},
+				    style: {textAlign: 'center'}, colFormatter: typeParser },
+				  { type: 'text',    field: 'shareby', label: L('share by'),    grid: {xs: false, sm: 2, md: 1},
+					style: {textAlign: 'center', paddingRight: '1em'} },
+				  { type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: false, sm: 2, md: 2},
+				    style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias }
 				]}
 				onSelectChange={this.viewFile}
 			/> :

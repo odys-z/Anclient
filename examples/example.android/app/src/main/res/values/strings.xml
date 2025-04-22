@@ -26,7 +26,7 @@
     <string name="jserv_1"       translatable="false">@string/prod_jserv_ir</string>
     <string name="jserv_name1"   translatable="false">@string/prod_jserv_name_ir</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
-    <string name="qrformat"      translatable="false">QR_CODE</string>
+<!--    <string name="qrformat"      translatable="false">QR_CODE</string>-->
 
     <string name="key_regist" translatable="false">btn-register</string>
 <!--    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>-->

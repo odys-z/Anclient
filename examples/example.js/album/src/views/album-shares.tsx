@@ -16,13 +16,20 @@ interface AlbumShareProps extends Comprops {
 	aid: string;
 
 	/** path (folder to) res.json, default "res-vol" */
-	res_json?: string;
+	// res_json?: string;
+
+	/** e. g. private/host.json (the default) */
+	// host_json?: string;
 }
 
 /**
  * Album View
  * 
- * Apk download link is: (props.res_json || 'res-vol')/res.json/{apk},
+ * To Generate APK link:
+ *  
+ * First round: url_apk = (props.res_json || 'res-vol')/res.json/{apk},
+ * Second round: try resolve private/host.json.localip, url = localip : window[href].port / url_apk
+ * 
  * where apk = res.json's json.apk.
  * @see AlbumShareProps["res_json"]
  */
@@ -34,14 +41,9 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
     nextAction: string | undefined;
 
 	synuri = '/album/syn';
-	// apk_web = 'res-vol/portfolio-0.7.apk';
-	apk_web: string | undefined = undefined; // 'url-root/res-vol/res.json/{apk}';
 
-	/**
-	 * The entity table name updated each time loaded a tree.
-	 * Issue: See java AlbumResp.docTable's comments
-	docTabl: string = 'h_photos';
-	 */
+	/** 'url-root/res-vol/res.json/{apk}'; */
+	apk_web: string | undefined = undefined;
 
 	state = {
 		hasError: false,
@@ -49,9 +51,6 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
 	client : SessionClient | undefined;
 
-	/**
-	 * Restore session from window.localStorage
-	 */
 	constructor(props: AlbumShareProps | Readonly<AlbumShareProps>) {
 		super(props);
 
@@ -66,19 +65,39 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
         if (client) { }
 
 		let that = this;
-		let res_vol = `${this.props.res_json || 'res-vol'}`; 
+
+        let res_vol = (this.context as AnContextType).res_vol || 'res-vol';
+		let host_json = (this.context as AnContextType).host_json;
+
 		fetch(`${res_vol}/res.json`) // Path relative to public folder
-			.then((response) => response.json())
-			.then((json) => {
-				that.apk_web = `${res_vol}/${json.apk}`;
-				if (typeof(that.apk_web) != 'string') 
-					console.error('apk_web is invalid.');
-				else {
-					console.log(that.apk_web);
+		.then((response) => response.json())
+		.then((json) => {
+			let apk = `${res_vol}/${json.apk}`;
+			if (typeof(apk) != 'string') 
+				console.error('Apk resource is invalid.');
+			else {
+				let {protocol, host} = window.location;
+				that.apk_web = `${protocol}//${host}/${apk}`;
+				console.log(that.apk_web);
+
+				if (host_json)
+				fetch(host_json)
+				.then((response) => response.json())
+				.then((json) => {
+					let ip = json.localip;
+					if (ip) {
+						let {protocol, port} = window.location;
+						if (port) that.apk_web = `${protocol}//${ip}:${port}/${apk}`;
+						else that.apk_web = `${protocol}//${ip}/${apk}`;
+						console.log(that.apk_web);
+					}
+					else console.warn("host.json doesn't provide ip configuration.");
 					that.setState({});
-				}
-			})
-			.catch((error) => console.error('Error loading JSON:', error));
+				});
+				that.setState({});
+			}
+		})
+		.catch((error) => console.error('Error loading JSON:', error));
 	}
 
 	onError(c: string, r: AnsonMsg<AnsonResp> ) {
@@ -96,15 +115,15 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	}
 
 	render() {
-	  let {protocol, host} = window.location;
-	  let apklink = `${protocol}//${host}/${this.apk_web}`;
-	  console.log(apklink);
+	  // let {protocol, host} = window.location;
+	  // let apklink = `${protocol}//${host}/${this.apk_web}`;
+	  // console.log(apklink);
 	  return (<> 
 	  	<Typography variant="h4" gutterBottom>Download APK</Typography>
 		{ this.apk_web &&
 		  <Card style={{"position": "absolute"}}>
-			<CardActionArea href={apklink}>
-			<QRCode value={apklink} bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
+			<CardActionArea href={this.apk_web}>
+			<QRCode value={this.apk_web} bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
 			<DownloadAlbumIcon containersize={128} size={32} />
 			</CardActionArea>
 		  </Card>}
