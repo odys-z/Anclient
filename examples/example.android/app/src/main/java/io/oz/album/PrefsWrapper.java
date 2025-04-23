@@ -51,12 +51,11 @@ public class PrefsWrapper extends Anson {
 
     private String landingUrl;
 
-    @AnsonField(ignoreFrom = true, ignoreTo = true)
-//    private Context errctx;
 
     /**
      * Options' template for an uploading doc's, such as share-flags, etc.
      */
+//    @AnsonField(ignoreFrom = true, ignoreTo = true)
     ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
@@ -65,7 +64,6 @@ public class PrefsWrapper extends Anson {
         try {
             config = (PrefsWrapper) Anson.fromJson(sharedPref.getString(json_k,
                     "{\"type\":\"io.oz.album.PrefsWrapper\"}"));
-//            config.errctx = ctx;
             config.sharedpref = sharedPref;
 
             if (config.jservlist == null) {
