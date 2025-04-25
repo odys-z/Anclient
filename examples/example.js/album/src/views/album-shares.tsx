@@ -8,7 +8,7 @@ import { AnReactExt,
 	Comprops} from '@anclient/anreact';
 import QRCode from 'react-qr-code';
 import { Card, CardActionArea, Typography } from '@material-ui/core';
-import { DownloadAlbumIcon } from '../icons/android';
+import { IcoDownloadApk } from '../icons/android';
 
 interface AlbumShareProps extends Comprops {
 	synuri: string
@@ -115,16 +115,13 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	}
 
 	render() {
-	  // let {protocol, host} = window.location;
-	  // let apklink = `${protocol}//${host}/${this.apk_web}`;
-	  // console.log(apklink);
 	  return (<> 
 	  	<Typography variant="h4" gutterBottom>Download APK</Typography>
 		{ this.apk_web &&
 		  <Card style={{"position": "absolute"}}>
 			<CardActionArea href={this.apk_web}>
 			<QRCode value={this.apk_web} bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
-			<DownloadAlbumIcon containersize={128} size={32} />
+			<IcoDownloadApk containersize={128} size={32} />
 			</CardActionArea>
 		  </Card>}
 		</>);

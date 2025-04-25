@@ -34,20 +34,40 @@ export interface AnContextType extends Semantext {
 	/** e.g.: private/host.json */
 	host_json: string,
 
-	/** e.g.: res-vol/res.json */
+	/**
+	 * e.g.: res-vol/res.json
+	 * @since 0.6.5
+	 */
 	res_vol: string,
 
+	/**
+	 * @since 0.6.5
+	 */
 	clientOpts?: ClientOptions
 
+	/**
+	 * Fullscreen event handler, a contract between the main frame (client window) and child components.
+	 * 
+	 * @since 0.6.5
+	 */
 	onFullScreen?: (isfull: any) => void;
 }
 
+/**
+ * @since 0.6.5 
+ */
 export interface ClientOptions {
 	/**
 	 * False: use iframe (pdf-iframe) for pdf, which uses browser's pdf rendere;
 	 * True: Use anreact/react/widgets/pdf-view.
 	 */
 	legacyPDF?: boolean
+
+	/** 
+	 * @since 0.6.5
+	 * 
+	 * Default: 'browser'
+	 */
 	platform?: 'android' | 'browser'
 }
 
