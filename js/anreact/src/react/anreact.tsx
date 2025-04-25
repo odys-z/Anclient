@@ -87,7 +87,6 @@ export const invalidStyles = {
 } as {[n in InvalidClassNames]: CSSProperties};
 
 export function toReactStyles(styles: CSS.Properties ) {
-// export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 

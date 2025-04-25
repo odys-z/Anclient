@@ -91,6 +91,8 @@ class LoginComp extends React.Component<LoginProps> {
 	componentDidMount() {
 		this.state.pswd = this.config.pswd;
 		this.state.userId = this.config.userid;
+
+		console.log(this.props.uri)
 	}
 
 	alert(classes: ClassNames) {
@@ -129,7 +131,11 @@ class LoginComp extends React.Component<LoginProps> {
 			let serv = ctx.servId || 'host';
 			let hosturl = ctx.servs[serv];
 
-			if (hosturl === undefined || hosturl.length <= 4) {
+			if (ctx.servs.syndomx) {
+				// Synode 0.7.1
+				hosturl = ctx.servs.syndomx[hosturl] || hosturl;
+			}
+			else if (hosturl === undefined || !hosturl.startsWith('http')) {
 				console.error(ctx.servs);
 				throw new Error(`No jserv-root configured for ${serv} in AnContext. Check private/host.json.`);
 			}

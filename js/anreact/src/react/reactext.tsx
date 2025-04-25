@@ -1,4 +1,4 @@
-import { ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
 import React from 'react';
 
 import { AnReact } from './anreact';
@@ -87,9 +87,8 @@ export const AnContext = React.createContext({
 	anReact: undefined,
 
 	error: {
-		/**@function (code: string, AnsonMsg<AnsonResp>) => void */
-		onError: undefined,
-		msg: undefined
+		onError: undefined as (code: string, resp: AnsonMsg<AnsonResp>) => undefined,
+		msg: undefined as string
 	} as ErrorCtx,
 	hasError: false,
 
