@@ -102,6 +102,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			ihome: this.props.iportal || 'portal.html',
 			error: this.error,
 			ssInf: undefined,
+			host_json: 'private/host.json',
 		}} >
 		  { this.tier.synodeLable() &&
 		    <Typography noWrap variant='body2'>{this.tier.synodeLable()}</Typography>}

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, JsonHosts, AnQueryst
+import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, JsonHosts, AnQueryst, ExternalHosts
 } from '@anclient/anreact';
 import { AnsonMsg, AnsonResp, NV, SessionClient, SessionInf } from '@anclient/semantier';
 import { Theme } from '@material-ui/core/styles';
@@ -16,12 +16,6 @@ const styles = (theme: Theme) => ({
 	    '& *': { margin: theme.spacing(1) }
 	},
 });
-
-export interface ExternalHosts {
-	host: string;
-	localip: string;
-	syndomx: { [key: string]: string };
-}
 
 export interface LoginProps extends Comprops {
 	servs: ExternalHosts;
@@ -40,37 +34,37 @@ class LoginApp extends React.Component<LoginProps> {
 
 	anClient: SessionClient | undefined;
 
-	/** current synode id */
-	servId: string;
-
-	/** jserv root url */
-	// jserv: string;
-
 	errCtx = {
 		msg: '',
 		onError: this.onError
 	};
 
-	jservNvs: NV[];
-	jserv: string;
-	domain: string;
+	// domain: string;
+	// /** current synode id */
+	// servId: string;
+	// jserv: string;
+	// jservNvs: NV[];
+	servdoms: ExternalHosts | undefined;
 
 	constructor(props: LoginProps) {
 		super(props);
 
 		this.uri = "/album/sys";
 
-		let host: string = props.servId ? props.servId : 'host';
-		host = props.servs[host as keyof ExternalHosts] as string;
-		this.servId = host;
-		
-		this.jservNvs = Object
-			.entries(props.servs.syndomx)
-			.filter(([x, v]) => x !== 'domain')
-			.map(([k, v]) => {return {n: k, v}});
+		// let host: string = props.servId ? props.servId : 'host';
+		this.servdoms = new ExternalHosts(props.servs); // .ServId(props.servId || 'host');
 
-		this.domain = props.servs.syndomx['domain'];
-		this.jserv = props.servs.syndomx[host]; // String(this.jservNvs.find((v) => v.n === this.servId)?.v || '');
+		// host = props.servs[host as keyof ExternalHosts] as string;
+		// this.servId = host;
+
+		// this.domain = (props.servs.syndomx ?? {})['domain'];
+		// this.jserv = (props.servs.syndomx ?? {} )[host]; // String(this.jservNvs.find((v) => v.n === this.servId)?.v || '');
+		
+		// this.jservNvs = Object
+		// 	.entries(props.servs.syndomx || {})
+		// 	.filter(([x, v]) => x !== 'domain')
+		// 	.map(([k, v]) => {return {n: k, v}});
+		
 
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
@@ -93,27 +87,31 @@ class LoginApp extends React.Component<LoginProps> {
 			if (!mainpage)
 				console.error('Login succeed, but no home page be found.');
 			else {
-				this.props.iparent.location = `${mainpage}?serv=${this.servId}`;
+				this.props.iparent.location = this.servdoms && this.servdoms?.host
+					?  `${mainpage}?serv=${this.servdoms?.host}`
+					: mainpage;
 				this.setState({anClient: clientInf});
 			}
 		}
 	}
 
 	render() {
+		let that = this;
+		let {domain, host, jserv, jservNvs} = this.servdoms as ExternalHosts;
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
 				ssInf: undefined,
 				ihome: '',
 				uiHelper: undefined,
-				servId: this.servId,
+				// servId: this.servId,
+				servId: host,
 				servs: this.props.servs as unknown as JsonHosts,
 				anClient: this.anClient as SessionClient,
 				hasError: this.state.hasError,
 				iparent: this.props.iparent,
 				error: this.errCtx,
 
-				res_vol : 'res-vol',
 				host_json:'private/host.json',
 				clientOpts: this.props.clientOpts,
 			}} >
@@ -123,28 +121,28 @@ class LoginApp extends React.Component<LoginProps> {
 					conds = { {
 						// pageInf: new PageInf(0, 20),
 						query: [ { 
-							type: 'cbb', options: this.jservNvs,
-							label: this.domain, // L('Select Synode'),
+							type: 'cbb', options: jservNvs,
+							label: domain, // L('Select Synode'),
 							field: '__delete__',
 							grid: {sm: 12, md: 7, lg: 4},
-							val: {n: this.servId, v: this.jserv},
+							val: {n: host, v: jserv},
 							onSelectChange: (v: NV) => {
 								if (v && v.n) {
-									this.servId = v.n;
-									this.jserv = v.v as string;
+									(that.servdoms as ExternalHosts).host = v.n;
+									(that.servdoms as ExternalHosts).jserv = v.v as string;
 								}
 								else
-									this.servId = undefined as any;
+									(that.servdoms as ExternalHosts).host = undefined as any;
 								this.setState({})}
 						} ] } }
 				/>
 				<Login onLogin={this.onLogin} uri={this.uri}/>
 
-				{this.servId && <>
+				{this.servdoms && this.servdoms.host && <>
 				<Typography variant='subtitle2' color='primary' gutterBottom>Scan here for login on Andriod.</Typography>
 				<Box style={{'justifyContent': 'center', 'width': '70vw', 'display': 'flex'}}>
 				<Card style={{'position': 'absolute'}}>
-					<QRCode value={formatJservQr(this.servId, this.jserv)}
+					<QRCode value={formatJservQr(host, jserv as string)}
 							bgColor={'#FFFFFF'} fgColor={'#000000'} size={320} level='H' />
 					<IcoLoginAlbum containersize={320} size={48} />
 				</Card></Box></>}

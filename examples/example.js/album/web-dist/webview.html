@@ -35,13 +35,8 @@
         aid, serv, Window, portal: 'index.html', clientOpts});
     }
 
-    if (searchParams && searchParams.get('debug'))
-      // debug by automatically login
-      loadAlbum('ody', '8964', {legacyPDF: false || !!searchParams.get('legacyPDF')});
-    else
-      // logged in successfully
-      album.App.bindHtml('app', {serv, Window, portal: 'index.html',
-                        clientOpts: {legacyPDF: false || !!searchParams.get('legacyPDF')}});
+    // start / debug script:
+    // loadAlbum('ody', '8964', {legacyPDF: true || !!searchParams.get('android')});
   </script>
 
 </body>

@@ -28,7 +28,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 
     inclient?: Inseclient;
 	anReact? : AnReactExt;  // helper for React
-	error: ErrorCtx;
+	// error: ErrorCtx;
     nextAction: string | undefined;
 
 	albumsk = 'tree-album-family-folder';
@@ -42,7 +42,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	docTabl: string = 'h_photos';
 
 	state = {
-		hasError: false,
+		// hasError: false,
 		showingDocs: false,
 		sk: undefined,
 	};
@@ -61,11 +61,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 
 		this.uri = '/album/sys';
 
-		this.error   = {onError: this.onError, msg: '', that: this};
+		// this.error   = {onError: this.onError, msg: '', that: this};
 		this.docIcon = new DocIcon();
 
-		this.onError = this.onError.bind(this);
-		this.onErrorClose = this.onErrorClose.bind(this);
+		// this.onError = this.onError.bind(this);
+		// this.onErrorClose = this.onErrorClose.bind(this);
 		this.toSearch = this.toSearch.bind(this);
 		this.switchDocMedias = this.switchDocMedias.bind(this);
         this.viewFile = this.viewFile.bind(this);
@@ -95,9 +95,9 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				that.docTabl = (rep.Body() as AlbumResp).docTabl || 'h_photos';
 				that.setState({});
 			}},
-			this.error);
+			this.context.error);
 
-		this.onErrorClose();
+		// this.context.onErrorClose();
 	}
 
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
@@ -162,10 +162,11 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				}
 				else {
 					this.pdfview = undefined;
-					this.error.msg = L('Type {t} is not supported yet.', {t});
-					this.setState({
-						hasError: true,
-						nextAction: 'ignore'});
+					// this.context.error.msg = L('Type {t} is not supported yet.', {t});
+					// this.setState({
+					// 	hasError: true,
+					// 	nextAction: 'ignore'});
+					this.context.error.onError( L('Type {t} is not supported yet.', {t}), undefined);
 				}
 			}
 		}
@@ -175,19 +176,19 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		this.setState({});
 	};
 
-	onError(c: string, r: AnsonMsg<AnsonResp> ) {
-		console.error(c, r.Body()?.msg(), r);
-		let ui = (this as ErrorCtx).that as AlbumDocview;
-		ui.error.msg = r.Body()?.msg();
-		ui.state.hasError = !!c;
-		ui.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
-		ui.setState({});
-	}
+	// onError(c: string, r: AnsonMsg<AnsonResp> ) {
+	// 	console.error(c, r.Body()?.msg(), r);
+	// 	let ui = (this as ErrorCtx).that as AlbumDocview;
+	// 	ui.error.msg = r.Body()?.msg();
+	// 	ui.state.hasError = !!c;
+	// 	ui.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
+	// 	ui.setState({});
+	// }
 
-	onErrorClose() {
-        this.state.hasError = false;
-		this.setState({});
-	}
+	// onErrorClose() {
+    //     this.state.hasError = false;
+	// 	this.setState({});
+	// }
 
 	render() {
 	  let that = this;
@@ -200,14 +201,15 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				tier={this.tier}
 				uri={this.synuri}
 				columns={[
-				  { type: 'iconame', field: 'docname', label: L('File Name'),   grid: {xs: 11, sm: 7, md: 8},
+				  { type: 'iconame', field: 'docname', label: L('File Name'),   grid: {xs: 10, sm: 7, md: 8},
 				    style: {maxWidth: '90vw', overflow: 'hidden', textOverflow: 'ellipsis'} },
 				  { type: 'text',    field: 'mime', label: ismd ? L('type'):'', grid: {xs: 1, sm: 1, md: 1},
 				    style: {textAlign: 'center'}, colFormatter: typeParser },
 				  { type: 'text',    field: 'shareby', label: L('share by'),    grid: {xs: false, sm: 2, md: 1},
 					style: {textAlign: 'center', paddingRight: '1em'} },
-				  { type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: false, sm: 2, md: 2},
-				    style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias }
+				  { type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: 1, sm: 2, md: 2},
+				    style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias,
+					colFormatter: (col, n, opts) => opts?.media?.isMd ? <span>{n.node.filesize}</span> : <></>}
 				]}
 				onSelectChange={this.viewFile}
 			/> :
@@ -228,10 +230,10 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 			/>) }
 		  { this.pdfview }
 		  { this.orgview }
-		  { this.state.hasError &&
+		  {/* { this.state.hasError &&
 			<AnError onClose={this.onErrorClose} fullScreen={false}
 				uri={this.uri} tier={undefined}
-				title={L('Error')} msg={this.error.msg || ''} /> }
+				title={L('Error')} msg={this.error.msg || ''} /> } */}
 	  </>);
 
 	  function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {

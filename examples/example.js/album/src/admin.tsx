@@ -1,5 +1,5 @@
 
-import React, { DOMElement } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
@@ -161,6 +161,8 @@ class Admin extends React.Component<Approps> {
 				iparent : this.props.iparent,
 				ihome: "#", // this.props.iportal || 'portal.html',
 				error: this.errorCtx,
+
+				host_json: 'private/host.json',
 			}} >
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
@@ -197,7 +199,7 @@ class Admin extends React.Component<Approps> {
 		}
 		
 		function login(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
-			let jserv = json[opts.serv || 'host'];
+			let jserv = json[opts.serv || 'host'] as string;
 			an.init(jserv)
 			  .login( uid, pswd,
 				(client: SessionClient) => {

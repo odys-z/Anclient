@@ -102,8 +102,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
-    private int originalWindowFlags;
-    private int originalSystemUiVisibility;
+//    private int originalWindowFlags;
+//    private int originalSystemUiVisibility;
     private boolean requiresFullscreen;
 
     @Override

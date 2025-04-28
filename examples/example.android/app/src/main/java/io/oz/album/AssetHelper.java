@@ -7,7 +7,7 @@ import io.oz.R;
 
 public class AssetHelper {
 
-    public static final String albumHome = "index.html";
+    public static final String albumHome = "webview.html";
     public static final String adminHome = "admin.html";
     public static final String synchPage = "sync.html";
 
