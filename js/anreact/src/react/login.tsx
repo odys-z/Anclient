@@ -129,13 +129,13 @@ class LoginComp extends React.Component<LoginProps> {
 
 		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
-			let hosturl = ctx.servs[serv];
+			let hosturl = ctx.servs[serv] as string;
 
 			if (ctx.servs.syndomx) {
 				// Synode 0.7.1
-				hosturl = ctx.servs.syndomx[hosturl] || hosturl;
+				hosturl = ctx.servs.syndomx[serv] || hosturl;
 			}
-			else if (hosturl === undefined || !hosturl.startsWith('http')) {
+			if (hosturl === undefined || !hosturl.startsWith('http')) {
 				console.error(ctx.servs);
 				throw new Error(`No jserv-root configured for ${serv} in AnContext. Check private/host.json.`);
 			}

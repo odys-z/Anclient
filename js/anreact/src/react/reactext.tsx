@@ -7,8 +7,41 @@ import { AnReact } from './anreact';
  * The configuration data object used by user App to setup jserv root URL.
  */
 export interface JsonHosts {
-	host?: string;
-	[h: string]: string,
+	host: string;
+	[h: string]: string | object,
+}
+
+export class ExternalHosts implements JsonHosts {
+	[h: string]: string | object;
+
+	host: string;
+	localip?: string;
+	syndomx?: { [key: string]: string };
+
+
+	constructor(json: {host: string, localip?: string, syndomx?: { [key: string]: string }}) {
+		Object.assign(this, json);
+
+		if (json !== undefined && json.host !== undefined) 
+			this.ServId(json.host);
+	}
+
+	/**
+	 * Setup which servId to use for jserv.
+	 * @param servId 
+	 * @returns this
+	 */
+	ServId (servId: string): this {
+		this.host = servId;
+		this.domain = (this.syndomx ?? {})['domain'];
+		this.jserv = (this.syndomx ?? {} )[this.host];
+		
+		this.jservNvs = Object
+			.entries(this.syndomx || {})
+			.filter(([x, v]) => x !== 'domain')
+			.map(([k, v]) => {return {n: k, v}});
+		return this;
+	}
 }
 
 export interface AnContextType extends Semantext {
@@ -37,8 +70,8 @@ export interface AnContextType extends Semantext {
 	/**
 	 * e.g.: res-vol/res.json
 	 * @since 0.6.5
-	 */
 	res_vol: string,
+	 */
 
 	/**
 	 * @since 0.6.5

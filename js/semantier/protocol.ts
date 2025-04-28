@@ -443,6 +443,16 @@ export class AnsonMsg<T extends AnsonBody> {
 
 	/**
 	 * @param json a json object to be deserialized.
+	 * 
+	 * TODO
+	 * There are better ways for this in Typescript:
+	 * const person = { ...new Person(), ...data };
+	 * or 
+	 * const person = Object.assign(new Person(), data as Partial<Person>);
+	 * ____________________________________________________________________
+	 * 
+	 * <p>Grok recommend using registered contructor rather than find constructor
+	 * from globe, the window.</p>
 	 */
     constructor(json: any) {
 		if (typeof json !== 'object')

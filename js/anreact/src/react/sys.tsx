@@ -40,6 +40,7 @@ import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import withWidth from '@material-ui/core/withWidth';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@material-ui/core/Fab';
+import { contextType } from 'react-modal';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -297,6 +298,7 @@ class SysComp extends CrudCompW<SysProps> {
 	anreact: AnReactExt;
 
 	confirmLogout: any;
+	onfullscreen: (isfull: any) => void;
 
 	static extendLinks(links) {
 		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
@@ -371,12 +373,14 @@ class SysComp extends CrudCompW<SysProps> {
 		this.anreact = ctx.uiHelper;
 
 		let onfullscreen = ctx.onFullScreen;
-		ctx.onFullScreen = (isfull) => {
+		this.onfullscreen = (isfull) => {
+			// TODO FIXME this is not called once the Error dialog is closed in app.tsx.
 			if (typeof(onfullscreen) === 'function')
 				onfullscreen(isfull);
 
 			this.setState({showAppBar: !isfull && !that.props.hideAppBar});
 		};
+		ctx.onFullScreen = this.onfullscreen;
 
 		let that = this;
 		this.anreact.loadMenu(
@@ -398,6 +402,10 @@ class SysComp extends CrudCompW<SysProps> {
 	}
 
 	componentDidUpdate(_: Readonly<SysProps>, _p: Readonly<{}>, _s?: any): void {
+		// reached here once the Error dialog is closed.
+		if (typeof(this.onfullscreen) === 'function')
+			this.context.onFullScreen = this.onfullscreen;
+
 		if (this.props.msHideAppBar > 0 && this.barAutoHidden) {
 			let that = this;
 			setTimeout(()=>{

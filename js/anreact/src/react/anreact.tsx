@@ -5,13 +5,13 @@ import * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
 	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs,
-	Tierec
+	Tierec,	an
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { ClientOptions, JsonHosts } from './reactext';
+import { ClientOptions, ExternalHosts, JsonHosts } from './reactext';
 import { MenuItem } from './sys';
 
 export interface ClassNames {[c: string]: string};
@@ -178,9 +178,12 @@ export class AnReact {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 	 * }
+	 * 
+	 * @since 0.6.5, there is another way to load servs, see album-shares.tsx.
+	 * host.json is planned to be deserialized as an instance of ExternalHosts.
 	 */
 	static loadServs( elem: string, opts: AnreactAppOptions,
-				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonHosts) => void) {
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: ExternalHosts) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -190,13 +193,13 @@ export class AnReact {
 				dataType: "json",
 				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
 			})
-			.done( (json: JsonHosts) => onJsonServ(elem, opts, json) )
+			.done( (json: ExternalHosts) => onJsonServ(elem, opts, new ExternalHosts(json)) )
 			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: `github.json?q=${Date.now()}`,
 				})
-				.done((json: JsonHosts) => onJsonServ(elem, opts, json))
+				.done((json: ExternalHosts) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
@@ -234,6 +237,11 @@ export interface AnreactAppOptions {
 	/** not used */
 	portal?: string;
 
+	/** login page
+	 * @since 0.6.5, used for nextAction == 're-login' target href location. 
+	 */
+	login?: string;
+
 	/**parent window */
 	parent?: Window;
 
@@ -248,10 +256,16 @@ export interface AnreactAppOptions {
 export class AnReactExt extends AnReact {
 	loading: boolean;
 
+	/** @deprecated replaced by ExtendPort */
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
 		return this;
 	}
+
+	static ExtendPort(ports: {[p: string]: string}) {
+		an.understandPorts(ports);
+	}
+
 
 	/** Load jsample menu. (using DatasetReq & menu.serv)
 	 * @since v0.9.32, AnReact(Ext) won't care error handling anymore.

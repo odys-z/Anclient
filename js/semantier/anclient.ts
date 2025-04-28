@@ -866,6 +866,7 @@ class SessionClient {
 		},
 		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
+			onError.onError(c, e);
 		} });
 	}
 }
