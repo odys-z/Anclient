@@ -9,3 +9,5 @@ release
 commit.comments*
 *.comments
 commit.*
+
+.idea
