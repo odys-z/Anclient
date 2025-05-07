@@ -7,3 +7,12 @@ release
 .vscode
 **/temp*
 commit.comments*
+*.comments
+commit.*
+
+.idea
+__pycache__
+dist
+*.egg-info
+*.egg
+
