@@ -14,11 +14,11 @@ print(f'--Anclient.py3 {version}--'),
 setup(
     name='anclient.py3',
     version=version,
-    description='Portfolio Synode Stand Alone Service',
+    description='Semantic-jserv Python Client',
     author='Ody Z',
     zip_safe=False,
     author_email='odys.zhou@gmail.com',
-    keywords='Documents Files Relational Database Synchronization',
+    keywords='semantic client tiers',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
@@ -27,8 +27,6 @@ setup(
 
     package_data={
     },
-
-    entry_points={'console_scripts': ['synode-uninstall-srv = src.synodepy3.cli:uninst_srv', 'synode-clean = src.synodepy3.cli:clean', 'synode-start-web = src.synodepy3.cli:startweb']},
 
     include_package_data=True,
     
