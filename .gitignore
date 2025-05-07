@@ -12,3 +12,6 @@ commit.*
 
 .idea
 __pycache__
+dist
+*.egg-info
+*.egg

@@ -12,7 +12,7 @@ version = '0.1.0'
 print(f'--Anclient.py3 {version}--'),
 
 setup(
-    name='Anclient.py3',
+    name='anclient.py3',
     version=version,
     description='Portfolio Synode Stand Alone Service',
     author='Ody Z',
