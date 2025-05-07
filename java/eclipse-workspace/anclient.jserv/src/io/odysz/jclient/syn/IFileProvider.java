@@ -1,9 +1,13 @@
 package io.odysz.jclient.syn;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 
 /**
  * <p>A file accessor used by AlbumTier etc., for accessing files without visiting traditional file system.</p>
@@ -21,7 +25,7 @@ public interface IFileProvider {
      * <pre>return Files.size(Paths.get(f.fullpath());</pre>
      * @return size
      */
-    long meta(ExpSyncDoc f) throws IOException;
+    default long meta(IFileDescriptor f) throws IOException { return Files.size(Paths.get(f.fullpath())); };
 
     /**
      * <p>Open file input stream.</p>
@@ -30,7 +34,7 @@ public interface IFileProvider {
      *
      * @return readable stream
      */
-    InputStream open(ExpSyncDoc f) throws IOException;
+    default InputStream open(IFileDescriptor f) throws IOException { return (InputStream) new FileInputStream(new File(f.fullpath())); };
 
     /**
      * <p>Resolve the initial folder (with Policies).</p>
@@ -41,5 +45,5 @@ public interface IFileProvider {
      * @since 0.2.1 (Albumtier)
      * @return initial folder to save the file at server side
      */
-    String saveFolder();
+    // String saveFolder();
 }

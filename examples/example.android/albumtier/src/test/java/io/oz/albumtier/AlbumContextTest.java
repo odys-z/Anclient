@@ -25,7 +25,7 @@ class AlbumContextTest {
 	void testLogin() throws SemanticException, AnsonException, IOException, InterruptedException {
 		String uri = "/test/ss-repack";
 		AlbumContext ctx = new AlbumContext()
-				.init("f/zsu", "syrskyi", "test", "http://localhost:8081");
+				.init("f/zsu", "syrskyi", "8964", "test", "http://localhost:8081");
 
 		Object[] code = new Object[] {0, null};
 		ctx.login("syrskyi", "слава україні",
@@ -35,7 +35,7 @@ class AlbumContextTest {
 					try {
 						code[0] = 1;
 						AnsonBody reqbd = new DocsReq(uri)
-												.a(DocsReq.A.checkDev);
+										.a(DocsReq.A.checkDev);
 						AnsonMsg<AnsonBody> req = client.userReq(uri, AlbumPort.album, reqbd);
 						DocsResp resp = client.commit(req, (MsgCode c, String msg, String... args) -> {
 							fail(msg);

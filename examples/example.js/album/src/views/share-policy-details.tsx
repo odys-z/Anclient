@@ -13,7 +13,7 @@ import Switch from '@material-ui/core/Switch';
 
 import { Theme } from '@material-ui/core';
 
-import { CRUD, Protocol, Tierec, AnTreeNode, AnlistColAttrs, DbCol } from '@anclient/semantier';
+import { CRUD, Protocol, Tierec, AnlistColAttrs, DbCol } from '@anclient/semantier';
 
 import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree,
 	TRecordForm, Media, ClassNames } from '@anclient/anreact'

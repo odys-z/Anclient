@@ -1,6 +1,6 @@
 import AES from './aes';
 import { SessionClient, SessionInf } from './anclient';
-import { arr, isEmpty, len, size, str } from './helpers';
+import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
@@ -443,6 +443,16 @@ export class AnsonMsg<T extends AnsonBody> {
 
 	/**
 	 * @param json a json object to be deserialized.
+	 * 
+	 * TODO
+	 * There are better ways for this in Typescript:
+	 * const person = { ...new Person(), ...data };
+	 * or 
+	 * const person = Object.assign(new Person(), data as Partial<Person>);
+	 * ____________________________________________________________________
+	 * 
+	 * <p>Grok recommend using registered contructor rather than find constructor
+	 * from globe, the window.</p>
 	 */
     constructor(json: any) {
 		if (typeof json !== 'object')
@@ -453,53 +463,62 @@ export class AnsonMsg<T extends AnsonBody> {
 			this.header = header;
 		else this.header = new AnHeader(undefined, undefined, undefined);
 
-		let [body] = json.body ? json.body : [{}] as any[];
-		let a = body.a;
+		if (!(json instanceof AnsonBody)) {
+			let [body] = json.body ? json.body : [{}] as any[];
+			let a = body.a;
 
-		// initiating json to class
-		if (body.constructor.name === 'Object') {
-			if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
-				body = new AnsonResp(body);
-			// else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
-			// 	body = new AnSessionResp(body);
-			else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
-				body = new AnSessionReq(body.uid, body.token, body.iv);
-			// else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
-			// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
-			else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
-				body = new UserReq(json.port, header, [body]);
-			else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
-				// body are provided by user
-				if (!body.sk) {
-					console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
-							"For example, see https://github.com/odys-z/Anclient/blob/master/js/semantier/test/03-jsample.mocha.ts");
-					throw new Error("DatasetReq.sk is essential but empty.");
+			// initiating json to class
+			if (body.constructor.name === 'Object') {
+				if (body.type === 'io.odysz.semantic.jprotocol.AnsonResp')
+					body = new AnsonResp(body);
+				// else if (body.type === 'io.odysz.semantic.jsession.AnSessionResp')
+				// 	body = new AnSessionResp(body);
+				else if (body.type === 'io.odysz.semantic.jsession.AnSessionReq')
+					body = new AnSessionReq(body.uid, body.token, body.iv);
+				// else if (body.type === "io.odysz.semantic.jserv.R.AnQueryReq")
+				// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
+				else if (body.type === 'io.odysz.semantic.jserv.user.UserReq')
+					body = new UserReq(json.port, header, [body]);
+				else if (body.type === "io.odysz.semantic.ext.AnDatasetReq") {
+					// body are provided by user
+					if (!body.sk) {
+						console.error("Since AnClient 0.9.28, constructing DatasetReq with AnsonMsg constructor needs providing DatasetReq as body.",
+								"For example, see https://github.com/odys-z/Anclient/blob/master/js/semantier/test/03-jsample.mocha.ts");
+						throw new Error("DatasetReq.sk is essential but empty.");
+					}
 				}
+				else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
+					body = new AnDatasetResp(body);
+
+				else if (body.type === DatasetierReq.__type__)
+					body = new DatasetierReq(body);
+				else if (body.type === DatasetierResp.__type__)
+					body = new DatasetierResp(body);
+
+				else if (body.type in Protocol.ansonTypes)
+					// TODO FIXME what happens if the other known types are all handled like this?
+					body = Protocol.ansonTypes[body.type](body);
+				else {
+					// server can't handle body without type
+					throw new Error("Error: Using json object directly as body. To extend protocol, register a new Protocol like this:"
+						+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
+						+ "\nType not handled : " + body.type );
+				}
+
+				if (a) body.A(a);
+
+				// imitate the ajax error
+				if (json.ajax)
+					body.ajax = json.ajax;
 			}
-			else if (body.type === "io.odysz.semantic.ext.AnDatasetResp")
-				body = new AnDatasetResp(body);
 
-			else if (body.type === DatasetierReq.__type__)
-				body = new DatasetierReq(body);
-			else if (body.type === DatasetierResp.__type__)
-				body = new DatasetierResp(body);
+			this.body = [];
+			if (body)
+				body.parent = this.type;
+			this.body.push(body);
 
-			else if (body.type in Protocol.ansonTypes)
-				// TODO FIXME what happens if the other known types are all handled like this?
-				body = Protocol.ansonTypes[body.type](body);
-			else {
-				// server can't handle body without type
-				throw new Error("Error: Using json object directly as body. To extend protocol, register a new Protocol like this:"
-					+ "\nProtocol.registerBody('io.odysz.jquiz.QuizResp', (jsonBd) => { return new QuizResp(jsonBd); });"
-					+ "\nType not handled : " + body.type );
-			}
-
-			if (a) body.A(a);
-
-			// imitate the ajax error
-			if (json.ajax)
-				body.ajax = json.ajax;
 		}
+		else this.body = [json as T];
 
 		this.code = json.code;
 		this.version = json.version ? json.version : "1.0";
@@ -510,11 +529,6 @@ export class AnsonMsg<T extends AnsonBody> {
 			this.seq = Math.round(Math.random() * 1000);
 
 		this.opts = Protocol.valOptions;
-
-		this.body = [];
-		if (body)
-			body.parent = this.type;
-		this.body.push(body);
     }
 
     /** A short cut for body[0].post()
@@ -1361,7 +1375,7 @@ export class AnsonResp extends AnsonBody {
 
     rs: AnResultset | Array<AnResultset>;
     Rs(rx = 0): AnResultset {
-		return this.rs?.length ? this.rs[rx] : this.rs;
+		return Array.isArray(this.rs) ? this.rs[rx] : this.rs;
 	}
 
     data: {props?: {}};
@@ -1413,9 +1427,10 @@ Protocol.registerBody(AnSessionResp.__type__, (json) => new AnSessionResp(json))
  */
 export class AnDatasetResp extends AnsonResp {
 	forest: Array<Tierec>;
+	static __type__ = "io.odysz.semantic.ext.AnDatasetResp";
 
 	constructor(dsJson: { forest: Tierec[]; }) {
-		super(dsJson);
+		super(Object.assign(dsJson, {type: AnDatasetResp.__type__}));
 		this.forest = dsJson.forest;
 	}
 
@@ -1423,6 +1438,7 @@ export class AnDatasetResp extends AnsonResp {
 		return this.rs? this.rs[rx] : undefined;
 	}
 }
+Protocol.registerBody(AnDatasetResp.__type__, (json) => new AnDatasetResp(json));
 
 export interface DatasetOpts {
 	/** API args should ignore this */
@@ -1777,7 +1793,7 @@ Protocol.registerBody(DocsResp.__type__, (json) => new DocsResp(json));
 export class SyncDoc implements Tierec {
 	/**
 	 * 'io.odysz.semantic.tier.docs.ExpSynDoc'
-	 * As this is an anbstract class, subclass must provide the static "type" field. 
+	 * As this is an anbstract class (in Java), subclass must provide the static "type" field. 
 	 */
 	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
 
@@ -1786,20 +1802,22 @@ export class SyncDoc implements Tierec {
 	type?: string;
 
 	/** pid */
-	docId?: string;
+	// docId?: string;
 
 	/** card title */
 	pname?: string;
 	shareby?: string | undefined;
 	sharedate?: string;
 	device?: string;
-
-	src: string;
+	src?: string;
+	syncFlag?: string;
+	size?: number;
+	mime?: string;
 
 	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
-		this.type = opt.type;
+		this.type = opt.type || SyncDoc.__type0__;
 		this.src = opt.src
-		this.docId = opt.recId;
+		this.recId = opt.recId;
 		this.device = opt.device;
 	}
 }
@@ -1816,34 +1834,41 @@ export class DocsReq extends AnsonBody {
 		del: 'd',
 	};
 
-	synuri: string;
+	synuri?: string;
 
-	doc: SyncDoc;
+	doc?: SyncDoc;
+
+	pageInf?: PageInf;
+
 	// docId: string;
 	// docName: string;
 	// mime: string;
 	// uri64: string;
 
-	deletings: string[];
+	deletings?: string[];
 	// subfolder: string;
 
 	/**
 	 *
 	 * @param uri
 	 * @param args
-	 * args.doctype: type for deserilizing user's tierec, e. g. type of PhotoRec.
-	 * args.deletings: old docId to be deleted
+	 * @param args.synuri The function uri for accessing doc's db. Must no null. 
+	 * This is not checked in Java, where the *args.uri* is used directly as synuri
+	 * @param args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
+	 * @param args.deletings: old docId to be deleted
 	 */
-	constructor(uri: string, args? : {synuri: string, doctype: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
+	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
 		super({uri, type: DocsReq.__type__});
-		this.synuri = args.synuri;
-		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.doctype}));
-		// this.docId = args.docId;
-		// this.docName = args.docName;
-		// this.mime = args.mime;
-		// this.uri64 = args.uri64;
 
-		// case d
+		if (!args || !args.synuri) {
+			console.warn("Since 1.0.1, Synuri for doc operation is required.");
+			this.synuri = uri;
+		}
+		else
+			this.synuri = args.synuri;
+
+		this.doc = new SyncDoc(Object.assign(args, {recId: args.docId, type: args.docFieldType}));
+
 		this.deletings = args.deletings;
 	}
 }

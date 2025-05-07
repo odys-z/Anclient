@@ -157,8 +157,8 @@ public class SessionClient {
 	/**
 	 * Start a heart beat thread which is sleeping on thread signal {@link #syncFlag}.
 	 * @param clientUri
-	 * @param onLink
-	 * @param onBroken
+	 * @param onLink can be null
+	 * @param onBroken can be null
 	 * @param msInterv
 	 * @return this
 	 */
@@ -186,7 +186,10 @@ public class SessionClient {
 					if (MsgCode.ok != code)
 						throw new SemanticException("retry");
 					failed = 0;
-					onLink.ok(resp.body(0));
+
+					if (onLink != null)
+						onLink.ok(resp.body(0));
+
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
@@ -440,6 +443,10 @@ public class SessionClient {
 
 	public void logout() {
 		closeLink();
+	}
+
+	public boolean isSessionValid() {
+		return !stoplink;
 	}
 
 }

@@ -92,13 +92,16 @@ export class AnTreeNode implements Tierec {
  */
 export class StreeTier extends Semantier {
     static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody} = {};
-    static registTierequest(port: string, factory: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody) {
+
+    static registTierequest(port: string,
+			factory: (v: DatasetOpts & {synrui?: string, sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody,
+			initFields = {uri: '', synuri: '', sk: ''}) {
         if (this.reqFactories[port])
             console.warn("Replacing new facotry of ", port, factory);
 
         this.reqFactories[port] = factory;
 
-        Protocol.registerBody(factory({uri: '', sk: ''}).type, factory);
+        Protocol.registerBody(factory(initFields).type, factory);
     }
 
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */
@@ -182,4 +185,29 @@ export class StreeTier extends Semantier {
 }
 StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 
+// /** SyncDoc is currently an abstract class for __type__ is absent, which makes this class can not be deserialized. */
+// export class SyncDoc implements Tierec {
+// 	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
+//     [f: string]: AnsonValue;
+
+// 	type?: string;
+
+// 	/** pid */
+// 	recId?: string;
+
+// 	/** card title */
+// 	pname?: string;
+// 	shareby?: string | undefined;
+// 	sharedate?: string;
+// 	device?: string;
+
+// 	src: string;
+
+// 	constructor (opt: { recId: any; src?: any; device?: string, type?: string }) {
+// 		this.type = opt.type || SyncDoc.__type0__;
+// 		this.src = opt.src
+// 		this.recId = opt.recId;
+// 		this.device = opt.device;
+// 	}
+// }
 

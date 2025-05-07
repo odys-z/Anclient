@@ -55,3 +55,5 @@ The jsapmple server side is needed to login. (Docker image avialable)
 * [PDF.js](https://github.com/mozilla/pdf.js)
 
 * [docx4j](https://www.docx4java.org/trac/docx4j)
+
+* [react-iframe](https://github.com/robbestad/react-iframe)

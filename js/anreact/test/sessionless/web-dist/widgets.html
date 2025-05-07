@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+
+  <script crossorigin src="react.development.js"></script>
+  <script crossorigin src="react-dom.development.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+  <link rel="stylesheet" href="sessionless.css" >
+
+  <title>Widgets Test</title>
+</head>
+
+<body>
+    <p>This widget must work with jserv docker image:
+	  <a href='https://hub.docker.com/r/odysz/jsandbox/tags'>odysz/jsandbox:treeditor</a>.<br>
+      Front end source: <a href='https://github.com/odys-z/Anclient/tree/master/js/anreact/test/sessionless'>
+        @anclient/anreact 0.4.38 test/sessionless</a></p>
+    <p>See also
+      <a href='https://odys-z.github.io/Anclient/guide/controls/index.html#test-antreeditor'>document: test explained</a>.</p>
+    <div id="app"></div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script src="widgets-1.1.1.min.js"></script>
+    <script>
+      let searchParams = new URLSearchParams(window.location.search)
+      let serv = searchParams ? searchParams.get('serv') : undefined;
+      less.WidgetsApp.bindHtml('app', {
+          jsonUrl: 'http://localhost:8900/github.json',
+          serv: serv || 'sandbox', Window, portal: '#'});
+    </script>
+    <hr>
+</body>
+</html>

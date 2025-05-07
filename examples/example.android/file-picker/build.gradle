@@ -26,6 +26,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    packagingOptions {
+        exclude 'org/sqlite/native/**'
+//        exclude 'org/sqlite/native/**/**.dll'
+//        exclude 'org/sqlite/native/Windows/x86/sqlitejdbc.dll'
+    }
 }
 
 dependencies {
@@ -40,13 +46,15 @@ dependencies {
     implementation "com.github.bumptech.glide:annotations:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
-    // implementation "com.bm.photoview:library:$bm_photoview_version"
+    implementation (group: 'io.github.odys-z', name: 'anclient.java', version: "$anclient_ver") {
+        exclude group: "org.xerial", module: "org.xerial"
+        exclude group: "mysql", module: "mysql-connector-java"
+    }
 
-    // implementation 'pub.devrel:easypermissions:3.0.0'
-
-    implementation group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver"
-    implementation group: 'io.github.odys-z', name: 'anclient.java',  version: "$anclient_ver"
-    // implementation group: 'io.github.odys-z', name: 'docsync.jserv', version: "$docsync_ver"
+    implementation (group: 'io.github.odys-z', name: 'semantic.jserv', version: "$jserv_ver") {
+        exclude group: "org.xerial", module: "org.xerial"
+        exclude group: "mysql", module: "mysql-connector-java"
+    }
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'

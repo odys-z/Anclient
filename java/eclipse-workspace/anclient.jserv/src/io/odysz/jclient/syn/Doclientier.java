@@ -5,26 +5,22 @@ import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.LangExt.str;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io_odysz.FilenameUtils;
 import org.xml.sax.SAXException;
 
+import io.odysz.anson.Anson;
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.AESHelper;
-import io.odysz.common.DocLocks;
-import io.odysz.common.EnvPath;
+import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.SessionClient;
@@ -46,7 +42,6 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.JUser.JUserMeta;
 import io.odysz.semantic.meta.ExpDocTableMeta;
 import io.odysz.semantic.tier.docs.Device;
-import io.odysz.semantic.tier.docs.DeviceTableMeta;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsReq.A;
 import io.odysz.semantic.tier.docs.DocsResp;
@@ -54,13 +49,13 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.ShareFlag;
+import io.odysz.semantics.SemanticObject;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
-import io.odysz.transact.sql.PageInf;
 import io.odysz.transact.x.TransException;
 
 public class Doclientier extends Semantier {
-	public boolean verbose = false;
+	public static boolean verbose = true;
 
 	protected final String doctbl;
 
@@ -232,12 +227,6 @@ public class Doclientier extends Semantier {
 					.fullpath(respath);
 
 		DocsResp resp = doclient.startPush(null, entityName, doc, ok, proc);
-//			(AnsonResp rep) -> {
-//				ExpSyncDoc d = ((DocsResp) rep).xdoc; 
-//
-//				// push again should fail
-//				// doclient.startPush(entityName, d, ok, errCtx);
-//			}
 
 		String docId = resp.xdoc.recId();
 		DocsResp rp = doclient.selectDoc(entityName, docId);
@@ -245,6 +234,7 @@ public class Doclientier extends Semantier {
 		return rp.xdoc;
 	}
 
+	// DON'T DELETE THIS AFTER TESTS FIXED
 //	/**
 //	 * Verify device &amp; client-paths are presenting at server.
 //	 * 
@@ -322,7 +312,6 @@ public class Doclientier extends Semantier {
 	 * @throws IOException
 	 * @throws TransException
 	 * @throws SQLException
-	 */
 	ExpSyncDoc synStreamPull(ExpSyncDoc p, ExpDocTableMeta meta)
 			throws AnsonException, IOException, TransException, SQLException {
 
@@ -367,6 +356,7 @@ public class Doclientier extends Semantier {
 			return false;
 		}
 	}
+	 */
 	
 	/**
 	 * [Synchronously]
@@ -432,7 +422,28 @@ public class Doclientier extends Semantier {
 			int seq = 0;
 			int totalBlocks = 0;
 
-			ExpSyncDoc p = videos.get(px).syndoc(template);
+			/* 
+			 * 025-03-02 fix class casting error while pick files on Android.
+			 * 2025-03-04 fix error of reading non-latin file name.
+			 */
+
+			IFileDescriptor f = videos.get(px);
+			if (fileProvider == null) {
+				if (isblank(f.fullpath()) || isblank(f.clientname()) || isblank(f.cdate()))
+					throw new IOException(
+							f("File information is not enough: %s, %s, create time %s",
+							f.clientname(), f.fullpath(), f.cdate()));
+			}
+			else if (fileProvider.meta(f) < 0) {
+				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by users.
+				reslts.add((DocsResp) new DocsResp()
+						.doc(f.syndoc(template)
+							  .shareflag(ShareFlag.deny,
+								f("File provide returned error: %s", f.fullpath()))));
+				continue;
+			}
+
+			ExpSyncDoc p = f.syndoc(template);
 
 			if ( isblank(p.clientpath) ||
 				(!isblank(p.device()) && !eq(p.device(), ssinf.device)))
@@ -440,40 +451,8 @@ public class Doclientier extends Semantier {
 						"Docs' pushing requires device id and clientpath.\n" +
 						"Doc Id: %s, device id: %s(%s), client-path: %s, resource name: %s",
 						p.recId, p.device(), ssinf.device, p.clientpath, p.pname);
-
-			/* From SynclientierMVP
-			SyncDoc p = videos.get(px);
-			if (fileProvider.meta(p) <= 0) {
-				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
-				reslts.add((DocsResp) new DocsResp()
-						.doc(p.syncFlag(SyncFlag.end))
-						.msg(p.pname));
-				continue;
-			}
-
-			DocsReq req = new AlbumReq(uri)
-					.folder(fileProvider.saveFolder())
-					.share(p)
-					.device(new Device(user.device, null))
-					.resetChain(true)
-					.blockStart(p, user);
-					*/
 			
-			if (fileProvider == null) {
-				if (isblank(p.fullpath()) || isblank(p.clientname()) || isblank(p.createDate))
-					throw new IOException(
-							f("File information is not enough: %s, %s, create time %s",
-							p.clientname(), p.fullpath(), p.createDate));
-			}
-			else if (fileProvider.meta(p) < 0) {
-				// sometimes third part apps will report wrong doc, e. g. WPS files deleted by uses.
-				reslts.add((DocsResp) new DocsResp()
-						.doc(p.shareflag(ShareFlag.deny,
-								f("File provide returned error: %s", p.clientpath))));
-				continue;
-			}
-			
-			DocsReq req  = new DocsReq(tbl, p.folder(fileProvider.saveFolder()), uri)
+			DocsReq req  = new DocsReq(tbl, p.folder(p.folder()), uri)
 					.device(ssinf.device)
 					.resetChain(true)
 					.blockStart(p, ssinf);
@@ -489,11 +468,15 @@ public class Doclientier extends Semantier {
 					Utils.warn("Resp is not replied with exactly the same path: %s",
 							resp0.xdoc.fullpath());
 
-				totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				// Doesn't work for Chinese file name in Android 10:
+				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
+				totalBlocks = (int) (Math.max(0, p.size - 1) / blocksize) + 1;
+
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 
-				DocLocks.reading(p.fullpath());
-				ifs = new FileInputStream(new File(p.fullpath()));
+				// DocLocks.reading(p.fullpath());
+				// ifs = new FileInputStream(new File(p.fullpath()));
+				ifs = (FileInputStream) fileProvider.open(f);
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
 				while (b64 != null) {
@@ -518,8 +501,11 @@ public class Doclientier extends Semantier {
 				reslts.add(respi);
 			}
 			catch (IOException | TransException | AnsonException | SQLException ex) { 
-				Utils.warn(ex.getMessage());
+				if (verbose) ex.printStackTrace();
 
+				String exmsg = ex.getMessage();
+				Utils.warn(exmsg);
+				
 				if (resp0 != null) {
 					req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
 					req.a(DocsReq.A.blockAbort);
@@ -530,14 +516,46 @@ public class Doclientier extends Semantier {
 
 				if (ex instanceof IOException)
 					continue;
-				else errHandler.err(MsgCode.exGeneral, ex.getMessage(),
-					ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+				else {
+					// Tag: MVP - This is not correct way of deserialize exception at client side
+					if (!isblank(exmsg)) {
+						try {
+							// Code: ext, mesage: {
+							//   \"type\": \"io.odysz.semantics.SemanticObject\",
+							//   \"props\": {\"code\": 99,
+							//   \"reasons\": [\"Found existing file for device & client path.\",
+							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
+
+							exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
+							SemanticObject exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
+							String reasons = exmsg;
+							try {
+								Object ress = exp.get("reasons");
+								reasons = ress == null ? null
+										: ress instanceof ArrayList<?> ? str((ArrayList<?>)ress)
+										: ress instanceof String[] ? str((String[])ress)
+										: ress.toString();
+							}
+							catch (Exception e) {
+								e.printStackTrace();
+							}
+							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp.get("code")));
+						}
+						catch (Exception exx) {
+							errHandler.err(MsgCode.exGeneral, ex.getMessage(),
+								ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+						}
+					}
+					else
+						errHandler.err(MsgCode.exGeneral, ex.getMessage(),
+							ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
+				}
 			}
-			finally {
-				if (ifs != null)
-					ifs.close();
-				DocLocks.readed(p.fullpath());
-			}
+//			finally {
+//				if (ifs != null)
+//					ifs.close();
+//				// DocLocks.readed(p.fullpath());
+//			}
 		}
 		if (docsOk != null) docsOk.ok(reslts);
 
@@ -685,11 +703,6 @@ public class Doclientier extends Semantier {
 		};
 
 		List<DocsResp> resps = startPushs(template, tabl, videos, onproc,
-//				new OnProcess() {
-//					@Override
-//					public void proc(int rows, int rx, int seqBlock, int totalBlocks, AnsonResp resp)
-//							throws IOException, AnsonException, SemanticException {
-//					}},
 				follows, isNull(errorCtx) ? errCtx : errorCtx[0]);
 		return isNull(resps) ? null : resps.get(0);
 	}
@@ -739,7 +752,6 @@ public class Doclientier extends Semantier {
 	 * @throws AnsonException 
 	 * @throws SemanticException 
 	 * @since 0.2.0
-	 */
 	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
 			throws SemanticException, AnsonException, IOException {
 		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docstier.name());
@@ -761,4 +773,5 @@ public class Doclientier extends Semantier {
 		String clientpath = f.fullpath().replaceAll(":", "");
 		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
 	}
+	 */
 }

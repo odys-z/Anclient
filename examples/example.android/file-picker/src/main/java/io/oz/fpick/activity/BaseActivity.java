@@ -10,7 +10,6 @@ import static io.odysz.common.LangExt.str;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,21 +30,17 @@ import androidx.fragment.app.FragmentActivity;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.FolderListHelper;
 import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.ImageFile;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.DocsException;
-import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
 import io.oz.fpick.R;
-import io.oz.fpick.adapter.BaseSynchronizer;
+import io.oz.fpick.adapter.PickAdaptor;
 import io.oz.fpick.filter.FileFilterx;
 
 /**
@@ -67,29 +62,25 @@ import io.oz.fpick.filter.FileFilterx;
 public abstract class BaseActivity extends FragmentActivity
         implements JProtocol.OnError, IProgressBarAct {
 
-//    public interface OnSelectStateListener {
-//        void onSelectStateChanged(int position, boolean state, AndroidFile file, View animation );
-//    }
-
     public static final String IS_TAKEN_AUTO_SELECTED = "IsTakenAutoSelected";
+
+    /** @deprecated */
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
 
     private static final int RC_READ_EXTERNAL_STORAGE = 123;
     public  static final String IS_NEED_FOLDER_LIST = "isNeedFolderList";
 
-    protected static ExpSyncDoc template;
-
-    public static ExpSyncDoc getTemplate () throws DocsException {
-        if (template == null)
-            throw new DocsException(0, "Template must be initialized by subclasses.");
-        return template;
-    }
+//    protected static ExpSyncDoc template;
+//    public static ExpSyncDoc getTemplate () throws DocsException {
+//        if (template == null)
+//            throw new DocsException(0, "Template must be initialized by subclasses.");
+//        return template;
+//    }
 
     protected FolderListHelper mFolderHelper;
     protected boolean isNeedFolderList;
 
-    // public ArrayList<AndroidFile> mSelectedList = new ArrayList<>();
-    private BaseSynchronizer<?, ?> mAdapter;
+    private PickAdaptor<?, ?> mAdapter;
     /** file pattern */
     protected String[] mSuffix;
     protected FileFilterx filefilter;
@@ -98,57 +89,31 @@ public abstract class BaseActivity extends FragmentActivity
 
     PickingMode pickmode = PickingMode.disabled;
     protected int fileType;
-    // private int mCurrentNumber = 0;
-    // protected int mMaxNumber;
     private TextView tv_count;
     private TextView tv_folder;
     private LinearLayout ll_folder;
     private RelativeLayout rl_done;
     private RelativeLayout tb_pick;
 
-    protected void linkAdapter(int adaptye, BaseSynchronizer<?, ?> adapter) {
+    protected void linkAdapter(int adaptye, PickAdaptor<?, ?> adapter) {
         this.fileType = adaptye;
         mAdapter = adapter;
 
         tv_count = findViewById(R.id.tv_count);
-        // tv_count.setText(getString(R.string.n_of_total, mCurrentNumber, mMaxNumber));
         tv_count.setText(mAdapter.allowingTxt());
-
-//        mAdapter.selectListener((position, state, file, animation) -> {
-//            if (state) {
-//                mSelectedList.add(file);
-//                mCurrentNumber++;
-//                animation.setAlpha ( 1f );
-//                animation.setVisibility ( View.VISIBLE );
-//
-//                AnimationDrawable animationDrawable = (AnimationDrawable) animation.getBackground ();
-//                animationDrawable.start ();
-//            } else {
-//                mSelectedList.remove(file);
-//                mCurrentNumber--;
-//                animation.setAlpha ( 0f );
-//                animation.setVisibility ( View.GONE );
-//            }
-//            tv_count.setText(mCurrentNumber + "/" + mMaxNumber);
-//        });
 
         rl_done = findViewById(R.id.rl_done);
         rl_done.setOnClickListener(v -> {
             Intent intent = new Intent();
-            // intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mSelectedList);
             intent.putParcelableArrayListExtra(Constant.RESULT_Abstract, mAdapter.selections());
             setResult(RESULT_OK, intent);
             finish();
         });
 
-        if (pickmode == PickingMode.disabled) {
-            // mMaxNumber = 0;
+        if (pickmode == PickingMode.disabled)
             rl_done.setVisibility(View.GONE);
-        }
-        else {
-            // mMaxNumber = 99;
+        else
             rl_done.setVisibility(View.VISIBLE);
-        }
 
         tb_pick = findViewById(R.id.tb_pick);
         ll_folder = findViewById(R.id.ll_folder);
@@ -231,7 +196,7 @@ public abstract class BaseActivity extends FragmentActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlbumContext.getInstance(this); // set error context
+        AlbumContext.initWithErrorCtx(this); // set error context
 
         Intent intt = getIntent();
         isNeedFolderList = intt.getBooleanExtra(IS_NEED_FOLDER_LIST, false);
@@ -253,8 +218,6 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Forward results to EasyPermissions
-        // EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
             permissionGranted();
@@ -264,17 +227,6 @@ public abstract class BaseActivity extends FragmentActivity
      * Read external storage file
      */
     private void readExternalStorage() {
-        /*
-        boolean isGranted = EasyPermissions.hasPermissions(this, "android.permission.READ_EXTERNAL_STORAGE");
-        if (isGranted) {
-            permissionGranted();
-        } else {
-            EasyPermissions.requestPermissions(this, getString(R.string.vw_rationale_storage),
-                    RC_READ_EXTERNAL_STORAGE,
-                   // "android.permission.READ_EXTERNAL_STORAGE");
-                    permissions());
-        }
-        */
         for (String p : permissions())
             if (ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(this, permissions(), RC_READ_EXTERNAL_STORAGE);
@@ -310,8 +262,12 @@ public abstract class BaseActivity extends FragmentActivity
     @Override
     public void err(AnsonMsg.MsgCode c, String msg, String... args) {
         runOnUiThread( () -> {
+            String m;
             // TODO report errors in a user's dialog...
-            String m = f("Error: type: %s, args: %s", msg, str(args));
+            if (c == AnsonMsg.MsgCode.exSession)
+                m = "Session error. Please login / re-login.";
+            else
+                m = f("Error: type: %s, args: %s", msg, str(args));
             Toast.makeText(getApplicationContext(), m, Toast.LENGTH_LONG).show();
         } );
     }
@@ -333,7 +289,7 @@ public abstract class BaseActivity extends FragmentActivity
         if (b != null) runOnUiThread(() -> b.setVisibility(View.GONE));
     }
 
-    public void onselect(ImageFile file) {
+    public void onselect(AndroidFile file) {
         tv_count.setText(mAdapter.allowingTxt());
     }
 }

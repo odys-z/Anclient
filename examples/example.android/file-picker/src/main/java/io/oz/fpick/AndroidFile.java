@@ -8,6 +8,7 @@ package io.oz.fpick;
 
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.DateFormat.formatYYmm;
+import static io.odysz.common.LangExt.mustnonull;
 
 import android.net.Uri;
 import android.os.Parcel;
@@ -15,21 +16,26 @@ import android.os.Parcelable;
 
 import com.vincent.filepicker.Util;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
+import io.odysz.anson.Anson;
+import io.odysz.anson.AnsonField;
 import io.odysz.anson.x.AnsonException;
+import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {
-    /** @since v 0.7, uploading state. */
-    // public ShareFlag syncFlag;
 
     /** The File id in Android, which is different from rec-id in docsync.jserv. */
     private long id;
     private String localDirId;  //Directory ID
     private String localDirName;//Directory Name
-    private long date;          //Added Date
+
+    @AnsonField(ignoreTo = true)
     private boolean isSelected;
     private Uri contUri;
 
@@ -40,8 +46,23 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
      */
     @Override
     public ExpSyncDoc syndoc (ExpSyncDoc template) {
-        Date d;
-        d = date == 0 && template != null ? new Date() : new Date(date);
+        String d = !isblank(createDate)
+                ? createDate
+                : template != null
+                ? template.cdate()
+                : DateFormat.formatime(new Date());
+
+        String shared = !isblank(this.sharedate)
+                ? sharedate
+                : template != null
+                ? template.sharedate
+                : DateFormat.formatime(new Date());
+
+        if (template != null) {
+            mustnonull(template.shareby, "Forcing template's sharer cannot be empty.");
+            mustnonull(template.device(), "Forcing template's device info cannot be empty.");
+            mustnonull(template.shareflag, "Forcing template's share-flag cannot be empty.");
+        }
 
         return template == null ?
             new ExpSyncDoc(entMeta, org)
@@ -50,27 +71,28 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
                 .clientpath(clientpath)
 
                 .share(this.shareby, this.shareflag, this.sharedate)
-                .sharedate(new Date())
-                .cdate(new Date(date))
+                .sharedate(shared)
+                .cdate(d)
                 .folder(folder())
                 .clientname(pname)
                 .uri64(uri64)
-                .mime(mime) :
-
+                .mime(mime)
+                .size(size)
+                :
            new ExpSyncDoc(entMeta == null ? template.entMeta : entMeta, isblank(org) ? template.org : org)
                 .recId(recId)
                 .device(isblank(device) ? template.device() : device)
                 .clientpath(clientpath)
 
-                .shareby(isblank(this.shareby) ? template.shareby : this.shareby)
-                .shareflag(isblank(this.shareflag) ? template.shareflag : this.shareflag)
-                .sharedate(isblank(this.shareflag) ? template.sharedate : this.sharedate)
-                .sharedate(new Date())
+                .shareby(template.shareby)
+                .shareflag(template.shareflag)
+                .sharedate(shared)
                 .cdate(d)
                 .folder(isblank(this.folder) ? template.folder() : folder())
                 .clientname(pname)
                 .uri64(uri64)
                 .mime(mime)
+                .size(size)
                 ;
     }
 
@@ -117,10 +139,10 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         this.localDirName = localDirName;
     }
 
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public long date() { return date; }
-    /** @deprecated removeing com.vincent.filepicker.filter */
-    public void date(long date) { this.date = date; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public long date() { return date; }
+//    /** @deprecated removeing com.vincent.filepicker.filter */
+//    public void date(long date) { this.date = date; }
 
     public boolean isSelected() { return isSelected; }
 
@@ -141,15 +163,11 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(pname);
-        dest.writeString(clientpath);
-        dest.writeLong(size);
-        dest.writeString(localDirId);
-        dest.writeString(localDirName);
-        dest.writeLong(date);
-        dest.writeByte((byte) (isSelected ? 1 : 0));
-        dest.writeString(folder());
+        try {
+            dest.writeString(this.toBlock());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -162,24 +180,12 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         }
 
         /**
-         * Implementation sample:<pre>
-         BaseFile file = new BaseFile();
-         file.id = in.readLong();
-         file.name = in.readString();
-         file.clientpath = in.readString();
-         file.size = in.readLong();
-         file.localDirId = in.readString();
-         file.localDirName = in.readString();
-         file.date = in.readLong();
-         file.isSelected = in.readByte() != 0;
-         return file;
-         * </pre>
          * @param in The Parcel to read the object's data from.
          * @return
          */
         @Override
         public AndroidFile createFromParcel(Parcel in) {
-            throw new AnsonException(0, "No overriding?");
+            return (AndroidFile) Anson.fromJson(in.readString());
         }
     };
 

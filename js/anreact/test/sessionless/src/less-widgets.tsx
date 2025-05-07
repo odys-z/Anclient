@@ -6,7 +6,7 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 } from '@anclient/semantier';
 
 import { L, Langstrs, AnContext, AnError, AnReactExt,
-	jsample, JsonServs, Login, CrudComp, AnTreeditor, Lightbox
+	jsample, JsonHosts, Login, CrudComp, AnTreeditor, Lightbox
 } from '../../../src/an-components';
 import { AlbumTier } from './tiers/album-tier';
 import { MuiThemeProvider } from '@material-ui/core/styles';
@@ -14,7 +14,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 const { JsampleTheme } = jsample;
 
 type LessProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 	iportal?: string;
 	iparent?: any; // parent of iframe
@@ -24,7 +24,7 @@ type LessProps = {
 /**
  * Widgets Tests
  */
-class Widgets extends React.Component<LessProps> {
+class WidgetsApp extends React.Component<LessProps> {
 	/** {@link InsercureClient} */
 	ssclient: SessionClient;
 	anReact: AnReactExt;  // helper for React
@@ -51,6 +51,7 @@ class Widgets extends React.Component<LessProps> {
 	albumSk = 'tree-album-family-folder';
 	rolefuncsk = 'trees.role_funcs';
 	uri = '/album/tree';
+	synuri = '/album/syn';
 
 	constructor(props: LessProps | Readonly<LessProps>) {
 		super(props);
@@ -102,23 +103,15 @@ class Widgets extends React.Component<LessProps> {
 		this.setState({hasError: false});
 	}
 
-	/**
-	 * Login as test robot, which is accutally a session based IUser instance.
-	 * 
-	 * Build AnClient & Semantier here, which is the same scenario of opening home page after logged in. 
-	 * 
-	 * TODO doc: this is another style of intitializing AnClient and SessionClient.
-	 * 
-	 * @param c instenct of AnClient.js
-	 */
 	onLogin(c: SessionClient): void {
 		this.ssclient = c;
 		this.ssclient.an.init(this.state.servs[this.props.servId]);
 
 		this.anReact  = new AnReactExt(this.ssclient, this.errctx)
-							.extendPorts({album: 'album.less'});
+							// .extendPorts({album: 'album.less'});
+							.extendPorts({docoll: 'docoll.syn'});
 
-		this.albumtier = new TestreeTier(this.uri, this, c);
+		this.albumtier = new TestreeTier(this.uri, this.synuri, this, c);
 
 		this.setState({reload: true});
 	}
@@ -145,16 +138,17 @@ class Widgets extends React.Component<LessProps> {
 				error: this.errctx,
 				ssInf: undefined,
 			}} >
-				<Login onLogin={this.onLogin} config={{userid: 'ody', pswd: '123456'}}/>
+				<Login uri={this.uri} onLogin={this.onLogin} config={{userid: 'ody', pswd: '8964'}}/>
                 {this.albumtier && Date().toString()}
 				<hr/>
                 {this.albumtier && <AnTreeditor key={this.albumSk}
 					parent={undefined} lastSibling={false}
-					uri={this.uri} reload={reload}
+					uri={this.uri} docuri={this.synuri}
+					reload={reload}
 					tnode={this.albumtier.treeroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.albumSk}
 					columns={[ // noly card for folder header
-						{ type: 'text', field: 'pname', label: 'Folder',
+						{ type: 'text', field: 'text', label: '[Folder]',
 						  grid: {xs: 6, sm: 6, md: 4} },
 						{ type: 'icon-sum', field: '', label: L('Summary'),
 						  grid: {sm: 6, md: 4} },
@@ -168,7 +162,8 @@ class Widgets extends React.Component<LessProps> {
 				<hr/>
 				{this.albumtier && <AnTreeditor key={this.rolefuncsk}
 					parent={undefined} lastSibling={false}
-					uri={this.uri} reload={reload}
+					uri={this.uri} docuri={this.synuri}
+					reload={reload}
 					tnode={this.albumtier.sysroot()} tier={this.albumtier}
 					pk={'NA'} sk={this.rolefuncsk}
 					columns={[
@@ -196,9 +191,9 @@ class Widgets extends React.Component<LessProps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
-			ReactDOM.render(<Widgets servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
+			ReactDOM.render(<WidgetsApp servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}
 	}
 
@@ -221,8 +216,11 @@ class TestreeTier extends AlbumTier {
 		}
 	}
 
-	constructor(uri: string, tree: CrudComp<any>, client?: SessionClient) {
-		super({uri, client, comp: tree});
+	constructor(uri: string, synuri: string, tree: CrudComp<any>, client?: SessionClient) {
+		super({
+			uri, client, comp: tree,
+			synuri
+		});
 		this.client = client;
 	}
 
@@ -238,6 +236,7 @@ class TestreeTier extends AlbumTier {
 			console.log({forest: resp.Body().forest});
 			onOk(resp);
 		}
+		opts.synuri = this.synuri;
 		super.stree(opts, errCtx);
 	}
 
@@ -255,4 +254,4 @@ class TestreeTier extends AlbumTier {
 	}
 }
 
-export { Widgets };
+export { WidgetsApp };

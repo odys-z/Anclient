@@ -4,13 +4,15 @@ import $ from 'jquery';
 import * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
-	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs
+	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs,
+	Tierec,	an
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { JsonServs } from './reactext';
+import { ClientOptions, ExternalHosts, JsonHosts } from './reactext';
+import { MenuItem } from './sys';
 
 export interface ClassNames {[c: string]: string};
 
@@ -85,7 +87,6 @@ export const invalidStyles = {
 } as {[n in InvalidClassNames]: CSSProperties};
 
 export function toReactStyles(styles: CSS.Properties ) {
-// export function toReactStyles(styles: CSSStyleDeclaration | undefined): CSSProperties {
 	return styles as unknown as CSSProperties;
 }
 
@@ -177,9 +178,12 @@ export class AnReact {
 	 * 	let dom = document.getElementById(elem);
 	 * 	ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 	 * }
+	 * 
+	 * @since 0.6.5, there is another way to load servs, see album-shares.tsx.
+	 * host.json is planned to be deserialized as an instance of ExternalHosts.
 	 */
 	static loadServs( elem: string, opts: AnreactAppOptions,
-				onJsonServ: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+				onJsonServ: (elem: string, opts: AnreactAppOptions, json: ExternalHosts) => void) {
 
 		if (!opts.serv) opts.serv = 'host';
 		if (!opts.home) opts.home = 'main.html';
@@ -189,13 +193,13 @@ export class AnReact {
 				dataType: "json",
 				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
 			})
-			.done( (json: JsonServs) => onJsonServ(elem, opts, json) )
+			.done( (json: ExternalHosts) => onJsonServ(elem, opts, new ExternalHosts(json)) )
 			.fail( (_e: any) => {
 				$.ajax({
 					dataType: "json",
 					url: `github.json?q=${Date.now()}`,
 				})
-				.done((json: JsonServs) => onJsonServ(elem, opts, json))
+				.done((json: ExternalHosts) => onJsonServ(elem, opts, json))
 				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
 			} )
 		}
@@ -210,7 +214,7 @@ export class AnReact {
 	 * @returns 
 	 */
 	static bindDom( elem: string, opts: AnreactAppOptions,
-				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonServs) => void) {
+				onJsonLoaded: (elem: string, opts: AnreactAppOptions, json: JsonHosts) => void) {
 		return AnReact.loadServs(elem, opts, onJsonLoaded);
 	}
 }
@@ -233,8 +237,15 @@ export interface AnreactAppOptions {
 	/** not used */
 	portal?: string;
 
+	/** login page
+	 * @since 0.6.5, used for nextAction == 're-login' target href location. 
+	 */
+	login?: string;
+
 	/**parent window */
 	parent?: Window;
+
+	clientOpts?: ClientOptions;
 };
 
 /**
@@ -245,26 +256,40 @@ export interface AnreactAppOptions {
 export class AnReactExt extends AnReact {
 	loading: boolean;
 
+	/** @deprecated replaced by ExtendPort */
 	extendPorts(ports: {[p: string]: string}) {
 		this.client.an.understandPorts(ports);
 		return this;
 	}
 
+	static ExtendPort(ports: {[p: string]: string}) {
+		an.understandPorts(ports);
+	}
+
+
 	/** Load jsample menu. (using DatasetReq & menu.serv)
-	 * Since v0.9.32, AnReact(Ext) won't care error handling anymore.
+	 * @since v0.9.32, AnReact(Ext) won't care error handling anymore.
+	 * @since v0.6.5, sk can be a function, e.g. () => {body: [{forest:Array<MenuItem}]}, where forest is understandable by Sys.parseMenu()
 	 * @param sk menu sk (semantics key, see dataset.xml), e.g. 'sys.menu.jsample'
 	 * @param uri
 	 * @param onLoad
 	 * @return this
 	 */
-	loadMenu(sk: string, uri: string, onLoad: OnCommitOk): AnReactExt {
-		if (!sk)
-			throw new Error("Arg 'sk' is null - AnReact requires a dataset semantics for system menu.");
+	loadMenu(sk: string, uri: string, onLoad: OnCommitOk, tree: Array<MenuItem>): AnReactExt {
+		if (!sk && (!tree || tree.length === 0))
+			throw new Error("Both 'sk' & tree items are null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
 
-		return this.dataset(
-			{port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
-			onLoad);
+		if (tree !== undefined && tree.length > 0) {
+			let t = new AnDatasetResp({ forest: tree as unknown as Tierec[]});
+			let resp = new AnsonMsg(t) as AnsonMsg<AnsonResp> ;
+			onLoad(resp);
+		}
+		else
+			return this.dataset(
+				// {port: pmenu, uri, sk, sqlArgs: [this.client.ssInf ? this.client.ssInf.uid : '']},
+				{port: pmenu, uri, sk, sqlArgs: [this.ssInf ? this.ssInf.uid : '']},
+				onLoad);
 	}
 
 	/** Load jsample.serv dataset. (using DatasetReq or menu.serv)
@@ -274,7 +299,7 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
-		Semantier.dataset(ds, this.client, onLoad, this.errCtx);
+		Semantier.dataset(ds, this.ssInf.client, onLoad, this.errCtx);
 		return this;
 	}
 

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name"        >文件柜</string>
-    <string name="txt0_ok"         >確 定</string>
-    <string name="txt0_cancel"     >取 消</string>
+<!--    <string name="txt0_ok"         >確 定</string>-->
+<!--    <string name="txt0_cancel"     >取 消</string>-->
 
 <!--    <string name="url_landing"     >@string/product_url_landing</string>-->
 <!--    <string name="url_help"        >@string/product_url_help</string>-->
@@ -13,7 +13,7 @@
     <string name="t_synch_ok"      >%s 文件已同步 (重複上傳: %s, 忽略: %s)</string>
     <string name="txt_prefs_device">设 备 信 息</string>
     <string name="devide_title"    >设备名</string>
-    <string name="login_succeed"   >登录成功。</string>
+    <string name="login_succeed"   >登录成功。\nWeb: %s</string>
 
     <string name="msg_ignore_offline">選項無效 - 未登錄</string>
     <string name="msg_templ_progress">進度 %d / %d, 文件頁 %s (%.1f%%)</string>
@@ -23,6 +23,10 @@
     <string name="err_pref_login"    >登录失败。\\n%s %s</string>
     <string name="err_empty_pswd"    >密碼為空！</string>
     <string name="err_empty_uid"     >用戶名不能為空！</string>
+
+    <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7/zh</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_help_devid"    >https://odys-z.github.io/products/portfolio/android/synode.html#devices-must-be-identically-registered</string>
 
     <string name="txt_prefs_jserv" >文 件 服 務 地 址</string>
     <string name="home_title"      >组 织 名 称</string>
@@ -46,19 +50,17 @@
     <string name="btn_add_img"     >+ 图片</string>
     <string name="pswd_title"      >密 码</string>
     <string name="txt_please_login">請先登錄</string>
-<!--    <string name="summery_login"   >登錄后可上傳文件</string>-->
     <string name="txt_login"       >点击登录</string>
 
-    <string name="my_group"          >當前組</string>
-    <string name="txt_set_groups"    >設置當前共享組</string>
-    <string name="unknown_qrformat"  >未知二維碼格式: %s</string>
-    <string name="unknown_qrcontent" >二維碼内容無法識別。</string>
-    <string name="msg_log4device"    >Login first to restore a previous used device ID.</string>
-    <string name="msg_no_used_dev"   >No available devices.</string>
-    <string name="dev_usedby"        >Device name used by %s (%s)</string>
-    <string name="msg_repace_devname">确定使用该设备名替换原设备吗？ %s [id: %s]</string>
-    <string name="msg_update_dev_err">设置设备名称错误： %s [id: %s]\nDetails:  %s</string>
+    <string name="unknown_qrformat"   >未知二維碼格式: %s</string>
+    <string name="unknown_qrcontent"  >二維碼内容無法識別。</string>
+    <string name="msg_log4device"     >登录成功后才能寻找恢复设备名称记录。</string>
+    <string name="msg_no_used_dev"    >无可选设备。</string>
+    <string name="dev_usedby"         >设备名称拥有者： %s (%s)</string>
+    <string name="msg_repace_devname" >确定使用该设备名替换原设备吗？ %s [id: %s]</string>
+    <string name="msg_update_dev_err" >设置设备名称错误： %s [id: %s]\nDetails:  %s</string>
     <string name="msg_dev_err_null_id">服务端错：设备ID空 [%s]</string>
-    <string name="log_prof_err">Correctly logged in, but got wrong profiles.</string>
+    <string name="log_prof_err"       >登录成功，但获取的用户配置或主页路径为空。</string>
+    <string name="msg_err_duplicate"  >错误：发现重复上传文件。</string>
 
 </resources>

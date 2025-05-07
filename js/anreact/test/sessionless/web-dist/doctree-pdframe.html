@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+  <title>Widgets - Treegrid</title>
+
+  <script crossorigin src="react.development.js"></script>
+  <script crossorigin src="react-dom.development.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+  <link rel="stylesheet" href="sessionless.css" >
+</head>
+
+<body>
+    <p>This widget must work with portfolio-synode:
+	  <a href='https://github.com/odys-z/semantic-jserv/releases/tag/portfolio-synode-0.7.0'>
+      portfolio synode 0.7.0</a>.</p>
+	  <p>See also
+      <a href='https://odys-z.github.io/Anclient/guide/controls/tree.html#test-antreeditor'>
+          AnTreeditor doc</a>for quick start, and
+      <a href='https://odys-z.github.io/Anclient/guide/controls/tree.html#controls_typeparser:'>
+          Example: doc type parser</a> for customizing cells.<br>
+      </p>
+    <div id="app"></div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script src="doctree-pdframe-1.1.1.min.js"></script>
+    <script>
+      let searchParams = new URLSearchParams(window.location.search)
+      let serv = searchParams ? searchParams.get('serv') : undefined;
+      less.TreegridApp.bindHtml('app', {
+          jsonUrl: 'http://localhost:8889/github.json',
+          serv: serv, Window, portal: '#'});
+    </script>
+    <hr>
+</body>
+</html>

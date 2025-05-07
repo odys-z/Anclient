@@ -3,10 +3,10 @@ import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protoco
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
-export class PhotoCSS {
-	type: string = 'io.oz.album.peer.PhotoCSS';
-	size: number[] = [0, 0, 0, 0];
-}
+// export class PhotoCSS {
+// 	type: string = 'io.oz.album.peer.PhotoCSS';
+// 	size: number[] = [0, 0, 0, 0];
+// }
 
 export class PhotoRec extends SyncDoc {
 
@@ -24,7 +24,7 @@ export class PhotoRec extends SyncDoc {
 	// mime?: string;
 	geox?: string;
 	geoy?: string;
-	css? : PhotoCSS | string;
+	css? : MediaCss | string;
     wh?  : number[];
 
 	srcSet?: Array<string>;
@@ -33,7 +33,7 @@ export class PhotoRec extends SyncDoc {
 
 	constructor (opt: {
             recId: string; src?: string; device?: string;
-            css: string | PhotoCSS | undefined;
+            css: string | MediaCss | undefined;
             wh: number[] }) {
 		super(Object.assign(opt, {type: PhotoRec.__type__}));
 
@@ -46,6 +46,16 @@ export class PhotoRec extends SyncDoc {
 	}
 };
 
+export class MediaCss {
+	type: string = 'io.oz.album.peer.PhotoRec$MediaCss';
+	wh: number[] = [4, 3];
+	widthHeight: number[] = [4, 3];
+	rotation: number = 0;
+}
+
+/**
+ * @deprecated
+ */
 export interface PhotoCollect extends Tierec {
 	title?: string;
 	thumbUps?: Set<string>;
@@ -122,8 +132,11 @@ export class AlbumReq extends DocsReq {
 
 	photo?    : PhotoRec;
 
+	/** e.g. h_photos */
+	docTabl   : string;
+
 	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
-		super(opt.uri, {docId: '', synuri: opt.synuri});
+		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__});
 		this.type = AlbumReq.__type__;
 
 		let {page, sk} = opt;
@@ -155,10 +168,14 @@ export class AlbumReq extends DocsReq {
 	}
 }
 // v 0.6.5
-StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
-// v 0.7
-StreeTier.registTierequest('docoll', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
+// StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
 
+// v 0.7
+StreeTier.registTierequest('docoll',
+	(opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts),
+	{uri: '-', synuri: '-', sk: '-'});
+
+// ISSUE: should extends DocsResp. We need a better tool to generate the class, desperately.
 export class AlbumResp extends AnDatasetResp {
 	static __type__ = 'io.oz.album.peer.AlbumResp';
 	album?: AlbumRec;
@@ -167,6 +184,8 @@ export class AlbumResp extends AnDatasetResp {
 	collects?: Array<PhotoCollect>;
 
 	photo?: PhotoRec;
+
+	docTabl?: string;
 
 	constructor (resp: AlbumRec & {
 			forest: AnTreeNode[], // profiles?: Profiles,

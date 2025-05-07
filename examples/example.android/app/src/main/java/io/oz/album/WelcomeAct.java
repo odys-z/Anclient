@@ -2,14 +2,16 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.bool;
+import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
-import static io.oz.AlbumApp.sharedPrefs;
-import static io.oz.album.webview.WebAlbumAct.Web_PageName;
-import static io.oz.fpick.activity.BaseActivity.IS_NEED_CAMERA;
+import static io.oz.AlbumApp.prfConfig;
+import static io.oz.album.webview.WebAlbumAct.Web_Intent_id;
+import static io.oz.albumtier.AlbumContext.ConnState;
+import static io.oz.albumtier.AlbumContext.verbose;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
-import static io.odysz.common.LangExt.isblank;
-import static io.oz.albumtier.AlbumContext.*;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -43,48 +45,50 @@ import androidx.preference.PreferenceManager;
 import com.hbisoft.pickit.DeviceHelper;
 import com.vincent.filepicker.Constant;
 
-import io.odysz.jclient.syn.Doclientier;
-import io.odysz.jclient.syn.IFileProvider;
-import io.odysz.semantic.tier.docs.DocsResp;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
-import io.oz.fpick.activity.AudioPickActivity;
-import io.oz.fpick.activity.ComfirmDlg;
-import io.oz.fpick.activity.ImagePickActivity;
-import io.oz.fpick.activity.VideoPickActivity;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.jclient.SessionClient;
+import io.odysz.jclient.syn.Doclientier;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.AlbumApp;
 import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
+import io.oz.album.webview.WebViewJavaScriptInterface;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
+import io.oz.fpick.activity.AudioPickActivity;
 import io.oz.fpick.activity.BaseActivity;
+import io.oz.fpick.activity.ComfirmDlg;
+import io.oz.fpick.activity.ImagePickActivity;
+import io.oz.fpick.activity.VideoPickActivity;
 import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
+    // for error:
+    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost',
+    // delete the 'build' folder
 
     AlbumContext clientext;
 
@@ -98,22 +102,70 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
+//    private int originalWindowFlags;
+//    private int originalSystemUiVisibility;
+    private boolean requiresFullscreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AlbumApp.keys = new PrefKeys(this);
-
-        clientext = AlbumContext.getInstance(this);
+        clientext = AlbumContext.initWithErrorCtx(this);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        PrefsWrapper c = AlbumApp.sharedPrefs
-                = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
-        clientext.init(c.homeName, c.uid, c.device, c.jserv());
+        PrefsWrapper c = AlbumApp.prfConfig
+                       = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
+        clientext.init(c.homeName, c.uid, c.pswd, c.device, c.jserv());
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
+
+//        originalWindowFlags = getWindow().getAttributes().flags;
+//        originalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+
+        WebView wv = findViewById(R.id.wv_welcome);
+        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this, (String d) -> {
+            if (bool(d)) {
+                requiresFullscreen = true;
+                findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+                findViewById(R.id.tv_status).setVisibility(View.GONE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().hide();
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//
+//                // Ensure content is drawn behind system bars (optional, for immersive look)
+//                getWindow().getDecorView().setSystemUiVisibility(
+//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
+//                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide status bar
+//                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Immersive mode, bars auto-hide on swipe
+//                );
+            }
+            else {
+                requiresFullscreen = false;
+                findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+                findViewById(R.id.tv_status).setVisibility(View.VISIBLE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().show();
+//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                getWindow().setFlags(originalWindowFlags, originalWindowFlags);
+//                getWindow().getDecorView().setSystemUiVisibility(originalSystemUiVisibility);
+            }
+        }), "AndroidInterface");
+
         errCtx = new AndErrorCtx().context(this);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
@@ -149,7 +201,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                        showStatus(R.string.msg_login_uid, AlbumApp.sharedPrefs.uid, AlbumApp.sharedPrefs.device);
+                        showStatus(R.string.msg_login_uid, c.uid, c.device);
                     }
                     reloadAlbum();
                 });
@@ -160,23 +212,23 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     result -> reloadAlbum());
 
         try {
-            if (clientext.needSetup() || AlbumApp.sharedPrefs.needSetup())
+            if (clientext.needSetup() || AlbumApp.prfConfig.needSetup())
                 // settings are cleared
                 startPrefsAct();
             else {
                 clientext
-                        .pswd(AlbumApp.sharedPrefs.pswd())
-                        .jserv(AlbumApp.sharedPrefs.jserv());
+                        .pswd(AlbumApp.prfConfig.pswd())
+                        .jserv(AlbumApp.prfConfig.jserv());
 
                 AlbumApp.login(clientext.pswd(),
                     (client) -> {
                         runOnUiThread(this::reloadAlbum);
                     },
                     (code, t, args) -> showStatus(R.string.t_login_failed, clientext.userInf.uid(),
-                            AlbumApp.sharedPrefs.jserv()));
+                            AlbumApp.prfConfig.jserv()));
             }
         } catch (Exception e) {
-            showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.sharedPrefs.jserv());
+            showStatus(R.string.t_login_failed, clientext.userInf.uid(), AlbumApp.prfConfig.jserv());
         }
     }
 
@@ -186,6 +238,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         WindowManager.LayoutParams attrs = getWindow().getAttributes();
 
+        if (!this.requiresFullscreen)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(attrs);
@@ -208,10 +261,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      * Reload album via call js function.
      */
     void reloadAlbum() {
-        if (clientext.tier == null || sharedPrefs == null)
+        if (clientext.tier == null || prfConfig == null)
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
+//        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this), "AndroidInterface");
         reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 
@@ -234,7 +288,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 if (!isblank(pswd)) {
-                    String script = String.format("loadAlbum('%s', '%s');", client.ssInfo().uid(), pswd);
+                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android'});",
+                                      client.ssInfo().uid(), pswd);
                     Utils.warn("\n[Load page script]: %s", script);
                     // https://www.techyourchance.com/communication-webview-javascript-android/
                     wv.evaluateJavascript(script, null);
@@ -304,9 +359,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.menu_settings) {
             startPrefsAct();
             return true;
-        } else if (id == R.id.menu_admin) {
-            startHelpAct(AssetHelper.Act_Admin);
-            return true;
+//        } else if (id == R.id.menu_admin) {
+//            startHelpAct(AssetHelper.Act_Admin);
+//            return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
             return true;
@@ -338,13 +393,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 }
                 else ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
-                            private String saveFolder;
+                            // private String saveFolder;
 
                             @Override
-                            public long meta(ExpSyncDoc f) throws IOException {
-                                if (f == null)
-                                    throw new IOException("Doc descriptor is null");
+                            public long meta(IFileDescriptor fd) throws IOException {
+                                if (fd == null || !(fd instanceof AndroidFile))
+                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
+                                AndroidFile f = (AndroidFile) fd;
                                 File file = new File(f.fullpath());
                                 f.size = file.length();
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -352,34 +408,38 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     FileTime d = attr.creationTime();
                                     f.cdate(d);
-                                    saveFolder = DateFormat.formatYYmm(d);
+                                    // saveFolder = DateFormat.formatYYmm(d);
                                 } else {
                                     Date d = new Date(file.lastModified());
                                     f.cdate(d);
-                                    saveFolder = DateFormat.formatYYmm(d);
+                                    // saveFolder = DateFormat.formatYYmm(d);
                                 }
                                 return f.size;
                             }
 
                             @Override
-                            public String saveFolder() {
-                                return saveFolder;
-                            }
-
-                            @Override
-                            public InputStream open(ExpSyncDoc f) throws IOException {
-                                return Files.newInputStream(Paths.get(f.fullpath()));
-                                // return getContentResolver().openInputStream(((AndroidFile) f).contentUri());
+                            public InputStream open(IFileDescriptor f) throws IOException {
+                                // return Files.newInputStream(Paths.get(f.fullpath()));
+                                return new FileInputStream(new File(f.fullpath()));
                             }
                         }))
-                        .asyVideos(sharedPrefs.template(), list,
+                        .asyVideos(prfConfig.template(), list,
                                 (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
                                         r, rx, total, (float) seq / total * 100),
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+                                    int[] nums = Doclientier.parseErrorCodes(resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
-                                errCtx.prepare(msgv, R.string.msg_upload_failed));
+                                (c, err, args) -> {
+                                    if (c == AnsonMsg.MsgCode.ext) {
+                                        errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                        err(null, getString(R.string.msg_err_duplicate), args); // show it
+                                    }
+                                    else {
+                                        errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                        err(null, getString(R.string.msg_upload_failed), err, args == null ? null : args[0]); // show it
+                                    }
+                                });
 
                 WebView wv = findViewById(R.id.wv_welcome);
                 wv.reload();
@@ -397,7 +457,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             if (data != null) {
                 DeviceHelper.init(errCtx);
                 ClipData clipData = data.getClipData();
-                Uri d = data.getData();
                 ArrayList<IFileDescriptor> paths;
 
                 if (clipData != null) {
@@ -428,15 +487,16 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 else {
                     ((PhotoSyntier)clientext.tier
                         .fileProvider(new IFileProvider() {
-                            private String saveFolder;
+                            // private String saveFolder;
                             // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
                             @Override
-                            public long meta(ExpSyncDoc f) throws IOException {
-                                if (f == null) {
-                                    throw new IOException("Descriptor f is null");
-                                }
+                            public long meta(IFileDescriptor fd) throws IOException {
+                                if (fd == null || !(fd instanceof AndroidFile))
+                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
-                                Uri returnUri = ((AndroidFile) f).contentUri();
+                                AndroidFile f = (AndroidFile) fd;
+                                Uri returnUri = f.contentUri();
+
                                 try (Cursor returnCursor = getContentResolver()
                                         .query(returnUri, null, null, null, null)) {
                                     int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
@@ -448,27 +508,40 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
                                     f.cdate(lastmodify);
-                                    saveFolder = DateFormat.formatYYmm(lastmodify);
+
+                                    if (isblank(f.folder()))
+                                        f.folder(DateFormat.formatYYmm(lastmodify));
                                     return f.size;
                                 }
                             }
-
-                            @Override
-                            public String saveFolder() { return saveFolder; }
-
                             // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
                             @Override
-                            public InputStream open(ExpSyncDoc p) throws FileNotFoundException {
+                            public InputStream open(IFileDescriptor p) throws FileNotFoundException {
                                 return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
                             }
                         }))
-                        .asyVideos(sharedPrefs.template(),
+                        .asyVideos(prfConfig.template(),
                             paths,
                             (r, rx, seq, total, rsp) -> showStatus(
                                     R.string.msg_templ_progress,
                                     r, rx, total, (float) seq / total * 100),
-                            (resps) -> {},
-                            errCtx.prepare(msgv, R.string.msg_upload_failed));
+                            (resps) -> {
+                                    // clearStatus();
+                                    int[] nums = Doclientier.parseErrorCodes(resps);
+                                    showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
+                                    if (nums[0] > 0)
+                                        clearStatus();
+                            },
+                            (c, err, args) -> {
+                                if (c == AnsonMsg.MsgCode.ext) {
+                                    errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                    err(null, getString(R.string.msg_err_duplicate), args); // show it
+                                }
+                                else {
+                                    errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                    err(null, getString(R.string.msg_upload_failed), args); // show it
+                                }
+                            });
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -485,14 +558,19 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         clearStatus();
 
         Intent intt = new Intent(this, act);
-        intt.putExtra(IS_NEED_CAMERA, true);
+        // intt.putExtra(IS_NEED_CAMERA, true);
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
 
-        sharedPrefs.using(act);
+        // prfConfig.using(act); // call target activity's getTemplate()
+
+        prfConfig.currentTemplate = new ExpSyncDoc()
+                .share(clientext.userInf.uid(), ShareFlag.publish.name(), new Date())
+                .device(clientext.userInf.device);
+
         pickMediaStarter.launch(intt);
     }
 
@@ -501,7 +579,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Web_PageName, action);
+        intent.putExtra(Web_Intent_id, action);
         webHelpStarter.launch(intent);
     }
 
@@ -528,6 +606,13 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             }
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+            // Notes MVP:
+            // file picking currently has no such an activity like ImagePickAdapter, hence no getTemplate() implementateion
+            // prfConfig.using(act);
+            prfConfig.currentTemplate = new ExpSyncDoc()
+                    .share(clientext.userInf.uid(), ShareFlag.prv.name(), new Date())
+                    .device(clientext.userInf.device);
+
             pickFileStarter.launch(intent);
         }
     }
@@ -535,13 +620,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
     @Override
     public void err(AnsonMsg.MsgCode ok, String msg, String... args) {
         runOnUiThread(() -> {
-            msgv.setText(msg);
+            String m = msg;
+            try { m = f(msg, (Object[])args); } catch (Exception e) {}
+            msgv.setText(m);
             msgv.setVisibility(View.VISIBLE);
         });
     }
-
-//    @Override
-//    public void addMenuProvider(@NonNull MenuProvider provider, @NonNull LifecycleOwner owner, @NonNull Lifecycle.State state) {
-//        Utils.warn("To be understood");
-//    }
 }

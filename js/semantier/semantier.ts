@@ -164,7 +164,8 @@ export interface Tierec {
 	[f: string]: string | number | boolean | object | undefined | null;
 }
 
-/**E.g. form's combobox field declaration
+/**
+ * E.g. form's combobox field declaration
  * 
  * TODO rename as QueryField
  */
@@ -200,6 +201,8 @@ export interface Semantext {
 	 * FIXME rename as presentier:
 	 * 
 	 * Gloabal UI presentation tier toolkit, e.g. AnReact
+	 * 
+	 * Issue since 1.0.2: Semantier has nothing to do with this field, why not move to the subclass in anreact ?
 	 */
     uiHelper: any;
     error: ErrorCtx;
@@ -216,6 +219,10 @@ export interface UIComponent {
  * Base class of semantic tier
  */
 export class Semantier {
+	/**
+	 * Issue since 1.0.2: Semantier has nothing to do with this field,
+	 * why not move to the subclass in anreact ?
+	 */
     uiHelper: any;
 
     /** list's columns */
@@ -271,7 +278,7 @@ export class Semantier {
 	}
 
     client: SessionClient | Inseclient;
-    // anReact: any; // for anreact/AnReact. TODO rename as UIHelper
+
     errCtx: ErrorCtx;
 
     disableValidate: any;

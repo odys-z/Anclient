@@ -4,14 +4,14 @@ import ReactDOM from 'react-dom';
 import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, JsonServs, AnreactAppOptions,
+	AnContext, AnError, AnReactExt, JsonHosts, AnreactAppOptions,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { AlbumEditier } from './tiers/album-tier';
 import Typography from '@material-ui/core/Typography';
 
 type AlbumProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 
 	orgId: string;
@@ -44,6 +44,8 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 	preview = (_col: any, rec: any) => {
 		return <></>;
 	};
+
+	synuri = '/album/syn';
 		
 	constructor(props: AlbumProps | Readonly<AlbumProps>) {
 		super(props);
@@ -100,6 +102,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			ihome: this.props.iportal || 'portal.html',
 			error: this.error,
 			ssInf: undefined,
+			host_json: 'private/host.json',
 		}} >
 		  { this.tier.synodeLable() &&
 		    <Typography noWrap variant='body2'>{this.tier.synodeLable()}</Typography>}
@@ -107,7 +110,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 			pk={'pid'}
 			sk={Protocol.sk.collectree} tnode={this.tier.root()}
 			onSelectChange={undefined}
-			uri={this.uri} mtabl='ind_emotion'
+			uri={this.uri} docuri={this.synuri}
 			columns={[
 				{ type: 'text', field: 'share', label: L('Share'),
 					grid: {xs: 6, sm: 6} },
@@ -141,7 +144,7 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
 			  <Admin

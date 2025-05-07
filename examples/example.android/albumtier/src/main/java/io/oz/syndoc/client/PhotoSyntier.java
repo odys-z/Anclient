@@ -11,7 +11,6 @@ import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.Clients.OnLogin;
 import io.odysz.jclient.syn.Doclientier;
-import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -120,16 +119,15 @@ public class PhotoSyntier extends Doclientier {
 	 * 
 	 * @return this
 	 */
-	public PhotoSyntier asynQueryDocs(List<IFileDescriptor> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
 				page.clear();
 				for (int i = page.start(); i < page.end() & i < files.size(); i++) {
 					ExpSyncDoc p = (ExpSyncDoc) files.get((int)i);
-					if (isblank(p.fullpath()))
-						continue;
-					else page.add(p.fullpath());
+					if (!isblank(p.fullpath()))
+						page.add(p.fullpath());
 				}
 
 				resp = synQueryPathsPage(page, SynDocollPort.docstier);
@@ -146,7 +144,10 @@ public class PhotoSyntier extends Doclientier {
 						e.getClass().getName(), resp == null ? null : resp.msg());
 				e.printStackTrace();
 			} catch (SemanticException e) {
-				onErr.err(MsgCode.exSemantic, e.getMessage(),
+				if (e.getMessage().startsWith("Code: exSession"))
+					onErr.err(MsgCode.exSemantic, e.getMessage());
+				else
+					onErr.err(MsgCode.exSemantic, e.getMessage(),
 						e.getClass().getName(), resp == null ? null : resp.msg());
 			} catch (TransException e) {
 				onErr.err(MsgCode.exTransct, e.getMessage(),
@@ -162,9 +163,9 @@ public class PhotoSyntier extends Doclientier {
 				AnsonHeader header = client.header()
 						.act(synuri, "devices", "r/devices", "restore devices");
 
-				AlbumReq req = new AlbumReq(synuri);
+				DocsReq req = new DocsReq(uri);
 				req.a(DocsReq.A.devices);
-				AnsonMsg<AlbumReq> q = client.userReq(synuri, SynDocollPort.docoll, req)
+				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
 						.header(header);
 				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
@@ -221,6 +222,8 @@ public class PhotoSyntier extends Doclientier {
 		new Thread(() -> {
 			try {
 				startPushs(template, doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);
+			} catch (DocsException e) {
+				onErr[0].err(MsgCode.ext, e.getMessage(), e.getClass().getName());
 			} catch (TransException e) {
 				e.printStackTrace();
 				if (!isNull(onErr))

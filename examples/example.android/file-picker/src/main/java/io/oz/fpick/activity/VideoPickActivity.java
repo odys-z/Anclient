@@ -3,13 +3,8 @@ package io.oz.fpick.activity;
 import static io.oz.fpick.filter.FileLoaderCallbackx.TYPE_VIDEO;
 
 import android.Manifest;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -17,8 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
-
-import java.util.ArrayList;
 
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.ShareFlag;
@@ -40,8 +33,8 @@ public class VideoPickActivity extends BaseActivity {
 
     public VideoPickActivity () {
         super();
-        if (template == null)
-            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
+//        if (template == null)
+//            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
     }
 
     @Override
@@ -64,7 +57,6 @@ public class VideoPickActivity extends BaseActivity {
         VideoPickAdapter adapter = new VideoPickAdapter(this, isNeedCamera, maxitems);
         mRecyclerView.setAdapter(adapter);
         linkAdapter(TYPE_VIDEO, adapter);
-
     }
 
     /**
