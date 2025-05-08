@@ -1,6 +1,14 @@
 import os
 import unittest
 
+# project_root = os.path.abspath(os.path.dirname(__file__))
+# if project_root in sys.path:
+#     sys.path.remove(project_root)
+#
+# site_packages = os.path.join(sys.exec_prefix, 'lib', 'site-packages')
+# if site_packages not in sys.path:
+#     sys.path.insert(0, site_packages)
+
 from anson.io.odysz.common import Utils
 
 """
@@ -14,7 +22,7 @@ def run_script(script_path):
     os.system(f'{python} {script_path}')
 
 test_loader = unittest.TestLoader()
-test_suite = test_loader.discover(start_dir='.', pattern='t_*.py')
+test_suite = test_loader.discover(start_dir='test', pattern='t_*.py')
 
 
 if __name__ == '__main__':

@@ -4,7 +4,16 @@ from typing import Protocol, Any, Optional
 
 import requests
 
-from src.io.odysz import SessionInf
+# site_packages = os.path.join(sys.exec_prefix, 'Lib', 'site-packages')
+# if site_packages in sys.path:
+#     sys.path.remove(site_packages)
+#
+# project_root = os.path.abspath(os.getcwd())
+# if project_root in sys.path:
+#     sys.path.remove(project_root)
+# sys.path.insert(0, project_root)
+
+from src.io.odysz.semantics import SessionInf
 from src.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
 from src.io.odysz.semantic.jserv.echo import EchoReq, A
 

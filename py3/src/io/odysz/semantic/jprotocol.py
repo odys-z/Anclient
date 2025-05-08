@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing_extensions import Self
 
-from anson.io.odysz.anson import JsonOpt
-from anson.io.odysz.ansons import Anson
+from anson.io.odysz.anson import JsonOpt, Anson
 
 
 class MsgCode(Enum):
