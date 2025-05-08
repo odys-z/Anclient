@@ -18,7 +18,7 @@ import java.util.List;
 import org.xml.sax.SAXException;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;

@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import org.apache.commons.io.IOUtils;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;

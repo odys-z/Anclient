@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;

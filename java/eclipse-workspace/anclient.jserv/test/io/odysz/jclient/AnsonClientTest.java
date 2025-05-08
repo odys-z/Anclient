@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Radix64;
 import io.odysz.common.Utils;

@@ -7,7 +7,7 @@ import static io.odysz.common.LangExt.f;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
