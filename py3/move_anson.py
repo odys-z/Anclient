@@ -9,10 +9,13 @@ class CustomBuildHook(BuildHookInterface):
         src = os.path.join(self.root, "src", "io")
         self.dst = os.path.join(self.root, "src", "anclient", "data", "io")
         os.makedirs(self.dst, exist_ok=True)
-        print("============= source exists: ", os.path.exists(src), src)
+        # print("============= source exists: ", os.path.exists(src), src)
         if os.path.exists(src):
-            print(src, "=============>>>", self.dst)
+            print(src, " ===  ===>>> ", self.dst)
             shutil.copytree(src, self.dst, dirs_exist_ok=True)
+        else:
+            print("[ERROR / EMPTY] === ===>>> ", self.dst)
+
         # Ensure anclient/data/ is included in the wheel
         build_data["artifacts"].append("anclient/data/")
 
