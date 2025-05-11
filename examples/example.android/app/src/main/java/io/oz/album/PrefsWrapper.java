@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonField;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.LangExt;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.R;

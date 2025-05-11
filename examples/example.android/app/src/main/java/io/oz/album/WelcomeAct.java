@@ -58,7 +58,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
 
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.jclient.SessionClient;
@@ -102,8 +102,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
-//    private int originalWindowFlags;
-//    private int originalSystemUiVisibility;
     private boolean requiresFullscreen;
 
     @Override
@@ -120,9 +118,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
 
-//        originalWindowFlags = getWindow().getAttributes().flags;
-//        originalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
-
         WebView wv = findViewById(R.id.wv_welcome);
         wv.addJavascriptInterface(new WebViewJavaScriptInterface(this, (String d) -> {
             if (bool(d)) {
@@ -136,18 +131,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                 if(this.getSupportActionBar() != null)
                     getSupportActionBar().hide();
-//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//
-//                // Ensure content is drawn behind system bars (optional, for immersive look)
-//                getWindow().getDecorView().setSystemUiVisibility(
-//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
-//                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide status bar
-//                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Immersive mode, bars auto-hide on swipe
-//                );
             }
             else {
                 requiresFullscreen = false;
@@ -160,9 +143,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                 if(this.getSupportActionBar() != null)
                     getSupportActionBar().show();
-//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                getWindow().setFlags(originalWindowFlags, originalWindowFlags);
-//                getWindow().getDecorView().setSystemUiVisibility(originalSystemUiVisibility);
             }
         }), "AndroidInterface");
 
@@ -359,9 +339,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.menu_settings) {
             startPrefsAct();
             return true;
-//        } else if (id == R.id.menu_admin) {
-//            startHelpAct(AssetHelper.Act_Admin);
-//            return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
             return true;
@@ -408,11 +385,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     FileTime d = attr.creationTime();
                                     f.cdate(d);
-                                    // saveFolder = DateFormat.formatYYmm(d);
                                 } else {
                                     Date d = new Date(file.lastModified());
                                     f.cdate(d);
-                                    // saveFolder = DateFormat.formatYYmm(d);
                                 }
                                 return f.size;
                             }
@@ -558,14 +533,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         clearStatus();
 
         Intent intt = new Intent(this, act);
-        // intt.putExtra(IS_NEED_CAMERA, true);
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
-
-        // prfConfig.using(act); // call target activity's getTemplate()
 
         prfConfig.currentTemplate = new ExpSyncDoc()
                 .share(clientext.userInf.uid(), ShareFlag.publish.name(), new Date())
