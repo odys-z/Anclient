@@ -221,7 +221,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {xs: 4, sm: 4, md: 3} },
 				{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
 				{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
-					thFormatter: this.switchDocMedias, formatter: ()=>{/* supress default */} }
+					thFormatter: this.switchDocMedias, formatter: ()=>{/* suppress default */} }
 			]}
 			lightbox={this.lightbox}
 		  />) }
