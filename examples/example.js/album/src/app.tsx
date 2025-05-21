@@ -144,9 +144,6 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	render() {
-
-		// let media = CrudCompW.getMedia(this.props.width);
-
 		return (this.ssclient &&
 		  <AnContext.Provider value={{
 			  servId    : this.config.servId,

@@ -219,21 +219,21 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         WindowManager.LayoutParams attrs = getWindow().getAttributes();
 
         if (!this.requiresFullscreen)
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(attrs);
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
 
-            findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
-            if(this.getSupportActionBar() != null)
-                getSupportActionBar().hide();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(attrs);
+                findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().hide();
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
 
-            findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
-            if(this.getSupportActionBar() != null)
-                this.getSupportActionBar().show();
-        }
+                findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+                if(this.getSupportActionBar() != null)
+                    this.getSupportActionBar().show();
+            }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -268,8 +268,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 if (!isblank(pswd)) {
-                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android'});",
-                                      client.ssInfo().uid(), pswd);
+                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android', serv: '%s'});",
+                                    client.ssInfo().uid(), pswd,
+                                    AlbumApp.prfConfig.jservlist.entry());
+                                    // singl.profiles == null ? singl.synode : singl.profiles.servId);
                     Utils.warn("\n[Load page script]: %s", script);
                     // https://www.techyourchance.com/communication-webview-javascript-android/
                     wv.evaluateJavascript(script, null);

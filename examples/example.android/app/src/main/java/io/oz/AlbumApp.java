@@ -56,7 +56,7 @@ public class AlbumApp extends Application {
 
                         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
                         
-                        if (clientext.profiles == null || isblank(clientext.profiles.webroot))
+                        if (clientext.profiles == null || isblank(clientext.profiles.webnode))
                             throw new DocsException(0, context.getString(R.string.log_prof_err));
 
                         prfConfig.policy2Prefs(sharedPref, clientext.profiles);

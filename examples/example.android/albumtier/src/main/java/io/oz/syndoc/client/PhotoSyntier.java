@@ -45,12 +45,6 @@ public class PhotoSyntier extends Doclientier {
 		this(clienturi, clienturi, new ErrorCtx() {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
-
-//	IFileProvider fileProvider;
-//	public PhotoSyntier fileProvider(IFileProvider p) {
-//		this.fileProvider = p;
-//		return this;
-//	}
 	
 	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.asyLoginByUri(this.uri, uid, pswd, (client) -> {

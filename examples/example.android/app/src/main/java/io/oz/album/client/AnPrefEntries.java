@@ -65,7 +65,8 @@ public class AnPrefEntries extends Anson {
         return false;
     }
 
-    /** get current entry */
+    /** Get current entry.
+     * @since 0.7.1, this is the current synode ID. */
     public String entry() {
         return entries != null && ix >= 0 && ix < entries.length ?
                 entries[ix] : "";

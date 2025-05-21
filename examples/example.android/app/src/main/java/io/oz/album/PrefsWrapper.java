@@ -92,7 +92,7 @@ public class PrefsWrapper extends Anson {
     }
 
     public void policy2Prefs(SharedPreferences sharedPref, Profiles profiles) {
-        albumroot  = profiles.webroot;
+        albumroot  = profiles.webnode;
         landingUrl = profiles.home;
 
         persist();

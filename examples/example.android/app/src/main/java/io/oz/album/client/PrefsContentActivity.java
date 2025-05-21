@@ -163,7 +163,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         try {
             AlbumApp.login(singleton.pswd(), (resp) -> {
                 prfConfig.persist();
-                confirmFormat(R.string.login_succeed, 3000, ((AlbumResp)resp).profiles().webroot);
+                confirmFormat(R.string.login_succeed, 3000, ((AlbumResp)resp).profiles().webnode);
             }, showErrConfirm);
         } catch (Exception e) {
             Log.e(sysuri, e.getClass().getName() + e.getMessage());
