@@ -14,6 +14,8 @@ import { GalleryTier } from '../tiers/gallerytier';
 import { Button, Grid } from '@material-ui/core';
 import { DocIcon } from '../icons/doc-ico';
 import { ConnectionDetails } from './album-doconn-details';
+import Alert from '@material-ui/lab/Alert';
+import AlertTitle from '@material-ui/lab/AlertTitle';
 
 interface AlbumDocProps extends Comprops {
 	synuri: string
@@ -44,6 +46,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	state = {
 		// hasError: false,
 		showingDocs: false,
+		showingSynode: true,
 		sk: undefined,
 	};
 
@@ -93,11 +96,18 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				tier.forest = (rep.Body() as AlbumResp).forest as AnTreeNode[];
 				// console.log((rep.Body() as AlbumResp).docTabl);
 				that.docTabl = (rep.Body() as AlbumResp).docTabl || 'h_photos';
-				that.setState({});
+
+				that.setState({showSynode: true});
+
+				new Promise((resolve) => {
+					setTimeout(() => {
+						resolve(true);
+					}, 5000);
+				}).then(() => {
+					that.setState({showingSynode: false});
+				});
 			}},
 			this.context.error);
-
-		// this.context.onErrorClose();
 	}
 
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
@@ -162,10 +172,6 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				}
 				else {
 					this.pdfview = undefined;
-					// this.context.error.msg = L('Type {t} is not supported yet.', {t});
-					// this.setState({
-					// 	hasError: true,
-					// 	nextAction: 'ignore'});
 					this.context.error.onError( L('Type {t} is not supported yet.', {t}), undefined);
 				}
 			}
@@ -176,64 +182,51 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 		this.setState({});
 	};
 
-	// onError(c: string, r: AnsonMsg<AnsonResp> ) {
-	// 	console.error(c, r.Body()?.msg(), r);
-	// 	let ui = (this as ErrorCtx).that as AlbumDocview;
-	// 	ui.error.msg = r.Body()?.msg();
-	// 	ui.state.hasError = !!c;
-	// 	ui.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
-	// 	ui.setState({});
-	// }
-
-	// onErrorClose() {
-    //     this.state.hasError = false;
-	// 	this.setState({});
-	// }
-
 	render() {
 	  let that = this;
 	  let ismd  = this.props.media?.isMd;
 	  return (<>
-		  { this.tier && (
-			this.state.showingDocs ?
-		    <AnTreegrid
-				pk={''} singleCheck
-				tier={this.tier}
-				uri={this.synuri}
-				columns={[
-				  { type: 'iconame', field: 'docname', label: L('File Name'),   grid: {xs: 10, sm: 7, md: 8},
-				    style: {maxWidth: '90vw', overflow: 'hidden', textOverflow: 'ellipsis'} },
-				  { type: 'text',    field: 'mime', label: ismd ? L('type'):'', grid: {xs: 1, sm: 1, md: 1},
-				    style: {textAlign: 'center'}, colFormatter: typeParser },
-				  { type: 'text',    field: 'shareby', label: L('share by'),    grid: {xs: false, sm: 2, md: 1},
-					style: {textAlign: 'center', paddingRight: '1em'} },
-				  { type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: 1, sm: 2, md: 2},
-				    style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias,
-					colFormatter: (col, n, opts) => opts?.media?.isMd ? <span>{n.node.filesize}</span> : <></>}
-				]}
-				onSelectChange={this.viewFile}
-			/> :
-		    <AnTreeditor {... this.props} // reload={!this.state.showingDocs}
-				pk={'pid'} sk={this.albumsk}
-				tier={this.tier}
-				tnode={this.tier.root()} title={this.tier.albumTitle}
-				onSelectChange={() => undefined}
-				uri={this.uri} docuri={this.synuri}
-				columns={[
-					{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
-					{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {xs: 4, sm: 4, md: 3} },
-					{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
-					{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
-					  thFormatter: this.switchDocMedias, formatter: ()=>{/* supress default */} }
-				]}
-				lightbox={this.lightbox}
-			/>) }
-		  { this.pdfview }
-		  { this.orgview }
-		  {/* { this.state.hasError &&
-			<AnError onClose={this.onErrorClose} fullScreen={false}
-				uri={this.uri} tier={undefined}
-				title={L('Error')} msg={this.error.msg || ''} /> } */}
+	  	{ this.state.showingSynode &&
+	  	  <Alert severity="success" onClose={() => {that.setState({showingSynode: false});}}>
+			<AlertTitle>{`Service ID: ${that?.context.servId}`}</AlertTitle>
+		  </Alert>}
+
+		{ this.tier && (
+		  this.state.showingDocs ?
+		  <AnTreegrid
+			pk={''} singleCheck
+			tier={this.tier}
+			uri={this.synuri}
+			columns={[
+				{ type: 'iconame', field: 'docname', label: L('File Name'),   grid: {xs: 10, sm: 7, md: 8},
+				  style: {maxWidth: '90vw', overflow: 'hidden', textOverflow: 'ellipsis'} },
+				{ type: 'text',    field: 'mime', label: ismd ? L('type'):'', grid: {xs: 1, sm: 1, md: 1},
+				  style: {textAlign: 'center'}, colFormatter: typeParser },
+				{ type: 'text',    field: 'shareby', label: L('share by'),    grid: {xs: false, sm: 2, md: 1},
+				  style: {textAlign: 'center', paddingRight: '1em'} },
+				{ type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: 1, sm: 2, md: 2},
+				  style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias,
+				  colFormatter: (col, n, opts) => opts?.media?.isMd ? <span>{n.node.filesize}</span> : <></>}
+			]}
+			onSelectChange={this.viewFile}
+		  /> :
+		  <AnTreeditor {... this.props} // reload={!this.state.showingDocs}
+			pk={'pid'} sk={this.albumsk}
+			tier={this.tier}
+			tnode={this.tier.root()} title={this.tier.albumTitle}
+			onSelectChange={() => undefined}
+			uri={this.uri} docuri={this.synuri}
+			columns={[
+				{ type: 'text',     field: 'text',   label: L('Folders'), grid: {xs: 5, sm: 4, md: 3} },
+				{ type: 'icon-sum', field: '',       label: L('Summary'), grid: {xs: 4, sm: 4, md: 3} },
+				{ type: 'text',     field: 'shareby',label: L('Share'),   grid: {sm: false, md: 3} },
+				{ type: 'actions',  field: '',       label: '',           grid: {xs: 3, sm: 4, md: 3},
+					thFormatter: this.switchDocMedias, formatter: ()=>{/* suppress default */} }
+			]}
+			lightbox={this.lightbox}
+		  />) }
+		{ this.pdfview }
+		{ this.orgview }
 	  </>);
 
 	  function typeParser(c: AnTreegridCol, n: AnTreeNode, opt?: CompOpts) {

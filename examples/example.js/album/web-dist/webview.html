@@ -28,9 +28,12 @@
   <script>
     let searchParams = new URLSearchParams(window.location.search)
     let aid = searchParams ? searchParams.get('album') : 'album-landing';
-    let serv = searchParams ? searchParams.get('serv') : 'landing';
+    // let serv = searchParams ? searchParams.get('serv') : 'landing';
 
     function loadAlbum(uid, pswd, clientOpts) {
+      serv = clientOpts.serv;
+      console.log('load webviewfrom synode', serv);
+
       album.App.bindHtml('app', {uid, pswd,
         aid, serv, Window, portal: 'index.html', clientOpts});
     }

@@ -11,6 +11,7 @@ import { Langstrs, AnContext, AnReactExt,
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
+import { useTheme } from '@emotion/react';
 
 type AlbumProps = {
 	servs: ExternalHosts;
@@ -88,10 +89,6 @@ export class App extends CrudCompW<AlbumProps> {
 		this.state.nextAction = 're-login',
 
         // DESIGN NOTES: extending ports shall be an automized processing
-		// this.anReact = new AnReactExt(this.inclient, this.error)
-                        // .extendPorts(SynDocollPort);
-		
-		// this.anReact = new AnReactExt(this.ssclient as SessionClient, this.error);
 		AnReactExt.ExtendPort(SynDocollPort);
 
 		SysComp.extendLinks( [
@@ -119,9 +116,9 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		let hosturl = this.config.servs[this.config.servId] as string;
+		let hosturl = this.config.servs.syndomx && this.config.servs.syndomx[this.config.servId] as string;
 		// for Synode 0.7.1, use syndomx[servId] as hosturl
-		if (this.servs.syndomx && this.servs.syndomx.hasOwnProperty(hosturl)) {
+		if (this.servs.syndomx && hosturl && this.servs.syndomx.hasOwnProperty(hosturl)) {
 			hosturl = (this.servs.syndomx as any)[hosturl] || hosturl;
 		}
 
@@ -137,7 +134,6 @@ export class App extends CrudCompW<AlbumProps> {
 			that.ssclient = client;
 
 			that.anReact = new AnReactExt(client, that.error);
-							// .extendPorts(SynDocollPort);
 			that.setState({});
 		}
 
@@ -169,7 +165,6 @@ export class App extends CrudCompW<AlbumProps> {
 					(window as any).AndroidInterface.onEvent(isfull);
 			}
 		  }} >
-			{/* <AlbumDocview synuri={this.synuri} aid={''} /> */}
 			<Sys msHideAppBar={0} tree={this.portfolioMenu} landingUrl={'/home'}
 				hideAppBar={this.props.clientOpts?.platform && this.props.clientOpts?.platform !== 'browser'}
 				sys={L('Portfolio 0.7')} menuTitle={L('Sys Menu')}
