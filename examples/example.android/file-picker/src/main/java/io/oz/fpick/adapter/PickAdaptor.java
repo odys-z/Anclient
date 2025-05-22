@@ -20,20 +20,17 @@ import com.bumptech.glide.request.RequestOptions;
 import com.vincent.filepicker.ToastUtil;
 import com.vincent.filepicker.Util;
 import com.vincent.filepicker.filter.entity.Directory;
-import com.vincent.filepicker.filter.entity.ImageFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ShareFlag;
@@ -118,7 +115,7 @@ public abstract class PickAdaptor<T extends AndroidFile, VH extends ViewHolder4G
      * @param list resource list
      */
     public PickAdaptor(BaseActivity ctx, ArrayList<AndroidFile> list, int max) {
-        this.singleton = AlbumContext.getInstance(ctx);
+        this.singleton = AlbumContext.initWithErrorCtx(ctx);
         shareSetting = ShareFlag.publish;
         mMaxNumber = max;
         mContext = ctx;

@@ -73,6 +73,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	photos: AnTreeNode[]; //PhotoCollect | undefined; 
 	slides: ImageSlide[];
 	albumtier: StreeTier;
+
+	fullcallback?: (isfull: boolean) => void;
 	
 	constructor(props: Comprops & GalleryProps) {
 		super(props);
@@ -92,24 +94,16 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	componentDidMount() {
-		/*
-		this.photos = this.props.tnode.node.children;
-		// this.slides = this.parse(this.props.tnode.node.children);
-		this.parse(this.photos).then((slides: ImageSlide[]) => {
-			this.slides = slides;
-			this.setState({});
-		});
-		*/
 		this.photos = this.props.photos;
-		// this.slides = this.parse(this.props.tnode.node.children);
+
+		this.fullcallback = this.context.onFullScreen;
 
 		if (!this.slides || this.slides.length === 0 
 			|| this.slides.length != this.photos.length
-			|| this.slides[0].node.id != this.photos[0].node.id // bug for ignoring others?
+			|| this.slides[0].node.id != this.photos[0].node.id
 		)
 			this.parse(this.photos).then((slides: ImageSlide[]) => {
 				this.slides = slides;
-				// this.props.slideBuff[0] = this.slides;
 				this.setState({});
 			});
 		else
@@ -164,6 +158,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 		let msg = getDownloadReq();//pid as string, opts);
 		let jserv = client.an.servUrl(port);
+
 		return `${jserv}?anson64=${window.btoa(JSON.stringify(msg))}`;
 
 		function getDownloadReq() {//pid: string, opts: {uri: string, port: string, client: SessionClient}) {
@@ -185,12 +180,17 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	openLightbox (_event: React.MouseEvent, ix: number) {
+		if (this.fullcallback)
+			this.fullcallback(true);
 		this.currentImx = ix;
 		this.showCarousel = true;
 		this.setState({});
 	}
 
 	closeLightbox () {
+		if (this.fullcallback)
+			this.fullcallback(false);
+
 		this.currentImx = 0;
 		this.showCarousel = false;
 		this.setState({})
@@ -228,10 +228,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,
-					onClose: () => {
-						that.showCarousel = false;
-						that.setState({});
-				  } } )
+					onClose: this.closeLightbox
+				  } )
 			 || <Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
@@ -260,10 +258,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	render() {
-		// let phs = this.slides || _photos;
-		// return (<div>
-		// 	{this.gallery( phs )}
-		// </div>);
 		return this.props.visible && this.gallery(this.slides);
 	}
 }

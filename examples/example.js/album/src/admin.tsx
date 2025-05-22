@@ -1,5 +1,5 @@
 
-import React, { DOMElement } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
@@ -8,7 +8,7 @@ import { StandardProps } from '@material-ui/core';
 import { Protocol, SessionClient, ErrorCtx, 
 	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
 
-import { L, Langstrs, AnContext, JsonServs,
+import { L, Langstrs, AnContext, JsonHosts,
 	AnReact, AnReactExt, AnreactAppOptions, AnError,
 	jsample, Sys, SysComp, Login
 } from '@anclient/anreact';
@@ -21,7 +21,7 @@ const {Roles} = jsample;
 
 interface Approps extends StandardProps<any, string> {
 	iwindow: Window;
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId?: string;
 };
 
@@ -161,6 +161,8 @@ class Admin extends React.Component<Approps> {
 				iparent : this.props.iparent,
 				ihome: "#", // this.props.iportal || 'portal.html',
 				error: this.errorCtx,
+
+				host_json: 'private/host.json',
 			}} >
 			  { !this.state.loggedin ?
 				<Login onLogin={this.onLogin} config={{userid: '', pswd: '123456'}}/>
@@ -189,15 +191,15 @@ class Admin extends React.Component<Approps> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReact.loadServs(elem, opts, login);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonHosts) {
 			let portal = opts.portal || 'index.html';
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv}
 								   iportal={portal} iwindow={window}/>, dom);
 		}
 		
-		function login(elem: string, opts: AnreactAppOptions, json: JsonServs) {
-			let jserv = json[opts.serv || 'host'];
+		function login(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
+			let jserv = json[opts.serv || 'host'] as string;
 			an.init(jserv)
 			  .login( uid, pswd,
 				(client: SessionClient) => {

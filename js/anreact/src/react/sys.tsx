@@ -38,19 +38,27 @@ import {
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import withWidth from '@material-ui/core/withWidth';
-import { SessionClient } from '@anclient/semantier/anclient';
+import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@material-ui/core/Fab';
+import { contextType } from 'react-modal';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
 	menu: string;
+
+	/** 
+	 * Alternatively, if menu is no usable, use this to compose menu's tree items.
+	 */
+	tree: Array<MenuItem>;
+
     /**Welcome page formatter */
     welcome?: (
 		/** @deprecated not used */
 		classes: ClassNames | undefined,
 		context: AnContextType, comp: SysComp) => JSX.Element;
-    // classes: {[x: string]: string};
+		
     hrefDoc?: string;
+
 	/**
 	 * On logout handler.
 	 * When called, the client is already logged out.
@@ -70,7 +78,12 @@ export interface SysProps extends Comprops {
 	 */
 	landingUrl?: string;
 
-	msHideAppBar?: number 
+	msHideAppBar?: number;
+
+	/**
+	 * Default: false
+	 */
+	hideAppBar?: boolean;
 }
 
 const _icons = {
@@ -212,7 +225,7 @@ export interface MenuItem {
  * Parse lagacy json format.
  * @return {menu, paths}
  * */
-export function parseMenus(json = []): {
+export function parseMenus(json: Array<{node: MenuItem}> | {node: MenuItem} = []): {
 	menu: Array<MenuItem>;
 	paths: Array<any>}
 {
@@ -285,6 +298,7 @@ class SysComp extends CrudCompW<SysProps> {
 	anreact: AnReactExt;
 
 	confirmLogout: any;
+	onfullscreen: (isfull: any) => void;
 
 	static extendLinks(links) {
 		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
@@ -311,10 +325,9 @@ class SysComp extends CrudCompW<SysProps> {
 
 		this.welcomePaper = this.welcomePaper.bind(this);
 
-		// this.ref = React.createRef();
-		// let m = ReactDOM.findDOMNode(this.ref)
-        // m.addEventListener('scroll', (e: UIEvent) => {console.log(e, e.target);});
-		window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
+		// window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
+
+		this.state.showAppBar = !props.hideAppBar;
 	}
 
 	welcomePaper(classes = {} as ClassNames) {
@@ -359,12 +372,22 @@ class SysComp extends CrudCompW<SysProps> {
 		// load menu
 		this.anreact = ctx.uiHelper;
 
+		let onfullscreen = ctx.onFullScreen;
+		this.onfullscreen = (isfull) => {
+			// TODO FIXME this is not called once the Error dialog is closed in app.tsx.
+			if (typeof(onfullscreen) === 'function')
+				onfullscreen(isfull);
+
+			this.setState({showAppBar: !isfull && !that.props.hideAppBar});
+		};
+		ctx.onFullScreen = this.onfullscreen;
+
 		let that = this;
 		this.anreact.loadMenu(
 			this.state.skMenu,
 			this.uri,
-			(dsResp) => {
-				let {menu, paths} = parseMenus((dsResp as AnsonMsg<AnDatasetResp>).Body().forest);
+			(dsResp: AnsonMsg<AnDatasetResp>) => {
+				let {menu, paths} = parseMenus(dsResp.Body().forest as Array<{node: MenuItem}>);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 
@@ -375,10 +398,14 @@ class SysComp extends CrudCompW<SysProps> {
 						welcome: false
 					} );
 				}
-			} );
+			}, this.props.tree );
 	}
 
 	componentDidUpdate(_: Readonly<SysProps>, _p: Readonly<{}>, _s?: any): void {
+		// reached here once the Error dialog is closed.
+		if (typeof(this.onfullscreen) === 'function')
+			this.context.onFullScreen = this.onfullscreen;
+
 		if (this.props.msHideAppBar > 0 && this.barAutoHidden) {
 			let that = this;
 			setTimeout(()=>{
@@ -622,7 +649,7 @@ class SysComp extends CrudCompW<SysProps> {
 						{this.route()}
 					</div>}
 			</main>
-			{ !showAppBar
+			{ !showAppBar && !this.props.hideAppBar
 			  && <Fab color="primary" size="small" style={{position: 'absolute'}} aria-label="open drawer"
 					onClick={this.showMenu} >
 			      {/* <IconButton

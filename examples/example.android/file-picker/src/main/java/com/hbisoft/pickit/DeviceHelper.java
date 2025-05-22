@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.odysz.common.FilenameUtils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
@@ -27,7 +28,6 @@ import static com.hbisoft.pickit.Utils.*;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import org.apache.commons.io_odysz.FilenameUtils;
 
 public class DeviceHelper {
     /** experienced file provider other than system's */

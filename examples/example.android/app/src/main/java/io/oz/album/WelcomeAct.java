@@ -2,12 +2,13 @@ package io.oz.album;
 
 import static com.hbisoft.pickit.DeviceHelper.getDocDescript;
 import static com.hbisoft.pickit.DeviceHelper.getMultipleDocs;
+import static io.odysz.common.LangExt.bool;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.common.LangExt.str;
 import static io.oz.AlbumApp.prfConfig;
-import static io.oz.album.webview.WebAlbumAct.Web_PageName;
+import static io.oz.album.webview.WebAlbumAct.Web_Intent_id;
 import static io.oz.albumtier.AlbumContext.ConnState;
 import static io.oz.albumtier.AlbumContext.verbose;
 import static io.oz.fpick.activity.BaseActivity.IS_NEED_FOLDER_LIST;
@@ -73,6 +74,7 @@ import io.oz.R;
 import io.oz.album.client.PrefsContentActivity;
 import io.oz.album.webview.VWebAlbum;
 import io.oz.album.webview.WebAlbumAct;
+import io.oz.album.webview.WebViewJavaScriptInterface;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.AndroidFile;
 import io.oz.fpick.PickingMode;
@@ -85,8 +87,8 @@ import io.oz.syndoc.client.PhotoSyntier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
     // for error:
-    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost'
-    // delete build dir
+    // Class 'WelcomeAct' must either be declared abstract or implement abstract method 'addMenuProvider(MenuProvider, LifecycleOwner, State)' in 'MenuHost',
+    // delete the 'build' folder
 
     AlbumContext clientext;
 
@@ -100,20 +102,70 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
+//    private int originalWindowFlags;
+//    private int originalSystemUiVisibility;
+    private boolean requiresFullscreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        clientext = AlbumContext.getInstance(this);
+        clientext = AlbumContext.initWithErrorCtx(this);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         PrefsWrapper c = AlbumApp.prfConfig
                        = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
-        clientext.init(c.homeName, c.uid, c.device, c.jserv());
+        clientext.init(c.homeName, c.uid, c.pswd, c.device, c.jserv());
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
+
+//        originalWindowFlags = getWindow().getAttributes().flags;
+//        originalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+
+        WebView wv = findViewById(R.id.wv_welcome);
+        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this, (String d) -> {
+            if (bool(d)) {
+                requiresFullscreen = true;
+                findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+                findViewById(R.id.tv_status).setVisibility(View.GONE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().hide();
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//
+//                // Ensure content is drawn behind system bars (optional, for immersive look)
+//                getWindow().getDecorView().setSystemUiVisibility(
+//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
+//                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide status bar
+//                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Immersive mode, bars auto-hide on swipe
+//                );
+            }
+            else {
+                requiresFullscreen = false;
+                findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+                findViewById(R.id.tv_status).setVisibility(View.VISIBLE);
+
+                WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
+
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().show();
+//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//                getWindow().setFlags(originalWindowFlags, originalWindowFlags);
+//                getWindow().getDecorView().setSystemUiVisibility(originalSystemUiVisibility);
+            }
+        }), "AndroidInterface");
+
         errCtx = new AndErrorCtx().context(this);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
@@ -186,6 +238,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
         WindowManager.LayoutParams attrs = getWindow().getAttributes();
 
+        if (!this.requiresFullscreen)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
             getWindow().setAttributes(attrs);
@@ -212,6 +265,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
+//        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this), "AndroidInterface");
         reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 
@@ -234,7 +288,8 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 if (!isblank(pswd)) {
-                    String script = String.format("loadAlbum('%s', '%s', {legacyPDF: true});", client.ssInfo().uid(), pswd);
+                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android'});",
+                                      client.ssInfo().uid(), pswd);
                     Utils.warn("\n[Load page script]: %s", script);
                     // https://www.techyourchance.com/communication-webview-javascript-android/
                     wv.evaluateJavascript(script, null);
@@ -304,9 +359,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.menu_settings) {
             startPrefsAct();
             return true;
-        } else if (id == R.id.menu_admin) {
-            startHelpAct(AssetHelper.Act_Admin);
-            return true;
+//        } else if (id == R.id.menu_admin) {
+//            startHelpAct(AssetHelper.Act_Admin);
+//            return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
             return true;
@@ -524,7 +579,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
      */
     protected void startHelpAct(int action) {
         Intent intent = new Intent(this, WebAlbumAct.class);
-        intent.putExtra(Web_PageName, action);
+        intent.putExtra(Web_Intent_id, action);
         webHelpStarter.launch(intent);
     }
 

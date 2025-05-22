@@ -2,17 +2,18 @@ import React from 'react';
 import { Button } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
-import { AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, PageInf, TierComboField } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp,
+	L, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, AnContext,
-	QueryPage, toPageInf, Spreadsheetier, CellEditingStoppedEvent, anMultiRowRenderer,
+	QueryPage, toPageInf, Spreadsheetier, anMultiRowRenderer,
 } from '@anclient/anreact';
 const { JsampleIcons } = jsample;
 
 import { Curriculum, CourseReq } from './tier';
 import { addAgStyle, StarTheme } from '../../../common/star-theme';
+import { CellEditingStoppedEvent } from 'ag-grid-community';
 
 const styles = (_theme: StarTheme) => ({
 	root: {
@@ -38,11 +39,11 @@ class CourseComp extends CrudComp<Comprops & {conn_state: string}>{
 			  query: [
 				{ type: 'text', label: L('Course'), field: 'currName', grid: {sm: 3, md: 3}},
 				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
-				  label: L('Module'), field: 'module', grid: {sm: 3, md: 3}} as ComboCondType,
+				  label: L('Module'), field: 'module', grid: {sm: 3, md: 3}} as TierComboField,
 				{ type: 'cbb', sk: 'curr-cate', uri: this.uri,
-				  label: L('Category'), field: 'cate', grid: {sm: 3, md: 3}} as ComboCondType,
+				  label: L('Category'), field: 'cate', grid: {sm: 3, md: 3}} as TierComboField,
 				{ type: 'cbb', sk: 'curr-level', uri: this.uri,
-				  label: L('Level'), field: 'clevel', grid: {sm: 3, md: 3}} as ComboCondType,
+				  label: L('Level'), field: 'clevel', grid: {sm: 3, md: 3}} as TierComboField,
 			] } as QueryPage;
 
 	rowClassRules = {

@@ -46,9 +46,9 @@
             android:key="@string/key_device"
             android:summary="@string/msg_only_once"
             android:title="@string/devide_title"/>
-<!--        <Preference-->
-<!--            android:key="@string/key_restore_dev"-->
-<!--            android:layout="@layout/edit_device" />-->
+        <Preference
+            android:key="@string/key_dev_restore"
+            android:layout="@layout/edit_device" />
         <Preference
             android:key="@string/key_regist"
             android:layout="@layout/bt_regist_device" />

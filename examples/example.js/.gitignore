@@ -1,4 +1,6 @@
 node_modules
+*.apk
+*.aab
 *-del
 # dist is copied to docker image
 # !react-quiz/dist

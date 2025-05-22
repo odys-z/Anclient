@@ -4,7 +4,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { Protocol, AnsonMsg, SessionClient, ErrorCtx, AnsonResp } from '@anclient/semantier'
 import { L, Langstrs,
-	Sys, SysComp,
+	Sys, SysComp, AnReact,
 	AnContext, AnError, AnReactExt, jsample, AnContextType, AnreactAppOptions
 } from '@anclient/anreact';
 const { Domain, Roles, Orgs, Userst, JsampleTheme } = jsample;
@@ -169,6 +169,8 @@ class App extends React.Component<Northprops, any> {
 				iparent: this.props.iparent,
 				ihome: this.props.iportal || 'portal.html',
 				error: this.error,
+
+				host_json: "private/host.json"
 			}} >
 				<Sys menu='sys.menu.jsample'
 					sys='Emotion Regulation - TSX' menuTitle='Sys Menu'

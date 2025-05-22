@@ -2,25 +2,27 @@ package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.ifnull;
 import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.len;
 import static io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import static io.oz.AlbumApp.prfConfig;
+import static io.oz.album.webview.WebAlbumAct.Web_Intent_id;
 import static io.oz.albumtier.AlbumContext.sysuri;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -35,7 +37,9 @@ import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.AssetHelper;
 import io.oz.album.peer.AlbumResp;
+import io.oz.album.webview.WebAlbumAct;
 import io.oz.albumtier.AlbumContext;
 import io.oz.fpick.activity.ComfirmDlg;
 
@@ -57,27 +61,17 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /** @see #buff_device */
     static String buff_devname;
-
-    /**
-     * Modified singlet.jservs
-     * null for clean
-     */
-//    private AnPrefEntries jsvEntsDirty;
-//    protected AnPrefEntries jsvEntsDirty(SharedPreferences sharedPrefs) {
-//        if (jsvEntsDirty == null)
-//            jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
-//        return jsvEntsDirty;
-//    }
+    private ActivityResultLauncher<Intent> hlpDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (singleton == null) {
-            singleton = AlbumContext.getInstance(this);
+        singleton = AlbumContext.initWithErrorCtx(this);
+        if (singleton == null)
             oldUid = null;
-        }
-        else oldUid = singleton.userInf.uid();
+        else
+            oldUid = singleton.userInf.uid();
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportFragmentManager()
@@ -85,12 +79,12 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 .replace(android.R.id.content, prefFragment)
                 .commit();
 
-        // SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        // jsvEntsDirty = AlbumApp.sharedPrefs.jservs(sharedPrefs);
-
         // https://issuetracker.google.com/issues/146166988/resources
         // this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        this.hlpDevice = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), r -> {} );
     }
 
     @Override
@@ -106,7 +100,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             },
             (c, m, a) -> {
                 new ComfirmDlg()
-                        // .dlgMsg(R.string.msg_conn_err, f("details: ", m, a), 0)
                         .dlgMsg(f("%s\ncode: %s\n%s", getString(R.string.msg_conn_err), c.name(), m), 0)
                         .onOk((dialog, id) -> {
                             dialog.dismiss();
@@ -136,8 +129,8 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
             String content = intentResult.getContents();
             if (content != null) {
                 String format  = intentResult.getFormatName();
-                if (eq(format, getString(R.string.qrformat))) {
-                    AnPrefEntries jsvEnts = prfConfig.jservs(); //jsvEntsDirty;
+                if (eq(format, "QR_CODE")) {
+                    AnPrefEntries jsvEnts = prfConfig.jservs();
                     if (jsvEnts.insert(content)) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
@@ -169,8 +162,6 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
         try {
             AlbumApp.login(singleton.pswd(), (resp) -> {
-                // AlbumApp.prfConfig.jservs(prfConfig.jservs());
-                // confirm(R.string.login_succeed, 3000);
                 prfConfig.persist();
                 confirmFormat(R.string.login_succeed, 3000, ((AlbumResp)resp).profiles().webroot);
             }, showErrConfirm);
@@ -206,16 +197,13 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 }
                 buff_device = devid;
                 singleton.device(buff_device, buff_devname);
-                AlbumApp.prfConfig.device(buff_device).persist();
+                AlbumApp.prfConfig.device(singleton).persist();
 
                 runOnUiThread(()-> prefFragment.device.setEnabled(false));
 
                 if (prefFragment.btnRegistDev != null) {
-//                    Preference btnrest = prefFragment.findpref(R.string.key_restore_dev);
-//                    if (btnrest != null) // too quick the UI events are happening
-//                        prefFragment.prefcateDev.removePreference(btnrest);
-
                     prefFragment.prefcateDev.removePreference(prefFragment.btnRegistDev);
+                    prefFragment.prefcateDev.removePreference(prefFragment.btnRestoreDev);
                     prefFragment.btnRegistDev = null;
                 }
             }, showErrConfirm);
@@ -223,6 +211,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /**
      * @param btn clicked button
+     * @since 0.7.0.6
      */
     public void onRestoreDev(View btn) {
         if (singleton.state() != AlbumContext.ConnState.Online || singleton.userInf == null) {
@@ -244,18 +233,16 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         String uname = (String) resp.data().get("owner-name");
                         String org   = (String) resp.data().get("org");
-                        String dev_usedby = getString(R.string.dev_usedby, uname, org);
+                        String dev_usedby = getString(R.string.dev_usedby, uname, ifnull(org, ""));
                         builder.setTitle(dev_usedby)
                             .setNegativeButton("Cancel", (dialog, which) -> { })
                             .setSingleChoiceItems(oldevnm, 0, (dialog, which) -> {
                                 buff_device  = oldevId[which];
                                 buff_devname = oldevnm[which];
                                 updateTitle(
-                                        // prefFragment.findPreference(keys.device),
                                         prefFragment.findpref(R.string.key_device),
                                         String.format("%s [%s]", buff_devname, buff_device));
 
-                                // updateSummery(prefFragment.findPreference(keys.device), dev_usedby);
                                 updateSummery(prefFragment.findpref(R.string.key_device), dev_usedby);
                                 dialog.dismiss();
                             });
@@ -271,6 +258,13 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
         }
     }
 
+    public void onHelpDeviceId(View btn) {
+        Intent intent = new Intent(this, WebAlbumAct.class);
+        intent.putExtra(Web_Intent_id, AssetHelper.Act_HelpDevice);
+
+        hlpDevice.launch(intent);
+    }
+
     /**
      * Set text into EditText's summery, running in ui thread.
      *
@@ -284,7 +278,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

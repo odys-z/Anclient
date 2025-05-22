@@ -3,7 +3,6 @@ package io.oz.album.webview;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,7 +19,7 @@ import io.oz.albumtier.AlbumContext;
 
 public class WebAlbumAct extends AppCompatActivity {
 
-	public static final String Web_PageName = "WebAction";
+	public static final String Web_Intent_id = "WebAction";
 
 	/** Landing uril such as error page, e.g. http://odys-z.github.io/Anclient */
 	static String url_landing;
@@ -34,12 +33,12 @@ public class WebAlbumAct extends AppCompatActivity {
 		setContentView(R.layout.wv);
 
 		errCtx = new AndErrorCtx().context(this);
-		singleton = AlbumContext.getInstance(errCtx);
+		singleton = AlbumContext.initWithErrorCtx(errCtx);
 
 		url_landing = getString(R.string.url_landing);
 
 		Intent intt = getIntent();
-		webpageId = intt.getIntExtra(Web_PageName, AssetHelper.Act_Landing);
+		webpageId = intt.getIntExtra(Web_Intent_id, AssetHelper.Act_Landing);
 
 		WebView wv = findViewById(R.id.wv);
 		wv.getSettings().setJavaScriptEnabled(true);

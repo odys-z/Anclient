@@ -12,9 +12,10 @@ const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: {"portfolio": "./src/app.tsx",
-			"login": "./src/login-admin.tsx",
-			"admin": "./src/admin.tsx" },
+	entry: { 'portfolio': './src/app.tsx',
+			 'login'    : './src/login-admin.tsx'
+			 // "admin": "./src/admin.tsx"
+		   },
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
@@ -26,6 +27,8 @@ module.exports = {
 	plugins: [
 		new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()
 	],
+
+	watch: false,
 
 	externals: {
 		'react': 'React',

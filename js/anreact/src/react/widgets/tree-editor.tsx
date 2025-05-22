@@ -250,6 +250,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 						{ typeof col.formatter === 'function' ?
 							col.formatter(col, tnode) :
 							<Typography noWrap variant='body2'
+								// issue: This is controlling the presentation layer by data service. Is this the right way?
 								align={align(n.css[col.field])}
 								className={classes.rowText} >
 								{n[col.field]}
@@ -369,6 +370,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 
 	/**
 	 * Ui helper for a summary of mime types.
+	 * If in grid md size, also with lable from tnode.node.pname || pid || text || fullpath.
 	 *
 	 * @param iconpool
 	 * @param tnode
@@ -381,7 +383,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 
 		return (
 		  <Typography noWrap variant='body2' className={classes.rowText} >
-			{hide(grid, media) ? undefined : media.isMd && `[${n.pname}]`}
+			{hide(grid, media) ? undefined : media.isMd && `[${n.pname || n.pid || n.text || n.fullpath}]` }
 			{ Number(n.img) > 0 && [icon(iconpool, "[]", 0), `x ${n.img}`] }
 			{ Number(n.geo) > 0 && [icon(iconpool, "!", 0), `x ${n.geo}`] }
 			{ Number(n.mov) > 0 && [icon(iconpool, ">", 0), `x ${n.mov}`] }
