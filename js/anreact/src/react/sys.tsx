@@ -121,7 +121,6 @@ const styles = (theme: Theme) => ({
 	direction: theme.direction || 'ltr' as any,
 	root: {
 		display: 'flex',
-
 	},
 	appBar: {
 		transition: theme.transitions.create(['margin', 'width'], {
