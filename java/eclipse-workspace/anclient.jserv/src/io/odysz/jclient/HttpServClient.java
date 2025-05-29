@@ -1,5 +1,8 @@
 package io.odysz.jclient;
 
+import static io.odysz.common.LangExt._0;
+import static io.odysz.common.LangExt.f;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,8 +10,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
 import org.apache.commons.io.IOUtils;
@@ -22,6 +29,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -35,6 +43,9 @@ import io.odysz.transact.x.TransException;
 public class HttpServClient {
 	protected static final String USER_AGENT = "Anclient.java/0.5.0";
 	
+	/** Must be multiple of 12. Default 3 MiB */
+	static int bufsize = 3 * 1024 * 1024;
+
 	/**
 	 * HttpServClient use this to put message code into exception object.
 	 * Upper layer use this to get exception code (SemanticException must
@@ -117,7 +128,7 @@ public class HttpServClient {
 	/**
 	 * Post in synchronized style. Call this within a worker thread.<br>
 	 * See {@link AnsonClientTest} for a query example.<br>
-	 * @param url
+	 * @param url serv-root/port-pattern
 	 * @param jreq
 	 * @return response if succeed
 	 * @throws IOException connection error
@@ -193,6 +204,104 @@ public class HttpServClient {
 	}
 
 	/**
+	 * 
+	 * @param url serv-root/port-pattern 
+	 * @return localpath
+	 * @throws IOException 
+	 * @throws SQLException 
+	 * @throws TransException 
+	 * @throws AnsonException 
+	 */
+ 	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte, Path localpath,
+ 			OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
+
+// 		        // Ensure download directory exists
+// 		        Path downloadDir = Paths.get(DOWNLOAD_DIR);
+// 		        Files.createDirectories(downloadir);
+//
+// 		        Path filePath = downloadDir.resolve(fileName);
+// 		        Path progressFile = downloadDir.resolve(fileName + PROGRESS_FILE_SUFFIX);
+//
+// 		        // Check for existing download progress
+// 		        long startByte = 0;
+// 		        if (Files.exists(progressFile)) {
+// 		            String progress = Files.readString(progressFile).trim();
+// 		            if (!progress.isEmpty()) {
+// 		                startByte = Long.parseLong(progress);
+// 		            }
+// 		        }
+//
+// 		        // Open connection
+
+			 // URL url = new URL(SERVER_URL);
+
+ 			URL url = new URL(f("%s?anson64=%s", urlport.toString(), jreq.toBlock()));
+ 			
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+			// Get total file size
+			connection.setRequestMethod("HEAD");
+			long totalSize = connection.getContentLengthLong();
+			connection.disconnect();
+
+			// Set up range request if resuming
+			connection = (HttpURLConnection) url.openConnection();
+			if (startByte > 0) {
+				connection.setRequestProperty("Range", "bytes=" + startByte + "-");
+			}
+			
+ 		       // Check response
+			int responseCode = connection.getResponseCode();
+			if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_PARTIAL) {
+				if (responseCode == 416) { // Range not satisfiable
+					Files.deleteIfExists(localpath);
+					startByte = 0;
+					connection.disconnect();
+					return download206(urlport, jreq, 0, localpath, progressCallback); // Retry from start
+				}
+				throw new IOException("HTTP error code: " + responseCode);
+			}
+
+			long contentLength = connection.getContentLengthLong();
+			long receivedLength = startByte;
+
+ 		       // Open file for appending or creating
+ 		       try (InputStream inputStream = connection.getInputStream();
+ 		            OutputStream outputStream = Files.newOutputStream(localpath,
+ 		                    startByte == 0 ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {
+
+ 		           byte[] buffer = new byte[bufsize];
+ 		           int bytesRead;
+
+ 		           // Download and write to file
+ 		           while ((bytesRead = inputStream.read(buffer)) != -1) {
+ 		               outputStream.write(buffer, 0, bytesRead);
+ 		               receivedLength += bytesRead;
+
+ 		               // Save progress
+ 		               Files.writeString(localpath, String.valueOf(receivedLength),
+ 		                       StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+
+ 		               // Report progress
+ 		               if (progressCallback != null) {
+ 		                   _0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null);
+ 		               }
+ 		           }
+// 		       } catch (IOException e) {
+// 		           // Preserve progress file for resume
+// 		           throw new IOException("Download failed: " + e.getMessage(), e);
+ 		       }
+
+ 		       // Clean up progress file on successful completion
+ 		       // Files.deleteIfExists(progressFile);
+ 		       connection.disconnect();
+
+ 		return localpath;
+ 	}
+	
+	/**
+	 * @deprecated this cannot support breakup point resuming, and is replaced by {@link #download206(String, AnsonMsg, String)}
+	 * 
 	 * @param url
 	 * @param jreq
 	 * @param localpath
@@ -202,7 +311,7 @@ public class HttpServClient {
 	 * @throws SemanticException
 	 */
 	@SuppressWarnings("unchecked")
-	public String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath)
+ 	public static String streamdown(String url, AnsonMsg<? extends DocsReq> jreq, String localpath)
 			throws IOException, AnsonException, SemanticException {
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();

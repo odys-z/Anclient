@@ -3,6 +3,7 @@ package io.odysz.jclient;
 import static io.odysz.common.LangExt.isblank;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.LogAct;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
@@ -327,6 +329,36 @@ public class SessionClient {
 	}
 
 	/**
+	 * Download with break point resuming, by range header.
+	 * @param startb 
+	 * @param onblock 
+	 * 
+	 * @return the local path
+	 */
+	public <T extends DocsReq> Path download206(String synuri, IPort port, String doctbl, Path localpath,
+			long startb, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
+
+		if (port == null)
+			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
+
+		String[] act = AnsonHeader.usrAct(synuri, port.name(), DocsReq.A.download206, localpath.toString());
+
+		DocsReq body = new DocsReq(doctbl, synuri);
+		body.a(DocsReq.A.download206);
+
+		AnsonMsg<T> req = new AnsonMsg<T>(port)
+				.header(header().act(act))
+				.body(body);
+
+		if (Clients.verbose) Utils.logi(req.toString());
+
+		return HttpServClient.download206(Clients.servUrl(port), req, startb, localpath, onblock); 
+	}
+
+	/**
+	 * @deprecated Since 0.5.18,
+	 * this cannot support breakup point resuming, and is replaced by {@link #download206(String, AnsonMsg, String)}
+	 * 
 	 * @param uri
 	 * @param port
 	 * @param body
@@ -337,7 +369,8 @@ public class SessionClient {
 	 * @throws SemanticException
 	 * @throws IOException
 	 */
-	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act) throws AnsonException, SemanticException, IOException {
+	public <T extends DocsReq> String download(String uri, IPort port, T body, String localpath, LogAct... act)
+			throws AnsonException, SemanticException, IOException {
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
 
@@ -348,8 +381,9 @@ public class SessionClient {
 
 		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header()).body(body);
 		if (Clients.verbose) Utils.logi(msg.toString());
-    	HttpServClient httpClient = new HttpServClient();
-  		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
+//		HttpServClient httpClient = new HttpServClient();
+//		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
+		return HttpServClient.streamdown(Clients.servUrl(port), msg, localpath); 
 	}
 
 	/*

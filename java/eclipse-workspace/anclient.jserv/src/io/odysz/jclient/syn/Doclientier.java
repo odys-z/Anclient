@@ -584,13 +584,13 @@ public class Doclientier extends Semantier {
 	}
 
 
-	public String download(String clientUri, String syname, ExpSyncDoc photo, String localpath)
-			throws SemanticException, AnsonException, IOException {
-		DocsReq req = (DocsReq) new DocsReq(syname, synuri);
-		req.doc.recId = photo.recId;
-		req.a(A.download);
-		return client.download(clientUri, Port.docstier, req, localpath);
-	}
+//	public String download(String clientUri, String syname, ExpSyncDoc photo, String localpath)
+//			throws SemanticException, AnsonException, IOException {
+//		DocsReq req = (DocsReq) new DocsReq(syname, synuri);
+//		req.doc.recId = photo.recId;
+//		req.a(A.download);
+//		return client.download(clientUri, Port.docstier, req, localpath);
+//	}
 
 	/**
 	 * Get a doc record from jserv.
