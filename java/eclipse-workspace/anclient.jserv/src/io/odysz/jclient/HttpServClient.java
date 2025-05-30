@@ -204,7 +204,7 @@ public class HttpServClient {
 	}
 
 	/**
-	 * 
+	 * [Synchronouse / Wait]
 	 * @param url serv-root/port-pattern 
 	 * @return localpath
 	 * @throws IOException 
@@ -214,26 +214,6 @@ public class HttpServClient {
 	 */
  	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte, Path localpath,
  			OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
-
-// 		        // Ensure download directory exists
-// 		        Path downloadDir = Paths.get(DOWNLOAD_DIR);
-// 		        Files.createDirectories(downloadir);
-//
-// 		        Path filePath = downloadDir.resolve(fileName);
-// 		        Path progressFile = downloadDir.resolve(fileName + PROGRESS_FILE_SUFFIX);
-//
-// 		        // Check for existing download progress
-// 		        long startByte = 0;
-// 		        if (Files.exists(progressFile)) {
-// 		            String progress = Files.readString(progressFile).trim();
-// 		            if (!progress.isEmpty()) {
-// 		                startByte = Long.parseLong(progress);
-// 		            }
-// 		        }
-//
-// 		        // Open connection
-
-			 // URL url = new URL(SERVER_URL);
 
  			URL url = new URL(f("%s?anson64=%s", urlport.toString(), jreq.toBlock()));
  			
@@ -284,12 +264,10 @@ public class HttpServClient {
 
  		               // Report progress
  		               if (progressCallback != null) {
- 		                   _0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null);
+ 		                   if (_0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null))
+ 		                	   break;
  		               }
  		           }
-// 		       } catch (IOException e) {
-// 		           // Preserve progress file for resume
-// 		           throw new IOException("Download failed: " + e.getMessage(), e);
  		       }
 
  		       // Clean up progress file on successful completion

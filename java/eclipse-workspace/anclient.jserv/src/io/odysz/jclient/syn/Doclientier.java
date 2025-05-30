@@ -500,7 +500,7 @@ public class Doclientier extends Semantier {
 
 				reslts.add(respi);
 			}
-			catch (IOException | TransException | AnsonException | SQLException ex) { 
+			catch (IOException | TransException | AnsonException ex) { 
 				if (verbose) ex.printStackTrace();
 
 				String exmsg = ex.getMessage();

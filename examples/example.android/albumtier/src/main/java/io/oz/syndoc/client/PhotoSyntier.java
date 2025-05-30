@@ -109,7 +109,7 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Asynchronously query synchronizing records.
-	 * 
+	 * @param page buffer (for performance?)
 	 * @return this
 	 */
 	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {

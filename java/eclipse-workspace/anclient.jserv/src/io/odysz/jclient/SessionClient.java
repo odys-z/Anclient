@@ -357,7 +357,8 @@ public class SessionClient {
 
 	/**
 	 * @deprecated Since 0.5.18,
-	 * this cannot support breakup point resuming, and is replaced by {@link #download206(String, AnsonMsg, String)}
+	 * this cannot support breakup point resuming,
+	 * and is replaced by {@link #download206(String, AnsonMsg, String)}
 	 * 
 	 * @param uri
 	 * @param port
