@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
+import io.odysz.common.AESHelper;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
@@ -30,6 +31,7 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.jserv.user.UserReq;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -215,7 +217,7 @@ public class HttpServClient {
  	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte, Path localpath,
  			OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
 
- 			URL url = new URL(f("%s?anson64=%s", urlport.toString(), jreq.toBlock()));
+ 			URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
  			
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
