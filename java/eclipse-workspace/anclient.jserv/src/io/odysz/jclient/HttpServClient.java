@@ -31,7 +31,6 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.jserv.user.UserReq;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -222,9 +221,18 @@ public class HttpServClient {
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
 			// Get total file size
+//			connection.setRequestMethod("HEAD");
+//			long totalSize = connection.getContentLengthLong();
+//			connection.disconnect();
+			
 			connection.setRequestMethod("HEAD");
-			long totalSize = connection.getContentLengthLong();
+			if (startByte > 0) {
+				connection.setRequestProperty("Length", "bytes");
+			}
+			String lenstr = connection.getHeaderField("Length");
+			long totalSize = Long.valueOf(lenstr);
 			connection.disconnect();
+			
 
 			// Set up range request if resuming
 			connection = (HttpURLConnection) url.openConnection();
@@ -244,7 +252,8 @@ public class HttpServClient {
 				throw new IOException("HTTP error code: " + responseCode);
 			}
 
-			long contentLength = connection.getContentLengthLong();
+			// long contentLength = connection.getContentLengthLong();
+
 			long receivedLength = startByte;
 
  		       // Open file for appending or creating
