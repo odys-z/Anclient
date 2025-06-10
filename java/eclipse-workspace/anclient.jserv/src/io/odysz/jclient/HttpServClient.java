@@ -2,6 +2,7 @@ package io.odysz.jclient;
 
 import static io.odysz.common.LangExt._0;
 import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.isblank;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +43,7 @@ import io.odysz.transact.x.TransException;
  *
  */
 public class HttpServClient {
-	protected static final String USER_AGENT = "Anclient.java/0.5.0";
+	protected static final String USER_AGENT = "Anclient.java/0.5.18";
 	
 	/** Must be multiple of 12. Default 3 MiB */
 	static int bufsize = 3 * 1024 * 1024;
@@ -221,24 +222,16 @@ public class HttpServClient {
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
 			// Get total file size
-//			connection.setRequestMethod("HEAD");
-//			long totalSize = connection.getContentLengthLong();
-//			connection.disconnect();
-			
 			connection.setRequestMethod("HEAD");
-			if (startByte > 0) {
-				connection.setRequestProperty("Length", "bytes");
-			}
-			String lenstr = connection.getHeaderField("Length");
-			long totalSize = Long.valueOf(lenstr);
-			connection.disconnect();
-			
+//			connection.setRequestProperty("Length", "bytes");
+//
+//			String lenstr = connection.getHeaderField("Length");
+//			long totalSize = Long.valueOf(lenstr);
+//			connection.disconnect();
 
 			// Set up range request if resuming
-			connection = (HttpURLConnection) url.openConnection();
-			if (startByte > 0) {
-				connection.setRequestProperty("Range", "bytes=" + startByte + "-");
-			}
+			// connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("Range", "bytes=" + startByte + "-");
 			
  		       // Check response
 			int responseCode = connection.getResponseCode();
@@ -249,41 +242,43 @@ public class HttpServClient {
 					connection.disconnect();
 					return download206(urlport, jreq, 0, localpath, progressCallback); // Retry from start
 				}
-				throw new IOException("HTTP error code: " + responseCode);
+				throw new IOException(f("HTTP error code: %s\nHeader.error:%s", responseCode, connection.getHeaderField("error")));
 			}
 
 			// long contentLength = connection.getContentLengthLong();
 
 			long receivedLength = startByte;
+			String lenstr = connection.getHeaderField("Length");
+			long totalSize = isblank(lenstr) ? 0 : Long.valueOf(lenstr);
 
- 		       // Open file for appending or creating
- 		       try (InputStream inputStream = connection.getInputStream();
- 		            OutputStream outputStream = Files.newOutputStream(localpath,
- 		                    startByte == 0 ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {
+			// Open file for appending or creating
+			try (InputStream inputStream = connection.getInputStream();
+				 OutputStream outputStream = Files.newOutputStream(localpath,
+						 startByte == 0 ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {
 
- 		           byte[] buffer = new byte[bufsize];
- 		           int bytesRead;
+				byte[] buffer = new byte[bufsize];
+				int bytesRead;
 
- 		           // Download and write to file
- 		           while ((bytesRead = inputStream.read(buffer)) != -1) {
- 		               outputStream.write(buffer, 0, bytesRead);
- 		               receivedLength += bytesRead;
+				// Download and write to file
+				while ((bytesRead = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, bytesRead);
+					receivedLength += bytesRead;
 
- 		               // Save progress
- 		               Files.writeString(localpath, String.valueOf(receivedLength),
- 		                       StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+					// Save progress
+					Files.writeString(localpath, String.valueOf(receivedLength),
+							StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
- 		               // Report progress
- 		               if (progressCallback != null) {
- 		                   if (_0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null))
- 		                	   break;
- 		               }
- 		           }
- 		       }
+					// Report progress
+					if (progressCallback != null) {
+						if (_0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null))
+							break;
+					}
+				}
+			}
 
- 		       // Clean up progress file on successful completion
- 		       // Files.deleteIfExists(progressFile);
- 		       connection.disconnect();
+			// Clean up progress file on successful completion
+			// Files.deleteIfExists(progressFile);
+			connection.disconnect();
 
  		return localpath;
  	}

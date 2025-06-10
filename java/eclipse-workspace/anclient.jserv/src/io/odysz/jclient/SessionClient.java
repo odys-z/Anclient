@@ -382,8 +382,6 @@ public class SessionClient {
 
 		AnsonMsg<T> msg = new AnsonMsg<T>(port).header(header()).body(body);
 		if (Clients.verbose) Utils.logi(msg.toString());
-//		HttpServClient httpClient = new HttpServClient();
-//		return httpClient.streamdown(Clients.servUrl(port), msg, localpath);
 		return HttpServClient.streamdown(Clients.servUrl(port), msg, localpath); 
 	}
 
