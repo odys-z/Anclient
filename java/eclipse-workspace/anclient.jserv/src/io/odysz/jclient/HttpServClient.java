@@ -1,6 +1,7 @@
 package io.odysz.jclient;
 
 import static io.odysz.common.LangExt._0;
+import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
 
@@ -30,9 +31,13 @@ import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
+import io.odysz.semantic.syn.Exchanging;
+import io.odysz.semantic.tier.docs.Docs206;
 import io.odysz.semantic.tier.docs.DocsReq;
+import io.odysz.semantics.x.ExchangeException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 
@@ -242,7 +247,16 @@ public class HttpServClient {
 					connection.disconnect();
 					return download206(urlport, jreq, 0, localpath, progressCallback); // Retry from start
 				}
-				throw new IOException(f("HTTP error code: %s\nHeader.error:%s", responseCode, connection.getHeaderField("error")));
+				else if (responseCode == 409) {
+					String reason = connection.getHeaderField(JProtocol.Headers.Reason);
+					String reqmsg = connection.getHeaderField(JProtocol.Headers.AnsonReq);
+					if (eq(reason, Docs206.reason_doc_ref))
+						throw new ExchangeException(Exchanging.ext_docref, null,
+								f("%s\n%s", reason, reqmsg));
+				}
+
+				throw new IOException(f("HTTP error code: %s\nHeader.error:%s",
+						responseCode, connection.getHeaderField("error")));
 			}
 
 			// long contentLength = connection.getContentLengthLong();

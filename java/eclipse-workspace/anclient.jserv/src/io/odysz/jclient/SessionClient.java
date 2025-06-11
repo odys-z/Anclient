@@ -30,6 +30,7 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.jsession.AnSessionReq;
 import io.odysz.semantic.jsession.AnSessionResp;
 import io.odysz.semantic.jsession.HeartBeat;
+import io.odysz.semantic.meta.DocRef;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
@@ -335,15 +336,15 @@ public class SessionClient {
 	 * 
 	 * @return the local path
 	 */
-	public <T extends DocsReq> Path download206(String synuri, IPort port, String doctbl, Path localpath,
-			long startb, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
+	public <T extends DocsReq> Path download206(String synuri, String peerjserv, IPort port,
+			Path localpath, DocRef doc, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
 
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
 
 		String[] act = AnsonHeader.usrAct(synuri, port.name(), DocsReq.A.download206, localpath.toString());
 
-		DocsReq body = new DocsReq(doctbl, synuri);
+		DocsReq body = new DocsReq(doc, synuri);
 		body.a(DocsReq.A.download206);
 
 		AnsonMsg<T> req = new AnsonMsg<T>(port)
@@ -352,7 +353,7 @@ public class SessionClient {
 
 		if (Clients.verbose) Utils.logi(req.toString());
 
-		return HttpServClient.download206(Clients.servUrl(port), req, startb, localpath, onblock); 
+		return HttpServClient.download206(port.url(peerjserv), req, doc.breakpoint, localpath, onblock); 
 	}
 
 	/**
