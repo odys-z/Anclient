@@ -266,6 +266,8 @@ public class HttpServClient {
 			long totalSize = isblank(lenstr) ? 0 : Long.valueOf(lenstr);
 
 			// Open file for appending or creating
+			Utils.touchDir(FilenameUtils.getFullPath(localpath));
+
 			try (InputStream inputStream = connection.getInputStream();
 				 OutputStream outputStream = Files.newOutputStream(localpath,
 						 startByte == 0 ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {

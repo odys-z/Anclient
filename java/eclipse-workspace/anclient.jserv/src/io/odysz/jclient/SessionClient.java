@@ -4,6 +4,7 @@ import static io.odysz.common.LangExt.isblank;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -337,7 +338,7 @@ public class SessionClient {
 	 * @return the local path
 	 */
 	public <T extends DocsReq> Path download206(String synuri, String peerjserv, IPort port,
-			Path localpath, DocRef doc, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
+			String localpath, DocRef doc, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
 
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<DocsReq> needs port being explicitly specified.");
@@ -353,7 +354,7 @@ public class SessionClient {
 
 		if (Clients.verbose) Utils.logi(req.toString());
 
-		return HttpServClient.download206(port.url(peerjserv), req, doc.breakpoint, localpath, onblock); 
+		return HttpServClient.download206(port.url(peerjserv), req, doc.breakpoint, Paths.get(localpath), onblock); 
 	}
 
 	/**
