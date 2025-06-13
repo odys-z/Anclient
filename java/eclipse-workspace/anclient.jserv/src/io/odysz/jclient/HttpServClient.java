@@ -227,7 +227,7 @@ public class HttpServClient {
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
 			// Get total file size
-			connection.setRequestMethod("HEAD");
+			connection.setRequestMethod("GET");
 //			connection.setRequestProperty("Length", "bytes");
 //
 //			String lenstr = connection.getHeaderField("Length");
@@ -262,7 +262,7 @@ public class HttpServClient {
 			// long contentLength = connection.getContentLengthLong();
 
 			long receivedLength = startByte;
-			String lenstr = connection.getHeaderField("Length");
+			String lenstr = connection.getHeaderField(JProtocol.Headers.Content_length);
 			long totalSize = isblank(lenstr) ? 0 : Long.valueOf(lenstr);
 
 			// Open file for appending or creating
@@ -281,8 +281,7 @@ public class HttpServClient {
 					receivedLength += bytesRead;
 
 					// Save progress
-					Files.writeString(localpath, String.valueOf(receivedLength),
-							StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+					// Files.writeString(localpath, String.valueOf(receivedLength), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 
 					// Report progress
 					if (progressCallback != null) {
