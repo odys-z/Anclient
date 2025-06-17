@@ -345,8 +345,8 @@ public class SessionClient {
 
 		String[] act = AnsonHeader.usrAct(synuri, port.name(), DocsReq.A.download206, localpath.toString());
 
-		DocsReq body = new DocsReq(doc, synuri);
-		body.a(DocsReq.A.download206);
+		DocsReq body = (DocsReq) new DocsReq(doc, synuri)
+				.a(DocsReq.A.download206);
 
 		AnsonMsg<T> req = new AnsonMsg<T>(port)
 				.header(header().act(act))

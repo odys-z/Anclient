@@ -219,28 +219,22 @@ public class HttpServClient {
 	 * @throws TransException 
 	 * @throws AnsonException 
 	 */
- 	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte, Path localpath,
- 			OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
+ 	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte,
+ 			Path localpath, OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
 
- 			URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
- 			
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+ 		URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
+		 
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		try {
 
 			// Get total file size
 			connection.setRequestMethod("GET");
-//			connection.setRequestProperty("Length", "bytes");
-//
-//			String lenstr = connection.getHeaderField("Length");
-//			long totalSize = Long.valueOf(lenstr);
-//			connection.disconnect();
-
-			// Set up range request if resuming
-			// connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestProperty("Range", "bytes=" + startByte + "-");
 			
- 		       // Check response
+ 		    //
 			int responseCode = connection.getResponseCode();
 			if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_PARTIAL) {
+				Utils.warn("Downlaod206(): response code: %s", responseCode);
 				if (responseCode == 416) { // Range not satisfiable
 					Files.deleteIfExists(localpath);
 					startByte = 0;
@@ -258,8 +252,6 @@ public class HttpServClient {
 				throw new IOException(f("HTTP error code: %s\nHeader.error:%s",
 						responseCode, connection.getHeaderField("error")));
 			}
-
-			// long contentLength = connection.getContentLengthLong();
 
 			long receivedLength = startByte;
 			String lenstr = connection.getHeaderField(JProtocol.Headers.Content_length);
@@ -280,20 +272,15 @@ public class HttpServClient {
 					outputStream.write(buffer, 0, bytesRead);
 					receivedLength += bytesRead;
 
-					// Save progress
-					// Files.writeString(localpath, String.valueOf(receivedLength), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-
 					// Report progress
 					if (progressCallback != null) {
+						// Save progress
 						if (_0(progressCallback).proc(-1, -1, (int)receivedLength, (int)totalSize, null))
 							break;
 					}
 				}
 			}
-
-			// Clean up progress file on successful completion
-			// Files.deleteIfExists(progressFile);
-			connection.disconnect();
+			} finally { connection.disconnect(); }
 
  		return localpath;
  	}
