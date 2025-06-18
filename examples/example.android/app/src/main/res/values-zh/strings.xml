@@ -16,7 +16,7 @@
     <string name="login_succeed"   >登录成功。\nWeb: %s</string>
 
     <string name="msg_ignore_offline">選項無效 - 未登錄</string>
-    <string name="msg_templ_progress">進度 %d / %d, 文件頁 %s (%.1f%%)</string>
+    <string name="msg_templ_progress">文件 %d / %d, 总进度 %s (%.1f%%)</string>
     <string name="msg_upload_failed" >上传失败。\\n%s\\n%s</string>
     <string name="msg_login_uid"     >登录名 %s</string>
     <string name="msg_login_required">请先登录！</string>

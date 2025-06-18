@@ -56,7 +56,7 @@
     <string name="login_succeed"   >Logged in successfully.\nWeb: %s</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
-    <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
+    <string name="msg_templ_progress">File: %d / %d, File Blocks: %s (%.1f%%)</string>
     <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
     <string name="msg_login_uid"     >Login as %s</string>
     <string name="msg_login_required">Login first fot the operation.</string>
