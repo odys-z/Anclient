@@ -222,7 +222,8 @@ public class HttpServClient {
  	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte,
  			Path localpath, OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
 
- 		URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
+ 		// URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
+ 		URL url = new URL(f("%s?anson64=%s", urlport, escapeUrlParam(jreq)));
 		 
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		try {
@@ -285,6 +286,18 @@ public class HttpServClient {
  		return localpath;
  	}
 	
+ 	/**
+ 	 * Replace '+' with '%2B'.
+ 	 * See https://docs.microfocus.com/OMi/10.62/Content/OMi/ExtGuide/ExtApps/URL_encoding.htm
+ 	 * @param jreq
+ 	 * @return value of parameter anson64
+ 	 * @throws AnsonException
+ 	 * @throws IOException
+ 	 */
+	public static String escapeUrlParam(AnsonMsg<? extends DocsReq> jreq) throws AnsonException, IOException {
+		return AESHelper.encode64(jreq.toBlock().getBytes()).replaceAll("\\+", "%2B");
+	}
+
 	/**
 	 * @deprecated this cannot support breakup point resuming, and is replaced by {@link #download206(String, AnsonMsg, String)}
 	 * 
