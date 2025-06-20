@@ -49,7 +49,7 @@ public class AnPrefEntries extends Anson {
     public boolean insert(String jserv) {
         String[] jss = jserv.split("\n");
         if (jss != null && jss.length >= 2 && !isblank(jss[0]) && !isblank(jss[1])) {
-            int i = indexOf(entVals, jss[0]);
+            int i = indexOf(entries, jss[0]);
             if (i > 0) {
                 swap(entVals, 0, i);
                 swap(entries, 0, i);
@@ -60,6 +60,7 @@ public class AnPrefEntries extends Anson {
                 entVals = insertAt(entVals, jss[1], 0);
                 ix = 0;
             }
+            entVals[0] = jss[1];
             return true;
         }
         return false;
