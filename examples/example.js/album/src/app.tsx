@@ -42,11 +42,11 @@ export class App extends CrudCompW<AlbumProps> {
 
 	error: ErrorCtx;
 
-	// servs: ExternalHosts;
+	servs: ExternalHosts;
 
 	config = {
 		/** json object specifying host's urls */
-		servs: {} as ExternalHosts,
+		// servs: {} as ExternalHosts,
 		/** the serv id for picking url */
 		servId: ''
 	};
@@ -80,8 +80,8 @@ export class App extends CrudCompW<AlbumProps> {
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
 		this.config.servId = props.servId;
-		this.config.servs = props.servs;
-		// this.servs = props.servs;
+		// this.config.servs = props.servs;
+		this.servs = props.servs;
 
 
 		// this.inclient = new Inseclient({urlRoot: this.servs.syndomx[this.props.servId]});
@@ -115,7 +115,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		let hosturl = this.config.servs.syndomx && this.config.servs.syndomx[this.config.servId] as string;
+		let hosturl; // = this.config.servs.syndomx && this.config.servs.syndomx[this.config.servId] as string;
 		// for Synode 0.7.1, use syndomx[servId] as hosturl
 		if (this.servs.syndomx && hosturl && this.servs.syndomx.hasOwnProperty(hosturl)) {
 			hosturl = (this.servs.syndomx as any)[hosturl] || hosturl;
