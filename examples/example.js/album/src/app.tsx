@@ -1,17 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
+import { Protocol, AnsonResp, AnsonMsg, 
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnReactExt, 
-	JsonHosts, ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
+	ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
 	ExternalHosts,
 	AnError
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
-import { useTheme } from '@emotion/react';
 
 type AlbumProps = {
 	servs: ExternalHosts;
@@ -43,7 +42,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 	error: ErrorCtx;
 
-	servs: ExternalHosts;
+	// servs: ExternalHosts;
 
 	config = {
 		/** json object specifying host's urls */
@@ -80,9 +79,9 @@ export class App extends CrudCompW<AlbumProps> {
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
-		this.config.servId = this.props.servId;
-		this.config.servs = this.props.servs;
-		this.servs = this.props.servs;
+		this.config.servId = props.servId;
+		this.config.servs = props.servs;
+		// this.servs = props.servs;
 
 
 		// this.inclient = new Inseclient({urlRoot: this.servs.syndomx[this.props.servId]});
