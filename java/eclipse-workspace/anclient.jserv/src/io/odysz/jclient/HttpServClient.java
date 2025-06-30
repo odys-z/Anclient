@@ -271,6 +271,7 @@ public class HttpServClient {
 				// Download and write to file
 				while ((bytesRead = inputStream.read(buffer)) != -1) {
 					outputStream.write(buffer, 0, bytesRead);
+					outputStream.flush();
 					receivedLength += bytesRead;
 
 					// Report progress

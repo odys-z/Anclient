@@ -234,43 +234,11 @@ public class Doclientier extends Semantier {
 		return rp.xdoc;
 	}
 
-	// DON'T DELETE THIS AFTER TESTS FIXED
-//	/**
-//	 * Verify device &amp; client-paths are presenting at server.
-//	 * 
-//	 * @param clientier
-//	 * @param entityName
-//	 * @param paths
-//	 * @throws Exception
-//	 */
-//	static void verifyPathsPage(Doclientier clientier, String entityName,
-//			String... paths) throws Exception {
-//		PathsPage pths = new PathsPage(clientier.client.ssInfo().device, 0, 1);
-//		HashSet<String> pathpool = new HashSet<String>();
-//		for (String pth : paths) {
-//			pths.add(pth);
-//			pathpool.add(pth);
-//		}
-//
-//		DocsResp rep = clientier.synQueryPathsPage(pths, entityName, Port.docstier);
-//
-//		PathsPage pthpage = rep.pathsPage();
-//
-//		assertEquals(clientier.client.ssInfo().device, pthpage.device);
-//		assertEquals(len(paths), pthpage.paths().size());
-//
-//		for (String pth : paths)
-//			pathpool.remove(pth);
-//
-//		assertEquals(0, pathpool.size());
-//	}
-
-
 	/**
 	 * Synchronizing files to a {@link ExpDoctier} using block chain, accessing port {@link Port.docstier}.
 	 * This method will use meta to create entity object of doc.
 	 * @param meta for creating {@link ExpSyncDoc} object 
-	 * @param rs tasks, rows should be limited
+	 * @param rs tasks, rows should be limited, and must be understandable by {@link ExpSyncDoc#ExpSyncDoc(AnResultset, ExpDocTableMeta)}.
 	 * @param onProc
 	 * @return Sync response list
 	 * @throws TransException 
@@ -304,30 +272,6 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
-	 * Downward synchronizing.
-	 * @param p
-	 * @param meta
-	 * @return doc record (e.g. h_photos)
-	 * @throws AnsonException
-	 * @throws IOException
-	 * @throws TransException
-	 * @throws SQLException
-	ExpSyncDoc synStreamPull(ExpSyncDoc p, ExpDocTableMeta meta)
-			throws AnsonException, IOException, TransException, SQLException {
-
-		if (!verifyDel(p, meta)) {
-			DocsReq req = (DocsReq) new DocsReq()
-							.docTabl(meta.tbl)
-							// .org(robot.orgId)
-							.queryPath(p.device(), p.fullpath())
-							.a(A.download);
-
-			String tempath = tempath(p);
-			tempath = client.download(synuri, Port.docstier, req, tempath);
-		}
-		return p;
-	}
-
 	protected boolean verifyDel(ExpSyncDoc f, ExpDocTableMeta meta) {
 		String pth = tempath(f);
 		File file = new File(pth);
@@ -373,11 +317,11 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws AnsonException 
 	 */
-	public List<DocsResp> startPushs(ExpSyncDoc templage, String tbl, List<IFileDescriptor> videos,
+	public List<DocsResp> startPushs(ExpSyncDoc template, String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, fileProvider, blocksize, templage,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, blocksize, template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -474,8 +418,6 @@ public class Doclientier extends Semantier {
 
 				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
 
-				// DocLocks.reading(p.fullpath());
-				// ifs = new FileInputStream(new File(p.fullpath()));
 				ifs = (FileInputStream) fileProvider.open(f);
 
 				String b64 = AESHelper.encode64(ifs, blocksize);
@@ -582,15 +524,6 @@ public class Doclientier extends Semantier {
 
 		return new int[] {0, 0, 0};
 	}
-
-
-//	public String download(String clientUri, String syname, ExpSyncDoc photo, String localpath)
-//			throws SemanticException, AnsonException, IOException {
-//		DocsReq req = (DocsReq) new DocsReq(syname, synuri);
-//		req.doc.recId = photo.recId;
-//		req.a(A.download);
-//		return client.download(clientUri, Port.docstier, req, localpath);
-//	}
 
 	/**
 	 * Get a doc record from jserv.
