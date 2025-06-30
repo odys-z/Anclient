@@ -212,7 +212,6 @@ public class AlbumContext {
         return this;
     }
 
-
     public AlbumContext devname(String name) {
         if (device == null)
 			device = new Device(userInf.device, name);

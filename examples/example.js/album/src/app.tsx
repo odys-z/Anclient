@@ -115,7 +115,8 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		let hosturl; // = this.config.servs.syndomx && this.config.servs.syndomx[this.config.servId] as string;
+		let hosturl = this.servs?.syndomx && this.servs.syndomx[this.config.servId] as string;
+
 		// for Synode 0.7.1, use syndomx[servId] as hosturl
 		if (this.servs.syndomx && hosturl && this.servs.syndomx.hasOwnProperty(hosturl)) {
 			hosturl = (this.servs.syndomx as any)[hosturl] || hosturl;

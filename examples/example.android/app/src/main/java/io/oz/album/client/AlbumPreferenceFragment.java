@@ -98,19 +98,13 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         String devid = singleton.userInf.device;
         String devname = singleton.device.devname;
         if (!isblank(devid)) {
-            // ((Preference)findpref(R.string.key_device)).setEnabled(false);
             btnRegistDev.setEnabled(false);
-
-            // ((Preference)findpref(R.string.key_dev_restore)).setVisible(false);
             btnRestoreDev.setVisible(false);
-
             prefcateDev.removePreference(btnRegistDev);
             device.setSummary(getString(R.string.device_name, f("%s [%s]", devname, devid)));
         }
         else {
             ((Preference)findpref(R.string.key_device)).setEnabled(true);
-//            ((Preference)findpref(R.string.key_dev_restore)).setVisible(true);
-//            ((Preference)findpref(R.string.key_dev_restore)).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
         }
         initing = false;
@@ -134,29 +128,14 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         (preference, newValue) -> {
             String stringValue = newValue == null ? "" : newValue.toString();
             String k = preference.getKey();
-            // if (k.equals(AlbumApp.keys.jserv)) {
             if (eqk(R.string.jserv_key, k)) {
                 AnPrefEntries jservlist = AlbumApp.prfConfig.jservlist;
                 jservlist.select(stringValue);
                 preference.setTitle(jservlist.entry());
                 preference.setSummary(jservlist.entryVal());
+
+                singleton.jserv(stringValue);
             }
-            // else if (AlbumApp.keys.pswd.equals(k)) {
-//            else if (eqk(R.string.pswd_key, k)) {
-//                prfConfig.pswd= stringValue;
-//                singleton.pswd(stringValue);
-//                // preference.setSummary(f(f("%%%ss", len(stringValue)), "*"));
-//                preference.setSummary(strof(stringValue, "*"));
-//            }
-            // else if (AlbumApp.keys.usrid.equals(k)) {
-//            else if (eqk(R.string.userid_key, k)) {
-//                prfConfig.uid = stringValue;
-//                singleton.userInf.uid(stringValue);
-//                String device = singleton.userInf.device;
-//                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue).device(device);
-//                preference.setSummary(stringValue);
-//            }
-            // else if (AlbumApp.keys.device.equals(k)) {
             else if (eqk(R.string.key_device, k)) {
                 if (eq(stringValue, buff_devname) && !initing) {
                     new ComfirmDlg(null)
@@ -178,7 +157,6 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setTitle(buff_device == null ?
                     stringValue : String.format("%s [%s]", stringValue, buff_device));
             }
-            // else if (AlbumApp.keys.home.equals(k)) {
             else if (eqk(R.string.key_home, k)) {
                 singleton.profiles.home(stringValue);
                 preference.setSummary(stringValue);

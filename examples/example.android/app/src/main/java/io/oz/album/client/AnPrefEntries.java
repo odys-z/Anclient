@@ -23,16 +23,12 @@ public class AnPrefEntries extends Anson {
         this.entVals = entvals;
     }
 
-//    public String select(AlbumContext singleton, int ix) {
     public String select(int ix) {
         if (ix >= 0 && ix < entries.length) {
             this.ix = ix;
-            // singleton.jserv(entryVal());
-            // return entries[ix];
             return entryVal();
         }
         return null;
-
     }
 
     public String select(String val) {
