@@ -18,6 +18,8 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  * which is different to Android file content between Activities, e. g. the ImageFile.</p>
  * 
  * This is a special bridge (interface) that semantiers can access file through Android content providers or so.
+ * For JDK reference's implementation, e.g JDK SE 1.8 or OpenJDK 17, use the default implementation is enough:
+ * <pre>new IFileProvider() {}</pre>
  */
 public interface IFileProvider {
     /**
