@@ -630,7 +630,8 @@ public class Doclientier extends Semantier {
 		
 		OnDocsOk follows = new OnDocsOk() {
 			@Override
-			public void ok(List<? extends AnsonResp> resps) throws IOException, AnsonException, TransException, SQLException {
+			public void ok(List<? extends AnsonResp> resps)
+					throws IOException, AnsonException, TransException, SQLException {
 				follow.ok(isNull(resps) ? null : resps.get(0));
 			}
 		};

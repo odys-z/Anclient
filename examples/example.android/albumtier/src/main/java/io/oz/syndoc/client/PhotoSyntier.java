@@ -112,7 +112,8 @@ public class PhotoSyntier extends Doclientier {
 	 * @param page buffer (for performance?)
 	 * @return this
 	 */
-	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files,
+			PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
@@ -150,7 +151,8 @@ public class PhotoSyntier extends Doclientier {
 		return this;
 	}
 
-	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
+	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr)
+			throws IOException, SemanticException {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
