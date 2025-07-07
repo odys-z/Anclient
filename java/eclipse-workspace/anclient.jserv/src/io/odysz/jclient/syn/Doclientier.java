@@ -70,7 +70,7 @@ public class Doclientier extends Semantier {
 	protected String tempath;
 
 	/** Must be multiple of 12. Default 3 MiB */
-	int blocksize = 3 * 1024 * 1024;
+	// int blocksize = 3 * 1024 * 1024;
 
 	protected String synuri;
 	public String synuri() { return synuri; }
@@ -80,7 +80,6 @@ public class Doclientier extends Semantier {
 	 * 
 	 * @param s must be multiple of 12
 	 * @throws SemanticException
-	 */
 	public void bloksize(int s) throws SemanticException {
 		if (s % 12 != 0)
 			throw new SemanticException("Block size must be multiple of 12.");
@@ -91,6 +90,7 @@ public class Doclientier extends Semantier {
 		blocksize = size;
 		return this;
 	}
+	 */
 	
 	IFileProvider fileProvider;
 	public Doclientier fileProvider(IFileProvider p) {
@@ -321,7 +321,7 @@ public class Doclientier extends Semantier {
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException, SQLException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, fileProvider, blocksize, template,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
