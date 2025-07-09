@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import io.odysz.common.EnvPath;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 
 /**
@@ -23,11 +24,18 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  */
 public interface IFileProvider {
     /**
-     * Default implementation example:
+     * Default implementation: figure f.uri64's physical file size first, the use f.fullpath().size.
+     * 
+     * <h4>Implementation Example on Android:</h4>
      * <pre>return Files.size(Paths.get(f.fullpath());</pre>
      * @return size
      */
-    default long meta(IFileDescriptor f) throws IOException { return Files.size(Paths.get(f.fullpath())); };
+    default long meta(IFileDescriptor f) throws IOException {
+    	return isblank(f.uri64())
+    		? Files.size(Paths.get(f.fullpath()))
+    		: Files.size(Paths.get(EnvPath.decodeUri(null, f.uri64())))
+    		;
+    	};
 
     /**
      * <p>Open file input stream.</p>
