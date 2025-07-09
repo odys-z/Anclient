@@ -24,6 +24,7 @@ class Clients:
     """
 
     servRt = None
+    timeout = None
 
     @staticmethod
     def pingLess(funcUri: str, errCtx: OnError=None):
@@ -36,6 +37,11 @@ class Clients:
         resp = client.commit(jmsg, errCtx)
 
         return resp
+
+    @classmethod
+    def init(cls, jserv: str, timeout: int=20):
+        cls.servRt = jserv
+        cls.timeout = timeout
 
 
 class SessionClient:
@@ -67,7 +73,8 @@ class SessionClient:
             print(req.toBlock(False))
             resp = requests.post(f'{self.myservRt}/{req.port.value}',
                                  proxies=self.proxies,
-                                 data=req.toBlock(False))
+                                 data=req.toBlock(False),
+                                 timeout=Clients.timeout)
             if resp.status_code == 200:
                 data = resp.json()  # If the response is JSON
                 return AnsonResp.from_envelope(data)
