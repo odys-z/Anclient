@@ -57,6 +57,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.odysz.anson.AnsonException;
 import io.odysz.common.DateFormat;
@@ -66,6 +67,7 @@ import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
@@ -407,7 +409,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                                 },
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes(resps);
+                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 (c, err, args) -> {
                                     if (c == AnsonMsg.MsgCode.ext) {
@@ -509,7 +511,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                         },
                         (resps) -> {
                                 // clearStatus();
-                                int[] nums = Doclientier.parseErrorCodes(resps);
+                                int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                 showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
                                 if (nums[0] > 0)
                                     clearStatus();
