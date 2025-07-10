@@ -1,14 +1,17 @@
 package io.odysz.jclient.syn;
 
-import java.io.File;
+import static io.odysz.common.Regex.startsVolume;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import io.odysz.common.EnvPath;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
+import io.odysz.transact.sql.Transcxt;
+import io.odysz.transact.sql.parts.ExtFilePaths;
 
 /**
  * <p>A file accessor used by AlbumTier etc., for accessing files without visiting traditional file system.</p>
@@ -24,18 +27,22 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
  */
 public interface IFileProvider {
     /**
-     * Default implementation: figure f.uri64's physical file size first, the use f.fullpath().size.
+     * Default implementation can usable on a Synode:
+     * figure f.uri64's physical file size first, then return f.fullpath().size.
      * 
-     * <h4>Implementation Example on Android:</h4>
+     * <h4>Implementation Example on client node:</h4>
      * <pre>return Files.size(Paths.get(f.fullpath());</pre>
      * @return size
      */
     default long meta(IFileDescriptor f) throws IOException {
-    	return isblank(f.uri64())
-    		? Files.size(Paths.get(f.fullpath()))
-    		: Files.size(Paths.get(EnvPath.decodeUri(null, f.uri64())))
-    		;
-    	};
+//    	String uri64 = f.uri64();
+
+//    	return startsVolume(uri64) ?
+//    		Files.size(Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64))) :
+//    		Files.size(Paths.get(f.fullpath()))
+//    		;
+    	return Files.size(pysicalPath(f));
+    };
 
     /**
      * <p>Open file input stream.</p>
@@ -44,16 +51,15 @@ public interface IFileProvider {
      *
      * @return readable stream
      */
-    default InputStream open(IFileDescriptor f) throws IOException { return (InputStream) new FileInputStream(new File(f.fullpath())); };
-
-    /**
-     * <p>Resolve the initial folder (with Policies).</p>
-     * Currently, the save folder policy is simple last modified date for documents and creating date
-     * for medias if API version later than Build.VERSION_CODES.O, otherwise use last modified.
-     * (Audio file in Andriod is named with date string).
-     *
-     * @since 0.2.1 (Albumtier)
-     * @return initial folder to save the file at server side
-     */
-    // String saveFolder();
+    default InputStream open(IFileDescriptor f) throws IOException {
+    	// return (InputStream) new FileInputStream(new File(f.fullpath()));
+    	return (InputStream) new FileInputStream(pysicalPath(f).toFile());
+    };
+    
+    default Path pysicalPath(IFileDescriptor f) {
+    	String uri64 = f.uri64();
+    	return startsVolume(uri64) ?
+    		Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64)) :
+    		Paths.get(f.fullpath());
+    }
 }
