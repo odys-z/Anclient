@@ -34,7 +34,7 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
-import io.odysz.semantic.syn.Exchanging;
+import io.odysz.semantic.syn.ExessionAct;
 import io.odysz.semantic.tier.docs.Docs206;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantics.x.ExchangeException;
@@ -246,7 +246,7 @@ public class HttpServClient {
 					String reason = connection.getHeaderField(JProtocol.Headers.Reason);
 					String reqmsg = connection.getHeaderField(JProtocol.Headers.AnsonReq);
 					if (eq(reason, Docs206.reason_doc_ref))
-						throw new ExchangeException(Exchanging.ext_docref, null,
+						throw new ExchangeException(ExessionAct.ext_docref, null,
 								f("%s\n%s", reason, reqmsg));
 				}
 
@@ -326,7 +326,6 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
 		if (Clients.verbose) Utils.logi(url);
