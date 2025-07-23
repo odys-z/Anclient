@@ -4,6 +4,9 @@ import static io.odysz.common.LangExt._0;
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.ifnull;
 import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.Utils.awaitAll;
+import static io.odysz.common.Utils.turngreen;
+import static io.odysz.common.Utils.turnred;
 import static io.odysz.common.Utils.warn;
 
 import java.net.InetSocketAddress;
@@ -40,6 +43,35 @@ public class SampleApp {
 	public static final String webinf = "./src/test/res/WEB-INF";
 	public static final String testDir   = "./src/test/res/";
 	public static final String sample_name = "Testing Sample Serv";
+
+	public static SampleApp app;
+
+	public static void startSampleServ(boolean[] quit) throws InterruptedException {
+		boolean[] ready = new boolean[] {false};
+		turnred(ready);
+		new Thread(() -> {
+			app = _main(null);
+			turngreen(ready);
+			try {
+				awaitAll(quit);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			// stop
+			try {
+				app.server.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}, "SampleApp main").start();
+
+		awaitAll(ready);
+	}
+
+	static public Sampleton sampleton() {
+		return app.syngleton;
+	}
 
 	final Sampleton syngleton;
 

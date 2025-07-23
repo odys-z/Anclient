@@ -1,26 +1,32 @@
 package io.odysz.jclient;
 
 import static io.odysz.common.LangExt.f;
+import static io.odysz.common.Utils.turngreen;
+import static io.odysz.common.Utils.turnred;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.tier.docs.DocsReq;
+import io.oz.jsample.SampleApp;
 
 class HttpServClientTest {
 
 	@Test
-	void testToUrlParam() throws MalformedURLException, AnsonException, IOException {
+	void testToUrlParam() throws Exception {
+		boolean[] can_quit = new boolean[] {false};
+		try {
+		turnred(can_quit);
+		SampleApp.startSampleServ(can_quit);
+		String sample_jserv = f("http://localhost:%s/jserv-album", SampleApp.sampleton().settings.port);
+
 		AnsonMsg.understandPorts(Port.echo);
 		
 		String req = "{\"type\": \"io.odysz.semantic.jprotocol.AnsonMsg\", "
@@ -41,12 +47,12 @@ class HttpServClientTest {
 		assertTrue(parss != null && parss.length > 2);
 
  		URL url = new URL(f("%s?anson64=%s",
- 				Port.echo.url("http://localhost:8964/jserv-album"),
+ 				Port.echo.url(sample_jserv),
  				HttpServClient.escapeUrlParam(jreq)));
 
  		System.out.println(url);
 
 		assertEquals(parss.length, url.toString().split("\\%2B").length);
+		} finally { turngreen(can_quit); }
 	}
-
 }
