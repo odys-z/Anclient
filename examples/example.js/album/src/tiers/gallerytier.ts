@@ -1,4 +1,4 @@
-import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect, SynDocollPort } from '@anclient/anreact';
 import { Protocol, AnsonMsg, AnsonBody, 
 	PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
 
@@ -8,21 +8,27 @@ const debug = true;
  */
 export class GalleryTier extends StreeTier {
 	comp: CrudComp<Comprops>;
-	port: string = "album";
+	// port: string = "album";
 
 	page: AlbumPage;
 	collectRecords?: PhotoCollect[];
 	albumTitle: string = 'title';
 
+	synuri: string;
+
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
+	constructor(props: {uri: string, synuri: string, client: SessionClient, comp: CrudComp<Comprops>}, ) {
 		super(props);
+
+		this.synuri = props.synuri;
 		this.comp = props.comp;
 		this.client = props.client;
 
 		this.page = new AlbumPage({});
+
+		this.port = "docoll"; // SynDocollPort.docoll;
 	}
 
 	/**
@@ -41,7 +47,7 @@ export class GalleryTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, page: conds as AlbumPage} )
+					new AlbumReq( {uri: this.uri, synuri: this.uri, page: conds as AlbumPage} )
 					.A(AlbumReq.A.records) );
 
 		client.commit(req,
@@ -64,13 +70,13 @@ export class GalleryTier extends StreeTier {
         this.collects(this.page, onLoad);
     }
 
-	static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
-		if (debug)
-			console.log(msg);
+	// static servUrl(jserv: string, msg: AnsonMsg<AlbumReq>) {
+	// 	if (debug)
+	// 		console.log(msg);
 
-		// use <img src='anson64'/> to GET Http resource
-		return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
-	}
+	// 	// use <img src='anson64'/> to GET Http resource
+	// 	return `${jserv}?anson64=${btoa( JSON.stringify(msg) )}`;
+	// }
 };
 
 class Profiles extends AnsonBody {

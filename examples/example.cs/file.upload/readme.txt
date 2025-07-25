@@ -1,6 +1,6 @@
 ﻿1. About
 
-Convert Gltf to Glb, uploadt to jserv sample server.
+Convert Gltf to Glb, and upload to jserv sample server.
 
 2. Quick Start
 

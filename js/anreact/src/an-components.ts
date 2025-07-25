@@ -33,10 +33,12 @@ export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';
 export * from './react/widgets/relation-tree';
 export * from './react/widgets/pdf-view';
+export * from './react/widgets/pdf-iframe';
 
 export * from './photo-gallery/src/photo-ts';
 export * from './photo-gallery/src/light-box';
 export * from './photo-gallery/src/tier/photo-rec';
+export * from './photo-gallery/src/tier/syn-docoll-port';
 
 import { JsampleIcons, JsampleTheme, jstyles } from './jsample/styles';
 import { Domain, DomainComp } from './jsample/views/domain';

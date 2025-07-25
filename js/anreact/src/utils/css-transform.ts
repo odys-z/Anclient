@@ -18,6 +18,8 @@ export class CSSTransform {
     scale0: number;
 
     handling: boolean;
+    pinching: boolean;
+    zoomsensity = 0.1;
 
     constructor() {
         this.reset();
@@ -54,19 +56,43 @@ export class CSSTransform {
     }
 
     end() {
-        this.handling = false;
-        this.txy[0] += this.dxy[0];
-        this.txy[1] += this.dxy[1];
-        this.dxy = [0, 0];
+        if (this.handling) {
+            this.handling = false;
+            this.txy[0] += this.dxy[0];
+            this.txy[1] += this.dxy[1];
+            this.dxy = [0, 0];
+        }
     }
 
-    scaleTo(e: {touches: TouchList}) {
-        if (this.handling)
-        if (e.touches && e.touches.length >= 2) {
-            let d = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+    pinchBegin(touches: TouchList) {
+        if (!this.pinching && touches.length >= 2) {
+            this.pinching = true;
+            let d = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+            this.pds = [d, 0]; 
+        }
+    }
+
+    pinchEnd(touches: TouchList) {
+        if (this.pinching)
+            this.pinching = false;
+    }
+
+    pinchTo(touches: TouchList) {
+        if (this.pinching)
+        if (touches && touches.length >= 2) {
+            let d = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
             if (this.pds === undefined)
                 this.pds = [d, d];
             else this.pds[1] = d;
+
+            let d0 = this.pds[0] === 0.0 ? 0.01 : this.pds[0]; // d0 > 0
+
+            let zoomFactor = 1 + (d - d0) / d0 * this.zoomsensity
+            let scale = Math.max(0.1, Math.min(5, this.scale * zoomFactor)); // Clamp between 0.1 and 5
+            this.scale = scale;
+
+            console.log(zoomFactor, this.pds);
+            return Math.abs(scale - this.scale0); 
         }
     }
 

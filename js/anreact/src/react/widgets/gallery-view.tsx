@@ -5,14 +5,14 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, isEmpty, len
+import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
 import { Comprops, CrudCompW } from '../crud';
 import { ForcedStyle } from '../../photo-gallery/src/photo-ts';
-import { AlbumReq, PhotoCSS, PhotoCollect } from '../../photo-gallery/src/tier/photo-rec';
+import { AlbumReq, MediaCss, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
 
-const _photos = [];
+// const _photos = [];
 
 export interface ImageSlide  {
 	index: number,
@@ -23,7 +23,7 @@ export interface ImageSlide  {
 	srcArr?: string[],
 	legend?: string | JSX.Element,
 	/** AnTreeNode.node */
-	node?  : object & {shareby?: string, device?: string, pname?: string},
+	node?  : object & {id?: string, shareby: string, device?: string, pname?: string},
 
 	/**
 	 * Use maxWidth to limit picture size when too few pictures;
@@ -48,6 +48,12 @@ export type lightboxFomatter = (photos: AnTreeNode[], opts?: {
 export interface GalleryProps {
 	cid: string;
 	photos?: AnTreeNode[];
+
+	/**
+	 * @since 0.6.0, the equivalent of synuri.
+	 */
+	docuri: string;
+
 	tier?: Semantier;
 
 	/** Modal dialog for picture slids. */
@@ -64,9 +70,11 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	showCarousel: boolean = false;
 
 	cid: string;
-	photos: PhotoCollect | undefined; 
+	photos: AnTreeNode[]; //PhotoCollect | undefined; 
 	slides: ImageSlide[];
 	albumtier: StreeTier;
+
+	fullcallback?: (isfull: boolean) => void;
 	
 	constructor(props: Comprops & GalleryProps) {
 		super(props);
@@ -86,36 +94,51 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	componentDidMount() {
-		this.photos = this.props.tnode.node.children;
-		this.slides = this.parse(this.props.tnode.node.children);
+		this.photos = this.props.photos;
+
+		this.fullcallback = this.context.onFullScreen;
+
+		if (!this.slides || this.slides.length === 0 
+			|| this.slides.length != this.photos.length
+			|| this.slides[0].node.id != this.photos[0].node.id
+		)
+			this.parse(this.photos).then((slides: ImageSlide[]) => {
+				this.slides = slides;
+				this.setState({});
+			});
+		else
+			this.setState({});
 	}
 
 	/**
 	 *  
 	 * @param nodes 
-	 * @returns parsed slides for <Gallery/>, height of 1 node gallery is forced to be 20vh.
+	 * @returns promise, resolver for parsed slides for <Gallery/>, height of 1 node gallery is forced to be 20vh.
 	 */
 	parse(nodes: AnTreeNode[]) {
-		let photos = [] as ImageSlide[];
+		return new Promise((resolve, _err) => {
+			let photos = [] as ImageSlide[];
 
-		let imgstyl = len(nodes) === 1
-					? {width:'auto', maxHeight: '20vh'}
-					: undefined;
+			let imgstyl = len(nodes) === 1
+						? {width:'auto', maxHeight: '20vh'}
+						: undefined;
 
-		nodes?.forEach( (p: AnTreeNode, x) => {
-			let [_width, _height, w, h] = (JSON.parse(p.node.css as string || '{"size": [1, 1, 4, 3]}') as PhotoCSS).size;
+			nodes?.forEach( (p: AnTreeNode, x) => {
+				let {wh} = JSON.parse(p.node.css as string || '{"wh": [4, 3]}') as MediaCss;
 
-			photos.push({
-				index: x,
-				node: p.node,
-				width: w, height: h,
-				src: GalleryView.imgSrcReq(p.id, this.albumtier),
-				imgstyl,
-				mime: p.node.mime as string
-			})
+				photos.push({
+					index: x,
+					node: { ...p.node, shareby: p.node.shareby as string },
+					width: wh[0], height: wh[1],
+					src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
+					imgstyl,
+					mime: p.node.mime as string
+				})
+			});
+
+			// return photos;
+			resolve(photos);
 		});
-
-		return photos;
 	}
 
 	/**
@@ -123,38 +146,51 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * 
 	 * @param pid 
 	 * @param opts 
+	 * opts.docuri()  Get document's uri for connection, e.g. synuri = '/album/syn'
 	 * @returns src for img, i.e. jserv?anst64=message-string 
 	 */
-	static imgSrcReq(pid: AnsonValue, opts: {uri: string, client: SessionClient, port: string}) : string {
+	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {
+		docuri(): string;
+		uri: string, client: SessionClient, port: string
+	}) : string {
 
 		let {client, port} = opts;
 
-		let msg = getDownloadReq(pid as string, opts);
+		let msg = getDownloadReq();//pid as string, opts);
 		let jserv = client.an.servUrl(port);
-		return `${jserv}?anson64=${window.btoa( JSON.stringify(msg))}`;
 
-		function getDownloadReq(pid: string, opts: {uri: string, port: string, client: SessionClient}) {
-			let {uri, port, client} = opts;
+		return `${jserv}?anson64=${window.btoa(JSON.stringify(msg))}`;
 
-			if (reqMsgs[pid] === undefined) {
+		function getDownloadReq() {//pid: string, opts: {uri: string, port: string, client: SessionClient}) {
+			let {port, client} = opts;
+			let uri = opts.docuri();
+
+			let msgId = `${doctable}.${pid}`;
+			if (reqMsgs[msgId] === undefined) {
 				let req = StreeTier
 					.reqFactories[port]({uri, sk: ''})
 					.A(AlbumReq.A.download) as AlbumReq;
 
-				req.docId = pid;
-				reqMsgs[pid] = client.userReq(uri, port, req);
+				req.doc = new SyncDoc({ recId: pid, type: PhotoRec.__type__ });
+				req.docTabl = doctable;
+				reqMsgs[msgId] = client.userReq(uri, port, req);
 			}
-			return reqMsgs[pid];
+			return reqMsgs[msgId];
 		}
 	}
 
 	openLightbox (_event: React.MouseEvent, ix: number) {
+		if (this.fullcallback)
+			this.fullcallback(true);
 		this.currentImx = ix;
 		this.showCarousel = true;
 		this.setState({});
 	}
 
 	closeLightbox () {
+		if (this.fullcallback)
+			this.fullcallback(false);
+
 		this.currentImx = 0;
 		this.showCarousel = false;
 		this.setState({})
@@ -192,10 +228,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,
-					onClose: () => {
-						that.showCarousel = false;
-						that.setState({});
-				  } } )
+					onClose: this.closeLightbox
+				  } )
 			 || <Modal isOpen={true} ariaHideApp={false}
 					onRequestClose={this.closeLightbox}
 					contentLabel="Example Modal" >
@@ -224,10 +258,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	render() {
-		let phs = this.slides || _photos;
-		return (<div>
-			{this.gallery( phs )}
-		</div>);
+		return this.props.visible && this.gallery(this.slides);
 	}
 }
 

@@ -2,24 +2,23 @@ package io.oz.album;
 
 import static io.odysz.common.LangExt.isNull;
 import static io.odysz.common.LangExt.isblank;
-import static io.oz.AlbumApp.context;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import androidx.preference.ListPreference;
-import androidx.preference.PreferenceManager;
 
 import java.io.IOException;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonField;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.LangExt;
-import io.oz.AlbumApp;
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.oz.R;
 import io.oz.album.client.AnPrefEntries;
-import io.oz.album.tier.Profiles;
+import io.oz.album.peer.Profiles;
 import io.oz.albumtier.AlbumContext;
 
 /**
@@ -27,50 +26,65 @@ import io.oz.albumtier.AlbumContext;
  * a data wrapper for avoid manage local preferences everywhere.
  * <h5>Small Argument</h5>
  * <p>Unstructured data, e. g. local configurations like {@link SharedPreferences} can be quick shift
- * int a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
+ * into a way of violating OOP principals of encapsulation, by accessing a data copy everywhere.</p>
  * @since 0.3.0
+ * @since 0.4.0 this data also manages uploading file's template, e.g. share-flag and folder.
+ *
+ * Data type for saving preferences in Android. See
+ * <a href='https://odys-z.github.io/docsync/issues.html#android-preferenceedit-saves-violate-oop-encapsulation-principle'>
+ *     the issue with PreferenceEdit</a>.
+ * <p>Do not confused with {@link io.oz.album.peer.Profiles}.</p>
  */
-public class PrefsWrapper {
+public class PrefsWrapper extends Anson {
     public String homeName;
 
     /** Anson string for load and save {@link SharedPreferences} */
     public AnPrefEntries jservlist;
     public String uid;
     public String device;
+    public String devname;
     public String albumroot;
-    private String pswd;
+    public String pswd;
+
+    /** key to persist preference */
+    private static final String json_k = "json";
 
     private String landingUrl;
 
-    static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
-        PrefsWrapper config = new PrefsWrapper();
-        config.homeName = sharedPref.getString(AlbumApp.keys.home, "");
-        config.uid      = sharedPref.getString(AlbumApp.keys.usrid, "");
-        config.pswd     = sharedPref.getString(AlbumApp.keys.pswd, "");
-        config.device   = sharedPref.getString(AlbumApp.keys.device, "");
 
-        try{
-            String jservs = sharedPref.getString(AlbumApp.keys.jserv, "");
-            if (!isblank(jservs))
-                config.jservlist = (AnPrefEntries) Anson.fromJson(jservs);
-            else {
+    /**
+     * Options' template for an uploading doc's, such as share-flags, etc.
+     */
+//    @AnsonField(ignoreFrom = true, ignoreTo = true)
+    ExpSyncDoc currentTemplate;
+
+    static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {
+
+        PrefsWrapper config = null;
+        try {
+            config = (PrefsWrapper) Anson.fromJson(sharedPref.getString(json_k,
+                    "{\"type\":\"io.oz.album.PrefsWrapper\"}"));
+            config.sharedpref = sharedPref;
+
+            if (config.jservlist == null) {
                 Resources r = ctx.getResources();
                 config.jservlist = new AnPrefEntries(
-                        r.getStringArray(R.array.jserv_entries),
-                        r.getStringArray(R.array.jserv_entvals));
+                                r.getStringArray(R.array.jserv_entries),
+                                r.getStringArray(R.array.jserv_entvals));
             }
         } catch (AnsonException e) {
             Resources r = ctx.getResources();
+            config = new PrefsWrapper(sharedPref);
             config.jservlist = new AnPrefEntries(
                     r.getStringArray(R.array.jserv_entries),
                     r.getStringArray(R.array.jserv_entvals));
         } catch (Exception e) {
             e.printStackTrace();
-            // TODO wring string from preference and no message to user?
         }
 
         if (isblank(config.albumroot) && !isNull(landingUrl))
-            config.albumroot = sharedPref.getString(AlbumApp.keys.homepage, landingUrl[0]);
+            config.albumroot = landingUrl[0];
+
         else
             config.albumroot = ctx.getResources().getString(R.string.url_landing);
 
@@ -78,13 +92,10 @@ public class PrefsWrapper {
     }
 
     public void policy2Prefs(SharedPreferences sharedPref, Profiles profiles) {
-        albumroot  = profiles.webroot;
+        albumroot  = profiles.webnode;
         landingUrl = profiles.home;
 
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(AlbumApp.keys.home, profiles.home);
-        editor.putString(AlbumApp.keys.homepage, profiles.webroot);
-        editor.apply();
+        persist();
     }
 
     /**
@@ -95,28 +106,7 @@ public class PrefsWrapper {
      */
     public PrefsWrapper jservs(AnPrefEntries anlist) {
         this.jservlist = anlist;
-        try {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(AlbumApp.context);
-            SharedPreferences.Editor editor = pref.edit();
-            editor.putString(AlbumApp.keys.jserv, anlist.toBlock());
-            editor.apply();
-            // singleton.jserv(jservlist.entryVal());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return this;
-    }
-
-    /**
-     * Read jservs list, if null, load from shared preference.
-     * @param sharepref
-     * @return jservs' list
-     */
-    public AnPrefEntries jservs(SharedPreferences sharepref) {
-        String jservs = sharepref.getString(AlbumApp.keys.jserv, "");
-        if (isNull(jservlist) && !isblank(jservs))
-            jservlist = (AnPrefEntries) Anson.fromJson(jservs);
-        return this.jservlist;
     }
 
     public AnPrefEntries jservs() {
@@ -136,13 +126,12 @@ public class PrefsWrapper {
     }
 
     public String pswd() {
-        return pswd;
+        return pswd == null ? "" : pswd;
     }
 
-    public PrefsWrapper device(SharedPreferences pref, String dev) {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString(AlbumApp.keys.device, dev);
-        editor.apply();
+    public PrefsWrapper device(AlbumContext singleton) {
+        device = singleton.device.id;
+        devname = singleton.device.devname;
         return this;
     }
 
@@ -155,10 +144,39 @@ public class PrefsWrapper {
             jservlist.ix = 0;
         }
 
-        jservlist.select(AlbumContext.getInstance(), jservlist.ix);
+        AlbumContext.initWithErrorCtx(null).jserv(jservlist.select(jservlist.ix));
+
         listJserv.setValueIndex(jservlist.ix);
         listJserv.setTitle(jservlist.entry());
         listJserv.setSummary(jservlist.entryVal());
+        return this;
+    }
+
+    public ExpSyncDoc template() {
+        return currentTemplate;
+    }
+
+    @AnsonField(ignoreTo = true, ignoreFrom = true)
+    SharedPreferences sharedpref;
+
+
+    /** For Anson deserialization, don't delete */
+    public PrefsWrapper() { }
+
+    public PrefsWrapper(SharedPreferences sharedPref) {
+        this.sharedpref = sharedPref;
+    }
+
+    public PrefsWrapper persist() {
+        if (sharedpref != null) {
+            SharedPreferences.Editor editor = sharedpref.edit();
+            try {
+                editor.putString(json_k, toBlock());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            editor.apply();
+        }
         return this;
     }
 }

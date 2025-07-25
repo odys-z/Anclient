@@ -1,34 +1,39 @@
 
-import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec
+import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec, DatasetOpts
 } from '@anclient/semantier';
 import { PhotoProps } from '../photo-ts';
 
-export class PhotoCSS {
-	type: string = 'io.oz.album.tier.PhotoCSS';
-	size: number[] = [0, 0, 0, 0];
-}
+// export class PhotoCSS {
+// 	type: string = 'io.oz.album.peer.PhotoCSS';
+// 	size: number[] = [0, 0, 0, 0];
+// }
 
 export class PhotoRec extends SyncDoc {
 
-	static __type__: 'io.oz.album.tier.PhotoRec';
+	static __type__: 'io.oz.album.peer.PhotoRec';
 
-	type: string = PhotoRec.__type0__;
+	// type: string = PhotoRec.__type0__;
 
 	/** pid */
 	// recId?;
 
 	/** card title */
 	// pname?: string;
-	css?: PhotoCSS | string;
+	/** Java type: Exifield */
+	exif?: object | string;
+	// mime?: string;
+	geox?: string;
+	geoy?: string;
+	css? : MediaCss | string;
+    wh?  : number[];
 
 	srcSet?: Array<string>;
 	width: number;
 	height: number
-    wh?: number[];
 
 	constructor (opt: {
             recId: string; src?: string; device?: string;
-            css: string | PhotoCSS | undefined;
+            css: string | MediaCss | undefined;
             wh: number[] }) {
 		super(Object.assign(opt, {type: PhotoRec.__type__}));
 
@@ -41,6 +46,16 @@ export class PhotoRec extends SyncDoc {
 	}
 };
 
+export class MediaCss {
+	type: string = 'io.oz.album.peer.PhotoRec$MediaCss';
+	wh: number[] = [4, 3];
+	widthHeight: number[] = [4, 3];
+	rotation: number = 0;
+}
+
+/**
+ * @deprecated
+ */
 export interface PhotoCollect extends Tierec {
 	title?: string;
 	thumbUps?: Set<string>;
@@ -81,7 +96,7 @@ export class AlbumPage extends PageInf {
 }
 
 export class AlbumReq extends DocsReq {
-	static __type__ = 'io.oz.album.tier.AlbumReq';
+	static __type__ = 'io.oz.album.peer.AlbumReq';
 
 	static A = {
  		stree   : DatasetierReq.A.stree,
@@ -100,16 +115,28 @@ export class AlbumReq extends DocsReq {
 		updateFolderel: 'u/folder-rel',
 	};
 
-	pageInf   : PageInf;
+	// pageInf   : PageInf;
 	albumId   : string | undefined;
+
+	/** Missing in Java */
 	cids?     : string[];
+
+	/** Missing in Java */
 	pids?     : string[];
+
 	sk        : string;
 	clearels? : boolean;
+
+	/** Missing in Java */
 	checkRels?: Array<NV[]>;
 
-	constructor (opt: {uri?: string, page?: AlbumPage, sk?: string}) {
-		super(opt.uri, {docId: ''});
+	photo?    : PhotoRec;
+
+	/** e.g. h_photos */
+	docTabl   : string;
+
+	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
+		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__});
 		this.type = AlbumReq.__type__;
 
 		let {page, sk} = opt;
@@ -136,20 +163,29 @@ export class AlbumReq extends DocsReq {
 	 */
 	shareTree(rows: Array<NV[]>, folder) {
 		this.checkRels = rows;
-		this.subfolder = folder;
+		// this.subfolder = folder;
 		return this;
 	}
 }
-StreeTier.registTierequest('album', (opts) => new AlbumReq(opts));
+// v 0.6.5
+// StreeTier.registTierequest('album', (opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts));
 
+// v 0.7
+StreeTier.registTierequest('docoll',
+	(opts: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf, synuri: string}) => new AlbumReq(opts),
+	{uri: '-', synuri: '-', sk: '-'});
+
+// ISSUE: should extends DocsResp. We need a better tool to generate the class, desperately.
 export class AlbumResp extends AnDatasetResp {
-	static __type__ = 'io.oz.album.tier.AlbumResp';
+	static __type__ = 'io.oz.album.peer.AlbumResp';
 	album?: AlbumRec;
 
 	collect?: Array<string>;
 	collects?: Array<PhotoCollect>;
 
 	photo?: PhotoRec;
+
+	docTabl?: string;
 
 	constructor (resp: AlbumRec & {
 			forest: AnTreeNode[], // profiles?: Profiles,

@@ -250,6 +250,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 						{ typeof col.formatter === 'function' ?
 							col.formatter(col, tnode) :
 							<Typography noWrap variant='body2'
+								// issue: This is controlling the presentation layer by data service. Is this the right way?
 								align={align(n.css[col.field])}
 								className={classes.rowText} >
 								{n[col.field]}
@@ -299,9 +300,10 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 		  <Collapse in={this.state.expand}>
 			<GalleryView {... this.props}
 				ref={undefined} // suppress type error
-				uri={this.uri} media={this.props.media}
+				uri={this.uri} docuri={this.props.docuri} media={this.props.media}
 				cid={this.collect}
 				photos={node.children} // or fire a request to get photos?
+				visible={this.state.expand}
 				lightbox={this.props.lightbox}
 			/>
 		  </Collapse>
@@ -364,11 +366,11 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 		  </Grid>
 		</div>
 		);
-
 	}
 
 	/**
 	 * Ui helper for a summary of mime types.
+	 * If in grid md size, also with lable from tnode.node.pname || pid || text || fullpath.
 	 *
 	 * @param iconpool
 	 * @param tnode
@@ -381,7 +383,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 
 		return (
 		  <Typography noWrap variant='body2' className={classes.rowText} >
-			{hide(grid, media) ? undefined : media.isMd && `[${n.pname}]`}
+			{hide(grid, media) ? undefined : media.isMd && `[${n.pname || n.pid || n.text || n.fullpath}]` }
 			{ Number(n.img) > 0 && [icon(iconpool, "[]", 0), `x ${n.img}`] }
 			{ Number(n.geo) > 0 && [icon(iconpool, "!", 0), `x ${n.geo}`] }
 			{ Number(n.mov) > 0 && [icon(iconpool, ">", 0), `x ${n.mov}`] }
@@ -394,6 +396,13 @@ const TreeGallary = withStyles<any, any, TreeItemProps>(styles)(withWidth()(Tree
 
 interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
+
+	/**
+	 * @since 0.6.0 As TreeEditor implements TreeCard or TrreeGallary that handling photos,
+	 * so TreeEditor needs this filed.
+	 */
+	docuri?: string;
+
 	tier: StreeTier;
 
 	reload: boolean;
@@ -421,7 +430,10 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 	constructor(props: AnTreeditorProps) {
 		super(props);
-		// for debugging (in Chrome's spooky debug console)
+
+		if (!props.docuri)
+			throw Error("Since 0.6.0, TreeEditor requirs doc-uri, separate to func-uri, for loading media files.");
+
 		this.columns = props.columns;
 		console.log(this.columns);
 
@@ -560,6 +572,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 			  return (
 				ntype === TreeNodeVisual.gallery ?
 				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
+					docuri={that.props.docuri}
 					lightbox={that.props.lightbox}
 					key={tnode.id} tier={that.treetier as StreeTier}
 					tnode={tnode} media={media}
@@ -580,7 +593,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 				  />
 				: that.props.nodeFormatter
 				? that.props.nodeFormatter(tnode, parent, compOpts)
-				: <>Unhandled tnode, id: {tnode.id}, visual type: {ntype}</>
+				: <>{`Unhandled tnode, id: ${tnode.id}, visual type: ${ntype}`}</>
 			  );
 			}
 		  }

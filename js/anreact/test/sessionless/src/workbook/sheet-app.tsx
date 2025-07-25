@@ -6,7 +6,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, ErrorCtx, TMsgCode } from '@anclient/semantier';
 
 import { L, Langstrs,
-	AnContext, AnError, AnReactExt, jsample, JsonServs, Spreadsheetier
+	AnContext, AnError, AnReactExt, jsample, JsonHosts, Spreadsheetier
 } from '../../../../src/an-components';
 
 import { Workbook } from './workbook-no-tier';
@@ -15,7 +15,7 @@ import { CellEditingStoppedEvent } from 'ag-grid-community';
 const { JsampleTheme } = jsample;
 
 type LessProps = {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 	iportal?: string;
 	iparent?: string; // parent of iframe
@@ -23,7 +23,7 @@ type LessProps = {
 }
 
 type State = {
-	servs?: JsonServs;
+	servs?: JsonHosts;
 	servId: string;
 	iportal?: string;
 	hasError?: boolean;
@@ -170,7 +170,7 @@ class App extends React.Component<LessProps, State> {
 		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonServs) {
+		function onJsonServ(elem: string, opts: { serv: string; }, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(<App servs={json} servId={opts.serv} iportal={portal} iwindow={window}/>, dom);
 		}

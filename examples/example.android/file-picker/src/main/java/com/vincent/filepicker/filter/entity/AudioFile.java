@@ -22,43 +22,46 @@ public class AudioFile extends AndroidFile implements Parcelable {
         this.duration = duration;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(getId());
-        dest.writeString(clientname());
-        dest.writeString(fullpath());
-        dest.writeLong(size);
-        dest.writeString(getLocalDirId());
-        dest.writeString(getLocalDirName());
-        dest.writeLong(getDate());
-        dest.writeByte((byte) (isSelected() ? 1 : 0));
-        dest.writeLong(getDuration());
-    }
+//    @Override
+//    public void writeToParcel(Parcel dest, int flags) {
+//        // FIXME shouldn't do this like ImageFile, by calling super.write() ?
+//        dest.writeLong(getId());
+//        dest.writeString(clientname());
+//        dest.writeString(fullpath());
+//        dest.writeLong(size);
+//        dest.writeString(getLocalDirId());
+//        dest.writeString(getLocalDirName());
+//        dest.writeLong(date());
+//        dest.writeString(shareflag);
+//        dest.writeByte((byte) (isSelected() ? 1 : 0));
+//        dest.writeLong(getDuration());
+//    }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+//    @Override
+//    public int describeContents() {
+//        return 0;
+//    }
 
-    public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
-        @Override
-        public AudioFile[] newArray(int size) {
-            return new AudioFile[size];
-        }
-
-        @Override
-        public AudioFile createFromParcel(Parcel in) {
-            AudioFile file = new AudioFile();
-            file.setId(in.readLong());
-            file.clientname(in.readString());
-            file.clientpath = in.readString();
-            file.size = in.readLong();
-            file.setLocalDirId(in.readString());
-            file.setLocalDirName(in.readString());
-            file.setDate(in.readLong());
-            file.setSelected(in.readByte() != 0);
-            file.setDuration(in.readLong());
-            return file;
-        }
-    };
+//    public static final Creator<AudioFile> CREATOR = new Creator<AudioFile>() {
+//        @Override
+//        public AudioFile[] newArray(int size) {
+//            return new AudioFile[size];
+//        }
+//
+//        @Override
+//        public AudioFile createFromParcel(Parcel in) {
+//            AudioFile file = new AudioFile();
+//            file.setId(in.readLong());
+//            file.clientname(in.readString());
+//            file.clientpath = in.readString();
+//            file.size = in.readLong();
+//            file.setLocalDirId(in.readString());
+//            file.setLocalDirName(in.readString());
+//            file.date(in.readLong());
+//            file.shareflag(in.readString());
+//            file.setSelected(in.readByte() != 0, file.shareflag);
+//            file.setDuration(in.readLong());
+//            return file;
+//        }
+//    };
 }

@@ -12,25 +12,27 @@ buildscript {
 
 allprojects {
     ext {
-        app_ver = "0.3.0"
-        appcompat_version = "1.6.1"
+        app_ver = '0.7.3' // configured by tasks.py
+        appcompat_version = '1.7.0'
         glide_version = '4.16.0'
-        bm_photoview_version = "2.0.6"
-        anclient_ver = "0.4.40"
-        jserv_ver = "1.4.40"
-        album_lib_ver = "0.4.40"
+        bm_photoview_version = '2.0.6'
+
+        anclient_ver = '[0.5.18-SNAPSHOT,)'
+        jserv_ver = '[1.5.16-SNAPSHOT,2.0.0-SNAPSHOT)'
+        syndoc_lib_ver = '[0.5.18-SNAPSHOT,)'
+
         sourceCompatibility = JavaVersion.VERSION_1_8
     }
 
     repositories {
-//        mavenLocal()
+        mavenLocal()
         // mavenCentral(){ mavenContent { releasesOnly() } }
-        google()
-        mavenCentral()
-        jcenter()
         maven() {
             url "https://oss.sonatype.org/content/repositories/snapshots"
         }
+        mavenCentral()
+        google()
+        jcenter()
     }
 }
 

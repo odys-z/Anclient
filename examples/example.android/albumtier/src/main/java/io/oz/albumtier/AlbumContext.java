@@ -1,22 +1,25 @@
 package io.oz.albumtier;
 
+import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.isblank;
-import static io.odysz.common.LangExt.isNull;
+import static io.odysz.common.LangExt.mustnonull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
+import io.odysz.semantic.tier.docs.Device;
 import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.AlbumPort;
-import io.oz.album.tier.Profiles;
+import io.oz.album.peer.Profiles;
+import io.oz.album.peer.SynDocollPort;
+import io.oz.syndoc.client.PhotoSyntier;
 
 /**
  * Album client context.
@@ -45,14 +48,15 @@ public class AlbumContext {
 
     static AlbumContext instance;
 
-    public static final String jdocbase  = "jserv-album";
+    /** To be localized */
+    public static final String sysuri = "/album/sys";
 
-    public static final String clientUri = "album.and";
+    public static final String synuri = "/album/syn";
 
     public OnError errCtx;
 
     static {
-        AnsonMsg.understandPorts(AlbumPort.album);
+        AnsonMsg.understandPorts(SynDocollPort.docoll);
         Anson.verbose = false;
     }
 
@@ -66,15 +70,14 @@ public class AlbumContext {
     /**
      * @param err can be ignored if no error message to show
      * @return single instance
+     * @since 0.7.1
      */
-    public static AlbumContext getInstance(OnError ... err) {
+    public static AlbumContext initWithErrorCtx(OnError err) {
         if (instance == null)
             instance = new AlbumContext();
 
-        if (!isNull(err))
-            instance.errCtx = err[0];
-        else
-            instance.errCtx = null;
+        if (err != null)
+            instance.errCtx = err;
 
         return instance;
     }
@@ -93,6 +96,7 @@ public class AlbumContext {
                 || isblank(userInf.uid());
     }
 
+    /** When this is null, means not logged in */
 	public PhotoSyntier tier;
 
     public SessionInf userInf;
@@ -102,21 +106,45 @@ public class AlbumContext {
 
     public AlbumContext() {
         state = ConnState.Disconnected;
+        device = new Device();
     }
 
 	public AlbumContext(ErrorCtx ctx) {
 		this.errCtx = ctx;
+        device = new Device();
 	}
 
 	/**
      * Init with preferences. Not login yet.
      */
-    public AlbumContext init(String family, String uid, String device, String jservroot) {
+    public AlbumContext init(String family, String uid, String pswd, String device, String jservroot) {
         profiles = new Profiles(family);
         userInf = new SessionInf(null, uid);
         userInf.device = device;
+        this.pswd = pswd;
+        this.device.id = device;
+        this.device.synode0 = device;
+        this.device.devname = f("%s[%s]", device, userInf.userName());
+
         jserv = jservroot;
-        Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
+        // Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
+        Clients.init(jservroot, false);
+
+        try {
+            tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
+                @Override
+                public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
+                    try {
+                        msg = f("Error handler is null. Caught error: %s", f(msg, (Object[])args));
+                    }
+                    catch (Exception e) {}
+                    mustnonull(errCtx, msg);
+
+                    errCtx.err(code, msg, args);
+                } });
+        } catch (SemanticException | IOException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -128,19 +156,14 @@ public class AlbumContext {
      * @return this
      */
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
-            throws SemanticException, AnsonException, IOException {
+            throws AnsonException {
 
-    	/* 0.3.0 allowed
-        if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
-            throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
-        */
-        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        Clients.init(jserv, verbose);
 
-        tier = new PhotoSyntier(clientUri, userInf.device, errCtx)
-				.asyLogin(uid, pswd, userInf.device,
+        tier.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
-				    client.openLink(clientUri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
+				    client.openLink(sysuri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
 				    onOk.ok(client);
                 },
                 (c, r, args) -> {
@@ -173,7 +196,26 @@ public class AlbumContext {
      */
     public AlbumContext jserv(String root) {
         jserv = root;
-        Clients.init(String.format("%s/%s", jserv, jdocbase), verbose);
+        Clients.init(jserv, verbose);
         return this;
     }
+
+    public Device device;
+    public AlbumContext device(Device d) {
+        this.device = d;
+        return this;
+    }
+
+    public AlbumContext device(String id, String... devname) {
+        this.device = new Device(id, id, devname);
+        this.userInf.device(id);
+        return this;
+    }
+
+    public AlbumContext devname(String name) {
+        if (device == null)
+			device = new Device(userInf.device, name);
+        return this;
+    }
+
 }

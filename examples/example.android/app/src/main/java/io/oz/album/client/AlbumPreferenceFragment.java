@@ -1,6 +1,10 @@
 package io.oz.album.client;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.LangExt.f;
+import static io.odysz.common.LangExt.strof;
+import static io.odysz.common.LangExt.isblank;
+import static io.oz.AlbumApp.prfConfig;
 import static io.oz.album.client.PrefsContentActivity.buff_device;
 import static io.oz.album.client.PrefsContentActivity.buff_devname;
 import static io.oz.album.client.PrefsContentActivity.singleton;
@@ -9,17 +13,16 @@ import android.os.Bundle;
 import android.text.InputType;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 
-import io.odysz.common.LangExt;
 import io.odysz.semantics.SessionInf;
 import io.oz.AlbumApp;
 import io.oz.R;
+import io.oz.album.PrefsWrapper;
 import io.oz.fpick.activity.ComfirmDlg;
 
 /**
@@ -37,6 +40,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
     /** Preference category: device info */
     PreferenceCategory prefcateDev;
     Preference btnRegistDev;
+    Preference btnRestoreDev;
     EditTextPreference pswd;
 
     EditTextPreference userid;
@@ -47,70 +51,74 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
         initing = true;
         addPreferencesFromResource(R.xml.prefv);
 
-        prefcateDev  = findPreference(AlbumApp.keys.devCate);
-        btnRegistDev = findPreference(AlbumApp.keys.bt_regist);
-        btnLogin     = findPreference(AlbumApp.keys.bt_login);
-        listJserv    = findPreference(AlbumApp.keys.jserv);
-        device       = findPreference(AlbumApp.keys.device);
-        pswd         = findPreference(AlbumApp.keys.pswd);
-        userid       = findPreference(AlbumApp.keys.usrid);
+        prefcateDev  = findpref(R.string.key_dev_cate);
+        btnRegistDev = findpref(R.string.key_regist);
+        btnRestoreDev= findpref(R.string.key_dev_restore);
+        btnLogin     = findpref(R.string.btn_login);
+        listJserv    = findpref(R.string.jserv_key);
+        device       = findpref(R.string.key_device);
+        pswd         = findpref(R.string.pswd_key);
+        userid       = findpref(R.string.userid_key);
 
         // bindPref2Val(listJserv);
-        listJserv.setEntries(AlbumApp.sharedPrefs.jservlist.entries);
-        listJserv.setEntryValues(AlbumApp.sharedPrefs.jservlist.entVals);
-        AlbumApp.sharedPrefs.selectDefaultJserv(listJserv);
+        listJserv.setEntries(AlbumApp.prfConfig.jservlist.entries);
+        listJserv.setEntryValues(AlbumApp.prfConfig.jservlist.entVals);
+        AlbumApp.prfConfig.selectDefaultJserv(listJserv);
         listJserv.setOnPreferenceChangeListener(prefsListener);
-//        PrefsWrapper sharedPrefs = PrefsWrapper
-//                .loadPrefs(getContext(), this.getPreferenceManager().getSharedPreferences(), getString(R.string.url_landing));
-
-//        if (listJserv.getTitle() == null) {
-//            listJserv.setTitle(AlbumApp.sharedPrefs.jservlist.entry());
-//            listJserv.setSummary(AlbumApp.sharedPrefs.jservlist.entryVal());
-//        }
-
-        /*
-        AnPrefEntries jservlist = AlbumApp.sharedPrefs
-                .loadPrefs(getContext(), this.getPreferenceManager().getSharedPreferences(), getString(R.string.url_landing))
-                .jservlist;
-        if (jservlist.ix < 0) {
-            jservlist.ix = 0;
-        }
-        jservlist.select(singleton, jservlist.ix);
-        ((ListPreference)listJserv).setValueIndex(jservlist.ix);
-        listJserv.setTitle(jservlist.entry());
-        listJserv.setSummary(jservlist.entryVal());
-         */
 
         // bindPref2Val(device);
         device.setOnPreferenceChangeListener(prefsListener);
-        prefsListener.onPreferenceChange(device, AlbumApp.sharedPrefs.device);
+        prefsListener.onPreferenceChange(device, AlbumApp.prfConfig.device);
 
-        // bindPref2Val(findPreference(AlbumApp.keys.usrid));
-        userid.setOnPreferenceChangeListener(prefsListener);
-        prefsListener.onPreferenceChange(userid, AlbumApp.sharedPrefs.uid);
+        userid.setText(AlbumApp.prfConfig.uid);
+        userid.setSummary(AlbumApp.prfConfig.uid);
+        userid.setOnPreferenceChangeListener((p, v) -> {
+            String str = v == null ? "" : v.toString();
+            prfConfig.uid = str;
+            singleton.userInf.uid(str);
+            String device = singleton.userInf.device;
+            singleton.userInf = new SessionInf(singleton.userInf.ssid(), str).device(device);
+            p.setSummary(str);
+            return true;
+        });
 
-        // bindPref2Val(pswd);
-        pswd.setOnPreferenceChangeListener(prefsListener);
-        prefsListener.onPreferenceChange(pswd, AlbumApp.sharedPrefs.pswd());
+        pswd.setText(AlbumApp.prfConfig.pswd());
+        pswd.setSummary(AlbumApp.prfConfig.pswd().replaceAll(".", "*"));
+        pswd.setOnPreferenceChangeListener((p, v) -> {
+                String str = v == null ? "" : v.toString();
+                prfConfig.pswd = str;
+                singleton.pswd(str);
+                p.setSummary(strof(str, "*"));
+                return true;
+        });
 
-        pswd.setSummary("");
         pswd.setOnBindEditTextListener(editText ->
                 editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD));
 
         String devid = singleton.userInf.device;
-        if (!LangExt.isblank(devid)) {
-            findPreference(AlbumApp.keys.device).setEnabled(false);
-            findPreference(AlbumApp.keys.restoreDev).setEnabled(false);
-            prefcateDev.removePreference(findPreference(AlbumApp.keys.restoreDev));
+        String devname = singleton.device.devname;
+        if (!isblank(devid)) {
+            btnRegistDev.setEnabled(false);
+            btnRestoreDev.setVisible(false);
             prefcateDev.removePreference(btnRegistDev);
-            device.setSummary(getString(R.string.device_name, devid));
+            device.setSummary(getString(R.string.device_name, f("%s [%s]", devname, devid)));
         }
         else {
-            findPreference(AlbumApp.keys.device).setEnabled(true);
+            ((Preference)findpref(R.string.key_device)).setEnabled(true);
             device.setSummary(R.string.msg_only_once);
         }
         initing = false;
     }
+
+    <T> T findpref(int pid) { return (T)findPreference(getString(pid)); }
+
+    /**
+     * Is eq(getString(strk), k)?
+     * @param strk
+     * @param k
+     * @return
+     */
+    boolean eqk(int strk, String k) { return eq(getString(strk), k); }
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -118,24 +126,17 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
      */
     private final Preference.OnPreferenceChangeListener prefsListener =
         (preference, newValue) -> {
-            String stringValue = newValue.toString();
+            String stringValue = newValue == null ? "" : newValue.toString();
             String k = preference.getKey();
-            if (k.equals(AlbumApp.keys.jserv)) {
-                AnPrefEntries jservlist = AlbumApp.sharedPrefs.jservlist;
-                jservlist.select(singleton, stringValue);
+            if (eqk(R.string.jserv_key, k)) {
+                AnPrefEntries jservlist = AlbumApp.prfConfig.jservlist;
+                jservlist.select(stringValue);
                 preference.setTitle(jservlist.entry());
                 preference.setSummary(jservlist.entryVal());
+
+                singleton.jserv(stringValue);
             }
-            else if (AlbumApp.keys.pswd.equals(k)) {
-                singleton.pswd(stringValue);
-                preference.setSummary("");
-            }
-            else if (AlbumApp.keys.usrid.equals(k)) {
-                String device = singleton.userInf.device;
-                singleton.userInf = new SessionInf(singleton.userInf.ssid(), stringValue).device(device);
-                preference.setSummary(stringValue);
-            }
-            else if (AlbumApp.keys.device.equals(k)) {
+            else if (eqk(R.string.key_device, k)) {
                 if (eq(stringValue, buff_devname) && !initing) {
                     new ComfirmDlg(null)
                         .dlgMsg(0, 0)
@@ -145,7 +146,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                             // replace old name with new Id
                             buff_device  = null;
                         })
-                        .showDlg((AppCompatActivity) getActivity(), "FIXME")
+                        .showDlg(getActivity(), "FIXME")
                         .live(3000);
                 }
                 else {
@@ -156,7 +157,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
                 preference.setTitle(buff_device == null ?
                     stringValue : String.format("%s [%s]", stringValue, buff_device));
             }
-            else if (AlbumApp.keys.home.equals(k)) {
+            else if (eqk(R.string.key_home, k)) {
                 singleton.profiles.home(stringValue);
                 preference.setSummary(stringValue);
             }

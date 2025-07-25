@@ -23,13 +23,13 @@
     <string name="homepage_key"  translatable="false">homepage-key</string>
     <string name="jserv_default" translatable="false">@string/product_jserv_default</string>
     <string name="jserv_name0"   translatable="false">@string/product_jserv_name0</string>
-    <string name="jserv_1"       translatable="false">@string/product_jserv_1</string>
-    <string name="jserv_name1"   translatable="false">@string/product_jserv_name1</string>
+    <string name="jserv_1"       translatable="false">@string/prod_jserv_ir</string>
+    <string name="jserv_name1"   translatable="false">@string/prod_jserv_name_ir</string>
     <string name="jserv"         translatable="false">@string/product_landing</string>
-    <string name="qrformat"      translatable="false">QR_CODE</string>
+<!--    <string name="qrformat"      translatable="false">QR_CODE</string>-->
 
     <string name="key_regist" translatable="false">btn-register</string>
-    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>
+<!--    <string name="key_restore_dev" translatable="false">btn-restore-dev</string>-->
     <string name="txt_loadused">Restore a used device</string>
     <string name="txt_regist">Save Device Name</string>
     <string name="txt_scanjserv">Scan jserv address.</string>
@@ -38,11 +38,12 @@
     <string name="userid_summery">Also used as folder name for saving files</string>
     <string name="userid_title">Login ID</string>
     <string name="pswd_title">Password</string>
-    <string name="userid_key" translatable="false">my</string>
-    <string name="pswd_key"   translatable="false">pswd_key</string>
-    <string name="btn_login"  translatable="false">bt_login</string>
+    <string name="userid_key"        translatable="false">my</string>
+    <string name="pswd_key"          translatable="false">pswd_key</string>
+    <string name="btn_login"         translatable="false">bt_login</string>
     <string name="key_login_summery" translatable="false">key_login_msg</string>
     <string name="key_dev_cate"      translatable="false">key-device-cate</string>
+    <string name="key_dev_restore"   translatable="false">key-device-restore</string>
     <string name="key_device"        translatable="false">key-device</string>
 
     <string name="t_synch_ok"      >%s files has been synchronized (duplicate: %s, ignored: %s)</string>
@@ -52,18 +53,21 @@
     <string name="txt_prefs_user"  >User Account</string>
 
     <string name="devide_title"    >Device Name</string>
-    <string name="login_succeed"   >Logged in successfully.</string>
+    <string name="login_succeed"   >Logged in successfully.\nWeb: %s</string>
 
     <string name="msg_ignore_offline">Selection / files ignored - not logged in.</string>
-    <string name="msg_templ_progress">Total files: %d / %d, File Blocks: %s (%.1f%%)</string>
+    <string name="msg_templ_progress">File: %d / %d, File Blocks: %s (%.1f%%)</string>
     <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
-    <string name="msg_login_uid"    >Login as %s</string>
+    <string name="msg_login_uid"     >Login as %s</string>
+    <string name="msg_login_required">Login first fot the operation.</string>
     <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
     <string name="err_empty_pswd"    >Password is empty!</string>
     <string name="err_empty_uid"     >User ID is empty!</string>
 
-    <string name="url_help"   >https://odys-z.github.io/products/album</string>
-    <string name="url_landing">https://odys-z.github.io/Anclient</string>
+    <string name="url_landing"       >https://odys-z.github.io/landings/portfolio-0.7</string>
+    <string name="url_help"          >https://odys-z.github.io/products/portfolio/android/quick-start.html</string>
+    <string name="url_help_devid"    >https://odys-z.github.io/products/portfolio/android/synode.html#devices-must-be-identically-registered</string>
+
     <string name="url_home"        translatable="false">https://odys-z.github.io/Anclient</string>
     <string name="url_album"       translatable="false">%s/%s</string>
     <string name="url_admin"       translatable="false">%s/%s</string>
@@ -74,23 +78,23 @@
     <string name="btn_add_video">+ Video</string>
     <string name="btn_add_img"  >+ Image</string>
 
-    <string name="my_group"          >Current Group</string>
-    <string name="txt_set_groups"    >Set Sharing Group</string>
-    <string name="unknown_qrformat"  >Unknow QR format: %s</string>
-    <string name="unknown_qrcontent" >QR code or content is not recognized.</string>
-    <string name="msg_log4device"    >Login first to restore a previous used device ID.</string>
-    <string name="msg_no_used_dev"   >No available devices previously used.</string>
-    <string name="dev_usedby"        >Device name used by %s (%s)</string>
-    <string name="msg_repace_devname">Using this device to replace old name %s [id: %s] ?</string>
+    <string name="unknown_qrformat"   >Unknow QR format: %s</string>
+    <string name="unknown_qrcontent"  >QR code or content is not recognized.</string>
+    <string name="msg_log4device"     >Login first to restore a previous used device ID.</string>
+    <string name="msg_no_used_dev"    >No available devices previously used.</string>
+    <string name="dev_usedby"         >Device name used by %s (%s)</string>
+    <string name="msg_repace_devname" >Using this device to replace old name %s [id: %s]?</string>
+    <string name="msg_update_dev_err" >Update device name failed with %s [id: %s].\nDetails:  %s</string>
+    <string name="msg_dev_err_null_id">Error of empty device [%s] response.</string>
+    <string name="log_prof_err"       >Correctly logged in, but got an empty profile or no web root.</string>
+    <string name="msg_err_duplicate"  >Error: found duplicated files.</string>
 
     <array name="jserv_entries">
-        <item>localhost:8888</item>
-        <item>@string/jserv_name0</item>
         <item>@string/jserv_name1</item>
+<!--        <item>@string/jserv_name0</item>-->
     </array>
     <array name="jserv_entvals">
-        <item>http://localhost:8888</item>
-        <item>@string/product_jserv_default</item>
-        <item>@string/product_jserv_1</item>
+        <item>@string/prod_jserv_ir</item>
+<!--        <item>@string/product_jserv_default</item>-->
     </array>
 </resources>

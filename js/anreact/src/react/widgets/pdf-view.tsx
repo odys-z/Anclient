@@ -1,130 +1,279 @@
-// Android webview can work with this
-// import * as pdfjsLib from "pdfjs-dist/build/pdf";
-// https://github.com/mozilla/pdf.js/issues/14729#issuecomment-1275824563
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-import * as pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
-//
 import React from 'react';
 import { Comprops, CrudCompW } from '../crud';
+import { CSSTransform } from '../../utils/css-transform';
 
-export interface PdfViewerProps {
+// Using legacy. To do: install types
+interface PDFDocumentLoadingTask {
+  promise: Promise<PDFDocumentProxy>;
+}
+
+interface PDFDocumentProxy {
+  getPage: (pageNumber: number) => Promise<PDFPageProxy>;
+}
+
+interface PDFPageProxy {
+  getViewport: (options: { scale: number }) => { width: number; height: number };
+  render: (context: { canvasContext: CanvasRenderingContext2D; viewport: any }) => { promise: Promise<void> };
+}
+
+export interface PdfViewProps {
+    /**
+     * Path to Mozzila PDF.js release, undefined for the CDN version,
+     * e. g. 'pdfjs-legacy/pdf.mjs';
+     */
+    pdfjs?: string,
+
+    /**
+     * Path to fonts cmapUrl, default to CDN, which is not always accessible, 
+     * e. g. '/pdfjs-legacy/cmaps/'
+     */
+    cMapUrl?: string,
+
+    /**
+     * Path to pdfjs worker src, for pdfjsLib.GlobalWorkerOptions.workerSrc,
+     * e. g. '/pdfjs-legacy/pdf.worker.mjs';
+     * Default: '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+     */
+    worksrc?: string,
+
+    /** Http GET to PDF doc. */
     src: string,
     close: (e: React.UIEvent) => void
 }
 
-export interface PdfObject {
-  getPage: (p: number) => Promise<{ getViewport: (ref: { scale: number; }) => any;
-  render : (ctx: { canvasContext: any; viewport: any; }) => void; }>;
-}
-
 /**
- * The dependency PDF.js required by @anclient/anreact is saved as develope. Users must install:
- * <pre>npm install pdfjs-dist</pre>
- *
- * Experiment results (loading on mobile device is more expensive):
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.min.js  :  87.8 KB, 1.39s
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/build/pdf.worker.js  :  391 KB, 2.03s
- *
- * https://cdn.jsdelivr.net/npm/pdfjs-dist@3.9.179/web/pdf_viewer.min.css  :  5.4 KB, 972ms
- *
- * local pdf: 1.4 M, 7ms
  */
-export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
+export class PdfView extends CrudCompW<Comprops & PdfViewProps> {
 
-  config = {
+  uiConfig = {
     iconSize: 5,
   };
 
-  state = {
-    currentPage: 0,
-    pdfRef: undefined,
+  state = { }
 
-    pageRendering: false,
-    pageNumPending: -1,
+  viewConfig = {
+    currentPage: 0,
+
+    canvas: undefined as HTMLCanvasElement,
+    context: undefined,
+
+    pdfdoc: undefined,
+    page: undefined as PDFPageProxy,
+
+    transform: undefined as CSSTransform
   }
 
-  canvasRef: HTMLCanvasElement;
-
-  constructor (props) {
+  constructor (props: PdfViewProps) {
     super(props);
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    this.renderPage.bind(this);
+    this.hasprev.bind(this);
+    this.prevpage.bind(this);
+    this.hasnext.bind(this);
+    this.nextpage.bind(this);
   }
 
-	componentDidMount() {
-    let loadingTask = pdfjsLib.getDocument(this.props.src);
+  renderPage() {
+    let cfg = this.viewConfig;
+    console.log(`Rendering page ${cfg.currentPage}`);
 
+    cfg.pdfdoc.getPage(cfg.currentPage + 1).then((page) => {
+      cfg.page = page;
+
+      let viewport = cfg.page.getViewport({scale: cfg.transform.scale0});
+
+      cfg.canvas.height = viewport.height;
+      cfg.canvas.width = viewport.width;
+
+      let renderContext = {
+        canvasContext: cfg.context,
+        viewport
+      };
+
+      try {
+        let renderTask = cfg.page.render(renderContext);
+        let that = this;
+        renderTask.promise.then(function () {
+          that.setState({});
+        });
+      } catch (e) {
+        // Too quick to rerender
+        console.log(e);
+      }
+    });
+  }
+
+  componentDidMount() {
     let that = this;
-    loadingTask.promise
-      .then((pdf: PdfObject) => {
-        this.renderPage(pdf, that.canvasRef, 1);
-        that.setState({pdfRef: pdf, currentPage: 1});
-      },
-      function (reason) {
-        console.error(reason);
-      })
+
+    // Create a script element
+    let script = document.createElement('script');
+    script.type = 'module';
+
+    script.async = true;
+
+    let pdflink = this.props.src;
+    script.src = this.props.pdfjs || '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs';
+    let cMapUrl = this.props.cMapUrl || '//cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/';
+    let worksrc = this.props.worksrc || '//cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.worker.mjs';
+
+    let screen = document.getElementById('screen') as HTMLCanvasElement;
+    let canvas = document.getElementById('pdf') as HTMLCanvasElement;
+    let context = canvas.getContext('2d');
+
+    this.viewConfig = {currentPage: 0, transform: new CSSTransform, canvas, context, pdfdoc: undefined, page: undefined};
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+
+      // Re-render if scale deviates too far (e.g., every 0.5 step)
+      if (this.viewConfig.transform.scaleBy(e) > 0.5) {
+        that.viewConfig.transform.stepScale();
+        that.renderPage();
+      }
+
+      canvas.style.transform = that.viewConfig.transform.transform();
+    });
+
+    canvas.addEventListener('touchend', (e) => {
+      console.log('touchend', e.touches.length, e.touches)
+      if (e.touches.length > 1)
+        that.viewConfig.transform.pinchEnd(e.touches);
+      else
+        that.viewConfig.transform.end();
+
+      canvas.style.transform = that.viewConfig.transform.transform();
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      console.log('touchstart', e.touches.length, e.touches[0])
+      that.viewConfig.transform.start(e.touches[0]);
+
+      if (e.touches.length > 1)
+        that.viewConfig.transform.pinchBegin(e.touches);
+
+      canvas.style.transform = that.viewConfig.transform.transform();
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      console.log('touchmove', e.touches.length)
+      if (that.viewConfig.transform.pinchTo(e.touches) > 0.5) {
+        that.viewConfig.transform.stepScale();
+        that.renderPage();
+      }
+      that.viewConfig.transform.moveTo(e.touches[0]);
+      canvas.style.transform = that.viewConfig.transform.transform();
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+      that.viewConfig.transform.end();
+      canvas.style.transform = that.viewConfig.transform.transform();
+    });
+
+    screen.addEventListener('mouseup', (e) => {
+      that.viewConfig.transform.end();
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      that.viewConfig.transform.start(e);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      let dxy = that.viewConfig.transform.moveTo(e);
+      if (dxy > 0) {
+        canvas.style.transform = that.viewConfig.transform.transform();
+      }
+    });
+
+    canvas.addEventListener('dblclick', (e) => {
+      that.viewConfig.transform.reset();
+      canvas.style.transform = that.viewConfig.transform.transform();
+      that.renderPage();
+    })
+
+    // Run code after the script is loaded
+    script.onload = () => {
+      console.log('pdf.mjs loaded!');
+
+      // let url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+      // let url = pdflink; //'private/CDSFL.pdf'; 
+
+      // Loaded via <script> tag, create shortcut to access PDF.js exports.
+      let { pdfjsLib } = globalThis as any;
+      console.log('pdfjsLib / globalThis', pdfjsLib, globalThis);
+  
+      // The workerSrc property shall be specified.
+      console.log('loading worker source from CDN...');
+
+      // works: pdfjsLib.GlobalWorkerOptions.workerSrc = 'http://192.168.0.201:8900/pdfjs-legacy/pdf.worker.mjs';
+      // pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs-legacy/pdf.worker.mjs';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = worksrc;
+
+
+      // Asynchronous download of PDF
+      // let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument(pdflink) as PDFDocumentLoadingTask;
+      let loadingTask: PDFDocumentLoadingTask = pdfjsLib.getDocument({url: pdflink,
+        // fuck CCP
+        // I  [INFO:CONSOLE(5529)] "Warning: loadFont - translateFont failed: "UnknownErrorException: Unable to load binary CMap at: https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/UniGB-UCS2-H.bcmap".", source: /pdfjs-legacy/pdf.worker.mjs (5529)
+        // cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.0.375/cmaps/'
+        // cMapUrl: '/pdfjs-legacy/cmaps/'
+        cMapUrl
+      }) as PDFDocumentLoadingTask;
+
+      loadingTask.promise.then(function(pdf) {
+        console.log('PDF loaded', pdf);
+        
+        that.viewConfig.pdfdoc = pdf;
+
+        // Fetch the first page
+        that.viewConfig.currentPage = 0;
+        that.viewConfig.pdfdoc = pdf;
+        that.renderPage();
+        }, function (reason) {
+          console.error(reason);
+        });
+    };
+
+    script.onerror = () => {
+      console.error('Failed to load pdf.js');
+    };
+
+    document.body.appendChild(script);
   }
 
-  /**
-   * If another page rendering in progress, waits until the rendering is
-   * finished. Otherwise, executes rendering immediately.
-   */
-  queueRenderPage(num) {
-    if (this.state.pageRendering) {
-      this.setState({pageNumPending: num});
-    } else {
-      this.renderPage(this.state.pdfRef, this.canvasRef, num);
-    }
+  componentWillUnmount() {
+    // Cleanup: remove the script when the component unmounts
+    // if (this.script) {
+    //   document.body.removeChild(this.script);
+    // }
+  }
+
+  hasprev() {
+    return this.viewConfig.pdfdoc && this.viewConfig.pdfdoc.numPages > 0 && this.viewConfig.currentPage > 0;
   }
 
   prevpage() {
-    if (this.state.currentPage <= 1)
+    if (!this.hasprev())
       return;
-    this.state.currentPage--;
-    this.queueRenderPage(this.state.currentPage);
+
+    this.viewConfig.currentPage--;
+    this.renderPage();
+  }
+
+  hasnext() {
+    return this.viewConfig.pdfdoc && this.viewConfig.pdfdoc.numPages > 0 && this.viewConfig.currentPage < this.viewConfig.pdfdoc.numPages - 1;
   }
 
   nextpage() {
-      if (this.state.currentPage >= this.state.pdfRef.numPages)
-        return;
-      this.state.currentPage++;
-      this.queueRenderPage(this.state.currentPage);
+    if (!this.hasnext())
+      return;
 
-  }
-
-  renderPage = (pdf: PdfObject, canvas: HTMLCanvasElement, pageNum: number) => {
-    pdf.getPage(pageNum).then(
-      (page: {
-        getViewport: (arg0: { scale: number; }) => any;
-        render: (arg0: { canvasContext: any; viewport: any; }) => void; }) => {
-          let viewport = page.getViewport({scale: 1.00});
-
-          const outputScale = window.devicePixelRatio || 1;
-          canvas.width  = Math.floor(viewport.width * outputScale);
-          canvas.height = Math.floor(viewport.height * outputScale);
-          canvas.style.width  = Math.floor(viewport.width) + "px";
-          canvas.style.height =  Math.floor(viewport.height) + "px";
-
-          let transform = outputScale !== 1
-                ? [outputScale, 0, 0, outputScale, 0, 0]
-                : null;
-
-          const renderContext = {
-              canvasContext: canvas.getContext('2d'),
-              viewport: viewport,
-              transform
-          };
-          page.render(renderContext);
-    } );
+    this.viewConfig.currentPage++;
+    this.renderPage();
   }
 
   render() {
-    return (<div
-    // onTouchStart={this.handleTouchStart}
-    // onTouchMove={this.handleTouchMove}
-    // onTouchEnd={() => close()}
+    return (<div id="screen"
     style={{
       top: '0px', left: '0px',
       overflow: 'hidden', position: 'fixed', display: 'flex',
@@ -132,15 +281,14 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
       height: '100%', width: '100%',
       backgroundColor: 'rgba(0,0,0,1)'
     }}>
-      <canvas style={{width: "90%", height: "90%"}} ref={(ref) => this.canvasRef = ref}></canvas>
-
+      <canvas id="pdf"/>
       <div style={{
           background: '#cacaca77',
           position: 'absolute',
           top: '0px', right: '0px',
           padding: '10px', cursor: 'pointer',
           color: '#FFFFFF',
-          fontSize: `${this.config.iconSize * 0.8}px`
+          fontSize: `${this.uiConfig.iconSize * 0.8}px`
         }}
         onClick={this.props.close}>
         <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#FFFFFF">
@@ -148,36 +296,36 @@ export class PdfViewer extends CrudCompW<Comprops & PdfViewerProps> {
           <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
         </svg>
       </div>
-      <div
+      {this.hasprev() && <div
         style={{
           background: '#cacaca77',
           borderRadius: '8px',
           position: 'absolute', left: '0px',
           zIndex: 1, cursor: 'pointer',
           color: '#FFFFFF',
-          fontSize: `${this.config.iconSize}px`
+          fontSize: `${this.uiConfig.iconSize}px`
         }}
         onClick={() => { this.prevpage(); }}>
         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF">
           <path d="M0 0h24v24H0z" fill="none" />
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
         </svg>
-      </div>
-      <div
+      </div>}
+      {this.hasnext() && <div
         style={{
           background: '#cacaca77',
           borderRadius: '8px',
           position: 'absolute',
           right: '0px', zIndex: 1,
           color: '#FFFFFF', cursor: 'pointer',
-          fontSize: `${this.config.iconSize}px`
+          fontSize: `${this.uiConfig.iconSize}px`
         }}
         onClick={() => { this.nextpage(); }}>
         <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#FFFFFF">
           <path d="M0 0h24v24H0z" fill="none" />
           <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
         </svg>
-      </div>
+      </div>}
     </div>);
   }
 

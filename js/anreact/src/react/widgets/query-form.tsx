@@ -102,6 +102,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					// cond,
 					onLoad: (_cols, rows) => {
 						cond.options = rows as NV[];
+						cond.loading = false;
 						that.setState({});
 					}
 				});
@@ -111,7 +112,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				console.warn("Looks like this field is intend to be a combbox but no cond.sk proviced.",
 							cond);
 			}
-		});
+		} );
 	}
 
 	handleChange( e: React.ChangeEvent<HTMLInputElement> ) {
@@ -156,6 +157,9 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				_that.qFields[x].val = item ? item : AnConst.cbbAllItem;
 
 			_that.setState({});
+
+			if (x && _that.qFields[x].onSelectChange) 
+				_that.qFields[x].onSelectChange(item, reason, _that.qFields[x].val);
 		}
 	}
 
@@ -198,14 +202,14 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		let that = this;
 
 		let { checked } = this.state;
-		let { classes, media } = this.props;
+		let { classes, media, hideButtons } = this.props;
 		return (
 		  <div className={classes?.root} >
-			<Switch checked={checked} onChange={this.handleChange} />
+			{!hideButtons && <Switch checked={checked} onChange={this.handleChange} />}
 			<Collapse in={checked} >
 			  <Grid container alignContent="flex-end" >
 				{ conditions(this.qFields, classes, media) }
-				<Grid item className={classes?.buttons} >
+				{ !hideButtons && <Grid item className={classes?.buttons} >
 					<Button variant="contained"
 						color="primary"
 						className={classes?.button}
@@ -220,7 +224,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 						startIcon={<Replay />}
 					>{(!this.props.buttonStyle || this.props.buttonStyle === 'norm') && L('Reset')}
 					</Button>
-				</Grid>
+				</Grid>}
 			  </Grid>
 			</Collapse>
 		  </div>);
@@ -305,6 +309,9 @@ export interface QueryFormProps extends Comprops {
 
 	/** @deprecated replaced by conds */
 	fields?: AnlistColAttrs<JSX.Element, CompOpts>[];
+
+	/** hide search and clear buttons, default false */
+	hideButtons?: boolean;
 
 	/**
 	 * User actions: search button clicked

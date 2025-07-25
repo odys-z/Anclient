@@ -14,25 +14,42 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
+import io.odysz.semantic.tier.docs.ExpSyncDoc;
+import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
-import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.adapter.ImagePickAdapter;
 
 /**
  * Created by Ody Zhou
  * Date 2022/02/11
  *
- * Credits to Vincent Woo
+ * <p>Credits to Vincent Woo</p>
+ *
+ * <h6>Debug memo:</h6>
+ *
+ * For Andoriod Studio complains errors like
+ * <pre>
+ *     Class must either be declared abstract or implement abstract method
+ *     addMenuProvider (MenuProvider, LifecycleOwner, State) in MenuHost
+ * </pre>
+ *
+ * see <a href="https://stackoverflow.com/questions/50714060/errors-in-the-ide-but-project-running-successfully">
+ *     Errors in IDE, StackOverflow</a>.
+ * Say, delete build.
  */
 public class ImagePickActivity extends BaseActivity {
     public static final String IS_NEED_CAMERA = "IsNeedCamera";
-    public static final String IS_NEED_IMAGE_PAGER = "IsNeedImagePager";
 
     public static final int DEFAULT_MAX_NUMBER = 99;
     public static final int COLUMN_NUMBER = 3;
 
     private boolean isNeedCamera;
-    private boolean isNeedImagePager;
+
+    public ImagePickActivity () {
+        super();
+//        if (template == null)
+//            template = new ExpSyncDoc().shareflag(ShareFlag.publish.name());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,21 +57,21 @@ public class ImagePickActivity extends BaseActivity {
         setContentView(R.layout.vw_activity_image_pick);
 
         Intent intt = getIntent();
-        mMaxNumber = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
+        int maxitems = intt.getIntExtra(Constant.MAX_NUMBER, DEFAULT_MAX_NUMBER);
         isNeedCamera = intt.getBooleanExtra(IS_NEED_CAMERA, false);
-        isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
+        // boolean isNeedImagePager = intt.getBooleanExtra(IS_NEED_IMAGE_PAGER, false);
 
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
         mSuffix = new String[] {"avif", "bmp", "gif", "ico", "jpeg", "jpg", "png", "svg", "tif", "tiff", "webp"};
-        initView();
+        initView(maxitems);
     }
 
-    private void initView() {
+    private void initView(int maxnum) {
         RecyclerView mRecyclerView = findViewById(R.id.rv_image_pick);
         final GridLayoutManager layoutManager = new GridLayoutManager(this, COLUMN_NUMBER);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.addItemDecoration(new DividerGridItemDecoration(this));
-        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, mMaxNumber);
+        ImagePickAdapter adapter = new ImagePickAdapter(this, isNeedCamera, maxnum);
         linkAdapter(TYPE_IMAGE, adapter);
         mRecyclerView.setAdapter(adapter);
     }

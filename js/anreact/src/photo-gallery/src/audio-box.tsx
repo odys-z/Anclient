@@ -19,7 +19,7 @@ import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, Dialo
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import ClosedCaption from '@material-ui/icons/ClosedCaption';
 import AudioPlayer from 'material-ui-audio-player';
-import { AudioPlayerVariation } from 'material-ui-audio-player/dist/components/AudioPlayer';
+// import { AudioPlayerVariation } from 'material-ui-audio-player/dist/components/AudioPlayer';
 
 import audioTheme, { audioSVG } from './audio-theme';
 import { isEmpty } from '@anclient/semantier/helpers';
@@ -176,7 +176,7 @@ class AudioBox extends Component<AudioBoxProps> {
                   {...rest}
                   src={src}
                   displaySlider={this.props.lightMode || spatial()}
-                  variation={color as keyof typeof AudioPlayerVariation}
+                  // variation={color as keyof typeof AudioPlayerVariation}
                   elevation={0}
                   useStyles={useClasses}
                   spacing={spacing.z as GridSpacing}

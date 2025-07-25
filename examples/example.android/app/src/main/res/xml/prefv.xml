@@ -19,6 +19,7 @@
         <EditTextPreference
             android:layout_width="match_parent"
             android:defaultValue=""
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,!@#$_-+=[](){}"
             android:key="@string/userid_key"
             android:summary="@string/userid_summery"
             android:title="@string/userid_title" />
@@ -44,9 +45,9 @@
             android:defaultValue=""
             android:key="@string/key_device"
             android:summary="@string/msg_only_once"
-            android:title="@string/devide_title" />
+            android:title="@string/devide_title"/>
         <Preference
-            android:key="@string/key_restore_dev"
+            android:key="@string/key_dev_restore"
             android:layout="@layout/edit_device" />
         <Preference
             android:key="@string/key_regist"

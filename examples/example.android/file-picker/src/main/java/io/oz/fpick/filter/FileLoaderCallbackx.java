@@ -28,7 +28,8 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.oz.fpick.AndroidFile;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.Utils;
 
 import static android.provider.BaseColumns._ID;
@@ -42,6 +43,15 @@ import static android.provider.MediaStore.MediaColumns.SIZE;
 import static android.provider.MediaStore.MediaColumns.TITLE;
 import static android.provider.MediaStore.Video.VideoColumns.DURATION;
 
+
+/**
+ * This class handling / creating AndroidFile instance provided by {@link FileFilterx} in the Android
+ * callback style.
+ * <p>
+ * Thanks to Vicent Woo, but this class is possibly a good sign of violating OO design principle.
+ * Take a look at {@link #onCreateLoader(int, Bundle)} and {@link #TYPE_IMAGE}, etc.
+ * </p>
+ */
 public class FileLoaderCallbackx implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final int TYPE_IMAGE = 0;
     public static final int TYPE_VIDEO = 1;

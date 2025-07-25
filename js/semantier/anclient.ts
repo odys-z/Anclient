@@ -103,7 +103,47 @@ class AnClient {
 		return Protocol.Port[name];
 	}
 
-    /**Login to jserv
+	/**
+	 * @since 0.9.105
+	 */
+	loginWithUri(uri: string, uid: string, pswd: string,
+		onLogin: OnLoginOk,
+		onError: ErrorCtx): this {
+
+		let iv = aes.getIv128() as unknown as Uint8Array;
+		let cpwd = aes.encrypt(uid, pswd, iv);
+		let req = Protocol.formatSessionLogin(uid, cpwd, aes.bytesToB64(iv))
+						.Uri(uri);
+
+		let that = this;
+		this.post(req,
+			/**@param resp
+			 * code: "ok"
+			 * data: Object { uid: "admin", ssid: "3sjUJk2JszDm", "user-name": "admin" }
+			 * port: "session"
+			 */
+			(resp: AnsonMsg<AnsonResp>) => {
+				let ssInf = resp.Body().ssInf;
+				ssInf.jserv = an.cfg.defaultServ;
+
+				console.log(ssInf.ssToken);
+				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
+				console.log(ssInf.ssToken);
+
+				let sessionClient = new SessionClient(ssInf, iv, true);
+				sessionClient.an = that;
+				if (typeof onLogin === "function")
+					onLogin(sessionClient);
+				else
+					console.log(sessionClient);
+			},
+			onError);
+		return this;
+	}
+
+    /**
+	 * Login to jserv
+	 * @deprecated since 0.9.105, replaced by {@link loginWithUri()}
      * @param usrId
      * @param pswd
      * @param onLogin on login ok handler
@@ -826,6 +866,7 @@ class SessionClient {
 		},
 		{ onError: (c, e) => {
         	localStorage.setItem(SessionClient.ssInfo, null);
+			onError.onError(c, e);
 		} });
 	}
 }

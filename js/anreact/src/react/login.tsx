@@ -27,12 +27,15 @@ const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 });
 
 interface LoginProps extends Comprops {
+	/** Requried since Semantic.jserv 1.5.0 */
+	uri: string;
+
 	/** Providing a callback to handle login-ok event will override auto re-direction. */
 	onLogin?: OnLoginOk;
 	// onLogin: OnCommitOk;
 
 	/** Default pswd and user-id, usually for debug. */
-	config: {pswd?: string, userid?: string}
+	config: {pswd?: string, userid?: string};
 }
 
 /**
@@ -88,6 +91,8 @@ class LoginComp extends React.Component<LoginProps> {
 	componentDidMount() {
 		this.state.pswd = this.config.pswd;
 		this.state.userId = this.config.userid;
+
+		console.log(this.props.uri)
 	}
 
 	alert(classes: ClassNames) {
@@ -124,10 +129,20 @@ class LoginComp extends React.Component<LoginProps> {
 
 		if (!this.config.loggedin) {
 			let serv = ctx.servId || 'host';
-			let hosturl = ctx.servs[serv];
+			let hosturl = ctx.servs[serv] as string;
+
+			if (ctx.servs.syndomx) {
+				// Synode 0.7.1
+				hosturl = ctx.servs.syndomx[serv] || hosturl;
+			}
+			if (hosturl === undefined || !hosturl.startsWith('http')) {
+				console.error(ctx.servs);
+				throw new Error(`No jserv-root configured for ${serv} in AnContext. Check private/host.json.`);
+			}
 
 			an.init(hosturl);
-			an.login( uid, pwd, reload, {onError} );
+			// an.login( uid, pwd, reload, {onError} );
+			an.loginWithUri(this.props.uri, uid, pwd, reload, {onError});
 		}
 
 		function reload (client: SessionClient) {

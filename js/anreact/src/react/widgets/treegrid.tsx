@@ -129,7 +129,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
         .filter( v => toBool(v.visible, true))
         .map( (col: AnTreegridCol, ix: number) => {
           if (col.thFormatter)
-            return col.thFormatter(col, ix, {classes, media});
+            return  hide(col.grid, media) ? undefined : col.thFormatter(col, ix, {classes, media});
 
           if (col.type === 'actions')
             return (
@@ -146,7 +146,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
             return (
               hide(col.grid, media) ? undefined :
               <Grid item key={ix} {...col.grid} className={classes.thCell}>
-                {col.label || col.field}
+                {col.label || col.label === undefined ? col.field : col.label}
               </Grid>);
             } )
       }
@@ -179,8 +179,14 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
       }
     }
 
+    /**
+     * ISSUE: This is controlling the presentation layer by data service. Is this the right way?
+     * 
+     * @param css 
+     * @returns 
+     */
     function align(css?: React.CSSProperties) : PropTypes.Alignment {
-      return css?.textAlign ? css.textAlign as PropTypes.Alignment : 'center'; //
+      return css?.textAlign ? css.textAlign as PropTypes.Alignment : 'inherit'; //
     }
 
     function folder(cols: AnTreegridCol[], n: AnTreeNode, open: boolean) {
@@ -211,7 +217,9 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                   <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
                     { typeof col.colFormatter === 'function' ?
                       col.colFormatter(col, n, {media, classes, colx: cx}) :
-                      <Typography noWrap variant='body2' align={align(n.node.css)} >
+                      <Typography noWrap variant='body2'
+								        // issue: This is controlling the presentation layer by data service. Is this the right way?
+                        align={align(n.node.css)} >
                         {n.node[col.field]}
                       </Typography>
                     }
@@ -241,7 +249,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
               //   </Grid>);
               // else
               if (cx === 0) return (
-                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.rowHead}>
+                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.rowHead} style={col.style}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
                     {n.node[col.field]}
@@ -254,7 +262,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 console.error("AnTreegridCol.formatter is replaced with colFormatter.");
               else return (
                 hide(col.grid, media) ? undefined :
-                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.treeItem}>
+                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.treeItem} style={col.style}>
                   { typeof col.colFormatter === 'function' ?
                     col.colFormatter(col, n, {media, classes, colx: cx}) :
                     <Typography noWrap variant='body2' align={align(n.node.css)} >

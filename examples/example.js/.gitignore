@@ -1,4 +1,6 @@
 node_modules
+*.apk
+*.aab
 *-del
 # dist is copied to docker image
 # !react-quiz/dist
@@ -7,14 +9,30 @@ node_modules
 **/dist/docs
 **/dist/img/sample.png
 !**/dist/*.html
+**/dist/report.html
 !**/dist/*.json
 !**/dist/*.css
 !**/dist/res-vol
 
+**/web-dist/*.min.js*
+**/web-dist/*
+**/web-dist/docs
+**/web-dist/img/sample.png
+!**/web-dist/*.html
+**/web-dist/report.html
+!**/web-dist/*.json
+!**/web-dist/*.css
+!**/web-dist/res-vol
+!**/web-dist/pdfjs-legacy
+**/web-dist/pdfjs-legacy/*
+!**/web-dist/pdfjs-*/*.md
+
 **/private.html
 **/private.json
 **/*.back.*
-private
+**/private
 _build
 album/products
 package-lock.json
+
+**/.npmrc

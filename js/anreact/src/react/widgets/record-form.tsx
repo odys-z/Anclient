@@ -49,7 +49,7 @@ export interface RecordFormProps extends Comprops {
 	/**Default: true */
 	enableValidate? : boolean,
 	tier            : Semantier,
-	fields          : Array<TierCol & {readOnly?: boolean}>
+	fields          : Array<TierCol & {readOnly?: boolean, grid?: object, fieldFormatter?: Function}>
 
 	onSwitchChange? : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean) => void,
 	onToggle?       : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean, toggleState: boolean) => void
@@ -119,7 +119,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		let {isSm} = media;
 		let that = this;
 
-		if (typeof this.tier.isReadonly === 'function')
+		if ((typeof this.tier as any).isReadonly === 'function')
 			console.error("Since 0.4.50, TRecordForm nolonger use tier.isReadonly for field property. User field.readonly instead.");
 
 		if (f.formatter) 

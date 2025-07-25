@@ -1,9 +1,9 @@
 import React from 'react';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { Protocol, AnsonMsg, AnsonResp, PageInf } from '@anclient/semantier';
+import { Protocol, AnsonMsg, AnsonResp, PageInf, TierComboField } from '@anclient/semantier';
 
-import { L, ComboCondType, Comprops, CrudComp,
+import { L, Comprops, CrudComp,
 	AnQueryst, jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, Spreadsheetier, SpreadsheetReq,
 } from '@anclient/anreact';
 import { ProgressReq } from './progress';
@@ -51,11 +51,11 @@ class AllDecisionsComp extends CrudComp<Comprops & {conn_state: string}>{
 	conds = { pageInf: new PageInf(0, 20),
 			  query: [
 				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
-				  label: L('Event'), field: 'eventId', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('Event'), field: 'eventId', grid: {sm: 2, md: 2}} ,
 				{ type: 'cbb', sk: Protocol.sk.cbbClasses, uri: this.uri, nv: {n: 'text', v: 'value'},
-				  label: L('My Class'), field: 'orgId', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('My Class'), field: 'orgId', grid: {sm: 2, md: 2}} as TierComboField,
 				{ type: 'cbb', sk: 'curr-modu', uri: this.uri,
-				  label: L('Module'), field: 'module', grid: {sm: 2, md: 2}} as ComboCondType,
+				  label: L('Module'), field: 'module', grid: {sm: 2, md: 2}} as TierComboField,
 			] } as QueryPage;
 
 	constructor(props: Comprops & {conn_state: string}) {

@@ -242,9 +242,12 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 			[{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f02'}]
 		];
 
-		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "jserv": "",
-					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj" };
+		let ssInf : SessionInf = {
+			"type": "io.odysz.semantic.jsession.SessionInf",
+			"jserv": "",
+			"uid": "admin", "roleId": undefined, "ssid": "001eysTj",
+			ssToken: undefined
+		};
 		let ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
 				.usrAct('func', 'cate', 'cmd', 'remarks')
 				.inserts(undefined, 'a_role_func', nvss)
@@ -289,9 +292,12 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 			[{n: 'roleId', v: 'r01'}, {n: 'funcId', v: 'f02'}]
 		];
 
-		let ssInf : SessionInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					"jserv": "",
-					"uid": "admin", "roleId": undefined, "ssid": "001eysTj" };
+		let ssInf : SessionInf = {
+			"type": "io.odysz.semantic.jsession.SessionInf",
+			"jserv": "",
+			"uid": "admin", "roleId": undefined, "ssid": "001eysTj",
+			ssToken: undefined
+		};
 		let ir = new SessionClient(ssInf, new TextEncoder().encode('iv 3456789ABCDEF'), true)
 				.usrAct('func', 'cate', 'cmd', 'remarks')
 				.insert(undefined, "ZSU", nvss[0])

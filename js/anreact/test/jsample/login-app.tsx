@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { AnsonMsg, AnsonResp, SessionClient } from '../../../semantier/anclient';
 import { AnContext, AnError, AnReact, L, Login } from '../../../anreact/src/an-components';
 import { Comprops } from '../../../anreact/src/react/crud';
-import { AnreactAppOptions, JsonServs } from '../../../anreact/src/an-components';
+import { AnreactAppOptions, JsonHosts } from '../../../anreact/src/an-components';
 import { SessionInf } from '@anclient/semantier/anclient';
 import { Theme } from '@material-ui/core/styles';
 
@@ -14,7 +14,7 @@ const styles = (theme: Theme) => ({
 });
 
 interface LoginProps extends Comprops {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId?: string;
 };
 
@@ -109,7 +109,7 @@ class LoginApp extends React.Component<LoginProps> {
 	static bindHtml(elem: string, opts: AnreactAppOptions = {serv: 'localhost'}) {
 		AnReact.loadServs(elem, opts, onJsonServ);
 
-		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonServs) {
+		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
 			let dom = document.getElementById(elem);
 			ReactDOM.render(
 				<LoginApp servs={json} servId={opts.serv} iparent={opts.parent} ihome={opts.home} />, dom);

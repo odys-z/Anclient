@@ -1,5 +1,7 @@
 package io.oz;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,17 +14,15 @@ import java.security.GeneralSecurityException;
 import io.odysz.anson.Anson;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsException;
 import io.odysz.semantics.x.SemanticException;
-import io.oz.album.PrefKeys;
 import io.oz.album.PrefsWrapper;
-import io.oz.album.tier.AlbumResp;
+import io.oz.album.peer.AlbumResp;
 import io.oz.albumtier.AlbumContext;
 
 public class AlbumApp extends Application {
 
-    public static PrefKeys keys;
-
-    public static PrefsWrapper sharedPrefs = new PrefsWrapper();
+    public static PrefsWrapper prfConfig;
     public static Context context;
 
     public AlbumApp() {
@@ -38,20 +38,30 @@ public class AlbumApp extends Application {
     /**
      * Compound handling of login and settings updating.
      */
-    public static void login(JProtocol.OnOk onOk, JProtocol.OnError onErr)
+    public static void login(String pswd, JProtocol.OnOk onOk, JProtocol.OnError onErr)
             throws GeneralSecurityException, IOException, SemanticException {
-        AlbumContext clientext = AlbumContext.getInstance();
-        clientext.pswd(sharedPrefs.pswd()).login((client) -> {
+        AlbumContext clientext = AlbumContext.initWithErrorCtx(null);
+        clientext
+            .pswd(pswd)
+            .login((client) -> {
             if (context != null) {
                 // load settings
                 Anson.verbose = AlbumContext.verbose;
                 clientext.tier.asyGetSettings(
                     (resp) -> {
                         clientext.profiles = ((AlbumResp) resp).profiles();
-                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-                        sharedPrefs.policy2Prefs(sharedPref, clientext.profiles);
 
-                        clientext.jserv(sharedPrefs.jserv());
+                        Utils.logi("Profiles response of session,\nsession:%s\nprofiles:%s",
+                                client.ssInfo().toBlock(), clientext.profiles.toBlock());
+
+                        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+                        
+                        if (clientext.profiles == null || isblank(clientext.profiles.webnode))
+                            throw new DocsException(0, context.getString(R.string.log_prof_err));
+
+                        prfConfig.policy2Prefs(sharedPref, clientext.profiles);
+
+                        clientext.jserv(prfConfig.jserv());
                         if (onOk != null)
                             onOk.ok(resp);
                     },

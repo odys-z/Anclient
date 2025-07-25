@@ -23,22 +23,20 @@ public class AnPrefEntries extends Anson {
         this.entVals = entvals;
     }
 
-    public String select(AlbumContext singleton, int ix) {
+    public String select(int ix) {
         if (ix >= 0 && ix < entries.length) {
             this.ix = ix;
-            singleton.jserv(entryVal());
-            return entries[ix];
+            return entryVal();
         }
         return null;
-
     }
 
-    public String select(AlbumContext singleton, String val) {
-        return select(singleton, indexOf(entVals, val));
-   }
+    public String select(String val) {
+        return select(indexOf(entVals, val));
+    }
 
     /**
-     * Insert a new name-url pair, if already exists, swap to the first
+     * Insert a new name-url pair, if the entry is already exist, swap it to the first.
      *
      * @param jserv 0.3.0: name\nurl
      * @return true if content seems usable
@@ -47,7 +45,7 @@ public class AnPrefEntries extends Anson {
     public boolean insert(String jserv) {
         String[] jss = jserv.split("\n");
         if (jss != null && jss.length >= 2 && !isblank(jss[0]) && !isblank(jss[1])) {
-            int i = indexOf(entVals, jss[1]);
+            int i = indexOf(entries, jss[0]);
             if (i > 0) {
                 swap(entVals, 0, i);
                 swap(entries, 0, i);
@@ -58,12 +56,14 @@ public class AnPrefEntries extends Anson {
                 entVals = insertAt(entVals, jss[1], 0);
                 ix = 0;
             }
+            entVals[0] = jss[1];
             return true;
         }
         return false;
     }
 
-    /** get current entry */
+    /** Get current entry.
+     * @since 0.7.1, this is the current synode ID. */
     public String entry() {
         return entries != null && ix >= 0 && ix < entries.length ?
                 entries[ix] : "";

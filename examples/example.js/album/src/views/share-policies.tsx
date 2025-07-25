@@ -3,9 +3,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 
 import { Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
-import { AnContext, JsonServs, CrudCompW,
-    AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
-    CompOpts, AnTreegridCol, AnTreegrid, jsample} from '@anclient/anreact';
+import { AnContext, CrudCompW, 
+    JsonHosts, AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
+    CompOpts, AnTreegridCol, AnTreegrid, jsample
+} from '@anclient/anreact';
 
 import { Button, Grid, Theme, withWidth } from '@material-ui/core';
 import { AlbumEditier } from '../tiers/album-tier';
@@ -21,7 +22,7 @@ const styles = (_theme: Theme) => ( {
 } );
 
 interface SharePolicyProps extends AnTablistProps {
-	servs: JsonServs;
+	servs: JsonHosts;
 	servId: string;
 
 	/** album id */
@@ -44,9 +45,9 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
     editForm: ReactNode;
     tier?: AlbumEditier;
     detailForm: JSX.Element | undefined;
-    confirm: JSX.Element | undefined;
-	docIcon  : DocIcon;
-    hasError: boolean;
+    confirm   : JSX.Element | undefined;
+	docIcon   : DocIcon;
+    hasError  : boolean;
     onErrorClose: any;
     error: any;
 

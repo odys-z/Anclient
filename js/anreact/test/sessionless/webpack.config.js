@@ -2,31 +2,49 @@ var path = require('path')
 var webpack = require('webpack')
 
 var v = 'development';// "production" | "development" | "none"
-var version = "1.0.0";
+var version = "1.1.1";
+
+// const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = {
 	mode: v,
 	devtool: 'source-map',
-	entry: {'AnHome': './src/less-app.tsx',
-			'AnWidgets': './src/less-widgets.tsx',
-			'Doctree': './src/less-widgets-treegrid.tsx',
-			'AnSheet': './src/workbook/sheet-app.tsx' },
+	entry: {// 'home': './src/less-app.tsx',
+			'widgets': './src/less-widgets.tsx',
+			'doctree-pdframe': './src/less-widgets-pdframe.tsx',
+			'doctree-pdfjs': './src/less-widgets-pdfjs.tsx',
+			'docview': './src/less-widgets-docview.tsx',
+			// 'sheet': './src/workbook/sheet-app.tsx'
+		},
 	
-	// external: {
-	// 	pdfjs: ''
-	// },
+	externals: {
+		'react': 'React',
+		'react-dom': 'ReactDOM',
+  
+		/**
+		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
+		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
+		 * <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+		 * <!-- If using ag-Grid Enterprise: -->
+		 * <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
+		 */
+		'ag-grid-community': 'agGrid'
+	},
 
 	output: {
 	  filename: "[name]-" + version + ".min.js",
-	  path: path.resolve(__dirname, 'dist'),
+	  path: path.resolve(__dirname, 'web-dist'),
 	  library: 'less',
 	  libraryTarget: 'umd'
 	},
 
-	plugins: [ ],
+	plugins: [
+		// new webpack.ProvidePlugin({ process: 'process/browser', Buffer: ['buffer', 'Buffer']}),
+		// new NodePolyfillPlugin()
+	],
 
 	resolve: {
-		extensions: ['*', '.ts', '.js', '.jsx', '.tsx']
+		extensions: ['.ts', '.js', '.jsx', '.tsx'],
 	},
 
 	module: {

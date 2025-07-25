@@ -6,6 +6,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:alertDialogStyle">@style/Theme.AlertDialog.Default</item>
     </style>
 
+    <style name="Theme.AlertDialog.Default" parent="AppTheme">
+        <item name="android:titleTextColor">@color/yellow</item>
+        <item name="android:textColorSecondary">@color/material_dynamic_secondary30</item>
+        <item name="android:textColorPrimary">@color/material_dynamic_primary0</item>
+    </style>
 </resources>

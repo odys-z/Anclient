@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:background="#00C8C8C8"
             android:layout_height="wrap_content"
-            android:onClick="onRegisterDevice"
+            android:onClick="onHelpDeviceId"
             android:layout_gravity="right"
             android:src="@drawable/ic_question" />
 </LinearLayout>

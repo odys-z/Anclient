@@ -2,10 +2,10 @@ import React from 'react';
 import { Box, Button, Card, Typography } from '@material-ui/core';
 import { Theme, withStyles } from '@material-ui/core/styles';
 
-import { Protocol, CRUD, PkMeta, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx } from '@anclient/semantier';
+import { Protocol, CRUD, NV, AnsonMsg, AnsonResp, PageInf, isEmpty, OnCommitOk, ErrorCtx, TierComboField } from '@anclient/semantier';
 
 import {
-	L, ComboCondType, Comprops, CrudComp, AnContextType,
+	L, Comprops, CrudComp, AnContextType,
 	jsample, AnSpreadsheet, SpreadsheetRec, AnContext, QueryPage, toPageInf, DatasetCombo,
 	Spreadsheetier, SpreadsheetReq, ConfirmDialog, SheetCol, CbbCellValue, SpreadsheetResp, ImageUpload, TRecordForm,
 } from '@anclient/anreact';
@@ -94,7 +94,7 @@ export class MyCoursesTier extends Spreadsheetier {
 
 	skCourses = 'couse-templ';
 
-	constructor(props: {uri: string, pkval: PkMeta, cols: SheetCol[]}) {
+	constructor(props: {uri: string, pkval: {pk: string, v: any, tabl: string}, cols: SheetCol[]}) {
 		super('mydecisions', props);
 
 		this.coursesPerModule = {};
@@ -167,14 +167,14 @@ export class MyCoursesTier extends Spreadsheetier {
 
 			for (let i = 0; i < nvs.length; i++)
 				if (nvs[i].n === n)
-					return nvs[i].v;
+					return nvs[i].v as string;
 			return `[${n}]`; // [] for tagging the invalid data in database
 		}
 
 		return super.encode(field, n, rec);
 	}
 
-	decode(p: ICellRendererParams): string | Element {
+	decode(p: ICellRendererParams) : string | Element {
 		let field = p.colDef.field;
 		if (p.rowIndex >= this.rows.length) return p.value;
 
@@ -188,7 +188,7 @@ export class MyCoursesTier extends Spreadsheetier {
 					return nvs[i].n;
 			return v;
 		}
-		return super.decode(p);
+		return super.decode(p, field);
 	}
 
 	updateCell(p: CellEditingStoppedEvent, onOk: OnCommitOk) : void {
@@ -248,7 +248,7 @@ class MyComp extends CrudComp<Comprops & {conn_state: string, tier: MyCoursesTie
 				{ type: 'cbb', sk: 'ann-evt', uri: this.uri,
 				  sqlArgs: [this.getUserId()],
 				  noAllItem: true,
-				  label: L('AP Events'), field: 'eId', grid: {sm: 8, md: 8}} as ComboCondType,
+				  label: L('AP Events'), field: 'eId', grid: {sm: 8, md: 8}} as TierComboField,
 			] } as QueryPage;
 
 	gridRef: React.MutableRefObject<undefined>;
