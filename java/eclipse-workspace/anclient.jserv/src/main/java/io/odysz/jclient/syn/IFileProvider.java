@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import io.odysz.semantic.tier.docs.IFileDescriptor;
-import io.odysz.transact.sql.Transcxt;
 import io.odysz.transact.sql.parts.ExtFilePaths;
 
 /**
@@ -59,7 +58,8 @@ public interface IFileProvider {
     default Path pysicalPath(IFileDescriptor f) {
     	String uri64 = f.uri64();
     	return startsVolume(uri64) ?
-    		Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64)) :
+    		// Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64)) :
+    		Paths.get(ExtFilePaths.decodeUriPath(uri64)) :
     		Paths.get(f.fullpath());
     }
 }

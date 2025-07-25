@@ -9,8 +9,8 @@
   		<id>sys-sqlite</id>
   		<type>sqlite</type>
   		<isdef>true</isdef>
-  		<!-- For sqlite, src = relative path from this configure file.
-  			So connection string can be: jdbc:sqlite:WEB-INF/remote.db
+  		<!-- For sqlite, since 1.5.0, the version introduced supporting of volume,
+  			the path is relative to runtime root.
   			-->
   		<src>$VOLUME_HOME/system.sqlite</src>
   		<usr>test</usr>
@@ -25,9 +25,6 @@
   		<id>log-sqlite</id>
   		<type>sqlite</type>
   		<isdef>false</isdef>
-  		<!-- NOTE For sqlite:
-  			 Same db file, e.g. system.sqliet will results in DB write lock exception.
-  		-->
   		<src>$VOLUME_HOME/syslog.sqlite</src>
   		<usr>test</usr>
   		<pswd>test</pswd>
@@ -35,20 +32,6 @@
   		<dbg>false</dbg>
   		<log>true</log>
   		<smtcs>semantic-log.xml</smtcs>
-  	</c>
-  	
-  	<c>
-  		<!-- This id must be the same as in workflow-meta.xml/t[cfg]/k[conn]/v -->
-  		<id>cheap-sqlite</id>
-  		<type>sqlite</type>
-  		<isdef></isdef>
-  		<src>$VOLUME_HOME/cheap.sqlite</src>
-  		<usr>test</usr>
-  		<pswd>test</pswd>
-  		<!-- enable sql printing -->
-  		<dbg>true</dbg>
-  		<log>false</log>
-  		<smtcs>semantics-workflow.xml</smtcs>
   	</c>
   	
   	<c>

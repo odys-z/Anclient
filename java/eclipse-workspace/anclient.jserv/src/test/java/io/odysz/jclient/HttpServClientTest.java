@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
 import io.odysz.common.AESHelper;
+import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.tier.docs.DocsReq;
@@ -21,11 +22,11 @@ class HttpServClientTest {
 
 	@Test
 	void testToUrlParam() throws Exception {
-		boolean[] can_quit = new boolean[] {false};
-		try {
-		turnred(can_quit);
-		SampleApp.startSampleServ(can_quit);
-		String sample_jserv = f("http://localhost:%s/jserv-album", SampleApp.sampleton().settings.port);
+//		boolean[] can_quit = new boolean[] {false};
+//		try {
+//		turnred(can_quit);
+//		SampleApp.startSampleServ(can_quit);
+//		String sample_jserv = SampleApp.sampleton().settings.jserv();
 
 		AnsonMsg.understandPorts(Port.echo);
 		
@@ -47,12 +48,13 @@ class HttpServClientTest {
 		assertTrue(parss != null && parss.length > 2);
 
  		URL url = new URL(f("%s?anson64=%s",
- 				Port.echo.url(sample_jserv),
+ 				Port.echo.url("http://localhost:8964/jserv-sample/echo.less"),
  				HttpServClient.escapeUrlParam(jreq)));
 
- 		System.out.println(url);
+ 		// System.out.println(url);
+ 		Utils.logT(new Object() {}, url.toString());
 
 		assertEquals(parss.length, url.toString().split("\\%2B").length);
-		} finally { turngreen(can_quit); }
+//		} finally { turngreen(can_quit); }
 	}
 }

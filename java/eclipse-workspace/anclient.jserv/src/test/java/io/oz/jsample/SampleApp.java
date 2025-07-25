@@ -34,9 +34,7 @@ import io.odysz.jsample.Sampleton;
  * @since 1.5.3
  */
 public class SampleApp {
-
-	public static final String servpath = "/jserv-sample";
-	
+	private static final String servpath = "jserv-sample";
 	public static final String config_xml = "config.xml";
 	public static final String settings_json = "settings.json";
 
@@ -46,27 +44,24 @@ public class SampleApp {
 
 	public static SampleApp app;
 
-	public static void startSampleServ(boolean[] quit) throws InterruptedException {
+	public static Thread startSampleServ(boolean[] quit) throws InterruptedException {
 		boolean[] ready = new boolean[] {false};
 		turnred(ready);
-		new Thread(() -> {
+		Thread t = new Thread(() -> {
 			app = _main(null);
 			turngreen(ready);
 			try {
-				awaitAll(quit);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			// stop
-			try {
+				awaitAll(quit, -1);
+				app.server.stop();
 				app.server.join();
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}, "SampleApp main").start();
+		}, "SampleApp Jetty Server");
 
-		awaitAll(ready);
+		t.start();
+		awaitAll(ready, -1);
+		return t;
 	}
 
 	static public Sampleton sampleton() {
@@ -121,20 +116,6 @@ public class SampleApp {
 	 * @return this
 	 */
 	SampleApp afterboot(SampleSettings settings) {
-//		if (!isNull(settings.startHandler)) {
-//			logi("Exposing locally by %s, %s ...", (Object[]) settings.startHandler);
-//			try {
-//				((ISynodeLocalExposer)Class
-//					.forName(settings.startHandler[0])
-//					.getDeclaredConstructor()
-//					.newInstance())
-//					.onExpose(settings, this.syngleton.syncfg.domain, settings.jserv(this.syngleton.synode()), this.syngleton.syncfg.https);
-//			} catch (Exception e) {
-//				warn("Exposing local resources failed!");
-//				e.printStackTrace();
-//			}
-//		}
-//
 		return this;
 	}
 
@@ -150,29 +131,11 @@ public class SampleApp {
 			PrintstreamProvider ... oe) throws Exception {
 		Configs.init(webinf);
 		Connects.init(webinf);
-		Sampleton.appName = ifnull(Configs.getCfg("app-name"), "Portfolio 0.7");
+		Sampleton.appName = ifnull(Configs.getCfg("app-name"), "Jserv Sample 1.5");
 
 		String $vol_home = "$" + settings.vol_name;
 
-//		YellowPages.load($vol_home);
-//		SynodeConfig cfg = YellowPages.synconfig();
-//		if (cfg.mode == null)
-//			cfg.mode = SynodeMode.peer;
-//		
-//		mustnonull(settings.rootkey, f(
-//				"Rootkey cannot be null for starting App. settings:\n%s", 
-//				settings.toBlock()));
-//
-//		YellowPages.load(FilenameUtils.concat(new File(".").getAbsolutePath(),
-//				webinf, EnvPath.replaceEnv($vol_home)));
-//
-//		Syngleton.defltScxt = new DATranscxt(cfg.sysconn);
-//		AppSettings.rebootdb(cfg, webinf, $vol_home, config_xml, settings.rootkey);
-//
-//		// updating configuration that's allowed to be re-configured at each time of booting
-//		AppSettings.updateOrgConfig(cfg, settings);
-
-		return createSyndoctierApp(settings, webinf, config_xml, f("%s/%s", $vol_home, "syntity.json"))
+		return createSyndoctierApp(settings, webinf, f("%s/%s", $vol_home, "syntity.json"))
 				.start(isNull(oe) ? () -> System.out : oe[0],
 					  !isNull(oe) && oe.length > 1 ? oe[1] : () -> System.err)
 				;
@@ -183,8 +146,7 @@ public class SampleApp {
 	 * @throws Exception
 	 */
 	public SampleApp(SampleSettings settings) throws Exception {
-		// syngleton = new Sampleton(cfg, settings);
-		syngleton = new Sampleton();
+		syngleton = new Sampleton(settings);
 	}
 
 	/**
@@ -194,19 +156,17 @@ public class SampleApp {
 	 * @throws Exception
 	 */
 	public static SampleApp createSyndoctierApp(SampleSettings settings,
-			String webinf, String config_xml, String syntity_json) throws Exception {
+			String webinf, String syntity_json) throws Exception {
 
-		SampleApp synapp = SampleApp.instanserver(webinf, settings, config_xml);
+		app = SampleApp.instanserver(settings);
 
 		Utils.logi("------------ Starting %s ... --------------", sample_name);
 	
-		// DBSynTransBuilder.synSemantics(new DATranscxt(sycon), sycon, synid, regists);
-
-		return registerPorts(synapp, settings.conn,
-				new AnSession(), new AnQuery(), new AnUpdate(),
-				new Echo(),
+		return registerPorts(app, settings.conn,
+				AnSession.init(Connects.defltConn()), new AnQuery(), new AnUpdate(),
+				new Echo(true),
 				new HeartLink())
-			.allowCors(synapp.schandler)
+			.allowCors(app.schandler)
 			;
 	}
 
@@ -239,7 +199,7 @@ public class SampleApp {
 	static public <T extends ServPort<? extends AnsonBody>> SampleApp registerPorts(
 			SampleApp synapp, String sysconn, T ... servports) throws Exception {
 
-        synapp.schandler = new ServletContextHandler(synapp.server, servpath);
+        synapp.schandler = new ServletContextHandler(synapp.server, f("/%s", servpath));
         for (T t : servports) {
         	synapp.registerServlets(synapp.schandler, t.trb(new DATranscxt(sysconn)));
         }
@@ -256,23 +216,11 @@ public class SampleApp {
 		
 		return this;
 	}
-//
-//	public SynotierJettyApp addServPort(ServPort<?> p) {
-//       	registerServlets(schandler, p);
-//       	return this;
-//	}
 
-	static SampleApp instanserver(String configPath, SampleSettings settings,
-			String config_xml) throws Exception {
-	
-	    // AnsonMsg.understandPorts(SynDocollPort.docoll);
-	
+	static SampleApp instanserver(SampleSettings settings) throws Exception {
 	    SampleApp synapp = new SampleApp(settings);
-
 		Sampleton.defltScxt = new DATranscxt(settings.conn);
-	
     	synapp.server = new Server(new InetSocketAddress("0.0.0.0", 8080));
-
 	    return synapp;
 	}
 
@@ -287,8 +235,12 @@ public class SampleApp {
 	}
 
 	public SampleApp print(String... msg) {
-		String qr = f("%s\n%s", sample_name, syngleton.settings.jserv());
+		String qr = f("%s\n%s", sample_name, jserv());
 		Utils.logi("%s\nSynode %s", _0(msg, ""), qr);
 		return this;
+	}
+
+	public static String jserv() {
+		return f("http://localhost:%s/%s", sampleton().settings.port, servpath);
 	}
 }
