@@ -31,7 +31,7 @@ import io.odysz.jsample.SampleSettings;
 import io.odysz.jsample.Sampleton;
 
 /**
- * @since 1.5.3
+ * @since 0.5.18
  */
 public class SampleApp {
 	private static final String servpath = "jserv-sample";
@@ -133,9 +133,7 @@ public class SampleApp {
 		Connects.init(webinf);
 		Sampleton.appName = ifnull(Configs.getCfg("app-name"), "Jserv Sample 1.5");
 
-		String $vol_home = "$" + settings.vol_name;
-
-		return createSyndoctierApp(settings, webinf, f("%s/%s", $vol_home, "syntity.json"))
+		return createSyndoctierApp(settings, webinf)
 				.start(isNull(oe) ? () -> System.out : oe[0],
 					  !isNull(oe) && oe.length > 1 ? oe[1] : () -> System.err)
 				;
@@ -150,13 +148,12 @@ public class SampleApp {
 	}
 
 	/**
-	 * Create an application instance working as a synode tier.
-	 * @param urlpath e. g. jserv-album
-	 * @param syntity_json e. g. $VOLUME_HOME/syntity.json
+	 * Create an application instance working as the web service.
+	 * @param urlpath 
 	 * @throws Exception
 	 */
 	public static SampleApp createSyndoctierApp(SampleSettings settings,
-			String webinf, String syntity_json) throws Exception {
+			String webinf) throws Exception {
 
 		app = SampleApp.instanserver(settings);
 
