@@ -4,10 +4,11 @@ import ReactDOM from 'react-dom';
 import { Protocol, AnsonResp, AnsonMsg, 
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
-import { Langstrs, AnContext, AnReactExt, 
+import { Langstrs, AnContext, AnContextType, AnReactExt, 
 	ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
 	ExternalHosts,
-	AnError
+	AnError,
+	jsample
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
@@ -78,6 +79,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.logout = this.logout.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
 		this.config.servId = props.servId;
 		// this.config.servs = props.servs;
@@ -144,6 +146,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	render() {
+		let that = this;
 		return (this.ssclient &&
 		  <AnContext.Provider value={{
 			  servId    : this.config.servId,
@@ -168,6 +171,8 @@ export class App extends CrudCompW<AlbumProps> {
 			<Sys msHideAppBar={0} tree={this.portfolioMenu} landingUrl={'/home'}
 				hideAppBar={this.props.clientOpts?.platform && this.props.clientOpts?.platform !== 'browser'}
 				sys={L('Portfolio 0.7')} menuTitle={L('Sys Menu')}
+				// myInfo={myInfoPanels}
+				onLogout={this.logout}
 				/>
 
 			{ this.state.hasError &&
@@ -198,9 +203,9 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({});
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
-	 * */
+	/**
+	 * For navigate to portal page, called by SysComp.onLogout.
+	 */
 	logout() {
 		let that = this;
 		// leaving
@@ -227,7 +232,7 @@ export class App extends CrudCompW<AlbumProps> {
 			if (app.context.anClient)
 				localStorage.setItem(SessionClient.ssInfo, null as any);
 			if (app.props.iwindow)
-				app.props.iwindow.location = app.context.iportal;
+				app.props.iwindow.location = that.props.iportal || "#";
 		}
 	}
 
