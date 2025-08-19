@@ -41,7 +41,6 @@ class Clients:
 
         return resp
 
-    @deprecated
     def signupLess(self, errCtx: OnError=None):
         '''
 		Testing, only for py3 client.
