@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "anclient.py3"
-version = "0.1.3"
+version = "0.1.4"
 description = "Semantic-jserv Python Client with bundled io.oz.* data"
 readme = "README.md"
 authors = [{name = "Ody Z", email = "odys.zhou@gmail.com"}]
