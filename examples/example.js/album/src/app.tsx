@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
+import { Protocol, AnsonResp, AnsonMsg, 
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
-import { Langstrs, AnContext, AnReactExt, 
-	JsonHosts, ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
+import { Langstrs, AnContext, AnContextType, AnReactExt, 
+	ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
 	ExternalHosts,
-	AnError
+	AnError,
+	jsample
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
-import { useTheme } from '@emotion/react';
 
 type AlbumProps = {
 	servs: ExternalHosts;
@@ -47,7 +47,7 @@ export class App extends CrudCompW<AlbumProps> {
 
 	config = {
 		/** json object specifying host's urls */
-		servs: {} as ExternalHosts,
+		// servs: {} as ExternalHosts,
 		/** the serv id for picking url */
 		servId: ''
 	};
@@ -79,10 +79,11 @@ export class App extends CrudCompW<AlbumProps> {
 
 		this.onError = this.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
+		this.logout = this.logout.bind(this);
 		this.error   = {onError: this.onError, msg: ''};
-		this.config.servId = this.props.servId;
-		this.config.servs = this.props.servs;
-		this.servs = this.props.servs;
+		this.config.servId = props.servId;
+		// this.config.servs = props.servs;
+		this.servs = props.servs;
 
 
 		// this.inclient = new Inseclient({urlRoot: this.servs.syndomx[this.props.servId]});
@@ -116,7 +117,8 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	login() {
-		let hosturl = this.config.servs.syndomx && this.config.servs.syndomx[this.config.servId] as string;
+		let hosturl = this.servs?.syndomx && this.servs.syndomx[this.config.servId] as string;
+
 		// for Synode 0.7.1, use syndomx[servId] as hosturl
 		if (this.servs.syndomx && hosturl && this.servs.syndomx.hasOwnProperty(hosturl)) {
 			hosturl = (this.servs.syndomx as any)[hosturl] || hosturl;
@@ -144,6 +146,7 @@ export class App extends CrudCompW<AlbumProps> {
 	}
 
 	render() {
+		let that = this;
 		return (this.ssclient &&
 		  <AnContext.Provider value={{
 			  servId    : this.config.servId,
@@ -168,6 +171,8 @@ export class App extends CrudCompW<AlbumProps> {
 			<Sys msHideAppBar={0} tree={this.portfolioMenu} landingUrl={'/home'}
 				hideAppBar={this.props.clientOpts?.platform && this.props.clientOpts?.platform !== 'browser'}
 				sys={L('Portfolio 0.7')} menuTitle={L('Sys Menu')}
+				// myInfo={myInfoPanels}
+				onLogout={this.logout}
 				/>
 
 			{ this.state.hasError &&
@@ -198,9 +203,9 @@ export class App extends CrudCompW<AlbumProps> {
 		this.setState({});
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
-	 * */
+	/**
+	 * For navigate to portal page, called by SysComp.onLogout.
+	 */
 	logout() {
 		let that = this;
 		// leaving
@@ -227,7 +232,7 @@ export class App extends CrudCompW<AlbumProps> {
 			if (app.context.anClient)
 				localStorage.setItem(SessionClient.ssInfo, null as any);
 			if (app.props.iwindow)
-				app.props.iwindow.location = app.context.iportal;
+				app.props.iwindow.location = that.props.iportal || "#";
 		}
 	}
 

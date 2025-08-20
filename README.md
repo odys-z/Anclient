@@ -12,17 +12,21 @@ is also been verified.
 
 together with
 
-[![npm](https://img.shields.io/npm/v/@anclient/anreact?logo=npm)](https://npmjs.org/package/@anclient/anreact)
-@anclient/anreact (and a VS Code plugin for HTML page editing [Anprism](https://github.dev/odys-z/Anclient/blob/master/js/anprism))
+[![npm](https://img.shields.io/npm/v/@anclient/semantier?logo=npm)](https://npmjs.org/package/@anclient/anreact)
+@anclient/anreact
 
 - Anclient.java
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
 Anclient for Java
 
+- Anclient.py3
+
+[![PyPI version](https://img.shields.io/pypi/v/anson.py3.svg)](https://pypi.org/project/anclient.py3/)anclient.py3
+
 # Repository Structure
 
-There are 3 clients in the solution:
+There are 3 active clients in the solution:
 
 - java
 
@@ -34,9 +38,13 @@ Ts client API depending on jquery. The test project is using React.
 
 Check js/test & examples/example.js for running tests and examples.
 
+- Python 3.9 above
+
+Python client, anclient.py3, available from PYPI.
+
 - c#
 
-published as nuget package (coming).
+published as nuget package (deprecated).
 
 # Examples
 

@@ -57,6 +57,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import io.odysz.anson.AnsonException;
 import io.odysz.common.DateFormat;
@@ -66,6 +67,7 @@ import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
@@ -245,7 +247,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
-//        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this), "AndroidInterface");
         reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 
@@ -401,11 +402,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             }
                         }))
                         .asyVideos(prfConfig.template(), list,
-                                (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
-                                        r, rx, total, (float) seq / total * 100),
+                                (r, rx, seq, total, rsp) -> {
+                                    showStatus(R.string.msg_templ_progress,
+                                            r, rx, total, (float) seq / total * 100);
+                                    return false;
+                                },
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes(resps);
+                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 (c, err, args) -> {
                                     if (c == AnsonMsg.MsgCode.ext) {
@@ -463,62 +467,65 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 }
                 else {
                     ((PhotoSyntier)clientext.tier
-                        .fileProvider(new IFileProvider() {
-                            // private String saveFolder;
-                            // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
-                            @Override
-                            public long meta(IFileDescriptor fd) throws IOException {
-                                if (fd == null || !(fd instanceof AndroidFile))
-                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
+                    .fileProvider(new IFileProvider() {
+                        // private String saveFolder;
+                        // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
+                        @Override
+                        public long meta(IFileDescriptor fd) throws IOException {
+                            if (fd == null || !(fd instanceof AndroidFile))
+                                throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
-                                AndroidFile f = (AndroidFile) fd;
-                                Uri returnUri = f.contentUri();
+                            AndroidFile f = (AndroidFile) fd;
+                            Uri returnUri = f.contentUri();
 
-                                try (Cursor returnCursor = getContentResolver()
-                                        .query(returnUri, null, null, null, null)) {
-                                    int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                                    int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                                    returnCursor.moveToFirst();
-                                    f.clientname(returnCursor.getString(nameIndex));
-                                    f.size = returnCursor.getLong(sizeIndex);
-                                    f.mime = getContentResolver().getType(returnUri);
+                            try (Cursor returnCursor = getContentResolver()
+                                    .query(returnUri, null, null, null, null)) {
+                                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                                returnCursor.moveToFirst();
+                                f.clientname(returnCursor.getString(nameIndex));
+                                f.size = returnCursor.getLong(sizeIndex);
+                                f.mime = getContentResolver().getType(returnUri);
 
-                                    Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
-                                    f.cdate(lastmodify);
+                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
+                                f.cdate(lastmodify);
 
-                                    if (isblank(f.folder()))
-                                        f.folder(DateFormat.formatYYmm(lastmodify));
-                                    return f.size;
-                                }
+                                if (isblank(f.folder()))
+                                    f.folder(DateFormat.formatYYmm(lastmodify));
+                                return f.size;
                             }
-                            // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
-                            @Override
-                            public InputStream open(IFileDescriptor p) throws FileNotFoundException {
-                                return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
-                            }
-                        }))
-                        .asyVideos(prfConfig.template(),
-                            paths,
-                            (r, rx, seq, total, rsp) -> showStatus(
+                        }
+                        // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
+                        @Override
+                        public InputStream open(IFileDescriptor p) throws FileNotFoundException {
+                            return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
+                        }
+                    }))
+                    .asyVideos(prfConfig.template(),
+                        paths,
+                        (rx, rs, seq, total, rsp) -> {
+                            showStatus(
                                     R.string.msg_templ_progress,
-                                    r, rx, total, (float) seq / total * 100),
-                            (resps) -> {
-                                    // clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes(resps);
-                                    showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
-                                    if (nums[0] > 0)
-                                        clearStatus();
-                            },
-                            (c, err, args) -> {
-                                if (c == AnsonMsg.MsgCode.ext) {
-                                    errCtx.prepare(msgv, R.string.msg_err_duplicate);
-                                    err(null, getString(R.string.msg_err_duplicate), args); // show it
-                                }
-                                else {
-                                    errCtx.prepare(msgv, R.string.msg_upload_failed);
-                                    err(null, getString(R.string.msg_upload_failed), args); // show it
-                                }
-                            });
+                                    rx, rs, total, (float) seq / total * 100);
+                            return false;
+                        },
+                        (resps) -> {
+                                // clearStatus();
+                                int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+                                showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
+                                if (nums[0] > 0)
+                                    clearStatus();
+                        },
+                        (c, err, args) -> {
+                            if (c == AnsonMsg.MsgCode.ext) {
+                                errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                err(null, getString(R.string.msg_err_duplicate), args); // show it
+                            }
+                            else {
+                                errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                err(null, getString(R.string.msg_upload_failed), args); // show it
+                            }
+                        });
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);

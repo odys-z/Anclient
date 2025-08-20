@@ -129,9 +129,9 @@ class App extends React.Component<Approps, any> {
 		this.setState({hasError: false})
 	}
 
-	/** For navigate to portal page
-	 * FIXME this should be done in SysComp, while firing goLogoutPage() instead.
-	 * */
+	/** 
+	 * For navigate to portal page, called by SysComp.onLogout.
+	 */
 	logout() {
 		let that = this;
 		// leaving

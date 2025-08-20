@@ -160,7 +160,7 @@ public class AlbumContext {
 
         Clients.init(jserv, verbose);
 
-		tier.asyLogin(uid, pswd, userInf.device,
+        tier.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
 				    client.openLink(sysuri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
@@ -211,7 +211,6 @@ public class AlbumContext {
         this.userInf.device(id);
         return this;
     }
-
 
     public AlbumContext devname(String name) {
         if (device == null)
