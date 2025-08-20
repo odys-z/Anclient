@@ -2,6 +2,9 @@ package io.odysz.jclient;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static io.odysz.common.Utils.turngreen;
+import static io.odysz.common.Utils.turnred;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +13,7 @@ import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -30,21 +34,33 @@ import io.odysz.semantic.jserv.R.AnQueryReq;
 import io.odysz.semantic.jserv.U.AnInsertReq;
 import io.odysz.semantic.jserv.U.AnUpdateReq;
 import io.odysz.semantic.jserv.echo.EchoReq;
+import io.odysz.semantic.jserv.echo.EchoReq.A;
 import io.odysz.semantics.x.SemanticException;
+import io.oz.jsample.SampleApp;
 
 /**
  * Unit test for sample App. 
  */
 public class AnsonClientTest {
-	private static String jserv = "http://localhost:8081/jserv-sample";
+	public static final String testUriClient = "test/anclient";
+	
+	private static String jserv = "http://localhost:8080/jserv-sample";
 	private static String pswd = "123456";
-	private static String filename = "res/Sun_Yat-sen_2.jpg";
+	private static String filename = "src/test/res/Sun_Yat-sen_2.jpg";
 	
 	private SessionClient client;
 	private static ErrorCtx errCtx;
 
+	static boolean[] can_quit = new boolean[] {false};
+	static Thread sampleApp;
+
 	@BeforeAll
-	public static void init() {
+	public static void init() throws InterruptedException {
+		turnred(can_quit);
+		sampleApp = SampleApp.startSampleServ(can_quit);
+		// jserv = SampleApp.sampleton().settings.jserv();
+		jserv = SampleApp.jserv();
+
 		Utils.printCaller(false);
 		// trigger factory registration, prevent error:
 		// io.odysz.anson.x.AnsonException: Invoking registered factory failed for value: session
@@ -59,6 +75,12 @@ public class AnsonClientTest {
     	};
     }
 
+	@AfterAll
+	public static void close() throws InterruptedException {
+		turngreen(can_quit);
+		sampleApp.join();
+	}
+
 	@Test
     public void queryTest() throws IOException,
     		SemanticException, SQLException, GeneralSecurityException, AnsonException {
@@ -66,7 +88,7 @@ public class AnsonClientTest {
 
     	String sys = "sys-sqlite";
     	
-    	client = Clients.login("ody", pswd);
+    	client = Clients.loginWithUri(testUriClient, "ody", pswd);
     	AnsonMsg<AnQueryReq> jreq = client.query(sys,
     			"a_users", "u",
     			-1, -1); // no paging
@@ -89,35 +111,9 @@ public class AnsonClientTest {
 				  String roleId = rs.getString("role");
 				  getEcho("admin", roleId);
 
-				  // function/semantics tests
 				  testUpload(client);
-				  // insert/load oracle reports
-				  // testORCL_Reports(client);
 			  }
 		}
-    	/* client.commit(jreq, (code, data) -> {
-				List<AnResultset> rses = (List<AnResultset>) data.rs();
-  				for (AnResultset rs : rses) {
-  					rs.printSomeData(true, 2, "uid", "uname", "role");
-  					rs.beforeFirst();
-  					while(rs.next()) {
-  						String uid0 = rs.getString("uid");
-  						assertEquals("admin", uid0);
-  								
-  						String roleId = rs.getString("role");
-  						getEcho("admin", roleId);
-
-  						// function/semantics tests
-  						testUpload(client);
-
-  						// insert/load oracle reports
-  						// testORCL_Reports(client);
-  					}
-  				}
-    		}, (code, err) -> {
-  				fail(err.msg());
-  				client.logout();
-    	}); */
     }
 
 	private void getEcho(String string, String roleId)
@@ -126,7 +122,7 @@ public class AnsonClientTest {
 			Utils.warn("getEcho() can only work with jsample");
 			Utils.warn(jserv);
 		}
-		EchoReq req = new EchoReq(null);
+		EchoReq req = (EchoReq) new EchoReq(null).a(A.echo);
 
 		String t = "menu";
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
@@ -169,7 +165,7 @@ public class AnsonClientTest {
 		jmsg.header(client.header());
 
 		AnsonResp resp = client.commit(jmsg, errCtx);
-		String aid = resp.resulvedata("a_attaches", "attId");
+		String aid = resp.resulvedata("a_attaches", "attId", 0);
 
 		assertTrue( Radix64.validate(aid) );
 	}

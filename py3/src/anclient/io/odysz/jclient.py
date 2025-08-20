@@ -6,7 +6,8 @@ import requests
 
 from src.io.odysz.semantics import SessionInf
 from src.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
-from src.io.odysz.semantic.jserv.echo import EchoReq, A
+from src.io.odysz.semantic.jserv.echo import EchoReq
+from src.io.odysz.semantic.jserv.signup import SingupReq
 
 
 class OnError(Protocol):
@@ -24,9 +25,12 @@ class Clients:
     """
 
     servRt = None
+    timeout = None
 
     @staticmethod
     def pingLess(funcUri: str, errCtx: OnError=None):
+        from src.io.odysz.semantic.jserv.echo import A
+
         req = EchoReq()
         req.a = A.echo
 
@@ -36,6 +40,29 @@ class Clients:
         resp = client.commit(jmsg, errCtx)
 
         return resp
+
+    def signupLess(self, errCtx: OnError=None):
+        '''
+		Testing, only for py3 client.
+        Easy to breach through into database.
+        :param errCtx:
+        :return:
+        '''
+        from src.io.odysz.semantic.jserv.signup import A
+        req = SingupReq()
+        req.a = A.singup
+
+        client = InsecureClient(Clients.servRt)
+        jmsg = client.userReq(funcUri, Port.singup, req)
+
+        resp = client.commit(jmsg, errCtx)
+
+        return resp
+
+    @classmethod
+    def init(cls, jserv: str, timeout: int=20):
+        cls.servRt = jserv
+        cls.timeout = timeout
 
 
 class SessionClient:
@@ -67,7 +94,8 @@ class SessionClient:
             print(req.toBlock(False))
             resp = requests.post(f'{self.myservRt}/{req.port.value}',
                                  proxies=self.proxies,
-                                 data=req.toBlock(False))
+                                 data=req.toBlock(False),
+                                 timeout=Clients.timeout)
             if resp.status_code == 200:
                 data = resp.json()  # If the response is JSON
                 return AnsonResp.from_envelope(data)

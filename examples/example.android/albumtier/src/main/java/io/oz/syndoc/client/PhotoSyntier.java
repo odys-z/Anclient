@@ -15,7 +15,6 @@ import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonHeader;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
-import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
@@ -110,10 +109,11 @@ public class PhotoSyntier extends Doclientier {
 
 	/**
 	 * Asynchronously query synchronizing records.
-	 * 
+	 * @param page buffer (for performance?)
 	 * @return this
 	 */
-	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files, PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files,
+			PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
@@ -151,7 +151,8 @@ public class PhotoSyntier extends Doclientier {
 		return this;
 	}
 
-	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr) throws IOException, SemanticException {
+	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr)
+			throws IOException, SemanticException {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
@@ -258,13 +259,13 @@ public class PhotoSyntier extends Doclientier {
 		return resp;
 	}
 	
-	public String download(String syname, ExpSyncDoc photo, String localpath)
-			throws SemanticException, AnsonException, IOException {
-		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
-		req.doc.recId = photo.recId;
-		req.a(A.download);
-		return client.download(synuri, Port.docstier, req, localpath);
-	}
+//	public String download(String syname, ExpSyncDoc photo, String localpath)
+//			throws SemanticException, AnsonException, IOException {
+//		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
+//		req.doc.recId = photo.recId;
+//		req.a(A.download);
+//		return client.download(synuri, Port.docstier, req, localpath);
+//	}
 
 //	public boolean isAbailable(String deviceId, String deviceName) throws IOException, SemanticException {
 //		String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
