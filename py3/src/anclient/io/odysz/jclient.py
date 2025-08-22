@@ -4,10 +4,10 @@ from typing import Protocol, Any, Optional
 
 import requests
 
-from src.io.odysz.semantics import SessionInf
-from src.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
-from src.io.odysz.semantic.jserv.echo import EchoReq
-from src.io.odysz.semantic.jserv.signup import SingupReq
+from semanticshare.io.odysz.semantics import SessionInf
+from semanticshare.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
+from semanticshare.io.odysz.semantic.jserv.echo import EchoReq
+from semanticshare.io.odysz.semantic.jserv.signup import SingupReq
 
 
 class OnError(Protocol):
@@ -29,7 +29,8 @@ class Clients:
 
     @staticmethod
     def pingLess(funcUri: str, errCtx: OnError=None):
-        from src.io.odysz.semantic.jserv.echo import A
+        # from src.io.odysz.semantic.jserv.echo import A
+        from semanticshare.io.odysz.semantic.jserv.echo import A
 
         req = EchoReq()
         req.a = A.echo
@@ -48,12 +49,13 @@ class Clients:
         :param errCtx:
         :return:
         '''
-        from src.io.odysz.semantic.jserv.signup import A
+        # from src.io.odysz.semantic.jserv.signup import A
+        from semanticshare.io.odysz.semantic.jserv.signup import A
         req = SingupReq()
         req.a = A.singup
 
         client = InsecureClient(Clients.servRt)
-        jmsg = client.userReq(funcUri, Port.singup, req)
+        jmsg = client.userReq("/py3/signup", Port.singup, req)
 
         resp = client.commit(jmsg, errCtx)
 
