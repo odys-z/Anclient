@@ -22,7 +22,7 @@ import io.oz.album.peer.AlbumPort;
 class AlbumContextTest {
 
 	@Test
-	void testLogin() throws SemanticException, AnsonException, IOException, InterruptedException {
+	void testLogin() throws AnsonException, InterruptedException {
 		String uri = "/test/ss-repack";
 		AlbumContext ctx = new AlbumContext()
 				.init("f/zsu", "syrskyi", "8964", "test", "http://localhost:8081");

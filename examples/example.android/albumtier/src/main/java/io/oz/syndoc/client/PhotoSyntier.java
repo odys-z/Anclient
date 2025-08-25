@@ -258,21 +258,4 @@ public class PhotoSyntier extends Doclientier {
 		}
 		return resp;
 	}
-	
-//	public String download(String syname, ExpSyncDoc photo, String localpath)
-//			throws SemanticException, AnsonException, IOException {
-//		DocsReq req = (DocsReq) new DocsReq(syname, uri).uri(synuri);
-//		req.doc.recId = photo.recId;
-//		req.a(A.download);
-//		return client.download(synuri, Port.docstier, req, localpath);
-//	}
-
-//	public boolean isAbailable(String deviceId, String deviceName) throws IOException, SemanticException {
-//		String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
-//		AnsonHeader header = client.header().act(act);
-//		AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, SynDocollPort.docoll, req)
-//				.header(header);
-//		AnsonResp resp = client.commit(q, errCtx);
-//		return resp != null;
-//	}
 }

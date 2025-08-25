@@ -69,28 +69,8 @@ public class Doclientier extends Semantier {
 	/** For download. */
 	protected String tempath;
 
-	/** Must be multiple of 12. Default 3 MiB */
-	// int blocksize = 3 * 1024 * 1024;
-
 	protected String synuri;
 	public String synuri() { return synuri; }
-
-	/**
-	 * Change default block size for performance. Default is 3 Mib.
-	 * 
-	 * @param s must be multiple of 12
-	 * @throws SemanticException
-	public void bloksize(int s) throws SemanticException {
-		if (s % 12 != 0)
-			throw new SemanticException("Block size must be multiple of 12.");
-		blocksize = s;
-	}
-	
-	public Doclientier blockSize(int size) {
-		blocksize = size;
-		return this;
-	}
-	 */
 	
 	IFileProvider fileProvider;
 	public Doclientier fileProvider(IFileProvider p) {
@@ -270,37 +250,6 @@ public class Doclientier extends Semantier {
 				} : docsOk[0],
 				errCtx);
 	}
-
-	/**
-	protected boolean verifyDel(ExpSyncDoc f, ExpDocTableMeta meta) {
-		String pth = tempath(f);
-		File file = new File(pth);
-		if (!file.exists())
-			return false;
-
-		long size = f.size;
-		long length = file.length();
-
-		if ( size == length ) {
-			// move temporary file
-			String targetPath = "";
-			if (verbose)
-				Utils.logi("   %s\n-> %s", pth, targetPath);
-			try {
-				Files.move(Paths.get(pth), Paths.get(targetPath), StandardCopyOption.ATOMIC_MOVE);
-			} catch (Throwable t) {
-				Utils.warn("Moving temporary file failed: %s\n->%s\n  %s\n  %s",
-							pth, targetPath, f.device(), f.fullpath());
-			}
-			return true;
-		}
-		else {
-			try { FileUtils.delete(new File(pth)); }
-			catch (Exception ex) {}
-			return false;
-		}
-	}
-	 */
 	
 	/**
 	 * [Synchronously]
@@ -667,45 +616,4 @@ public class Doclientier extends Semantier {
 
 		return resp;
 	}
-
-	/**
-	 * Implementing new device registering.
-	 * 
-	 * <pre>CREATE TABLE doc_devices (
-      synode0 varchar(12)  NOT NULL, -- initial node a device is registered
-      device  varchar(12)  NOT NULL, -- ak, generated when registering, but is used together with synode-0 for file identity.
-      devname varchar(256) NOT NULL, -- set by user, warn on duplicate, use old device id if user confirmed, otherwise generate a new one.
-      mac     varchar(512),          -- an anciliary identity for recognize a device if there are supporting ways to automatically find out a device mac
-      orgId   varchar(12)  NOT NULL, -- fk-del, usually won't happen
-      owner   varchar(12),           -- or current user, not permenatly bound
-      PRIMARY KEY (synode0, device)
-      ); -- registered device names. Name is set by user, prompt if he's device names are duplicated
-	 * </pre>
-	 * @return this
-	 * @throws IOException 
-	 * @throws AnsonException 
-	 * @throws SemanticException 
-	 * @since 0.2.0
-	public DocsResp registerDevice(DeviceTableMeta devm, String devname)
-			throws SemanticException, AnsonException, IOException {
-		String[] act = AnsonHeader.usrAct("synclient.java", "register", A.devices, Port.docstier.name());
-		AnsonHeader header = client.header().act(act);
-
-		// DocsReq req = (DocsReq) new DocsReq("doc_devices", synuri);
-		DocsReq req = (DocsReq) new DocsReq(devm.tbl, synuri);
-		req.pageInf = new PageInf(0, -1, devm.devname ,devname);
-		req.a(A.registDev);
-
-		AnsonMsg<DocsReq> q = client
-			.<DocsReq>userReq(synuri, Port.docstier, req)
-			.header(header);
-
-		return client.commit(q, errCtx);
-	}
-	
-	public String tempath(IFileDescriptor f) {
-		String clientpath = f.fullpath().replaceAll(":", "");
-		return EnvPath.decodeUri(tempath, f.device(), FilenameUtils.getName(clientpath));
-	}
-	 */
 }
