@@ -20,6 +20,8 @@ import io.odysz.common.Utils;
 import io.odysz.semantic.DATranscxt;
 import io.odysz.semantic.DA.Connects;
 import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jserv.ServPort;
 import io.odysz.semantic.jserv.R.AnQuery;
 import io.odysz.semantic.jserv.ServPort.PrintstreamProvider;
@@ -47,6 +49,9 @@ public class SampleApp {
 	public static Thread startSampleServ(boolean[] quit) throws InterruptedException {
 		boolean[] ready = new boolean[] {false};
 		turnred(ready);
+
+		JProtocol.setup("jserv-sample", Port.echo);
+
 		Thread t = new Thread(() -> {
 			app = _main(null);
 			turngreen(ready);
