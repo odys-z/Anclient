@@ -117,7 +117,7 @@ public class SampleApp {
 	}
 
 	/**
-	 * Expose locally
+	 * E.g. for a Synode, expose jservs locally.
 	 * @return this
 	 */
 	SampleApp afterboot(SampleSettings settings) {
