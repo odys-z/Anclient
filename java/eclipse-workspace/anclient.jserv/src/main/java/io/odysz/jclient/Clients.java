@@ -70,15 +70,16 @@ public class Clients {
 	 */
 	public static SessionClient login(String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
-		return new SessionClient(servRt, null).loginWithUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
+		return // new SessionClient(servRt, null).
+				loginWithUri(null, uid, pswdPlain, isNull(mac) ? null : mac[0]);
 	}
 
 	public static SessionClient loginWithUri(String clienturi, String uid, String pswd, String ... device)
 			throws SemanticException, AnsonException, SsException, IOException {
 		if (isblank(servRt))
 			throw new AnsonException(0, "The root path is empty. Call Clients#init(jserv) first.");
-		return new SessionClient(servRt, null)
-			.loginWithUri(clienturi, uid, pswd,
+		return // new SessionClient(servRt, null).
+				loginWithUri(clienturi, uid, pswd,
 						  isNull(device) ? null : device[0]);
 	}
 	
@@ -147,6 +148,19 @@ public class Clients {
 		return String.format("%s/%s", servRt, port.url());
 	}
 
+	/**
+	 * TODO implement based on
+	 * {@link HttpServClient#download206(String, AnsonMsg, long, java.nio.file.Path, io.odysz.semantic.jprotocol.JProtocol.OnProcess...)
+	 * download206()}
+	 * @deprecated cannot resume on breakpoint
+	 * @param port
+	 * @param req
+	 * @param localpath
+	 * @return localpath
+	 * @throws IOException
+	 * @throws AnsonException
+	 * @throws SemanticException
+	 */
 	public String download(IPort port, AnsonMsg<? extends DocsReq> req, String localpath)
 			throws IOException, AnsonException, SemanticException {
 		String url = servUrl(port);
@@ -172,7 +186,6 @@ public class Clients {
 		InsecureClient client = new InsecureClient(Clients.servRt);
 		AnsonMsg<? extends AnsonBody> jmsg = client.<EchoReq>userReq(funcUri, AnsonMsg.Port.echo, req);
 
-		// Anson.verbose = true;
 		AnsonResp resp = client.commit(jmsg, errCtx);
 
 		return resp;

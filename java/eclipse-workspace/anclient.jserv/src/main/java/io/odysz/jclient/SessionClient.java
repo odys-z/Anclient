@@ -70,7 +70,7 @@ public class SessionClient {
 	 * Session login response from server.
 	 * @param sessionInfo
 	 */
-	public SessionClient(final String jservRoot, SessionInf sessionInfo) {
+	SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 		if (isblank(this.myservRt))
@@ -83,7 +83,7 @@ public class SessionClient {
 	 * @param pswdPlain 
 	 * @throws SsException 
 	 */
-	public SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
+	SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
 		try {
 			myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 			if (isblank(this.myservRt))
@@ -116,7 +116,7 @@ public class SessionClient {
 	 * @throws SsException
 	 * @since 2.0.0
 	 */
-	public SessionClient loginWithUri(String uri, String uid, String pswdPlain, String... mac)
+	public static SessionClient loginWithUri(String servroot, String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
 		byte[] iv =   AESHelper.getRandom();
 		String iv64 = AESHelper.encode64(iv);
@@ -135,14 +135,15 @@ public class SessionClient {
 										.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
-		String url = servUrl(Port.session); 
+		String url = servUrl(servroot, Port.session); 
 
 		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
 		if (Clients.verbose)
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			SessionClient c = new SessionClient(myservRt, (AnSessionResp) resp.body(0), pswdPlain);
+			SessionClient c = new SessionClient(servroot, // myservRt,
+								(AnSessionResp) resp.body(0), pswdPlain);
 
 			if (mac != null && mac.length > 0)
 				c.ssInfo().device(mac[0]);
@@ -154,8 +155,8 @@ public class SessionClient {
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 
-	String servUrl(IPort p) {
-		return String.format("%s/%s", myservRt, p.url());
+	static String servUrl(String servrt, IPort p) {
+		return String.format("%s/%s", servrt, p.url());
 	}
 
 	/**
@@ -336,6 +337,7 @@ public class SessionClient {
 	 * @param onblock 
 	 * 
 	 * @return the local path
+	 * @since 0.5.18
 	 */
 	public <T extends DocsReq> Path download206(String synuri, String peerjserv, IPort port,
 			String localpath, DocRef doc, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
@@ -449,7 +451,7 @@ public class SessionClient {
 	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, OnError err)
 			throws SemanticException, IOException, AnsonException {
     	if (verbose) {
-    		Utils.logi(servUrl(req.port()));
+    		Utils.logi(servUrl(myservRt, req.port()));
     		Utils.logAnson(req);
     	}
     	
@@ -458,7 +460,7 @@ public class SessionClient {
     			"Since anclient.java 0.5, jserv 2.0.0, a non-empty a-tag is forced for session-required request.");
     	
     	HttpServClient httpClient = new HttpServClient();
-  		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(req.port()), req);
+  		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(myservRt, req.port()), req);
 
   		MsgCode code = resp.code();
 

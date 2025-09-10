@@ -222,7 +222,6 @@ public class HttpServClient {
  	public static Path download206(String urlport, AnsonMsg<? extends DocsReq> jreq, long startByte,
  			Path localpath, OnProcess ... progressCallback) throws IOException, AnsonException, TransException, SQLException {
 
- 		// URL url = new URL(f("%s?anson64=%s", urlport.toString(), AESHelper.encode64(jreq.toBlock().getBytes())));
  		URL url = new URL(f("%s?anson64=%s", urlport, escapeUrlParam(jreq)));
 		 
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();

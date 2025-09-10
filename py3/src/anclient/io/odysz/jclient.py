@@ -42,14 +42,28 @@ class Clients:
 
         return resp
 
-    def signupLess(self, errCtx: OnError=None):
+    @classmethod
+    def init(cls, jserv: str, timeout: int=20):
+        cls.servRt = jserv
+        cls.timeout = timeout
+
+    def loginWithUrl(self):
+        pass
+
+class SessionClient:
+    myservRt: str
+    ssInf: SessionInf
+    header: AnsonHeader
+
+    @staticmethod
+    def signupLess(errCtx: OnError = None):
         '''
-		Testing, only for py3 client.
+        Testing, only for py3 client.
         Easy to breach through into database.
         :param errCtx:
         :return:
         '''
-        # from src.io.odysz.semantic.jserv.signup import A
+
         from semanticshare.io.odysz.semantic.jserv.signup import A
         req = SingupReq()
         req.a = A.singup
@@ -61,20 +75,13 @@ class Clients:
 
         return resp
 
-    @classmethod
-    def init(cls, jserv: str, timeout: int=20):
-        cls.servRt = jserv
-        cls.timeout = timeout
-
-
-class SessionClient:
-    myservRt: str
-    ssInf: SessionInf
-    header: AnsonHeader
+    @staticmethod
+    def loginWithUri(servroot: str, uri: str, uid: str, pswdPlain: str, mac: str = None):
+        return SessionClient(servroot, SessionInf(uid, pswdPlain))
 
     def __init__(self, jserv: str, ssInf: SessionInf):
         self.proxies = {
-            "http": None,
+            "http" : None,
             "https": None,
         }
         '''
@@ -92,23 +99,32 @@ class SessionClient:
 
     def commit(self, req: AnsonMsg, err: OnError) ->Optional[AnsonResp]:
         try:
-            print(f'{self.myservRt}/{req.port.value}')
+            # print(f'{self.myservRt}/{req.port.value}')
+            url = f'{self.myservRt}/{req.port.value}'
             print(req.toBlock(False))
-            resp = requests.post(f'{self.myservRt}/{req.port.value}',
+            resp = requests.post(url=url,
                                  proxies=self.proxies,
                                  data=req.toBlock(False),
                                  timeout=Clients.timeout)
             if resp.status_code == 200:
                 data = resp.json()  # If the response is JSON
-                return AnsonResp.from_envelope(data)
+                env = AnsonResp.from_envelope(data)
+                if env.code != MsgCode.ok and env.code != MsgCode.ok.name:
+                    print(f"Error: {env.code}\n{env.Body().msg()}", file=stderr)
+                    err(env.code, env.Body().msg(), env)
+                    return None
+                else:
+                    return env.Body()
+
             else:
                 print(f"Error: {resp.status_code}", file=stderr)
                 res = f'{resp.status_code}\n{self.myservRt}\n{"" if req is None else req.toBlock()}'
-                err.err(MsgCode.exIo, res, resp.text)
+                err(MsgCode.exIo, res, resp.text)
                 return None
         except Exception as e:
             if err is not None:
-                err(MsgCode.exIo, e.message if hasattr(e, 'message') else str(e), None)
+                err(MsgCode.exIo, '[SessionClient.commit()] ' +
+                                  e.message if hasattr(e, 'message') else str(e), None)
             else:
                 raise e
 
