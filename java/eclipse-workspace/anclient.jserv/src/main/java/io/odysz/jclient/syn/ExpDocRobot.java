@@ -80,7 +80,7 @@ public class ExpDocRobot implements IUser {
 		public RobotMeta(String tbl, String conn) {
 			super(conn);
 
-			iv = "iv";
+//			iv = "iv";
 			device = "device";
 		}
 	}

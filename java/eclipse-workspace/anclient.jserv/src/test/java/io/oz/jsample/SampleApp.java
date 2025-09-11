@@ -100,7 +100,7 @@ public class SampleApp {
 			// E. g. -DWEB-INF=src/main/webapp/WEB-INF
 			String srcwebinf = ifnull(System.getProperty("WEB-INF"), webinf);
 
-			SampleSettings settings = SampleSettings.check(srcwebinf, "settings.json", true);
+			SampleSettings settings = SampleSettings.check(srcwebinf, "settings.json");
 
 			SampleApp app = boot(settings)
 					.afterboot(settings)

@@ -29,11 +29,9 @@ class Clients:
 
     @staticmethod
     def pingLess(funcUri: str, errCtx: OnError=None):
-        # from src.io.odysz.semantic.jserv.echo import A
-        from semanticshare.io.odysz.semantic.jserv.echo import A
 
         req = EchoReq()
-        req.a = A.echo
+        req.a = EchoReq.A.echo
 
         client = InsecureClient(Clients.servRt)
         jmsg = client.userReq(funcUri, Port.echo, req)
@@ -99,7 +97,6 @@ class SessionClient:
 
     def commit(self, req: AnsonMsg, err: OnError) ->Optional[AnsonResp]:
         try:
-            # print(f'{self.myservRt}/{req.port.value}')
             url = f'{self.myservRt}/{req.port.value}'
             print(req.toBlock(False))
             resp = requests.post(url=url,
