@@ -116,7 +116,12 @@ class SessionClient:
             else:
                 print(f"Error: {resp.status_code}", file=stderr)
                 res = f'{resp.status_code}\n{self.myservRt}\n{"" if req is None else req.toBlock()}'
-                err(MsgCode.exIo, res, resp.text)
+                try: err(MsgCode.exIo, res, resp.text)
+                except Exception as e:
+                    try:
+                        print("There are errors in error handler:", err)
+                        print(e)
+                    except: pass
                 return None
         except Exception as e:
             if err is not None:
