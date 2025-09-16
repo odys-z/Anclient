@@ -61,7 +61,7 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>jserv-sample</artifactId>
-	    <version>1.5.4</version>
+	    <version>1.5.5</version>
 	    <scope>test</scope>
 	</dependency>
 	    

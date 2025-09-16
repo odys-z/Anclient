@@ -79,7 +79,8 @@ public class Clients {
 		if (isblank(servRt))
 			throw new AnsonException(0, "The root path is empty. Call Clients#init(jserv) first.");
 		return // new SessionClient(servRt, null).
-				loginWithUri(clienturi, uid, pswd,
+				SessionClient.
+				loginWithUri(servRt, clienturi, uid, pswd,
 						  isNull(device) ? null : device[0]);
 	}
 	
