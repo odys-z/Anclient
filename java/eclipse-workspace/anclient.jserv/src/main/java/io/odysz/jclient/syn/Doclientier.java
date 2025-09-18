@@ -129,7 +129,6 @@ public class Doclientier extends Semantier {
 	 * @throws IOException
 	 * @throws TransException 
 	 * @throws SsException 
-	 */
 	public Doclientier login(String workerId, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
@@ -137,6 +136,7 @@ public class Doclientier extends Semantier {
 
 		return onLogin(client);
 	}
+	 */
 
 	/**
 	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
@@ -150,10 +150,11 @@ public class Doclientier extends Semantier {
 	 * @throws SsException
 	 * @throws IOException
 	 */
-	public Doclientier loginWithUri(String workerId, String device, String pswd)
+	public Doclientier loginWithUri(String jservrt, String workerId, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
-		client = Clients.loginWithUri(uri, workerId, pswd, device);
+		// client = Clients.loginWithUri(uri, workerId, pswd, device);
+		client = SessionClient.loginWithUri(jservrt, uri, workerId, pswd, device);
 
 		return onLogin(client);
 	}
