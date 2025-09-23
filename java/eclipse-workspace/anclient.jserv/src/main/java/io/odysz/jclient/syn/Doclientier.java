@@ -418,10 +418,11 @@ public class Doclientier extends Semantier {
 							//   \"reasons\": [\"Found existing file for device & client path.\",
 							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
 
-							exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
-							SemanticObject exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
 							String reasons = exmsg;
+							SemanticObject exp = null; 
 							try {
+								exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
+								exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
 								Object ress = exp.get("reasons");
 								reasons = ress == null ? null
 										: ress instanceof ArrayList<?> ? str((ArrayList<?>)ress)
@@ -429,9 +430,13 @@ public class Doclientier extends Semantier {
 										: ress.toString();
 							}
 							catch (Exception e) {
-								e.printStackTrace();
+								try {
+									Utils.warnT(new Object(){}, "\n[ERROR] Parsing exception message failed.\n%s\n%s",
+											e.getClass().getName(), e.getMessage());
+									Utils.warn("Message:\n%s", exmsg);
+								} catch (Exception x) {}
 							}
-							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp.get("code")));
+							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp == null ? MsgCode.exGeneral : exp.get("code")));
 						}
 						catch (Exception exx) {
 							errHandler.err(MsgCode.exGeneral, ex.getMessage(),
