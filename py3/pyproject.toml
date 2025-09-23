@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anclient.py3"
-version = "0.2.0"
+version = "0.2.1"
 description = "Semantic-jserv Python Client with bundled io.odysz.* data"
 readme = "README.md"
 license = { text = "Apache-2.0" }
