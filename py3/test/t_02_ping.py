@@ -20,8 +20,8 @@ class AnclientTest(unittest.TestCase):
         self.assertIsNotNone(resp)
 
         print(Clients.servRt, '<echo>', resp.toBlock())
-        self.assertEqual(type(resp.body[0]), AnsonResp)
-        self.assertEqual('ok', resp.code, resp.body[0].msg()) # TODO MsgCode.ok
+        self.assertEqual(type(resp), AnsonResp)
+        self.assertEqual(MsgCode.ok, resp.code, resp.msg()) # TODO MsgCode.ok
 
 
 if __name__ == '__main__':
