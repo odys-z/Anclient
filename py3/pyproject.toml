@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anclient.py3"
-version = "0.2.3"
+version = "0.2.4"
 description = "Semantic-jserv Python Client"
 readme = "README.md"
 license = { text = "Apache-2.0" }
