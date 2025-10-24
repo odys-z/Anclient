@@ -119,7 +119,7 @@ class SessionClient:
                 try: err(MsgCode.exIo, res, resp.text)
                 except Exception as e:
                     try:
-                        print("There are errors in error handler:", err)
+                        print("[ERROR!] There are errors in error handler:", err)
                         print(e)
                     except: pass
                 return None
