@@ -6,6 +6,8 @@
  */
 package io.oz.fpick.adapter;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.graphics.drawable.AnimationDrawable;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
@@ -80,7 +82,8 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
 
         //change itemview to mCbx
         holder.itemView.setOnClickListener(v -> {
-            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
             if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
                 return;
 
@@ -225,7 +228,8 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
             holder.mTvTitle.setLines(1);
         }
 
-        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
         if (file.isSelected()) {
 //            holder.icAlbum.setVisibility(View.INVISIBLE);
             // holder.mCbx.setSelected(true);

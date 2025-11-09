@@ -130,10 +130,9 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
 
     @Override
     protected void visualHolderx(ImagePickViewHolder holder, AndroidFile file) {
-//        if (isblank(file.shareflag))
-//            file.shareflag = ShareFlag.device.name();
 
-        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
 
         holder.cmd0.setVisibility(View.GONE);
         holder.vShadow.setVisibility(View.GONE);

@@ -2,6 +2,8 @@ package io.oz.fpick.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.view.LayoutInflater;
@@ -129,7 +131,8 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
         if (file == null) // shouldn't happen
             return;
 
-        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
         if ( file.isSelected ( ) ) {
             // not synced but selected
             // holder.mCbx.setSelected ( true );
@@ -229,7 +232,8 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
                 // .into ( holder.mIvThumbnail );
                 .into ( holder.glideThumb );
 
-            ShareFlag share = ShareFlag.valueOf(file.shareflag);
+            // ShareFlag share = ShareFlag.valueOf(file.shareflag());
+            ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
             if (ShareFlag.pushing == share) {
                 // holder.mCbx.setSelected ( false );
                 holder.vShadow.setVisibility(View.GONE);
