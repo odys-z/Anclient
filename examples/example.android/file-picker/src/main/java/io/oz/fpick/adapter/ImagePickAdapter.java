@@ -63,61 +63,6 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
         return imagePickViewHolder;
     }
 
-
-    /*
-    @Override
-    public void onBindViewHolder (@NonNull final ImagePickViewHolder holder , final int position ) {
-        if ( isNeedCamera && position == 0 ) {
-            setHolder0(holder);
-            return;
-        }
-
-        ImageFile file;
-        int fx = isNeedCamera ? position - 1 : position;
-        file = mList.get(fx);
-
-        setHolderx(holder, file);
-
-        Glide.with ( mContext )
-                .load ( file.fullpath() )
-                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.RESOURCE)
-                        .centerCrop()
-                        .error(R.drawable.vw_ic_synced))
-                .transition ( withCrossFade() )
-                .listener(glideListener)
-                .into (holder.vImage);
-
-        holder.vImage.setOnLongClickListener(
-               (View view) -> startMediaViewer(mContext, "image/*", file.fullpath()));
-
-        holder.vImage.setOnClickListener((View h) -> {
-            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
-            if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
-                return;
-
-            if ( !file.isSelected() && isUpToMax() ) {
-                ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
-            }
-            else {
-                boolean old = file.setSelected(!file.isSelected(), shareSetting);
-                if (old) {
-                    file.shareflag(null);
-                    mCurrentNumber--;
-                    mSelections.remove(file);
-                }
-                else {
-                    mSelections.add(file);
-                    mCurrentNumber++;
-                }
-                visualSelect(!old, holder);
-            }
-            mContext.onselect(file);
-        });
-
-        holder.setIsRecyclable ( true );
-    }
-     */
-
     @Override
     protected void visualHolder0(ImagePickViewHolder holder) {
         holder.cmd0.setVisibility ( View.VISIBLE );
@@ -177,17 +122,6 @@ public class ImagePickAdapter extends PickAdaptor<ImageFile, ImagePickAdapter.Im
             holder.vShadow.setVisibility ( View.INVISIBLE );
         }
     }
-
-//    RequestListener glideListener = new RequestListener() {
-//        @Override
-//        public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target target, boolean isFirstResource) {
-//            return false;
-//        }
-//        @Override
-//        public boolean onResourceReady(@NonNull Object resource, @NonNull Object model, Target target, @NonNull DataSource dataSource, boolean isFirstResource) {
-//            return false;
-//        }
-//    };
 
     @Override
     protected String mediaViewType() {

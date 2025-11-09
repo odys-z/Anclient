@@ -39,10 +39,6 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
         super(ctx, new ArrayList<>(), max);
     }
 
-//    public AudioPickAdapter(BaseActivity ctx, ArrayList<AndroidFile> list, boolean needCamera, int max) {
-//        super(ctx, list, max);
-//        isNeedCamera = needCamera;
-//    }
     public void onPlay(View v) {
         System.out.println("\n\nplay\n\n");
     }
@@ -108,107 +104,6 @@ public class AudioPickAdapter extends PickAdaptor<AudioFile, AudioPickAdapter.Au
 
         holder.setIsRecyclable(true);
     }
-
-    /*
-    @Override
-    public void onBindViewHolder(@NonNull AudioPickViewHolder holder, int position) {
-        final AudioFile file = mList.get(position);
-
-        holder.mTvTitle.setText(file.clientname());
-        holder.mTvTitle.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        if (holder.mTvTitle.getMeasuredWidth() >
-                Util.getScreenWidth(mContext) - Util.dip2px(mContext, 10 + 32 + 10 + 48 + 10 * 2)) {
-            holder.mTvTitle.setLines(2);
-        } else {
-            holder.mTvTitle.setLines(1);
-        }
-
-        ShareFlag share = ShareFlag.valueOf(file.shareflag);
-
-        holder.mTvDuration.setText(Util.getDurationString(file.getDuration()));
-        if (ShareFlag.prv == share) {
-            holder.mCbx.setSelected ( false );
-            holder.icAlbum.setVisibility(View.INVISIBLE);
-            holder.icSyncing.setVisibility(View.GONE);
-            holder.icSynced.setVisibility(View.VISIBLE);
-        }
-        else if (ShareFlag.publish == share) {
-            holder.mCbx.setSelected(true);
-            holder.icAlbum.setVisibility(View.INVISIBLE);
-            holder.icSyncing.setVisibility(View.GONE);
-            holder.icSynced.setVisibility(View.VISIBLE);
-        }
-        else if (file.isSelected()) {
-            holder.icAlbum.setVisibility(View.INVISIBLE);
-            holder.mCbx.setSelected(true);
-            holder.animation.setVisibility (View.VISIBLE);
-            holder.animation.setAlpha ( 1f );
-            AnimationDrawable animationDrawable = (AnimationDrawable) holder.animation.getBackground ( );
-            animationDrawable.start();
-        } else {
-            holder.mCbx.setSelected(false);
-            holder.icAlbum.setVisibility(View.GONE);
-            holder.animation.setVisibility (View.INVISIBLE);
-            holder.animation.setAlpha ( 0f );
-            holder.icSynced.setVisibility(View.INVISIBLE);
-        }
-
-        holder.itemView.setOnLongClickListener((View view) -> {
-            int index = isNeedCamera ? holder.getAbsoluteAdapterPosition() - 1 : holder.getAbsoluteAdapterPosition();
-            AudioFile f = mList.get(index);
-
-            MediaPlayer mp = new MediaPlayer();
-
-            try {
-                mp.setDataSource(f.fullpath());
-                mp.prepare();
-                mp.start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return true;
-        });
-
-        //change itemview to mCbx
-        holder.itemView.setOnClickListener(v -> {
-            int index = holder.getAbsoluteAdapterPosition();
-
-            if (!v.isSelected() && isUpToMax()) {
-                ToastUtil.getInstance(mContext).showToast(R.string.vw_up_to_max);
-                return;
-            }
-
-            ShareFlag sync = ShareFlag.valueOf( mList.get(index).shareflag );
-            if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
-                return;
-
-            if (holder.mCbx.isSelected()) {
-                holder.mCbx.setSelected(false);
-                mCurrentNumber--;
-                mList.get( index ).setSelected ( false, shareSetting );
-            } else {
-                holder.mCbx.setSelected(true);
-                mCurrentNumber++;
-                mList.get( index ).setSelected ( true, shareSetting );
-            }
-
-//            if (mListener != null) {
-//                mListener.onSelectStateChanged(
-//                        index,
-//                        holder.mCbx.isSelected(),
-//                        mList.get(holder.getAbsoluteAdapterPosition()),
-//                        holder.animation);
-//            }
-        });
-
-        holder.setIsRecyclable(true);
-    }
-
-    @Override
-    public int getItemCount() {
-        return isNeedCamera ? mList.size ( ) + 1 : mList.size ( );
-    }
-    */
 
     @Override
     protected String mediaViewType() { return null; }
