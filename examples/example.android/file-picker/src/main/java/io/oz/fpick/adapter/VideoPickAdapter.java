@@ -2,6 +2,8 @@ package io.oz.fpick.adapter;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
+import static io.odysz.common.LangExt.isblank;
+
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.view.LayoutInflater;
@@ -62,58 +64,6 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
         return videoViewHolder;
     }
 
-    /*
-    @Override
-    public void onBindViewHolder (@NonNull final VideoPickViewHolder holder , final int position ) {
-        if (isNeedCamera && position == 0) {
-            visualHolder0(holder);
-            return;
-        }
-
-        VideoFile file;
-        if (isNeedCamera)
-            file = mList.get ( position - 1 );
-        else
-            file = mList.get ( position );
-
-        visaulHolderx(holder, file);
-
-        RequestOptions options = new RequestOptions ( );
-        Glide.with ( mContext )
-             .load ( file.fullpath() )
-             .apply ( options.centerCrop() )
-             .transition ( withCrossFade() )
-             .into ( holder.mIvThumbnail );
-
-        holder.mIvThumbnail.setOnLongClickListener(
-                (View view) -> startMediaViewer(mContext, "video/*", file.fullpath()));
-
-        holder.mIvThumbnail.setOnClickListener((View h) -> {
-            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
-            if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
-                return;
-
-            if ( !file.isSelected() && isUpToMax() ) {
-                ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
-            }
-            else {
-                boolean old = file.setSelected(!file.isSelected(), shareSetting);
-                if (old) {
-                    file.shareflag(null);
-                    mCurrentNumber--;
-                    mSelections.remove(file);
-                }
-                else {
-                    mSelections.add(file);
-                    mCurrentNumber++;
-                }
-                visualSelect(!old, holder);
-            }
-            mContext.onselect(file);
-        });
-    }
-     */
-
     @Override
     protected void visualHolder0(VideoPickViewHolder holder) {
         holder.vAlbum.setVisibility ( View.VISIBLE );
@@ -129,7 +79,8 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
         if (file == null) // shouldn't happen
             return;
 
-        ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+        ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
         if ( file.isSelected ( ) ) {
             // not synced but selected
             // holder.mCbx.setSelected ( true );
@@ -229,7 +180,8 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
                 // .into ( holder.mIvThumbnail );
                 .into ( holder.glideThumb );
 
-            ShareFlag share = ShareFlag.valueOf(file.shareflag);
+            // ShareFlag share = ShareFlag.valueOf(file.shareflag());
+            ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
             if (ShareFlag.pushing == share) {
                 // holder.mCbx.setSelected ( false );
                 holder.vShadow.setVisibility(View.GONE);
@@ -281,28 +233,6 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
                 ShareFlag sync = ShareFlag.valueOf(mList.get(index).shareflag());
                 if (ShareFlag.publish == sync || ShareFlag.pushing == sync)
                     return;
-
-//                if ( !holder.mCbx.isSelected ( ) && isUpToMax ( ) ) {
-//                    ToastUtil.getInstance ( mContext ).showToast ( R.string.vw_up_to_max );
-//                    return;
-//                }
-
-//                if ( holder.vCbx.isSelected ( ) ) {
-//                    holder.mShadow.setVisibility ( View.GONE );
-//                    holder.mCbx.setSelected ( false );
-//                    mCurrentNumber--;
-//                    mList.get ( index ).setSelected ( false, shareSetting );
-//                }
-//                else {
-//                    holder.mShadow.setVisibility ( View.VISIBLE );
-//                    holder.mCbx.setSelected ( true );
-//                    mCurrentNumber++;
-//                    mList.get ( index ).setSelected ( true, shareSetting );
-//                }
-
-//                if ( mListener != null ) {
-//                    mListener.onSelectStateChanged( index , holder.mCbx.isSelected ( ) , mList.get ( index ) , holder.animation );
-//                }
             });
 
             holder.mDuration.setText(Util.getDurationString(file.getDuration()));
