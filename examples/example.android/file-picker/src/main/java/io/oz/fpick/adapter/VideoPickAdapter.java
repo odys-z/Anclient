@@ -149,7 +149,7 @@ public class VideoPickAdapter extends PickAdaptor<VideoFile, VideoPickAdapter.Vi
         }
     }
 
-    public void onBindViewHolder_del (@NonNull final VideoPickViewHolder holder , final int position ) {
+    private void onBindViewHolder_del (@NonNull final VideoPickViewHolder holder , final int position ) {
         if ( isNeedCamera && position == 0 ) {
             holder.vAlbum.setVisibility ( View.VISIBLE );
             holder.vSynced.setVisibility ( View.INVISIBLE );

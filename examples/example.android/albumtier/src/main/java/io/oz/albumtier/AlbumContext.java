@@ -127,17 +127,16 @@ public class AlbumContext {
         this.device.devname = f("%s[%s]", device, userInf.userName());
 
         jserv = jservroot;
-        // Clients.init(String.format("%s/%s", jservroot, jdocbase), false);
         Clients.init(jservroot, false);
 
         try {
             tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
                 @Override
                 public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
-                    try {
-                        msg = f("Error handler is null. Caught error: %s", f(msg, (Object[])args));
-                    }
-                    catch (Exception e) {}
+//                    try {
+//                        msg = f("Error handler is null. Caught error: %s", f(msg, (Object[])args));
+//                    }
+//                    catch (Exception e) {}
                     mustnonull(errCtx, msg);
 
                     errCtx.err(code, msg, args);
@@ -149,7 +148,7 @@ public class AlbumContext {
     }
 
     /**
-     * Call {@link PhotoSyntier#login(String, String, String)} to login.
+     * Call {@link PhotoSyntier#asyLogin(String, String, String, Clients.OnLogin, OnError)} to login.
      *
      * <p><b></b>Note:</b><br>
      * For Android client, don't call this directly. Call App's login instead.</p>
@@ -182,6 +181,7 @@ public class AlbumContext {
         if (state == ConnState.Disconnected)
             ; // how to notify?
         state = ConnState.Online;
+        ; // don't break here
     });
 
     OnError onLinkBroken = ((c, r, args) -> {
