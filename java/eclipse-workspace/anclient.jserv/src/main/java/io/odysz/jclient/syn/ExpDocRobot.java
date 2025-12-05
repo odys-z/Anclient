@@ -167,10 +167,6 @@ public class ExpDocRobot implements IUser {
 		return tempDir;
 	}
 
-//	public String defaultAlbum() {
-//		return "a-001";
-//	}
-
 	public SessionInf sessionInf() {
 		return new SessionInf().device(deviceId);
 	}
