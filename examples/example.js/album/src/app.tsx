@@ -253,7 +253,9 @@ export class App extends CrudCompW<AlbumProps> {
 		let portal = opts.portal ?? 'index.html';
 		let login  = opts.login ?? 'login.html';
 		let { aid, uid, pswd, clientOpts } = opts;
-		try { Langstrs.load('/res-vol/lang.json'); } catch (e) {}
+		try {
+			Langstrs.load('res-vol/lang.json',navigator.language);
+		} catch (e) {}
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: ExternalHosts) {

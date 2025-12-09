@@ -1,26 +1,5 @@
 import $ from 'jquery';
 
-/* experimental for next L function.
-const R_ = [
-  {
-	edit: 'a',
-	add: 'x',
-  },
-  {
-	edit: 'v',
-  }
-]
-
-class R {
-	/** jsdoc ... * /
-	static lang = 0;
-	static edit = R_[R.lang].edit;
-	static add  = R_[R.lang].add
-}
-
-R.lang;
-*/
-
 /**
  * 
  */
@@ -46,20 +25,24 @@ export const Langstrs = {
 	 * 
 	 * @param url relative json path
 	 */
-	load: function(url: string) {
+	load: function(url: string, usingLang?: string) {
 		$.ajax({
 			dataType: "json",
 			url,
 		})
 		.done( (json) => {
 			Object.assign(Langstrs.s, json);
-			Langstrs.using(json.using);
+			Langstrs.using(usingLang || json.using);
 		} )
 		.fail( (_e) => {
 			console.error("Loading language resource failed. Url: " + url);
 		} )
 	},
 
+	/**
+	 * Don't call this immediately after load, as load is async.
+	 * @param lang
+	 */
 	using: function (lang = 'en') {
 		Langstrs.lang = lang;
 		if (! (lang in Langstrs.s))
