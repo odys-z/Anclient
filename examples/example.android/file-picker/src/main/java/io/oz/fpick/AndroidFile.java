@@ -6,8 +6,8 @@
 
 package io.oz.fpick;
 
-import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.DateFormat.formatYYmm;
+import static io.odysz.common.LangExt.isblank;
 import static io.odysz.common.LangExt.mustnonull;
 
 import android.net.Uri;
@@ -17,15 +17,12 @@ import android.os.Parcelable;
 import com.vincent.filepicker.Util;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonField;
-import io.odysz.anson.x.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
 
 public class AndroidFile extends ExpSyncDoc implements Parcelable {

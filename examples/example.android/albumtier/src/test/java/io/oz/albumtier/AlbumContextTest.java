@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import io.odysz.anson.x.AnsonException;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.anson.AnsonException;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;

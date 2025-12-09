@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.Anson;
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.jclient.Clients;
 import io.odysz.jclient.tier.ErrorCtx;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -158,13 +158,9 @@ public class AlbumContext {
 	AlbumContext login(String uid, String pswd, Clients.OnLogin onOk, OnError onErr)
             throws AnsonException {
 
-    	/* 0.3.0 allowed
-        if (LangExt.isblank(userInf.device, "\\.", "/", "\\?", ":"))
-            throw new GeneralSecurityException("AlbumContext.photoUser.device Id is null. (call #init() first)");
-        */
         Clients.init(jserv, verbose);
 
-		tier.asyLogin(uid, pswd, userInf.device,
+        tier.asyLogin(uid, pswd, userInf.device,
                 (client) -> {
 				    state = ConnState.Online;
 				    client.openLink(sysuri, onHeartbeat, onLinkBroken, 19900); // 4 times failed in 3 min (FIXME too long)
@@ -215,7 +211,6 @@ public class AlbumContext {
         this.userInf.device(id);
         return this;
     }
-
 
     public AlbumContext devname(String name) {
         if (device == null)

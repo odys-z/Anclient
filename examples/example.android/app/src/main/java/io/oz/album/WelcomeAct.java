@@ -57,8 +57,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import io.odysz.anson.x.AnsonException;
+import io.odysz.anson.AnsonException;
 import io.odysz.common.DateFormat;
 import io.odysz.common.Utils;
 import io.odysz.jclient.SessionClient;
@@ -66,6 +67,7 @@ import io.odysz.jclient.syn.Doclientier;
 import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantic.tier.docs.ShareFlag;
@@ -102,8 +104,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
     TextView msgv;
     AndErrorCtx errCtx;
-//    private int originalWindowFlags;
-//    private int originalSystemUiVisibility;
     private boolean requiresFullscreen;
 
     @Override
@@ -120,9 +120,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);
 
-//        originalWindowFlags = getWindow().getAttributes().flags;
-//        originalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
-
         WebView wv = findViewById(R.id.wv_welcome);
         wv.addJavascriptInterface(new WebViewJavaScriptInterface(this, (String d) -> {
             if (bool(d)) {
@@ -136,18 +133,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                 if(this.getSupportActionBar() != null)
                     getSupportActionBar().hide();
-//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//
-//                // Ensure content is drawn behind system bars (optional, for immersive look)
-//                getWindow().getDecorView().setSystemUiVisibility(
-//                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Hide navigation bar
-//                                | View.SYSTEM_UI_FLAG_FULLSCREEN // Hide status bar
-//                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY // Immersive mode, bars auto-hide on swipe
-//                );
             }
             else {
                 requiresFullscreen = false;
@@ -160,9 +145,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                 if(this.getSupportActionBar() != null)
                     getSupportActionBar().show();
-//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                getWindow().setFlags(originalWindowFlags, originalWindowFlags);
-//                getWindow().getDecorView().setSystemUiVisibility(originalSystemUiVisibility);
             }
         }), "AndroidInterface");
 
@@ -239,21 +221,21 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         WindowManager.LayoutParams attrs = getWindow().getAttributes();
 
         if (!this.requiresFullscreen)
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(attrs);
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
 
-            findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
-            if(this.getSupportActionBar() != null)
-                getSupportActionBar().hide();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(attrs);
+                findViewById(R.id.bar_home_actions).setVisibility(View.GONE);
+                if(this.getSupportActionBar() != null)
+                    getSupportActionBar().hide();
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                getWindow().setAttributes(attrs);
 
-            findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
-            if(this.getSupportActionBar() != null)
-                this.getSupportActionBar().show();
-        }
+                findViewById(R.id.bar_home_actions).setVisibility(View.VISIBLE);
+                if(this.getSupportActionBar() != null)
+                    this.getSupportActionBar().show();
+            }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -265,7 +247,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
             return;
 
         WebView wv = findViewById(R.id.wv_welcome);
-//        wv.addJavascriptInterface(new WebViewJavaScriptInterface(this), "AndroidInterface");
         reloadWeb(clientext, wv, this, AssetHelper.Act_Album);
     }
 
@@ -288,8 +269,10 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         wv.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 if (!isblank(pswd)) {
-                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android'});",
-                                      client.ssInfo().uid(), pswd);
+                    String script = f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android', serv: '%s'});",
+                                    client.ssInfo().uid(), pswd,
+                                    AlbumApp.prfConfig.jservlist.entry());
+                                    // singl.profiles == null ? singl.synode : singl.profiles.servId);
                     Utils.warn("\n[Load page script]: %s", script);
                     // https://www.techyourchance.com/communication-webview-javascript-android/
                     wv.evaluateJavascript(script, null);
@@ -359,9 +342,6 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.menu_settings) {
             startPrefsAct();
             return true;
-//        } else if (id == R.id.menu_admin) {
-//            startHelpAct(AssetHelper.Act_Admin);
-//            return true;
         } else if (id == R.id.menu_help) {
             startHelpAct(AssetHelper.Act_Help);
             return true;
@@ -408,11 +388,9 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
 
                                     FileTime d = attr.creationTime();
                                     f.cdate(d);
-                                    // saveFolder = DateFormat.formatYYmm(d);
                                 } else {
                                     Date d = new Date(file.lastModified());
                                     f.cdate(d);
-                                    // saveFolder = DateFormat.formatYYmm(d);
                                 }
                                 return f.size;
                             }
@@ -424,11 +402,14 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                             }
                         }))
                         .asyVideos(prfConfig.template(), list,
-                                (r, rx, seq, total, rsp) -> showStatus(R.string.msg_templ_progress,
-                                        r, rx, total, (float) seq / total * 100),
+                                (r, rx, seq, total, rsp) -> {
+                                    showStatus(R.string.msg_templ_progress,
+                                            r, rx, total, (float) seq / total * 100);
+                                    return false;
+                                },
                                 (resps) -> {
                                     clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes(resps);
+                                    int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
                                     showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]); },
                                 (c, err, args) -> {
                                     if (c == AnsonMsg.MsgCode.ext) {
@@ -486,62 +467,65 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                 }
                 else {
                     ((PhotoSyntier)clientext.tier
-                        .fileProvider(new IFileProvider() {
-                            // private String saveFolder;
-                            // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
-                            @Override
-                            public long meta(IFileDescriptor fd) throws IOException {
-                                if (fd == null || !(fd instanceof AndroidFile))
-                                    throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
+                    .fileProvider(new IFileProvider() {
+                        // private String saveFolder;
+                        // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata
+                        @Override
+                        public long meta(IFileDescriptor fd) throws IOException {
+                            if (fd == null || !(fd instanceof AndroidFile))
+                                throw new IOException("Doc descriptor be a non-null AndroidFile instance.");
 
-                                AndroidFile f = (AndroidFile) fd;
-                                Uri returnUri = f.contentUri();
+                            AndroidFile f = (AndroidFile) fd;
+                            Uri returnUri = f.contentUri();
 
-                                try (Cursor returnCursor = getContentResolver()
-                                        .query(returnUri, null, null, null, null)) {
-                                    int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                                    int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-                                    returnCursor.moveToFirst();
-                                    f.clientname(returnCursor.getString(nameIndex));
-                                    f.size = returnCursor.getLong(sizeIndex);
-                                    f.mime = getContentResolver().getType(returnUri);
+                            try (Cursor returnCursor = getContentResolver()
+                                    .query(returnUri, null, null, null, null)) {
+                                int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                                int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+                                returnCursor.moveToFirst();
+                                f.clientname(returnCursor.getString(nameIndex));
+                                f.size = returnCursor.getLong(sizeIndex);
+                                f.mime = getContentResolver().getType(returnUri);
 
-                                    Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
-                                    f.cdate(lastmodify);
+                                Date lastmodify = new Date(DocumentFile.fromSingleUri(getApplicationContext(), returnUri).lastModified());
+                                f.cdate(lastmodify);
 
-                                    if (isblank(f.folder()))
-                                        f.folder(DateFormat.formatYYmm(lastmodify));
-                                    return f.size;
-                                }
+                                if (isblank(f.folder()))
+                                    f.folder(DateFormat.formatYYmm(lastmodify));
+                                return f.size;
                             }
-                            // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
-                            @Override
-                            public InputStream open(IFileDescriptor p) throws FileNotFoundException {
-                                return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
-                            }
-                        }))
-                        .asyVideos(prfConfig.template(),
-                            paths,
-                            (r, rx, seq, total, rsp) -> showStatus(
+                        }
+                        // https://developer.android.com/training/data-storage/shared/documents-files#input_stream
+                        @Override
+                        public InputStream open(IFileDescriptor p) throws FileNotFoundException {
+                            return getContentResolver().openInputStream(((AndroidFile) p).contentUri());
+                        }
+                    }))
+                    .asyVideos(prfConfig.template(),
+                        paths,
+                        (rx, rs, seq, total, rsp) -> {
+                            showStatus(
                                     R.string.msg_templ_progress,
-                                    r, rx, total, (float) seq / total * 100),
-                            (resps) -> {
-                                    // clearStatus();
-                                    int[] nums = Doclientier.parseErrorCodes(resps);
-                                    showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
-                                    if (nums[0] > 0)
-                                        clearStatus();
-                            },
-                            (c, err, args) -> {
-                                if (c == AnsonMsg.MsgCode.ext) {
-                                    errCtx.prepare(msgv, R.string.msg_err_duplicate);
-                                    err(null, getString(R.string.msg_err_duplicate), args); // show it
-                                }
-                                else {
-                                    errCtx.prepare(msgv, R.string.msg_upload_failed);
-                                    err(null, getString(R.string.msg_upload_failed), args); // show it
-                                }
-                            });
+                                    rx, rs, total, (float) seq / total * 100);
+                            return false;
+                        },
+                        (resps) -> {
+                                // clearStatus();
+                                int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
+                                showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
+                                if (nums[0] > 0)
+                                    clearStatus();
+                        },
+                        (c, err, args) -> {
+                            if (c == AnsonMsg.MsgCode.ext) {
+                                errCtx.prepare(msgv, R.string.msg_err_duplicate);
+                                err(null, getString(R.string.msg_err_duplicate), args); // show it
+                            }
+                            else {
+                                errCtx.prepare(msgv, R.string.msg_upload_failed);
+                                err(null, getString(R.string.msg_upload_failed), args); // show it
+                            }
+                        });
                 }
 
                 WebView wv = findViewById(R.id.wv_welcome);
@@ -558,14 +542,11 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         clearStatus();
 
         Intent intt = new Intent(this, act);
-        // intt.putExtra(IS_NEED_CAMERA, true);
         intt.putExtra(Constant.MAX_NUMBER, 99);
         intt.putExtra(IS_NEED_FOLDER_LIST, true);
         intt.putExtra(Constant.PickingMode,
                 clientext.state() == ConnState.Disconnected ?
                         PickingMode.disabled : PickingMode.limit99);
-
-        // prfConfig.using(act); // call target activity's getTemplate()
 
         prfConfig.currentTemplate = new ExpSyncDoc()
                 .share(clientext.userInf.uid(), ShareFlag.publish.name(), new Date())

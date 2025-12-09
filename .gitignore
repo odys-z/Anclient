@@ -9,3 +9,10 @@ release
 commit.comments*
 *.comments
 commit.*
+
+.idea
+__pycache__
+dist
+*.egg-info
+*.egg
+py3/src/anclient/data
