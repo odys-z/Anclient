@@ -1,0 +1,277 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.odys-z</groupId>
+  <artifactId>ipc-agent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>jserv-album Synode</name>
+  <url>https://odys-z.github.io</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	  <maven.compiler.source>17</maven.compiler.source>
+	  <maven.compiler.target>17</maven.compiler.target>
+	  <jetty.version>12.0.21</jetty.version>
+	  <jetty-ee8.version>12.0.21</jetty-ee8.version>
+  </properties>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+  	<connection>scm:git:git://github.com/odys-z/anclient.git</connection>
+  	<developerConnection>scm:git:odys-z@github.com:odys-z/anclient.git</developerConnection>
+  	<url>https://github.com/odys-z/anclient</url>
+  	<tag>HEAD</tag>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Ody Zhou</name>
+      <email>odys.zhou@gmail.com</email>
+      <organization>odys-z.github.io</organization>
+      <organizationUrl>https://odys-z.github.io</organizationUrl>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.9.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <!-- https://stackoverflow.com/a/66368511 -->
+      <groupId>org.eclipse.jetty.ee8</groupId>
+      <artifactId>jetty-ee8-webapp</artifactId>
+      <version>${jetty-ee8.version}</version>
+    </dependency>
+    
+	<dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+	  <version>${jetty.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.github.odys-z</groupId>
+      <artifactId>anclient.java</artifactId>
+	  <version>0.5.18</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>ipc-agent-${project.version}</finalName>
+    <!-- <pluginManagement>lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+    <plugins>
+     <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+      </plugin>
+      <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+      <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+      </plugin>
+      <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+      </plugin>
+      <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.1</version>
+      </plugin>
+      <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>3.2.2</version>
+      </plugin>
+      <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+      </plugin>
+
+
+   	  <plugin>
+	  	<artifactId>maven-deploy-plugin</artifactId>
+	  	<version>2.8.2</version>
+	  	<executions>
+	  		<execution>
+	  			<id>default-deploy</id>
+	  			<phase>deploy</phase>
+	  			<goals>
+	  				<goal>deploy</goal>
+	  			</goals>
+	  		</execution>
+	  	</executions>
+	  </plugin>
+
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-release-plugin</artifactId>
+		<version>2.5.3</version>
+		<configuration>
+			<localCheckout>true</localCheckout>
+			<pushChanges>false</pushChanges>
+			<mavenExecutorId>forked-path</mavenExecutorId>
+			<arguments>-Dgpg.passphrase=${gpg.passphrase}</arguments>
+		</configuration>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-provider-gitexe</artifactId>
+				<version>1.9.5</version>
+			</dependency>
+		</dependencies>
+	  </plugin>
+
+	  <plugin>
+		<groupId>org.sonatype.plugins</groupId>
+		<artifactId>nexus-staging-maven-plugin</artifactId>
+		<version>1.6.7</version>
+		<extensions>true</extensions>
+		<configuration>
+			<serverId>ossrh</serverId>
+			<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+			<autoReleaseAfterClose>true</autoReleaseAfterClose>
+		</configuration>
+	  </plugin>
+
+	  <!-- JavaDoc and source attachment -->
+	  <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-source-plugin</artifactId>
+	      <version>2.2.1</version>
+	      <executions>
+	        <execution>
+	          <id>attach-sources</id>
+	          <goals>
+	            <goal>jar-no-fork</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	  </plugin>
+
+	  <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-javadoc-plugin</artifactId>
+	      <version>3.4.0</version>
+	      <executions>
+	        <execution>
+	          <id>attach-javadocs</id>
+	          <goals>
+	            <goal>jar</goal>
+	          </goals>
+	        </execution>
+	      </executions>
+	      <configuration>
+	      	<failOnError>false</failOnError>
+	      	<!-- https://stackoverflow.com/a/48511911/7362888
+				https://maven.apache.org/plugins/maven-javadoc-plugin/javadoc-mojo.html
+	      	-->
+	      	<additionalJOption>-Xdoclint:none</additionalJOption>
+	      </configuration>
+	  </plugin>
+
+	  <plugin>
+		<!-- For troubleshooting like
+			[ERROR] Failed to execute goal org.apache.maven.plugins:
+			maven-compiler-plugin:3.7.0:compile (default-compile) on
+			project semantic.jserv: Compilation failure: Compilation failure...
+
+		  see https://dzone.com/articles/publish-your-artifacts-to-maven-central -->
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-gpg-plugin</artifactId>
+		<version>1.5</version>
+		<executions>
+			<execution>
+			  <id>semantics.transact</id>
+			  <phase>verify</phase>
+			  <goals>
+				<goal>sign</goal>
+			  </goals>
+			  <configuration>
+				<gpgArguments>
+				  <arg>--pinentry-mode</arg>
+				  <arg>loopback</arg>
+				</gpgArguments>
+		  	  </configuration>
+			</execution>
+		</executions>
+	  </plugin>
+    <!-- </plugins>
+  </pluginManagement>
+
+    <plugins> -->
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-shade-plugin</artifactId>
+		<version>3.2.2</version>
+		<executions>
+			<execution>
+				<phase>package</phase>
+				<goals>
+					<goal>shade</goal>
+				</goals>
+				<configuration>
+					<finalName>${project.artifactId}-${project.version}</finalName>
+				</configuration>
+			</execution>
+		</executions>
+		<configuration>
+			<filters>
+				<filter>
+					<artifact>*:*</artifact>
+					<excludes>
+						<exclude>META-INF/*.SF</exclude>
+						<exclude>META-INF/*.DSA</exclude>
+						<exclude>META-INF/*.RSA</exclude>
+					</excludes>
+				</filter>
+			</filters>
+
+			<transformers>
+				<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+					<mainClass>io.oz.anclient.ipcangent.AnclentApp</mainClass>
+				<!--
+					<mainClass>io.oz.album.helpers.AppEnvHelper</mainClass>
+				-->
+				</transformer>
+				<!--
+				<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+					<resource>WEB-INF/</resource>
+					<file>src/main/webapp/WEB-INF/*</file>
+				</transformer>
+				-->
+			</transformers>
+		</configuration>
+	  </plugin>
+    </plugins>
+
+    <resources>
+      <resource>
+        <directory>${project.basedir}/src/main/java</directory>
+        <includes>
+          <include>**/*.sqlite.ddl</include>
+          <include>**/*.txt</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+
+</project>
