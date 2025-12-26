@@ -4,7 +4,7 @@ let webpack = require('webpack')
 // v is used in js code?
 let v = 'development'; // "production" | "development" | "none"
 
-let version = "0.4.2";
+let version = "0.4.3";
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -18,7 +18,7 @@ module.exports = {
 		   },
 
 	output: {
-	  filename: "[name]-" + version + ".min.js",
+	  filename: "[name].min.js",
 	  path: path.resolve(__dirname, 'web-dist'),
 	  library: 'album',
 	  libraryTarget: 'umd'

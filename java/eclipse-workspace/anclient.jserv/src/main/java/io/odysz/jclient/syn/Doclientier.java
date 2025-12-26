@@ -116,29 +116,6 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
-	 * 
-	 * @deprecated use {@link #loginWithUri(String, String, String)} instead
-	 * 
-	 * @param workerId
-	 * @param device
-	 * @param pswd
-	 * @return this
-	 * @throws SemanticException 
-	 * @throws SQLException
-	 * @throws AnsonException
-	 * @throws IOException
-	 * @throws TransException 
-	 * @throws SsException 
-	public Doclientier login(String workerId, String device, String pswd)
-			throws SemanticException, AnsonException, SsException, IOException {
-
-		client = Clients.login(workerId, pswd, device);
-
-		return onLogin(client);
-	}
-	 */
-
-	/**
 	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
 	 * 
 	 * @param workerId
