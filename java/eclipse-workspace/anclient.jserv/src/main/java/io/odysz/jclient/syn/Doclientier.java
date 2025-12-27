@@ -61,7 +61,7 @@ public class Doclientier extends Semantier {
 
 	public SessionClient client;
 	
-	/** @since 2.0.0 changed to static */
+	/** @since 0.5.0 changed to static */
 	protected static ErrorCtx errCtx;
 
 	protected ExpDocRobot robt;
@@ -219,7 +219,7 @@ public class Doclientier extends Semantier {
 
 	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
 			OnProcess onProc, OnDocsOk... docsOk)
-			throws TransException, AnsonException, IOException, SQLException {
+			throws TransException, AnsonException, IOException {
 		return startPushs(
 				null, tabl, videos, onProc,
 				isNull(docsOk) ? new OnDocsOk() {
@@ -246,7 +246,7 @@ public class Doclientier extends Semantier {
 	 */
 	public List<DocsResp> startPushs(ExpSyncDoc template, String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
-				throws TransException, IOException, AnsonException, SQLException {
+				throws TransException, IOException, AnsonException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
 		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
@@ -272,10 +272,10 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws AnsonException 
 	 */
-	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
+	static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
-			throws TransException, IOException, AnsonException, SQLException {
+			throws TransException, IOException, AnsonException {
 
 		SessionInf ssinf = client.ssInfo();
 
@@ -563,7 +563,7 @@ public class Doclientier extends Semantier {
 		OnDocsOk follows = new OnDocsOk() {
 			@Override
 			public void ok(List<? extends AnsonResp> resps)
-					throws IOException, AnsonException, TransException, SQLException {
+					throws IOException, AnsonException, TransException {
 				follow.ok(isNull(resps) ? null : resps.get(0));
 			}
 		};
