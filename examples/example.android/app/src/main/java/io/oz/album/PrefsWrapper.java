@@ -55,7 +55,7 @@ public class PrefsWrapper extends Anson {
     /**
      * Options' template for an uploading doc's, such as share-flags, etc.
      */
-//    @AnsonField(ignoreFrom = true, ignoreTo = true)
+
     ExpSyncDoc currentTemplate;
 
     static public PrefsWrapper loadPrefs(Context ctx, SharedPreferences sharedPref, String... landingUrl) {

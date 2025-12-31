@@ -556,7 +556,7 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException
 	 */
 	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
-			throws TransException, IOException, SQLException {
+			throws TransException, IOException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
 		
