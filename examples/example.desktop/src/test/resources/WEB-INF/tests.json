@@ -1,3 +1,3 @@
 { "type"  : "io.oz.anclient.ipcagent.TestSettings",
-  "tester": "src/test/resources/ipc_visitor.exe" 
+  "qtclient": "src/test/qt/desktop_cli/build/Desktop-Debug/desktop_cli"
 }

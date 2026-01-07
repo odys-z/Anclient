@@ -4,6 +4,6 @@ import io.odysz.anson.Anson;
 
 public class TestSettings extends Anson {
 
-	String tester;
+	String qtclient;
 
 }

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.server.Server;
@@ -19,30 +21,28 @@ class AnclientAppTest {
 
 	static TestSettings testSettings;
 
-	static Server jettyserver;
+	static Server ipcserver;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		testSettings = Anson.fromPath("src/test/resources/tests.json");
-		jettyserver = WSAgent._main("src/test/resources/setting.json");
-        jettyserver.start();
-		startQt();
+		ipcserver = WSAgent._main("src/test/resources/setting.json");
+        ipcserver.start();
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-		closeQt();
-		jettyserver.stop();
-		jettyserver.join();
+		ipcserver.stop();
+		ipcserver.join();
 	}
 	
-	static void startQt() {
+	static void startQt(String qtmode, String m0, String m1) {
 		try {
 			// 1. Specify the absolute path to your Qt executable
-			String qtAppPath = testSettings.tester;
+			String qtAppPath = testSettings.qtclient;
 			
 			// 2. Configure the process
-			ProcessBuilder pb = new ProcessBuilder(qtAppPath);
+			ProcessBuilder pb = new ProcessBuilder(qtAppPath, qtmode, m0, m1);
 			
 			// Set the working directory to the folder containing the .exe
 			// This is critical for Qt apps to find their local .dlls or assets
@@ -63,6 +63,10 @@ class AnclientAppTest {
 		}
 	}
 	
+	static void byeQt() {
+		ipcserver.wsAgent().send("bye");
+	}
+	
 	static void closeQt() {
 		// 1. Attempt a graceful termination (SIGTERM on Linux/macOS, WM_CLOSE on Windows)
 		qt.destroy();
@@ -81,7 +85,14 @@ class AnclientAppTest {
 	
 	@Test
 	void test() {
-		fail("Not yet implemented");
+		String m0 = "send-me-0";
+		String m1 = "send-me-1";
+		startQt("junit-desktop", m0, m1);
+		byeQt();
+		closeQt();
+		
+		List<String> msgs = ipcserver.wsAgent().dumpSocketMessages();
+		
+		assertEquals(List.of(m0, m1), msgs);
 	}
-
 }
