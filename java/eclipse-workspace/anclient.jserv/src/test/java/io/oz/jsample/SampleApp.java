@@ -46,6 +46,7 @@ public class SampleApp {
 
 	public static SampleApp app;
 
+	@SuppressWarnings("deprecation")
 	public static Thread startSampleServ(boolean[] quit) throws InterruptedException {
 		boolean[] ready = new boolean[] {false};
 		turnred(ready);

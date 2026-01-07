@@ -98,7 +98,6 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
 		if (Clients.verbose) Utils.logi("[Clients.verbose] %s", url);
