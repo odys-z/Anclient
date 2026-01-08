@@ -2,17 +2,21 @@ package io.oz.anclient.ipcagent;
 
 import java.io.IOException;
 
-import org.eclipse.jetty.websocket.api.Session;
-
 import io.odysz.anson.AnsonException;
-import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
+import jakarta.websocket.Session;
 
-abstract public class IPCPort <T extends AnsonBody> {
+public interface IPCPort {
 
-	public abstract void onMessage(AnsonBody req, Session session)
-			throws SemanticException, AnsonException, SsException, IOException, TransException;
+	WSPort doclient = null;
+
+	public void onMessage(AnsonMsg<?> ansonMsg, Session session)
+			throws SemanticException, TransException, AnsonException, SsException, IOException;
+
+	public IPort port();
 
 }

@@ -11,4 +11,12 @@ public class AgentSettings extends SampleSettings {
 
 	public String[] tiers;
 
+	/**
+	 * Get the jserv to the target (current?) synode.
+	 * @return jserv
+	 */
+	public String synodeJserv() {
+		return null;
+	}
+
 }

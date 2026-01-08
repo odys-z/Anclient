@@ -4,12 +4,15 @@ import static io.odysz.common.LangExt._0;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.InetAccessHandler;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
-
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import io.odysz.anson.Anson;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 public class WSAgent {
+	public static final String ipc_path = "ipc";
+	public static AgentSettings settings;
+	
 	public static void main(String[] args) throws Exception {
 		Server server = _main("WEB-INF/settings.json");
         server.start();
@@ -17,38 +20,30 @@ public class WSAgent {
 	}
 
     public static Server _main(String... args) throws Exception {
-    	AgentSettings settings = Anson.fromPath(_0(args));
+    	settings = Anson.fromPath(_0(args));
 
         Server server = new Server(8080); // No setHost means it listens on all interfaces
 
-        // 1. Define your WebSocket logic
-        WebSocketHandler wsHandler = new WebSocketHandler() {
-            @Override
-            public void configure(WebSocketServletFactory factory) {
-                // factory.register(WSSocket.class);
-            	factory.setCreator((servletUpgradeRequest, servletUpgradeResponse)
-            						-> WSSocket.build(settings.tiers));
-            }
-        };
-        
-        /*
-         Google AI:
-         It's possible to bind multiple service on different url path, with 
-         org.eclipse.jetty.websocket : websocket-jetty-server : 12.0.x 
+        // 1. Create a ServletContextHandler (the EE8 container for your WebSocket)
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
 
-        WebSocketUpgradeHandler wsHandler = WebSocketUpgradeHandler.from(server, container -> {
-            // Path 1: /events
-            container.addMapping("/events", (req, resp) -> WSSocket.build(settings.tiers));
-            
-            // Path 2: /chat
-            container.addMapping("/chat", (req, resp) -> new OtherSocketImplementation());
-            
-            // Optional: Set global timeouts
-            container.setIdleTimeout(Duration.ofMinutes(5));
+        // 2. Configure the WebSocket Creator using the modern Initializer
+        JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
+            ServerEndpointConfig config = ServerEndpointConfig.Builder
+                    .create(WSSocket.class, "/" + ipc_path)
+                    .configurator(new ServerEndpointConfig.Configurator() {
+                        @SuppressWarnings("unchecked")
+						@Override
+                        public <T> T getEndpointInstance(Class<T> clazz) {
+                            return (T) WSSocket.build(settings);
+                        }
+                    })
+                    .build();
+            container.addEndpoint(config);
         });
-         */
-
-        // 2. Create the IP Whitelist Handler
+        
+        // 3. Create the IP Whitelist Handler
         InetAccessHandler ipHandler = new InetAccessHandler();
         
         ipHandler.include("127.0.0.1");
@@ -56,7 +51,7 @@ public class WSAgent {
         ipHandler.include("10.0.0.0/24");
 
         // 3. Chain them: IP Filter -> WebSocket Handler
-        ipHandler.setHandler(wsHandler);
+        ipHandler.setHandler(context);
         server.setHandler(ipHandler);
 
         return server;

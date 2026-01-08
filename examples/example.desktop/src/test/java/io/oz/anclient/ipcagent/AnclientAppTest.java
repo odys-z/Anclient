@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jetty.server.Server;
@@ -22,6 +23,10 @@ class AnclientAppTest {
 	static TestSettings testSettings;
 
 	static Server ipcserver;
+
+	
+	static CountDownLatch byelatch = new CountDownLatch(1);
+	static List<String> docsResponse = new ArrayList<String>();
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -62,9 +67,13 @@ class AnclientAppTest {
 			System.err.println("Failed to start Qt app: " + e.getMessage());
 		}
 	}
-	
-	static void byeQt() {
-		ipcserver.wsAgent().send("bye");
+
+	static void byeQt(String bye) throws InterruptedException {
+		WSSocket.instance().sendEnvelope(bye, (resp) -> {
+			docsResponse.add(resp.msg());
+			byelatch.countDown();
+		});
+		byelatch.await();
 	}
 	
 	static void closeQt() {
@@ -82,16 +91,17 @@ class AnclientAppTest {
 		    qt.destroyForcibly();
 		}
 	}
+
 	
 	@Test
-	void test() {
+	void test() throws InterruptedException {
 		String m0 = "send-me-0";
 		String m1 = "send-me-1";
-		startQt("junit-desktop", m0, m1);
-		byeQt();
-		closeQt();
+//		startQt("junit-desktop", m0, m1);
+//		byeQt("bye");
+//		closeQt();
 		
-		List<String> msgs = ipcserver.wsAgent().dumpSocketMessages();
+		List<String> msgs = docsResponse;
 		
 		assertEquals(List.of(m0, m1), msgs);
 	}

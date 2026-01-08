@@ -15,6 +15,7 @@
 	  <maven.compiler.source>17</maven.compiler.source>
 	  <maven.compiler.target>17</maven.compiler.target>
 	  <jetty.version>12.0.21</jetty.version>
+	  <jetty-socket.version>11.0.26</jetty-socket.version>
 	  <jetty-ee8.version>12.0.21</jetty-ee8.version>
   </properties>
 
@@ -49,6 +50,8 @@
       <scope>test</scope>
     </dependency>
 
+	<!-- 
+	-->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -57,10 +60,9 @@
     </dependency>
 
     <dependency>
-      <!-- https://stackoverflow.com/a/66368511 -->
-      <groupId>org.eclipse.jetty.ee8</groupId>
-      <artifactId>jetty-ee8-webapp</artifactId>
-      <version>${jetty-ee8.version}</version>
+        <groupId>org.eclipse.jetty.ee10</groupId>
+        <artifactId>jetty-ee10-servlet</artifactId>
+        <version>${jetty.version}</version>
     </dependency>
     
 	<dependency>
@@ -70,27 +72,52 @@
     </dependency>
     
     <dependency>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-api</artifactId>
+        <version>2.1.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+        <version>${jetty.version}</version>
+    </dependency>
+
+	<!-- redundent to jett ee10 websocket 
+	<dependency>
+		<groupId>jakarta.websocket</groupId>
+		<artifactId>jakarta.websocket-client-api</artifactId>
+		<version>2.1.1</version>
+		<scope>test</scope>
+	</dependency>
+	-->
+
+	<!--  This way the output stream is accessable
+	<!- - 1. The Jakarta WebSocket API (2.1.1 or 2.2.0 for 2026) - ->
+    <dependency>
+        <groupId>jakarta.websocket</groupId>
+        <artifactId>jakarta.websocket-api</artifactId>
+        <version>2.1.1</version>
+    </dependency>
+
+    <!- - 2. Jetty EE10 Jakarta WebSocket Server Implementation - ->
+    <dependency>
+        <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+        <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+        <version>12.0.31</version>
+    </dependency>
+    -->
+
+    <dependency>
       <groupId>io.github.odys-z</groupId>
       <artifactId>anclient.java</artifactId>
-	  <version>0.5.18</version>
+	  <version>[0.5.19,)</version>
     </dependency>
     
-    <dependency>
-		<groupId>org.eclipse.jetty</groupId>
-		<artifactId>jetty-server</artifactId>
-		<version>9.4.58.v20250814</version>
-	</dependency>
-    
-	<dependency>
-		<groupId>org.eclipse.jetty.websocket</groupId>
-		<artifactId>websocket-server</artifactId>
-		<version>[9.4.58.v20250814,)</version>
-	</dependency>
-
    	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>jserv-sample</artifactId>
-	    <version>[1.5.6,)</version>
+	    <version>[1.5.7,)</version>
 	</dependency>
   </dependencies>
 

@@ -6,4 +6,6 @@ public class TestSettings extends Anson {
 
 	String qtclient;
 
+	int ipc_port;
+
 }
