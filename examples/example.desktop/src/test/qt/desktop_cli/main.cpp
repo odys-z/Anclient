@@ -7,6 +7,9 @@
 #include <thread>
 #include <iostream>
 
+#include <glaze/glaze.hpp>
+#include "io/oz/anclient/ipcagent.hpp"
+
 #define NL "\n"
 
 using namespace std;
@@ -24,7 +27,9 @@ int main(int argc, char *argv[])
     // ... inside a function or slot
     qDebug() << "Desktop-cli current directory:" << QDir::currentPath();
 
-    if (string_view(argv[0]) != "junit-desktop") {
+    if (string_view(argv[1]) != "junit-desktop") {
+        qDebug() << "== Stand Alone Desktop" << argv[1] << "===";
+
         QProcess myProcess = QProcess();
         const QString program = "java";
         QStringList arguments;
@@ -77,7 +82,8 @@ int main(int argc, char *argv[])
     });
 
     // Match the Java servlet path /ws/
-    socket.open(QUrl("ws://localhost:8080/ws/"));
+    // socket.open(QUrl("ws://localhost:8080/ws/"));
+    TestSettings settings;
 
     return a.exec();
 }

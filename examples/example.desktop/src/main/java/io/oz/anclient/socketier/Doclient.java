@@ -19,6 +19,7 @@ import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCPort;
 import io.oz.anclient.ipcagent.WSAgent;
 import io.oz.anclient.ipcagent.WSPort;
+import io.oz.anclient.ipcagent.WSSocket;
 import jakarta.websocket.Session;
 
 public class Doclient implements IPCPort {
@@ -30,6 +31,12 @@ public class Doclient implements IPCPort {
 	}
 	
 	Doclientier doctier;
+
+	final WSSocket socket;
+
+	public Doclient(WSSocket wsSocket) {
+		socket = wsSocket;
+	}
 
 	@Override
 	public void onMessage(AnsonMsg<?> msg, Session session)

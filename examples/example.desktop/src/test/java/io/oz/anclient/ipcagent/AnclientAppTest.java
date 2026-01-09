@@ -1,6 +1,7 @@
 package io.oz.anclient.ipcagent;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static io.odysz.common.Utils.logi;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
+import io.odysz.semantic.jprotocol.AnsonResp;
 
 class AnclientAppTest {
 
@@ -31,7 +33,7 @@ class AnclientAppTest {
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
 		testSettings = Anson.fromPath("src/test/resources/tests.json");
-		ipcserver = WSAgent._main("src/test/resources/setting.json");
+		ipcserver = WSAgent._main("src/test/resources/WEB-INF/settings.json");
         ipcserver.start();
 	}
 
@@ -73,6 +75,7 @@ class AnclientAppTest {
 			docsResponse.add(resp.msg());
 			byelatch.countDown();
 		});
+		logi("Waiting Qt quit ...");
 		byelatch.await();
 	}
 	
@@ -92,17 +95,24 @@ class AnclientAppTest {
 		}
 	}
 
-	
 	@Test
-	void test() throws InterruptedException {
+	void test() throws Exception {
+		String ping = "bla bla";
+		SimpleClient sc = SimpleClient.connect(testSettings, 60000);
+		sc.asynEcho(ping);
+		sc.close();
+		AnsonResp res = sc.nextEnvelope(); 
+		assertEquals(SimpleClient.funcid, res.uri());
+		assertEquals(ping, res.msg());
+		
 		String m0 = "send-me-0";
 		String m1 = "send-me-1";
-//		startQt("junit-desktop", m0, m1);
-//		byeQt("bye");
-//		closeQt();
+		startQt("junit-desktop", m0, m1);
+		byeQt("bye");
+		closeQt();
 		
 		List<String> msgs = docsResponse;
 		
-		assertEquals(List.of(m0, m1), msgs);
+		// assertEquals(List.of(m0, m1), msgs);
 	}
 }

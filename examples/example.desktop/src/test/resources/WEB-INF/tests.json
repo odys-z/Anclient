@@ -1,4 +1,0 @@
-{ "type"  : "io.oz.anclient.ipcagent.TestSettings",
-  "qtclient": "src/test/qt/desktop_cli/build/Desktop-Debug/desktop_cli",
-  "ipc_port": 8700
-}

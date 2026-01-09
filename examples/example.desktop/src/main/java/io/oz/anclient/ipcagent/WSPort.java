@@ -12,14 +12,14 @@ import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantics.x.SemanticException;
 
 public enum WSPort implements IPort {
-	doclient("doclient.agent"), configIPC("config.agent");
+	doclient("doclient.ws"), configIPC("config.ws"), echo("echo.ws");
 
-	static {
-		JSONAnsonListener.registFactory(WSPort.class, 
-			(s) -> {
-				return WSPort.valueOf(s);
-			});
-	}
+//	static {
+//		JSONAnsonListener.registFactory(IPort.class, 
+//			(s) -> {
+//				return WSPort.valueOf(s);
+//			});
+//	}
 	
 	private String url;
 	WSPort(String v) { url = v; };
@@ -27,7 +27,7 @@ public enum WSPort implements IPort {
 	@Override
 	public IPort valof(String pname) throws SemanticException {
 		try {
-			return Port.valueOf(pname);
+			return WSPort.valueOf(pname);
 		} catch (Exception e) {
 			try { return valueOf(pname); }
 			catch (IllegalArgumentException ex) {

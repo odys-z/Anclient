@@ -15,7 +15,7 @@ public interface IPCPort {
 	WSPort doclient = null;
 
 	public void onMessage(AnsonMsg<?> ansonMsg, Session session)
-			throws SemanticException, TransException, AnsonException, SsException, IOException;
+			throws IPCException, SemanticException, TransException, AnsonException, SsException, IOException;
 
 	public IPort port();
 

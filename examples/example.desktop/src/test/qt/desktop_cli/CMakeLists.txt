@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
@@ -17,10 +17,19 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core WebSockets)
 
 add_executable(desktop_cli
   main.cpp
+  io/oz/anclient/ipcagent.hpp
 )
-target_link_libraries(
-    desktop_cli Qt${QT_VERSION_MAJOR}::Core
+
+include(FetchContent)
+FetchContent_Declare(glaze GIT_REPOSITORY https://github.com/stephenberry/glaze.git GIT_TAG main)
+FetchContent_MakeAvailable(glaze)
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE glaze::glaze)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
     Qt6::WebSockets
+    glaze::glaze
 )
 
 include(GNUInstallDirs)
@@ -28,3 +37,5 @@ install(TARGETS desktop_cli
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+

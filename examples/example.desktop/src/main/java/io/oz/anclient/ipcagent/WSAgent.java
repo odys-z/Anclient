@@ -2,11 +2,14 @@ package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt._0;
 
+import java.util.Map;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.InetAccessHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import io.odysz.anson.Anson;
+import io.odysz.semantic.jprotocol.JProtocol;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 public class WSAgent {
@@ -20,9 +23,11 @@ public class WSAgent {
 	}
 
     public static Server _main(String... args) throws Exception {
+    	JProtocol.setup(ipc_path, WSPort.echo);
+
     	settings = Anson.fromPath(_0(args));
 
-        Server server = new Server(8080); // No setHost means it listens on all interfaces
+        Server server = new Server(settings.wsport); // No setHost means it listens on all interfaces
 
         // 1. Create a ServletContextHandler (the EE8 container for your WebSocket)
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -40,6 +45,8 @@ public class WSAgent {
                         }
                     })
                     .build();
+            Map<String, Object> userProps = config.getUserProperties();
+            userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
             container.addEndpoint(config);
         });
         

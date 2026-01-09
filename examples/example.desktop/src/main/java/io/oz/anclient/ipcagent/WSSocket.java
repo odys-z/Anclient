@@ -4,6 +4,7 @@ import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.mustnonull;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
@@ -17,14 +18,17 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.transact.x.TransException;
-import io.oz.anclient.socketier.Doclient;
+import io.oz.anclient.socketier.T_Doclient;
+import io.oz.anclient.socketier.WSEcho;
+import jakarta.websocket.CloseReason;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
-//@ServerEndpoint(value = "/ipc")
+@ServerEndpoint(value = "/" + WSAgent.ipc_path)
 public class WSSocket {
 
     static WSSocket instance;
@@ -42,9 +46,13 @@ public class WSSocket {
 
 	public WSSocket(String[] tiernames) {
 		ipcPorts = new HashMap<IPort, IPCPort>(tiernames.length);
-		Doclient p = new Doclient();
+
+		T_Doclient p = new T_Doclient(this);
 		ipcPorts.put(p.port(), p);
 		
+		WSEcho e = new WSEcho(this);
+		ipcPorts.put(e.port(), e);
+
 		sessions = new HashMap<String, Session>();
 	}
 
@@ -125,15 +133,25 @@ public class WSSocket {
 	 */
 	protected void write(Session resp, AnsonMsg<? extends AnsonResp> msg, JsonOpt... opts) {
 		try {
-			if (msg != null)
-				msg.toBlock(resp.getBasicRemote().getSendStream(), opts);
+			if (msg != null) {
+				try (OutputStream o = resp.getBasicRemote().getSendStream()) {
+					msg.toBlock(o, opts);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+	public <U extends AnsonResp> AnsonMsg<U> ok(Session session, IPort p, U body) {
+		AnsonMsg<U> msg = new AnsonMsg<U>(p, MsgCode.ok);
+		msg.body(body);
+		write(session, msg);
+		return msg;
+	}
 	
     @OnClose
-    public void onClose(int statusCode, String reason) {
+    public void onClose(CloseReason reason) {
         System.out.println("Closed: " + reason);
     }
 
