@@ -18,6 +18,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core WebSockets)
 add_executable(desktop_cli
   main.cpp
   io/oz/anclient/ipcagent.hpp
+  io/odysz/semantics.hpp
+  io/odysz/anson.hpp
+  io/odysz/glaze.hpp
 )
 
 include(FetchContent)
@@ -31,6 +34,9 @@ target_link_libraries(${PROJECT_NAME}
     Qt6::WebSockets
     glaze::glaze
 )
+
+# Should be handled in anson.cmake
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(GNUInstallDirs)
 install(TARGETS desktop_cli

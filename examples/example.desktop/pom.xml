@@ -6,8 +6,8 @@
   <groupId>io.github.odys-z</groupId>
   <artifactId>ws-agent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-
-  <name>jserv-album Synode</name>
+  <packaging>jar</packaging>
+  <name>Anclient.java Agent</name>
   <url>https://odys-z.github.io</url>
 
   <properties>
@@ -298,10 +298,7 @@
 
 			<transformers>
 				<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-					<mainClass>io.oz.anclient.ipcangent.AnclentApp</mainClass>
-				<!--
-					<mainClass>io.oz.album.helpers.AppEnvHelper</mainClass>
-				-->
+					<mainClass>io.oz.anclient.ipcagent.WSAgent</mainClass>
 				</transformer>
 				<!--
 				<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">

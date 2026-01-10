@@ -107,7 +107,8 @@ public class SimpleClient {
 		container.setDefaultMaxSessionIdleTimeout(timout); 
 
 		// String uri = "ws://localhost:8080/ipc"; // Matches your Jetty server endpoint
-		String uri = f("ws://127.0.0.1:%d/%s", testtings.ipc_port, WSAgent.ipc_path);
+		// String uri = f("ws://127.0.0.1:%d/%s", testtings.ipc_port, WSAgent.ipc_path);
+		String uri = testtings.wsUri();
 
 		// Connects the endpoint class to the URI
 		mustnonull(testtings.ipc_session);

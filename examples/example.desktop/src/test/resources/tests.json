@@ -1,4 +1,6 @@
 { "type"       : "io.oz.anclient.ipcagent.TestSettings",
+  "agent_jar"  : "target/ws-agent-0.0.1-SNAPSHOT.jar",
+  "agent_json" : "src/test/resources/WEB-INF/settings.json",
   "qtclient"   : "src/test/qt/desktop_cli/build/Desktop-Debug/desktop_cli",
   "ipc_port"   : 8700,
   "ipc_session": {"ssid": "test", "uid": "test"}

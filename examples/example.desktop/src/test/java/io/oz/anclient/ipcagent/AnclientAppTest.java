@@ -19,21 +19,24 @@ import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.AnsonResp;
 
 class AnclientAppTest {
+	static final String test_json = "src/test/resources/tests.json";
 
 	static Process qt;
 
 	static TestSettings testSettings;
 
 	static Server ipcserver;
-
 	
 	static CountDownLatch byelatch = new CountDownLatch(1);
 	static List<String> docsResponse = new ArrayList<String>();
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		testSettings = Anson.fromPath("src/test/resources/tests.json");
-		ipcserver = WSAgent._main("src/test/resources/WEB-INF/settings.json");
+		testSettings = Anson.fromPath(test_json);
+		// ipcserver = WSAgent._main("src/test/resources/WEB-INF/settings.json");
+		logi(test_json);
+		logi(testSettings.agent_json);
+		ipcserver = WSAgent._main(testSettings.agent_json);
         ipcserver.start();
 	}
 
@@ -49,7 +52,7 @@ class AnclientAppTest {
 			String qtAppPath = testSettings.qtclient;
 			
 			// 2. Configure the process
-			ProcessBuilder pb = new ProcessBuilder(qtAppPath, qtmode, m0, m1);
+			ProcessBuilder pb = new ProcessBuilder(qtAppPath, qtmode, test_json, m0, m1);
 			
 			// Set the working directory to the folder containing the .exe
 			// This is critical for Qt apps to find their local .dlls or assets

@@ -2,15 +2,59 @@
 #define io_oz_anclient_ipcagent
 
 #include <string>
-#include <map>
+#include <format>
+#include <filesystem>
+
+// # In your CMakeLists.txt
+// target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+#include "io/odysz/anson.hpp"
+#include "io/odysz/semantics.hpp"
+#include <glaze/glaze.hpp>
 
 using namespace std;
 
-struct TestSettings {
+class WSAgent {
+public:
+    static string ipc_path;
+};
+
+string WSAgent::ipc_path = "ipc";
+
+struct TestSettings : public Anson {
     string type;
+    string agent_jar;
+    string agent_json;
     string qtclient;
     int ipc_port;
-    map<string, string> ipc_session;
+    // map<string, string> ipc_session;
+    SessionInf ipc_session;
+
+    string wsUri()
+    {
+        return format("ws://127.0.0.1:{0:d}/{1:s}", ipc_port, WSAgent::ipc_path);
+    }
+
+    filesystem::path agentJar(string prefix) {
+        filesystem::path p0 = prefix;
+        return p0 / this->agent_jar;
+    }
+
+    filesystem::path agentJson(string prefix) {
+        filesystem::path p0 = prefix;
+        return p0 / this->agent_json;
+    }
+
+    struct glaze {
+        using T = TestSettings;
+        static constexpr auto value = glz::object(
+            "type", &T::type,
+            "agent_jar", &T::agent_jar,
+            "agent_json", &T::agent_json,
+            "qtclient", &T::qtclient,
+            "ipc_port", &T::ipc_port,
+            "ipc_session", &T::ipc_session
+            );
+    };
 };
 
 #endif

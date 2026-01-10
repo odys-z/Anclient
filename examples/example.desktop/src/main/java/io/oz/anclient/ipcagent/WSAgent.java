@@ -17,7 +17,7 @@ public class WSAgent {
 	public static AgentSettings settings;
 	
 	public static void main(String[] args) throws Exception {
-		Server server = _main("WEB-INF/settings.json");
+		Server server = _main(_0(args, "WEB-INF/settings.json"));
         server.start();
         server.join();
 	}
