@@ -10,7 +10,7 @@
   "author": "Odys Zhou",
   "license": "MIT",
   "devDependencies": {
-    "webpack": "^5.76.0",
+    "webpack": "^5.94.0",
     "webpack-cli": "^4.5.0"
   }
 }
