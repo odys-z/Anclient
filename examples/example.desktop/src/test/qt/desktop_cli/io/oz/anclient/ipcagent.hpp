@@ -7,9 +7,11 @@
 
 // # In your CMakeLists.txt
 // target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-#include "io/odysz/anson.hpp"
-#include "io/odysz/semantics.hpp"
 #include <glaze/glaze.hpp>
+
+#include "io/odysz/anson.hpp"
+#include "io/odysz/semantic/jprotocol.hpp"
+#include "io/odysz/semantics.hpp"
 
 using namespace std;
 
@@ -17,16 +19,15 @@ class WSAgent {
 public:
     static string ipc_path;
 };
-
 string WSAgent::ipc_path = "ipc";
 
 struct TestSettings : public Anson {
     string type;
+
     string agent_jar;
     string agent_json;
     string qtclient;
     int ipc_port;
-    // map<string, string> ipc_session;
     SessionInf ipc_session;
 
     string wsUri()
@@ -47,14 +48,15 @@ struct TestSettings : public Anson {
     struct glaze {
         using T = TestSettings;
         static constexpr auto value = glz::object(
-            "type", &T::type,
-            "agent_jar", &T::agent_jar,
+            "type",       [](auto&&) { return "io.oz.anclient.ipcagent.TestSettings"; },
+            "agent_jar",  &T::agent_jar,
             "agent_json", &T::agent_json,
-            "qtclient", &T::qtclient,
-            "ipc_port", &T::ipc_port,
-            "ipc_session", &T::ipc_session
-            );
+            "qtclient",   &T::qtclient,
+            "ipc_port",   &T::ipc_port,
+            "ipc_session",&T::ipc_session);
     };
 };
+
+template void Anson::toPath<TestSettings>(const string&);
 
 #endif

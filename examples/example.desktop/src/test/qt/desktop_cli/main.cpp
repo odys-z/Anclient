@@ -8,16 +8,27 @@
 
 #include <glaze/glaze.hpp>
 #include "io/odysz/anson.hpp"
+#include "io/odysz/semantic/jprotocol.hpp"
 #include "io/oz/anclient/ipcagent.hpp"
+#include "io/oz/anclient/soketier.h"
 
 #define NL "\n"
 
 using namespace std;
 
+void ping(QWebSocket& skt, const string& msg) {
+    WSEchoReq req;
+    req.echo = msg;
+    AnsonMsg<WSEchoReq> anmsg;
+    string reqs = req.toBlock<WSEchoReq>();
+    qDebug() << reqs.c_str();
+    skt.sendTextMessage(reqs.c_str());
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    QTimer::singleShot(5000, &a, &QCoreApplication::quit);
+    // QTimer::singleShot(50000, &a, &QCoreApplication::quit);
 
     qDebug() << "IPC Client:\n" ;
 
@@ -29,6 +40,13 @@ int main(int argc, char *argv[])
 
     auto ptr = Anson::fromPath<TestSettings>(argv[2]);
     TestSettings* settings = ptr.get();
+
+    settings->toPath<TestSettings>(string(argv[2]) + ".beautify");
+
+    JsonOpt jsonOpt;
+    jsonOpt.beautify(false);
+    settings->toPath<TestSettings>(string(argv[2]) + ".test-anson.cmake", jsonOpt);
+
 
     string path2prj = "../../../../../../";
     filesystem::path agent_jar = settings->agentJar(path2prj);
@@ -95,19 +113,30 @@ int main(int argc, char *argv[])
     // If you do not need a running Qt event loop, remove the call
     // to a.exec() or use the Non-Qt Plain C++ Application template.
 
+    string hello = "Hello from Qt C++";
+
     QWebSocket socket;
     QObject::connect(&socket, &QWebSocket::connected, [&]() {
         qDebug() << "Connected to Jetty!";
-        socket.sendTextMessage("Hello from Qt C++");
+        // socket.sendTextMessage("Hello from Qt C++");
+        ping(socket, hello);
     });
 
+
     QObject::connect(&socket, &QWebSocket::textMessageReceived, [&socket](const QString &msg) {
-        qDebug() << "Server replied:" << msg;
+        qDebug() << "[Qt Client] Server replied:";
+        qDebug() << msg;
+
+        AnsonResp* resp = Anson::fromJson<AnsonResp>(msg.toStdString());
 
         if (msg == "bye") {
             socket.close();
             QCoreApplication::quit();
         }
+    });
+
+    QObject::connect(&socket, &QWebSocket::binaryMessageReceived, &a, [](const QByteArray &message) {
+        qDebug() << "[Qt Client] Full stream received. Total size:" << message.size();
     });
 
     // Match the Java servlet path /ws/

@@ -8,7 +8,8 @@
 using namespace std;
 
 struct SessionInf {
-    string type;
+    string type = "io.odysz.semantics.SessionInf";
+
     string ssid;
 	string uid;
 	string roleId;

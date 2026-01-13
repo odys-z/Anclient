@@ -90,7 +90,7 @@ public class WSSocket {
 
 	@OnMessage
     public void onMessage(Session session, String message) {
-        System.out.println("Received: " + message);
+        System.out.println("[WS Agent] Received: " + message);
         try {
             // Echo the message back to the client
             // session.getRemote().sendString("Echo: " + message);

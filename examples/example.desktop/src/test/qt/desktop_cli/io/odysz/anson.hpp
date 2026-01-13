@@ -7,7 +7,6 @@
 #include <concepts>
 #include <stdexcept>
 #include <glaze/glaze.hpp>
-// #include<glaze/util/any.hpp>
 #include <glaze/util/type_traits.hpp>
 #include <bits/stl_map.h>
 
@@ -24,38 +23,22 @@ public:
         virtual unique_ptr<IJsonable> fromJson(const string& json);
     };
 
-    // IJsonable toBlock(ostream& stream, JsonOpt& opt) {
-    //     // glz::write<glz::opts{}>(this, stream);
-    //     glz::basic_ostream_buffer os_buf{stream};
-    //     glz::write(this, os_buff);
-    // }
+    template <typename T>
+    IJsonable& toBlock(ostream& stream, JsonOpt& opt);
 
-    void toBlock(ostream& stream, JsonOpt& opt) {
-        // 1. Wrap the stream in a Glaze-optimized buffer
-        glz::basic_ostream_buffer os_buf{stream};
-
-        // 2. Dereference 'this' and pass the instance of your options
-        // Using glz::write_json is the standard for JSON specifically
-        glz::write_json(glz::to_any{*this}, os_buf);
-
-        // Note: The buffer flushes to the stream automatically when it goes out of scope.
-    }
-
-    // default
-    string toBlock(JsonOpt* opt)
+    template <typename T>
+    string toBlock(JsonOpt& opt)
     {
         ostringstream bos;// = new ByteArrayOutputStream();
-        this->toBlock(bos, opt);
+        this->toBlock<T>(bos, opt);
         return bos.str();
     }
 
-    string toBlock()
-    {
-        JsonOpt* defaultopt = nullptr;
-        return this->toBlock(defaultopt);
-    }
+    template <typename T>
+    string toBlock();
 
-    virtual IJsonable toJson(string buf);
+    template <typename T>
+    IJsonable& toJson(ostringstream& buf) ;
 };
 
 #define GLZ_REGISTER_JSONABLE(T) \
@@ -68,7 +51,27 @@ public:
     virtual ~Anson() = default;
 
     template<std::derived_from<Anson> T = Anson>
-    static std::unique_ptr<T> fromPath(const std::string& path) {
+    static T* fromJson(const string& json) {
+        auto p = make_unique<T>();
+
+        constexpr auto options = glz::opts{
+            .error_on_unknown_keys = false,
+            .error_on_missing_keys = false,
+            .partial_read = true
+        };
+
+        auto ec = glz::read<options>(*p, json);
+
+        if (ec) {
+            throw std::runtime_error("Glaze parse error: " + json);
+        }
+
+        // return p;
+        return p.get();
+    }
+
+    template<derived_from<Anson> T = Anson>
+    static unique_ptr<T> fromPath(const string& path) {
         auto p = std::make_unique<T>();
 
         constexpr auto options = glz::opts{
@@ -77,26 +80,86 @@ public:
             .partial_read = true
         };
 
-        auto ec = glz::read_file_json<options>(*p, path, std::string{});
+        auto ec = glz::read_file_json<options>(*p, path, string{});
 
         if (ec) {
-            throw std::runtime_error("Glaze parse error at file: " + path);
+            throw runtime_error("Glaze parse error at file: " + path);
         }
 
         return p;
     }
+
+    template<derived_from<Anson> T = Anson>
+    void toPath(const string& path);
+
+    template<derived_from<Anson> T = Anson>
+    void toPath(const string& path, JsonOpt& opt);
+
+    // string toBlock();
+
+private:
+    template <typename T, typename V>
+    T* try_get_animal(V& variant_obj) {
+        return std::get_if<T>(&variant_obj);
+    }
 };
 
 class JsonOpt : public Anson {
+
 public:
-   virtual ~JsonOpt() = default;
+
+    virtual ~JsonOpt() = default;
+
+    bool beauty;
+    JsonOpt& beautify(bool opt) {
+        this->beauty = opt;
+        return *this;
+    }
 };
-// template <>
-// struct glz::meta<IJsonable*> {
-//     static constexpr auto value = glz::object(
-//         "DerivedA", [](auto&& v) { return static_cast<DerivedA*>(v); },
-//         "DerivedC", [](auto&& v) { return static_cast<DerivedC*>(v); }
-//         );
-// };
+
+///////////////////////////////////////////////////////////////////////////////////
+/// \brief IJsonable::toBlock
+/// \return
+///
+///
+template <typename T>
+inline string IJsonable::toBlock()
+{
+    JsonOpt defaultopt;
+    return ((IJsonable*)this)->toBlock<T>(defaultopt);
+}
+
+template <typename T>
+inline IJsonable& IJsonable::toJson(ostringstream& buf)
+{
+    JsonOpt opt;
+    ((IJsonable*)this)->toBlock<T>(buf, opt);
+    return *this;
+}
+
+template <std::derived_from<Anson> T>
+inline void Anson::toPath(const string& path) {
+    JsonOpt defaultopt;
+    this->toPath<T>(path, defaultopt);
+}
+
+template <std::derived_from<Anson> T>
+inline void Anson::toPath(const string& path, JsonOpt& opt) {
+    // JsonOpt defaultopt; // = new JsonOpt();
+    std::ofstream fout(path);
+    ((IJsonable*)this)->toBlock<T>(fout, opt);
+}
+
+template <typename T>
+inline IJsonable& IJsonable::toBlock(ostream& os, JsonOpt& opt)
+{
+    glz::ostream_buffer<> buffer{os};
+
+    if (opt.beauty)
+        auto ec = glz::write<glz::opts{.prettify=true}>(static_cast<T&>(*this), buffer);
+    else
+        auto ec = glz::write<glz::opts{.prettify=false}>(static_cast<T&>(*this), buffer);
+    return *this;
+}
 
 #endif // ANSON_HPP
