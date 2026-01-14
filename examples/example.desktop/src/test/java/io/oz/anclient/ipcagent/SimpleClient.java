@@ -1,25 +1,16 @@
 package io.oz.anclient.ipcagent;
 
-import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.musteq;
 import static io.odysz.common.LangExt.mustnonull;
 import static io.odysz.common.Utils.logT;
 import static io.odysz.common.Utils.warn;
-
-import jakarta.websocket.ClientEndpoint;
-import jakarta.websocket.CloseReason;
-import jakarta.websocket.ContainerProvider;
-import jakarta.websocket.DeploymentException;
-import jakarta.websocket.OnMessage;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
-import jakarta.websocket.WebSocketContainer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
 import io.odysz.semantic.jprotocol.AnsonBody;
@@ -32,6 +23,14 @@ import io.odysz.semantic.jprotocol.LogAct;
 import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantics.SessionInf;
 import io.oz.anclient.socketier.WSEchoReq;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 @ClientEndpoint
 public class SimpleClient {

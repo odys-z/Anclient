@@ -1,35 +1,8 @@
 #ifndef io_odysz_semantic_jprotocol_hpp
 #define io_odysz_semantic_jprotocol_hpp
 
-#include <format>
-
 #include "io/odysz/anson.hpp"
 #include "io/odysz/module/rs.hpp"
-
-// class IPort : public IJsonable {
-
-// public:
-//     /**
-//      * Get port url surfix, e.g. "echo.jserv".
-//      * @return url surfix, the servlet pattern
-//      */
-//     string url() { return "echo.jserv"; }
-
-//     /**
-//      * @since 1.5.16
-//      * @param jservroot
-//      * @return jservroot/{@link #url()}
-//      */
-//     string url(string jservroot) { return format("{:s}/{:s}", jservroot, url()); }
-
-//     virtual string name();
-
-//     /**
-//      * Equivalent of enum.valueOf(), except for subclass returning instance of jserv.Port.
-//      * @throws SemanticException port name not found
-//      */
-//     virtual IPort valof(string pname);
-// };
 
 enum class Port : int {
     heartbeat = 0, //("ping.serv"),
@@ -95,7 +68,6 @@ struct glz::meta<Port> {
         "user", T::user,
         "userstier", T::userstier,
         "stree", T::stree,
-
         "dataset", T::dataset,
         "datasetier", T::datasetier,
         "docstier", T::docstier,
@@ -123,14 +95,24 @@ public:
 template <std::derived_from<AnsonBody> T>
 class AnsonMsg : public Anson {
 public:
-    virtual ~AnsonMsg() = default;
+    ~AnsonMsg() = default;
+
+    AnsonMsg(Port p) : port(p) { }
+    AnsonMsg(Port p, T& body) : port(p), body({body}) {}
 
     Port port;
     vector<T> body;
+
+    struct glaze {
+        static constexpr auto value = glz::object(
+            "type", [](auto&&) { return "io.odysz.semantic.jprotocol.AnsonMsg"; },
+            "port", &AnsonMsg::port,
+            "body", &AnsonMsg::body);
+    };
 };
 
 class AnsonResp : public AnsonBody {
-    string type = "io.odysz.semantic.jprotocol.AnsonResp";
+    // string type = "io.odysz.semantic.jprotocol.AnsonResp";
 
 public:
     ~AnsonResp() = default;
@@ -141,7 +123,7 @@ public:
     struct glaze {
         using T = AnsonResp;
         static constexpr auto value = glz::object(
-            "type", &T::type,
+            "type", [](auto&&) { return "io.odysz.semantic.jprotocol.AnsonResp"; },
             "m",    &T::m,
             "rs",   &T::rs
         );

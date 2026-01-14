@@ -41,10 +41,10 @@ public:
     IJsonable& toJson(ostringstream& buf) ;
 };
 
-#define GLZ_REGISTER_JSONABLE(T) \
-void dispatch_write(glz::basic_ostream_buffer<std::ostream>& buf) const override { \
-        glz::write_json(*static_cast<const T*>(this), buf); \
-}
+// #define GLZ_REGISTER_JSONABLE(T) \
+// void dispatch_write(glz::basic_ostream_buffer<std::ostream>& buf) const override { \
+//         glz::write_json(*static_cast<const T*>(this), buf); \
+// }
 
 class Anson : public IJsonable {
 public:
@@ -115,6 +115,13 @@ public:
         this->beauty = opt;
         return *this;
     }
+
+    struct glaze {
+        using T = JsonOpt;
+        static constexpr auto value = glz::object(
+            "type", [](auto&&) { return "io.odysz.anson.JsonOpt"; },
+            "beauty", &T::beauty);
+    };
 };
 
 ///////////////////////////////////////////////////////////////////////////////////

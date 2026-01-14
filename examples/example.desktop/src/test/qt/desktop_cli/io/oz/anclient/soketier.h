@@ -11,11 +11,14 @@ class WSEchoReq : public AnsonBody {
 public:
     string echo;
 
+    // WSEchoReq() {
+    //     this->port = Port::echo;
+    // }
+
     struct glaze {
-        using T = WSEchoReq;
         static constexpr auto value = glz::object(
             "type", [](auto&&) { return "io.oz.anclient.socketier.WSEchoReq"; },
-            "echo", &T::echo);
+            "echo", &WSEchoReq::echo);
     };
 };
 

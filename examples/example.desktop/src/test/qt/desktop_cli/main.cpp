@@ -19,9 +19,13 @@ using namespace std;
 void ping(QWebSocket& skt, const string& msg) {
     WSEchoReq req;
     req.echo = msg;
-    AnsonMsg<WSEchoReq> anmsg;
-    string reqs = req.toBlock<WSEchoReq>();
-    qDebug() << reqs.c_str();
+
+    qDebug() << "[Qt Clinet Ping].body" << req.toBlock<WSEchoReq>().c_str();
+
+    AnsonMsg<WSEchoReq> anmsg(Port::echo, req);
+    // anmsg.body.push_back(req);
+    string reqs = anmsg.toBlock<AnsonMsg<WSEchoReq>>();
+    qDebug() << "[Qt Clinet Ping]" << reqs.c_str();
     skt.sendTextMessage(reqs.c_str());
 }
 
@@ -96,7 +100,7 @@ int main(int argc, char *argv[])
         else
             qDebug() << "JAVA PID:" << myProcess.processId();
 
-        qDebug() << "Stopping Java Process ...";
+        // qDebug() << "Stopping Java Process ...";
         this_thread::sleep_for(chrono::seconds(3));
     }
     else qDebug() << "desktop-cli in junit-desktop mode...";
@@ -144,8 +148,14 @@ int main(int argc, char *argv[])
     QString wsurl = QString::fromStdString(settings->wsUri());
     qDebug() << wsurl;
     socket.open(QUrl(wsurl));
-    socket.sendTextMessage(argv[3]);
-    socket.sendTextMessage(argv[4]);
+
+    this_thread::sleep_for(chrono::seconds(10));
+
+    // socket.sendTextMessage(argv[3]);
+    // socket.sendTextMessage(argv[4]);
+    ping(socket, argv[3]);
+    ping(socket, argv[4]);
 
     return a.exec();
+    // final  qDebug() << "Stopping Java Process ...";
 }
