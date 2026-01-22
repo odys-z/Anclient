@@ -1,0 +1,6 @@
+/target/
+.qtcreator
+build
+*.user
+**/*.test-anson.cmake
+**/*.beautify
