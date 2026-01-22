@@ -45,12 +45,12 @@ Item {
             id: fileitem
             width: filelist.width
             height: 40
-            color: root.selectedIndices.includes(index) ? Colors.color2 : "transparent" // [cite: 20]
+            color: root.selectedIndices.includes(index) ? Colors.selection : "transparent"
 
             required property int index
-            required property string fileName // [cite: 47]
-            required property string filePath // [cite: 50]
-            required property bool fileIsDir // [cite: 46]
+            required property string fileName
+            required property string filePath
+            required property bool fileIsDir
 
             RowLayout {
                 anchors.fill: parent
@@ -58,9 +58,31 @@ Item {
                 spacing: 10
 
                 CheckBox {
+                    id: ckb
                     checked: root.selectedIndices.includes(index)
                     onToggled: root.toggleSelection(index)
                     focusPolicy: Qt.NoFocus
+                    // 1. The Box (Indicator)
+                    indicator: Rectangle {
+                        implicitWidth: 26
+                        implicitHeight: 26
+                        x: control.leftPadding
+                        y: parent.height / 2 - height / 2
+                        radius: 3
+                        border.color: ckb.down ? "#109012" : "#21be2b"
+                        color: "transparent"
+
+                        // The Checkmark
+                        Rectangle {
+                            width: 14
+                            height: 14
+                            x: 6
+                            y: 6
+                            radius: 2
+                            color: ckb.down ? "#17a81a" : "#21be2b"
+                            visible: ckb.checked
+                        }
+                    }
                 }
 
                 Text {
