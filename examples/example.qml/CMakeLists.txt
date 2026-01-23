@@ -4,14 +4,20 @@ project(anclient VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+set(RTTR_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(RTTR_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(RTTR_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(RTTR_BUILD_INSTALLER OFF CACHE BOOL "" FORCE)
+set(CMAKE_COMPILER_IS_MSVC 1)
+set(RTTR_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+
+add_compile_options(/WX-)
+
 # 1. Require RTTR (No hardcoded paths!)
 # Users must set -DCMAKE_PREFIX_PATH="C:/path/to/rttr/install"
 find_package(RTTR REQUIRED)
-# find_package(nlohmann_json REQUIRED)
-
-# 2. Add the library
-add_subdirectory(src)
-
 
 include(FetchContent)
 
@@ -23,14 +29,30 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
+  anson
+  GIT_REPOSITORY https://github.com/odys-z/antson.git
+  SOURCE_SUBDIR  antson.cmake
+  GIT_TAG        master
+)
+set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(anson)
+
+FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG        v1.15.2
 )
 FetchContent_MakeAvailable(googletest)
 
+add_subdirectory(src)
+
 # 3. Add tests (only if this is the main project)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# To deploy
+# cp build/src/anclient.exe deploy/
+# cd deploy
+# windeployqt.exe --qmldir ..\src\qml anclient.exe

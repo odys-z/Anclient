@@ -69,9 +69,10 @@ int main(int argc, char *argv[])
         const QString program = "java";
         QStringList arguments;
         arguments << "-jar";
-        // arguments << "ipc-agent.jar"; // Replace with the actual path to your JAR file
-        arguments << agent_jar.c_str();
-        arguments << agent_json.c_str();
+
+        // Gemini: On windows, QStringList (and QString) internally stores everything as UTF-16.
+        arguments << QString::fromUtf8(agent_jar.u8string().c_str());
+        arguments << QString::fromUtf8(agent_json.u8string().c_str());
 
         QString cmd = "java";
         for (const QString& value : std::as_const(arguments)) {

@@ -64,22 +64,22 @@ Item {
                     focusPolicy: Qt.NoFocus
                     // 1. The Box (Indicator)
                     indicator: Rectangle {
-                        implicitWidth: 26
-                        implicitHeight: 26
-                        x: control.leftPadding
+                        implicitWidth: 20
+                        implicitHeight: 20
+                        x: ckb.leftPadding
                         y: parent.height / 2 - height / 2
-                        radius: 3
-                        border.color: ckb.down ? "#109012" : "#21be2b"
+                        radius: ckb.checked ? 5 : 3
+                        border.color: ckb.checked ? "#21ce2b" : "#109007"
                         color: "transparent"
 
                         // The Checkmark
                         Rectangle {
-                            width: 14
-                            height: 14
-                            x: 6
-                            y: 6
-                            radius: 2
-                            color: ckb.down ? "#17a81a" : "#21be2b"
+                            width: 12
+                            height: 12
+                            x: 4
+                            y: 4
+                            radius: 3
+                            color: ckb.checked ? "#21ce2b" : "#109007"
                             visible: ckb.checked
                         }
                     }
@@ -110,8 +110,10 @@ Item {
                     cppHandler.on_double_click(filePath, fileIsDir);
 
                     // 2. Still notify the UI to update the view
-                    if (fileIsDir)
-                        root.folderDoubleClicked(filePath);
+                    if (fileIsDir) {
+                        root.selectedIndices = [];
+                        folderModel.folder =  Qt.resolvedUrl("file:" + filePath);
+                    }
                     else
                         root.fileDoubleClicked(filePath);
                 }

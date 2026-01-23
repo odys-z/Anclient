@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <glaze/glaze.hpp>
 #include <glaze/util/type_traits.hpp>
-#include <bits/stl_map.h>
 
 using namespace std;
 

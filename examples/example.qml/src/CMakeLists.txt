@@ -17,6 +17,10 @@ qt_add_executable(${PROJECT_NAME}
     main.cpp
     qml/FileListView.qml
     filelistview.h
+    clients.cpp
+    clients.h
+    semantier.cpp
+    semantier.h
 )
 
 set_source_files_properties(qml/Colors.qml
@@ -67,6 +71,7 @@ target_link_libraries(anclient
         Qt6::QuickControls2
         Qt6::Svg
         Qt6::Widgets
+        anson
 )
 
 set_target_properties(anclient

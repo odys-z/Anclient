@@ -32,19 +32,22 @@ import io.oz.album.peer.AlbumReq;
 import io.oz.album.peer.AlbumReq.A;
 import io.oz.album.peer.SynDocollPort;
 
-public class PhotoSyntier extends Doclientier {
+/**
+ * A wrapper for the runtime requires backgound thread networking, such as Android Activities.
+ */
+public class AsynClientier extends Doclientier {
 
-	public PhotoSyntier(String sysuri, String synuri, ErrorCtx errCtx)
+	public AsynClientier(String sysuri, String synuri, ErrorCtx errCtx)
 			throws SemanticException, IOException {
 		super("h_photos", sysuri, synuri, errCtx);
 	}
 
-	public PhotoSyntier(String clienturi, OnError err) throws SemanticException, IOException {
+	public AsynClientier(String clienturi, OnError err) throws SemanticException, IOException {
 		this(clienturi, clienturi, new ErrorCtx() {
 			public void err(MsgCode code, String msg, String... device) { err.err(code, msg, device);}});
 	}
 	
-	public PhotoSyntier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
+	public AsynClientier asyLogin(String uid, String pswd, String device, OnLogin ok, OnError err) {
 		Clients.asyLoginByUri(this.uri, uid, pswd, (client) -> {
 			this.client = client;
 			onLogin(client);
@@ -76,7 +79,7 @@ public class PhotoSyntier extends Doclientier {
 	 *
 	 * @return this
 	 */
-	public PhotoSyntier asyGetSettings(OnOk onOk, OnError... onErr) {
+	public AsynClientier asyGetSettings(OnOk onOk, OnError... onErr) {
 	  new Thread(() -> {
 		try {
 			AnsonHeader header = client.header()
@@ -111,8 +114,8 @@ public class PhotoSyntier extends Doclientier {
 	 * @param page buffer (for performance?)
 	 * @return this
 	 */
-	public <T extends IFileDescriptor> PhotoSyntier asynQueryDocs(List<T> files,
-			PathsPage page, OnOk onOk, OnError onErr) {
+	public <T extends IFileDescriptor> AsynClientier asynQueryDocs(List<T> files,
+			   PathsPage page, OnOk onOk, OnError onErr) {
 		new Thread(() -> {
 			DocsResp resp = null;
 			try {
@@ -150,7 +153,7 @@ public class PhotoSyntier extends Doclientier {
 		return this;
 	}
 
-	public PhotoSyntier asyAvailableDevices(OnOk ok, ErrorCtx... onErr)
+	public AsynClientier asyAvailableDevices(OnOk ok, ErrorCtx... onErr)
 			throws IOException, SemanticException {
 		new Thread(() -> {
 			try {
@@ -177,7 +180,7 @@ public class PhotoSyntier extends Doclientier {
 		return this;
 	}
 
-	public PhotoSyntier asyRegisterDevice(String device, String devname, OnOk ok, OnError... onErr) {
+	public AsynClientier asyRegisterDevice(String device, String devname, OnOk ok, OnError... onErr) {
 		new Thread(() -> {
 			try {
 				AnsonHeader header = client.header()
@@ -211,8 +214,8 @@ public class PhotoSyntier extends Doclientier {
 	 * @return this (handle events with callbacks)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends IFileDescriptor> PhotoSyntier asyVideos(ExpSyncDoc template, List<T> videos,
-				OnProcess proc, OnDocsOk docsOk, OnError ... onErr) {
+	public <T extends IFileDescriptor> AsynClientier asyVideos(ExpSyncDoc template, List<T> videos,
+					   OnProcess proc, OnDocsOk docsOk, OnError ... onErr) {
 		new Thread(() -> {
 			try {
 				startPushs(template, doctbl, (List<IFileDescriptor>) videos, proc, docsOk, onErr);

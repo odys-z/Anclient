@@ -478,6 +478,19 @@ public class SessionClient {
 		}
 	}
 
+	/**
+	 * TODO Commit over web socket.
+	 * @param <R>
+	 * @param <A>
+	 * @param req
+	 * @param err
+	 * @return response
+	 * @since 0.5.19
+	 */
+	public <R extends AnsonBody, A extends AnsonResp> A commit_ws(AnsonMsg<R> req, OnError err) {
+		throw new AnsonException(0, "TODO");
+	}
+
 	public void logout() {
 		closeLink();
 	}

@@ -19,7 +19,7 @@ import io.odysz.semantics.SessionInf;
 import io.odysz.semantics.x.SemanticException;
 import io.oz.album.peer.Profiles;
 import io.oz.album.peer.SynDocollPort;
-import io.oz.syndoc.client.PhotoSyntier;
+import io.oz.syndoc.client.AsynClientier;
 
 /**
  * Album client context.
@@ -97,7 +97,7 @@ public class AlbumContext {
     }
 
     /** When this is null, means not logged in */
-	public PhotoSyntier tier;
+	public AsynClientier tier;
 
     public SessionInf userInf;
 
@@ -130,15 +130,10 @@ public class AlbumContext {
         Clients.init(jservroot, false);
 
         try {
-            tier = new PhotoSyntier(sysuri, synuri, new ErrorCtx() {
+            tier = new AsynClientier(sysuri, synuri, new ErrorCtx() {
                 @Override
                 public void err(AnsonMsg.MsgCode code, String msg, String ... args) {
-//                    try {
-//                        msg = f("Error handler is null. Caught error: %s", f(msg, (Object[])args));
-//                    }
-//                    catch (Exception e) {}
                     mustnonull(errCtx, msg);
-
                     errCtx.err(code, msg, args);
                 } });
         } catch (SemanticException | IOException e) {
@@ -148,7 +143,7 @@ public class AlbumContext {
     }
 
     /**
-     * Call {@link PhotoSyntier#asyLogin(String, String, String, Clients.OnLogin, OnError)} to login.
+     * Call {@link AsynClientier#asyLogin(String, String, String, Clients.OnLogin, OnError)} to login.
      *
      * <p><b></b>Note:</b><br>
      * For Android client, don't call this directly. Call App's login instead.</p>
