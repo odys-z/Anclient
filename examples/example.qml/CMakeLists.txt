@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.30)
 project(anclient VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -17,8 +17,7 @@ add_compile_options(/WX-)
 
 # 1. Require RTTR (No hardcoded paths!)
 # Users must set -DCMAKE_PREFIX_PATH="C:/path/to/rttr/install"
-# find_package(RTTR REQUIRED)
-find_package(RTTR CONFIG REQUIRED Core)
+find_package(RTTR REQUIRED)
 
 include(FetchContent)
 

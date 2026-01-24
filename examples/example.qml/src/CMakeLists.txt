@@ -1,7 +1,7 @@
 # Copyright (C) 2023 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.30)
 project(anclient VERSION 1.0 LANGUAGES CXX)
 
 if (ANDROID OR IOS)
@@ -25,7 +25,7 @@ qt_add_executable(${PROJECT_NAME}
 
 set_source_files_properties(qml/Colors.qml
     PROPERTIES
-        QT_QML_SINGLETON_TYPE TRUE
+    QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(anclient
@@ -84,7 +84,7 @@ set_target_properties(anclient
 
 if (MSVC)
     # 1. Force relaxed mode
-    target_compile_options(anclient PRIVATE /permissive)
+    # target_compile_options(anclient PRIVATE /permissive)
 
     # 2. Disable specific warnings that RTTR 0.9.6 triggers in modern MSVC
     target_compile_options(anclient PRIVATE /wd4003 /wd4005)
@@ -97,12 +97,23 @@ if (MSVC)
     endif()
 
     # RTTR 0.9.6 needs the legacy preprocessor behavior in some MSVC versions
-    add_compile_options(/Zc:preprocessor-)
+    # add_compile_options(/Zc:preprocessor-)
     # Or ensure it's not using the new lambda processor which breaks old RTTR
-    add_compile_options(/Zc:lambda-)
+    # add_compile_options(/Zc:lambda-)
 
+    target_compile_options(anclient PRIVATE
+            /permissive-  # Relaxed mode
+            /Zc:lambda-   # Disable modern lambda processor (Fixes C3878)
+            /Zc:preprocessor- # Use legacy preprocessor (Fixes C3878)
+        )
 endif()
 
+# Instead of global 'set', use target-specific properties
+# set_target_properties(anclient PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_STANDARD_REQUIRED ON
+#     CXX_EXTENSIONS OFF
+# )
 
 if (APPLE)
     set_target_properties(anclient PROPERTIES
