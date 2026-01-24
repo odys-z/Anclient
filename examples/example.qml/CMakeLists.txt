@@ -17,7 +17,8 @@ add_compile_options(/WX-)
 
 # 1. Require RTTR (No hardcoded paths!)
 # Users must set -DCMAKE_PREFIX_PATH="C:/path/to/rttr/install"
-find_package(RTTR REQUIRED)
+# find_package(RTTR REQUIRED)
+find_package(RTTR CONFIG REQUIRED Core)
 
 include(FetchContent)
 
@@ -32,7 +33,7 @@ FetchContent_Declare(
   anson
   GIT_REPOSITORY https://github.com/odys-z/antson.git
   SOURCE_SUBDIR  antson.cmake
-  GIT_TAG        master
+  GIT_TAG        master # cmake-0.0.1 # 2026-01-24
 )
 set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(anson)
