@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.30)
-project(anclient VERSION 1.0 LANGUAGES CXX)
+# project(anclient VERSION 1.0 LANGUAGES CXX)
 
 if (ANDROID OR IOS)
     message(FATAL_ERROR "Platform is not supported")
@@ -72,48 +72,15 @@ target_link_libraries(anclient
         Qt6::Svg
         Qt6::Widgets
 
-        RTTR::Core
+        EnTT::EnTT
         nlohmann_json::nlohmann_json
-        anson
+        anson.cmake
 )
 
 set_target_properties(anclient
     PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
-
-# if (MSVC)
-#     # 1. Force relaxed mode
-#     # target_compile_options(anclient PRIVATE /permissive)
-
-#     # 2. Disable specific warnings that RTTR 0.9.6 triggers in modern MSVC
-#     target_compile_options(anclient PRIVATE /wd4003 /wd4005)
-
-#     # 3. If the error persists, explicitly remove the strict flag from this target
-#     get_target_property(CURRENT_FLAGS anclient COMPILE_OPTIONS)
-#     if(CURRENT_FLAGS)
-#         list(REMOVE_ITEM CURRENT_FLAGS "/permissive-")
-#         set_target_properties(anclient PROPERTIES COMPILE_OPTIONS "${CURRENT_FLAGS}")
-#     endif()
-
-#     # RTTR 0.9.6 needs the legacy preprocessor behavior in some MSVC versions
-#     # add_compile_options(/Zc:preprocessor-)
-#     # Or ensure it's not using the new lambda processor which breaks old RTTR
-#     # add_compile_options(/Zc:lambda-)
-
-#     target_compile_options(anclient PRIVATE
-#             /permissive-  # Relaxed mode
-#             /Zc:lambda-   # Disable modern lambda processor (Fixes C3878)
-#             /Zc:preprocessor- # Use legacy preprocessor (Fixes C3878)
-#         )
-# endif()
-
-# Instead of global 'set', use target-specific properties
-# set_target_properties(anclient PROPERTIES
-#     CXX_STANDARD 17
-#     CXX_STANDARD_REQUIRED ON
-#     CXX_EXTENSIONS OFF
-# )
 
 if (APPLE)
     set_target_properties(anclient PROPERTIES

@@ -1,23 +1,24 @@
 cmake_minimum_required(VERSION 3.30)
+
+# Use CMakePresets.json for vcpkg configuration
+# Build with: cmake --preset default
+# Or: cmake --preset vs2022
+
+# tree structure:
+# my/github/vcpkg
+# my/github/anclient/examples/example.qml
+#
+# in my/github/vcpkg
+# ./vcpkg install entt:x64-windows --x-install-root="../anclient/examples/example.qml/vcpkg_packages"
+
+# set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_packages" CACHE PATH "vcpkg install dir")
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+
 project(anclient VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
-# set(RTTR_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-# set(RTTR_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-# set(RTTR_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-# set(RTTR_BUILD_INSTALLER OFF CACHE BOOL "" FORCE)
-# set(CMAKE_COMPILER_IS_MSVC 1)
-# set(RTTR_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-# set(BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-
-# add_compile_options(/WX-)
-
-# 1. Require RTTR (No hardcoded paths!)
-# Users must set -DCMAKE_PREFIX_PATH="C:/path/to/rttr/install"
-find_package(RTTR REQUIRED)
 
 include(FetchContent)
 
@@ -28,14 +29,39 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
+# try to auto-locate EnTT installed by vcpkg
+message(STATUS "=========================================== CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
+
+# my/github/vcpkg/...
+# set(CMAKE_TOOLCHAIN_FILE "../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+
+# if(NOT DEFINED EnTT_DIR)
+  set(_vcpkg_root "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_packages/")
+  set(_triplet "x64-windows") # or use VCPKG_TARGET_TRIPLET if provided
+  set(_entt_path "${_vcpkg_root}/${_triplet}/share/entt")
+  set(_nlohmanjson_path "${_vcpkg_root}/${_triplet}/share/nlohmann_json")
+
+  message(STATUS "=========================================== _ent_path(EnTTConfig.cmake) = ${_entt_path}")
+  # if(EXISTS "${_entt_path}/EnTTConfig.cmake")
+    # set(EnTT_DIR "${_entt_path}" CACHE PATH "Path to EnTTConfig.cmake" FORCE)
+    # set(nlohmann_json_DIR "${_nlohmanjson_path}" CACHE PATH "Path to nlohmann_jsonConfig.cmake" FORCE)
+    message(STATUS "=========================================== _nlohmanjson_path = ${_nlohmanjson_path}")
+    # list(APPEND CMAKE_PREFIX_PATH "${_entt_path}")
+    message(STATUS "Set EnTT_DIR=${EnTT_DIR}")
+  # endif()
+# endif()
+
+find_package(EnTT CONFIG REQUIRED)
+
 FetchContent_Declare(
-  anson
+  anson.cmake
   GIT_REPOSITORY https://github.com/odys-z/antson.git
   SOURCE_SUBDIR  antson.cmake
-  GIT_TAG        master # cmake-0.0.1 # 2026-01-24
+  GIT_TAG        master # cmake-0.0.1 # 2026-01-30
 )
+
 set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(anson)
+FetchContent_MakeAvailable(anson.cmake)
 
 FetchContent_Declare(
   googletest
@@ -53,6 +79,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 # To deploy
+# cmake --preset default
+# cmake --build --preset default
 # cp build/src/anclient.exe deploy/
 # cd deploy
 # windeployqt.exe --qmldir ..\src\qml anclient.exe

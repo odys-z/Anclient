@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
-#include <rttr/type>
-#include <rttr/registration>
 
-#include <io/odysz/anson.hpp>
+#include <io/odysz/anson.h>
 #include "clients.h"
 
 /**

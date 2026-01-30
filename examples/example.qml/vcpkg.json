@@ -1,0 +1,9 @@
+{
+  "name": "anclient",
+  "version": "1.0.0",
+  "description": "File System Explorer with Anclient integration",
+  "dependencies": [
+    "entt",
+    "nlohmann-json"
+  ]
+}
