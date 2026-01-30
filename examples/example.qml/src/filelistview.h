@@ -7,6 +7,11 @@
 #include <QFileSystemModel>
 #include <QQmlEngine>
 
+/**
+ * The file loader & previewer.
+ *
+ * @brief The FileHandler class
+ */
 class FileHandler : public QObject
 {
     Q_OBJECT

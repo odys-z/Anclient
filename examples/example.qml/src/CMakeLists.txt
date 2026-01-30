@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.30)
-# project(anclient VERSION 1.0 LANGUAGES CXX)
+project(anclient VERSION 1.0 LANGUAGES CXX)
 
 if (ANDROID OR IOS)
     message(FATAL_ERROR "Platform is not supported")
@@ -15,12 +15,6 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-    qml/FileListView.qml
-    filelistview.h
-    clients.cpp
-    clients.h
-    semantier.cpp
-    semantier.h
 )
 
 set_source_files_properties(qml/Colors.qml
@@ -30,6 +24,7 @@ set_source_files_properties(qml/Colors.qml
 
 qt_add_qml_module(anclient
     URI FilesystModule
+    VERSION 1.0
     QML_FILES
         "Main.qml"
         "qml/About.qml"
@@ -41,7 +36,6 @@ qt_add_qml_module(anclient
         "qml/Sidebar.qml"
         "qml/ResizeButton.qml"
         "qml/WindowDragHandler.qml"
-
         "qml/FileListView.qml"    #
     RESOURCES
         "icons/folder_closed.svg"
@@ -54,13 +48,18 @@ qt_add_qml_module(anclient
         "icons/resize.svg"
         "icons/qt_logo.svg"
         "icons/app_icon.svg"
+        "icons/album.svg"
     SOURCES
         filesysmodel.cpp
         filesysmodel.h
         linenumbermodel.cpp
         linenumbermodel.h
-
         filelistview.h	#
+        clients.cpp
+        clients.h
+        semantier.cpp
+        semantier.h
+
 )
 
 target_link_libraries(anclient
@@ -74,7 +73,7 @@ target_link_libraries(anclient
 
         EnTT::EnTT
         nlohmann_json::nlohmann_json
-        anson.cmake
+        anson
 )
 
 set_target_properties(anclient

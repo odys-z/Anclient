@@ -3,6 +3,7 @@ include(GoogleTest)
 add_executable(
     anclient_tests
     test_01_hello_anson.cpp
+    jsample.h
 )
 
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR})

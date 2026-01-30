@@ -33,21 +33,54 @@ ApplicationWindow {
         return root.expandPath ? out : out.substring(out.lastIndexOf("/") + 1, out.length)
     }
 
+    Doclientier{ id: doclient }
+
+    Connections {
+        target: doclient
+
+        function onFileStatusChanged(path, success) {
+            console.log("Update for:", path, "Success:", success);
+
+            // Update the status in the object
+            // 3 = Success, 4 = Failed (or use your custom logic)
+            if (success) {
+                fileListView.selectedPaths[path] = 3;
+                console.log("OK", path)
+            } else {
+                fileListView.selectedPaths[path] = 4;
+                console.log("Failed", path)
+            }
+
+            // Force the CheckBox/Icon in the delegate to re-draw
+            fileListView.selecount++;
+        }
+    }
+
     menuBar: MyMenuBar {
         dragWindow: root
         infoText: root.getInfoText()
         MyMenu {
             title: qsTr("File")
 
+            // Action {
+            //     text: qsTr("Increase Font")
+            //     shortcut: StandardKey.ZoomIn
+            //     onTriggered: editor.text.font.pixelSize += 1
+            // }
+            // Action {
+            //     text: qsTr("Decrease Font")
+            //     shortcut: StandardKey.ZoomOut
+            //     onTriggered: editor.text.font.pixelSize -= 1
+            // }
             Action {
-                text: qsTr("Increase Font")
-                shortcut: StandardKey.ZoomIn
-                onTriggered: editor.text.font.pixelSize += 1
-            }
-            Action {
-                text: qsTr("Decrease Font")
-                shortcut: StandardKey.ZoomOut
-                onTriggered: editor.text.font.pixelSize -= 1
+                text: qsTr("Upload")
+                shortcut: StandardKey.Save
+                onTriggered: () => {
+                        console.log(`Uploading ${Object.keys(fileListView.selectedPaths).length} files ....`)
+                        Object.keys(fileListView.selectedPaths).forEach(p => {
+                            console.log(p, fileListView.selectedPaths[p]); });
+                        doclient.push_files(fileListView.selectedPaths);
+                    }
             }
             Action {
                 text: root.showLineNumbers ? qsTr("Toggle Line Numbers OFF")
@@ -217,7 +250,7 @@ ApplicationWindow {
                     FileListView {
                         id: fileListView
                         anchors.top: folderbrief.bottom
-                        height: rightpan.height
+                        height: parent.height - folderbrief.height
                         width: rightpan.width
                         currentPath: root.currentFilePath
 

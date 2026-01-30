@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.30)
 # set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_packages" CACHE PATH "vcpkg install dir")
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
-project(anclient VERSION 1.0.0 LANGUAGES CXX)
+project(anclient.qml VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,24 +32,24 @@ FetchContent_MakeAvailable(json)
 # try to auto-locate EnTT installed by vcpkg
 message(STATUS "=========================================== CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
-# my/github/vcpkg/...
-# set(CMAKE_TOOLCHAIN_FILE "../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+# # my/github/vcpkg/...
+# # set(CMAKE_TOOLCHAIN_FILE "../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 
-# if(NOT DEFINED EnTT_DIR)
-  set(_vcpkg_root "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_packages/")
-  set(_triplet "x64-windows") # or use VCPKG_TARGET_TRIPLET if provided
-  set(_entt_path "${_vcpkg_root}/${_triplet}/share/entt")
-  set(_nlohmanjson_path "${_vcpkg_root}/${_triplet}/share/nlohmann_json")
+# # if(NOT DEFINED EnTT_DIR)
+#   set(_vcpkg_root "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_packages/")
+#   set(_triplet "x64-windows") # or use VCPKG_TARGET_TRIPLET if provided
+#   set(_entt_path "${_vcpkg_root}/${_triplet}/share/entt")
+#   set(_nlohmanjson_path "${_vcpkg_root}/${_triplet}/share/nlohmann_json")
 
-  message(STATUS "=========================================== _ent_path(EnTTConfig.cmake) = ${_entt_path}")
-  # if(EXISTS "${_entt_path}/EnTTConfig.cmake")
-    # set(EnTT_DIR "${_entt_path}" CACHE PATH "Path to EnTTConfig.cmake" FORCE)
-    # set(nlohmann_json_DIR "${_nlohmanjson_path}" CACHE PATH "Path to nlohmann_jsonConfig.cmake" FORCE)
-    message(STATUS "=========================================== _nlohmanjson_path = ${_nlohmanjson_path}")
-    # list(APPEND CMAKE_PREFIX_PATH "${_entt_path}")
-    message(STATUS "Set EnTT_DIR=${EnTT_DIR}")
-  # endif()
-# endif()
+#   message(STATUS "=========================================== _ent_path(EnTTConfig.cmake) = ${_entt_path}")
+#   # if(EXISTS "${_entt_path}/EnTTConfig.cmake")
+#     # set(EnTT_DIR "${_entt_path}" CACHE PATH "Path to EnTTConfig.cmake" FORCE)
+#     # set(nlohmann_json_DIR "${_nlohmanjson_path}" CACHE PATH "Path to nlohmann_jsonConfig.cmake" FORCE)
+#     message(STATUS "=========================================== _nlohmanjson_path = ${_nlohmanjson_path}")
+#     # list(APPEND CMAKE_PREFIX_PATH "${_entt_path}")
+#     message(STATUS "Set EnTT_DIR=${EnTT_DIR}")
+#   # endif()
+# # endif()
 
 find_package(EnTT CONFIG REQUIRED)
 

@@ -10,6 +10,7 @@
 
 #define FilesystMod "FilesystModule"
 
+
 int main(int argc, char *argv[])
 {
     // Initialize the static application object.
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
     QGuiApplication::setOrganizationName("QtProject");
     QGuiApplication::setApplicationName("File System Explorer");
     // FilesystModule
-    QGuiApplication::setWindowIcon(QIcon((std::string(":/qt/qml/") + FilesystMod + "/icons/app_icon.svg").c_str()));
+    QGuiApplication::setWindowIcon(QIcon((std::string(":/qt/qml/") + FilesystMod + "/icons/album.svg").c_str()));
 
     // Setup the parser and parse the command-line arguments.
     QCommandLineParser parser;

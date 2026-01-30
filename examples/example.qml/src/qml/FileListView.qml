@@ -11,7 +11,10 @@ Item {
     // property string currentPath: ""
     property alias currentPath: folderModel.folder
 
-    property var selectedIndices: []
+    // property var selectedIndices: []
+    property var selectedPaths: ({})
+    /** select paths is a set, which qml engine won't lisenting it's elements changes. */
+    property int selecount: 0
 
     // Signals to communicate events back to the parent
     signal fileDoubleClicked(string path)
@@ -22,12 +25,23 @@ Item {
         id: cppHandler
     }
 
-    function toggleSelection(index) {
+    function toggleSelection(path) {
+        /*
         let current = [...selectedIndices]
         let pos = current.indexOf(index)
         if (pos > -1) current.splice(pos, 1)
         else current.push(index)
         selectedIndices = current
+        */
+        if (selectedPaths.hasOwnProperty(path)) {
+            console.log("removing", path);
+            delete selectedPaths[path];
+        }
+        else {
+            console.log("adding", path);
+            // selectedPaths[path] = 0;
+            selectedPaths[path] = AppConstants.Synching;
+        }
     }
 
     ListView {
@@ -45,7 +59,8 @@ Item {
             id: fileitem
             width: filelist.width
             height: 40
-            color: root.selectedIndices.includes(index) ? Colors.selection : "transparent"
+            // color: root.selectedIndices.includes(index) ? Colors.selection : "transparent"
+            color: root.selectedPaths.hasOwnProperty(filePath) ? Colors.selection : "transparent"
 
             required property int index
             required property string fileName
@@ -59,8 +74,10 @@ Item {
 
                 CheckBox {
                     id: ckb
-                    checked: root.selectedIndices.includes(index)
-                    onToggled: root.toggleSelection(index)
+                    // checked: root.selectedIndices.includes(index)
+                    // checked: root.selecount > 0 && (console.log(filePath, root.selectedPaths.has(filePath)) !== undefined || root.selectedPaths.has(filePath))
+                    checked: root.selecount >= 0 && root.selectedPaths.hasOwnProperty(filePath)
+                    onToggled: root.toggleSelection(filePath)
                     focusPolicy: Qt.NoFocus
                     // 1. The Box (Indicator)
                     indicator: Rectangle {
@@ -86,8 +103,8 @@ Item {
                 }
 
                 Text {
-                    text: fileName // [cite: 47]
-                    color: Colors.text // [cite: 28]
+                    text: fileName
+                    color: Colors.text
                     Layout.fillWidth: true
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -98,11 +115,18 @@ Item {
                 propagateComposedEvents: true
                 onClicked: (mouse) => {
                     if (mouse.modifiers & Qt.ControlModifier) {
-                        root.toggleSelection(index)
+                        // root.toggleSelection(index);
+                        root.toggleSelection(filePath);
+                        // console.log('+', index, filePath, fileName);
                     } else {
-                        root.selectedIndices = [index]
+                        // root.selectedIndices = [index];
+                        // root.selectedPaths.clear();
+                        root.selectedPaths = {};
+                        root.selectedPaths[filePath] = AppConstants.Synching;
+                        // console.log(index, filePath, fileName);
                     }
-                    mouse.accepted = false
+                    root.selecount++;
+                    mouse.accepted = false;
                 }
 
                 onDoubleClicked: {
@@ -111,7 +135,8 @@ Item {
 
                     // 2. Still notify the UI to update the view
                     if (fileIsDir) {
-                        root.selectedIndices = [];
+                        // root.selectedIndices = [];
+                        root.selectedPaths = new Set();
                         folderModel.folder =  Qt.resolvedUrl("file:" + filePath);
                     }
                     else
