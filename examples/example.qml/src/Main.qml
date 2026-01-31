@@ -43,7 +43,7 @@ ApplicationWindow {
 
             // Update the status in the object
             // 3 = Success, 4 = Failed (or use your custom logic)
-            if (success) {
+            if (AppConstants.Synching === success) {
                 fileListView.selectedPaths[path] = 3;
                 console.log("OK", path)
             } else {

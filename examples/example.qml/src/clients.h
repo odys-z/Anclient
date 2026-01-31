@@ -1,58 +1,37 @@
 #pragma once
 
-#include <string>
-// #include <io/odysz/jprotocol.hpp>
-// #include <semantier.h>
-#include <QObject>
-#include <QDebug>
-#include <QUrl>
-
-#include <QFileSystemModel>
-#include <QQmlEngine>
-#include <QJSValue>
-#include <QJSValueIterator>
-
 #include <thread>
 #include <chrono>
+#include <string>
+
+
+#include <QDebug>
+#include <QJSValue>
+#include <QJSValueIterator>
+#include "semantier.h"
 
 using namespace std;
 
-class AppConstants : public QObject {
-    Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
-public:
-    enum SyncState {
-        Synching = 1,
-        Synced = 2
-    };
-    Q_ENUM(SyncState)
-};
-
 namespace anson {
 
-class WSClient : public QObject {
+
+/**
+ * TODO move to a stand alone protocol tier?
+ * JProtocol.OnProgress
+ */
+using OnProgress = std::function<void(QString path, std::string status)>;
+
+class WSClient {
 
 };
 
 class Doclientier : public WSClient {
-    Q_OBJECT
-    QML_ELEMENT
 
+    string device;
 public:
-    Q_INVOKABLE void push_files(QJSValue paths) {if (paths.isUndefined()) {
-            qDebug() << "CPP: paths is Undefined";
-            return;
-        }
-        if (paths.isNull()) {
-            qDebug() << "CPP: paths is Null";
-            return;
-        }
-        if (!paths.isObject()) {
-            // This will tell you if it's a string, number, etc.
-            qDebug() << "CPP: paths is not an object. It is a:" << paths.toString();
-            return;
-        }
+    Doclientier(string device) : device(device) {}
+
+    void push_files_TDD(QJSValue paths, OnProgress onprc) {
 
         // Get an iterator for the JavaScript object
         QJSValueIterator it(paths);
@@ -67,12 +46,29 @@ public:
 
             std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
-            emit fileStatusChanged(currentPath, true);
+            // emit fileStatusChanged(currentPath, "synching");
+            onprc(currentPath, "synching");
         }
     }
 
-signals:
-    // Signal sends the specific path and success/fail
-    void fileStatusChanged(QString path, bool success);
+    void push_files(QJSValue paths, OnProgress onprc) {
+
+        // PathsPage sync_page(device);
+        DocsReq reqbd{device, DocsReq::A::requestSyn};
+
+        QJSValueIterator it(paths);
+        while (it.hasNext()) {
+            it.next();
+            QString pth = it.name();
+
+            reqbd.syncingPage.append(pth.toStdString(), "synching");
+
+            onprc(pth, "synching");
+        }
+    }
+
+// signals:
+//     // Signal sends the specific path and success/fail
+//     void fileStatusChanged(QString path, string status);
 };
 }

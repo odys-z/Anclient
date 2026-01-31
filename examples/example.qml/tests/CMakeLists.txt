@@ -1,9 +1,17 @@
 include(GoogleTest)
 
+find_package(Qt6 REQUIRED COMPONENTS Core Qml Test)
+
 add_executable(
     anclient_tests
     test_01_hello_anson.cpp
     jsample.h
+    ../src/qml_cpp.cpp
+    ../src/qml_cpp.h
+    ../src/clients.cpp
+    ../src/clients.h
+    ../src/semantier.cpp
+    ../src/semantier.h
 )
 
 # include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -11,6 +19,11 @@ add_executable(
 target_include_directories(anclient_tests PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../src"
 )
+
+if (MSVC)
+target_compile_options(anclient_tests PRIVATE /utf-8)
+endif()
+
 
 target_sources(anclient_tests PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../src/clients.cpp"
@@ -32,6 +45,9 @@ add_library(anson.cmake INTERFACE)
 target_link_libraries(anclient_tests PRIVATE 
     EnTT::EnTT
     nlohmann_json::nlohmann_json
+    Qt6::Core
+    Qt6::Qml
+    Qt6::Test
     anson
     gtest_main
 )

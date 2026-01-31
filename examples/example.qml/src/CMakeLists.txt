@@ -15,6 +15,9 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
+    qml_cpp.h
+    qml_cpp.cpp
+
 )
 
 set_source_files_properties(qml/Colors.qml
@@ -55,6 +58,8 @@ qt_add_qml_module(anclient
         linenumbermodel.cpp
         linenumbermodel.h
         filelistview.h	#
+        qml_cpp.cpp
+        qml_cpp.h
         clients.cpp
         clients.h
         semantier.cpp
