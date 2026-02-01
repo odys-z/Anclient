@@ -15,7 +15,7 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-    qml_cpp.h
+    qml_cpp.h # here?
     qml_cpp.cpp
 )
 
@@ -63,7 +63,6 @@ qt_add_qml_module(${PROJECT_NAME}
         clients.h
         semantier.cpp
         semantier.h
-
 )
 
 target_link_libraries(${PROJECT_NAME}

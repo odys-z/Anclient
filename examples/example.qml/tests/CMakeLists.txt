@@ -14,19 +14,9 @@ add_executable(
     ../src/semantier.h
 )
 
-# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 target_include_directories(album_tests PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../src"
 )
-
-
-# target_sources(album_tests PRIVATE
-#     "${CMAKE_CURRENT_SOURCE_DIR}/../src/clients.cpp"
-# )
-# set_tests_properties(album_tests PROPERTIES ENVIRONMENT
-#     "PATH=${QT_INSTALL_BIN};$ENV{PATH}"
-# )
 
 add_custom_command(TARGET album_tests POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -55,7 +45,7 @@ qt_generate_deploy_app_script(
     TARGET album_tests
     OUTPUT_SCRIPT deploy_script
 )
-# install(SCRIPT ${deploy_script})
+
 get_target_property(_qmake_executable Qt6::Core LOCATION)
 get_filename_component(QT_BIN_DIR "${_qmake_executable}" DIRECTORY)
 

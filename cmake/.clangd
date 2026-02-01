@@ -1,0 +1,10 @@
+CompileFlags:
+  Add:
+    - "-I./vcpkg_packages/x64-windows/include"
+    - "-I./src"
+  Suppress:
+    - -Wunused-parameter
+
+  Index:
+    # Ensure clangd indexes files inside the FetchContent/vcpkg folders, entt for anson
+    ExternalFiles: true

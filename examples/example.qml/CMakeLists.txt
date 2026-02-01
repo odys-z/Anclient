@@ -34,6 +34,7 @@ FetchContent_MakeAvailable(json)
 # try to auto-locate EnTT installed by vcpkg
 message(STATUS "=========================================== CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
+# ./vcpkg install entt:x64-windows --x-install-root="../anclient/examples/example.qml/vcpkg_packages"
 find_package(EnTT CONFIG REQUIRED)
 
 FetchContent_Declare(
