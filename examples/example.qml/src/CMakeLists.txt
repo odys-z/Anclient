@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.30)
-project(anclient VERSION 1.0 LANGUAGES CXX)
+project(album VERSION 1.0 LANGUAGES CXX)
 
 if (ANDROID OR IOS)
     message(FATAL_ERROR "Platform is not supported")
@@ -17,7 +17,6 @@ qt_add_executable(${PROJECT_NAME}
     main.cpp
     qml_cpp.h
     qml_cpp.cpp
-
 )
 
 set_source_files_properties(qml/Colors.qml
@@ -25,7 +24,7 @@ set_source_files_properties(qml/Colors.qml
     QT_QML_SINGLETON_TYPE TRUE
 )
 
-qt_add_qml_module(anclient
+qt_add_qml_module(${PROJECT_NAME}
     URI FilesystModule
     VERSION 1.0
     QML_FILES
@@ -67,7 +66,7 @@ qt_add_qml_module(anclient
 
 )
 
-target_link_libraries(anclient
+target_link_libraries(${PROJECT_NAME}
     PRIVATE
         Qt6::Core
         Qt6::Gui
@@ -81,13 +80,17 @@ target_link_libraries(anclient
         anson
 )
 
-set_target_properties(anclient
+set_target_properties(${PROJECT_NAME}
     PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+if (MSVC)
+target_compile_options(album PRIVATE /utf-8)
+endif()
+
 if (APPLE)
-    set_target_properties(anclient PROPERTIES
+    set_target_properties(${PROJECT_NAME} PROPERTIES
         OUTPUT_NAME "File System Explorer"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_BUNDLE_NAME "File System Explorer"
@@ -98,14 +101,14 @@ if (APPLE)
     )
 endif()
 
-install(TARGETS anclient
+install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 qt_generate_deploy_qml_app_script(
-    TARGET anclient
+    TARGET ${PROJECT_NAME}
     OUTPUT_SCRIPT deploy_script
     MACOS_BUNDLE_POST_BUILD
     NO_UNSUPPORTED_PLATFORM_ERROR
