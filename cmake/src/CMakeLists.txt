@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(anclient INTERFACE
-    io/odysz_anc/clients.h
-    io/odysz_anc/semantier.h
+    io/odysz/clients.h
+    io/odysz/semantier.h
     # io/odysz/jprotocol.h
     # io/odysz/json.h
 )
@@ -20,7 +20,7 @@ target_sources(anclient INTERFACE
     FILE_SET HEADERS
     BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
     FILES
-        io/odysz_anc/anson.h
+        io/odysz/anson.h
         # io/odysz/jprotocol.h
         # io/odysz/json.h
 )

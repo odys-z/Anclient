@@ -48,13 +48,24 @@ set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(anson.cmake)
 
 FetchContent_Declare(
+  anclient.cmake
+  GIT_REPOSITORY https://github.com/odys-z/Anclient.git
+  SOURCE_SUBDIR  cmake
+  GIT_TAG        master
+)
+
+set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(anclient.cmake)
+
+FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG        v1.15.2
 )
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory(src)
+# add_subdirectory(src)
+add_subdirectory(app)
 
 # 3. Add tests (only if this is the main project)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
