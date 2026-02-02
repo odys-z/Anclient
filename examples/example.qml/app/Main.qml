@@ -33,7 +33,10 @@ ApplicationWindow {
         return root.expandPath ? out : out.substring(out.lastIndexOf("/") + 1, out.length)
     }
 
-    Doclientier{ id: doclient }
+    QDoclientier{
+        id: doclient
+        device: "test"
+    }
 
     Connections {
         target: doclient
@@ -79,6 +82,7 @@ ApplicationWindow {
                         console.log(`Uploading ${Object.keys(fileListView.selectedPaths).length} files ....`)
                         Object.keys(fileListView.selectedPaths).forEach(p => {
                             console.log(p, fileListView.selectedPaths[p]); });
+                        // doclient.push_files_TDD(fileListView.selectedPaths);
                         doclient.push_files(fileListView.selectedPaths);
                     }
             }
@@ -213,14 +217,6 @@ ApplicationWindow {
                 }
             }
 
-            // The main view that contains the editor.
-            // Editor {
-            //     id: editor
-            //     showLineNumbers: root.showLineNumbers
-            //     currentFilePath: root.currentFilePath
-            //     SplitView.fillWidth: true
-            //     SplitView.fillHeight: true
-            // }
             Column {
                 id: rightpan
                 SplitView.fillWidth: true
@@ -241,7 +237,7 @@ ApplicationWindow {
                         Text {
                             color: "lightgrey"
                             padding: 10
-                            anchors.centerIn: rightpan;
+                            anchors.centerIn: folderbrief;
                             // text: `This is a gallery: ${root.currentFilePath} : ${folderModel.folder} [${folderModel.count}]...`
                             text: `This is a gallery: ${root.currentFilePath} : ${root.currentFilePath} ["$folderModel.count"]...`
                         }
@@ -264,54 +260,6 @@ ApplicationWindow {
                             root.show_dir_file = 1 // Stay in gallery/folder view
                         }
                     }
-
-                    /*
-                    ListView {
-                        id: filelist
-                        // anchors.fill: gallery
-                        anchors.top: folderbrief.bottom
-                        height: rightpan.height
-                        width: rightpan.width
-
-                        model: FolderListModel {
-                            id: folderModel
-                            folder: root.currentFilePath
-                            showDirs: true        // Show directories
-                            showFiles: true       // Show regular files
-                            // nameFilters: ["*"]    // Filter for all files
-                        }
-                        // model: ["red", "grey", "silver", "pink"]
-
-                        delegate: Rectangle {
-                            id: fileitem
-                            width: filelist.width
-                            height: 30
-                            border.color: "#aaa"
-                            color: "transparent"
-
-                            required property string fileName
-                            required property string filePath
-                            required property string fileSuffix
-                            required property string fileBaseName
-                            required property bool fileIsDir
-
-                            Text {
-                                // anchors.centerIn: filelist
-                                text: fileName
-                                color: "white"
-                                // text: fileName // Role provided by FolderListModel
-                            }
-
-                            MouseArea {
-                                anchors.fill: fileitem
-                                onClicked: {
-                                    console.log("selected file:", filePath)
-                                    console.log(`[Dir ${fileIsDir}]`, `[${fileSuffix}]`, fileBaseName)
-                                }
-                            }
-                        }
-                    }
-                    */
                 }
 
                 // Component 2: Visible when showFirst is false

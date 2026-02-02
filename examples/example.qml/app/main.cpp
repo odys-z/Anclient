@@ -10,12 +10,13 @@
 
 #define FilesystMod "FilesystModule"
 
+#include "qml_cpp.h"
 
 int main(int argc, char *argv[])
 {
     // Initialize the static application object.
     QGuiApplication app(argc, argv);
-    QGuiApplication::setOrganizationName("QtProject");
+    QGuiApplication::setOrganizationName("io.github.odys-z");
     QGuiApplication::setApplicationName("File System Explorer");
     // FilesystModule
     QGuiApplication::setWindowIcon(QIcon((std::string(":/qt/qml/") + FilesystMod + "/icons/album.svg").c_str()));
@@ -45,6 +46,8 @@ int main(int argc, char *argv[])
             FilesystMod, FilesystMod);
         fileSystemModel->setInitialDirectory(args[0]);
     }
+
+    qmlRegisterType<AppConstants>("FilesystModule", 1, 0, "AppConstants");
 
     return QGuiApplication::exec(); // Start the event loop.
 }

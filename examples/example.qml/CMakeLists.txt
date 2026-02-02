@@ -10,14 +10,16 @@ cmake_minimum_required(VERSION 3.30)
 #
 # in my/github/vcpkg
 # ./vcpkg install entt:x64-windows --x-install-root="../anclient/examples/example.qml/vcpkg_packages"
-
-# set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_packages" CACHE PATH "vcpkg install dir")
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_packages" CACHE PATH "vcpkg install dir")
 
 project(album.qml VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# see ping.cpp
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Qml)
 qt_standard_project_setup(REQUIRES 6.8)
@@ -49,13 +51,13 @@ FetchContent_MakeAvailable(anson.cmake)
 
 FetchContent_Declare(
   anclient.cmake
-  GIT_REPOSITORY https://github.com/odys-z/Anclient.git
-  SOURCE_SUBDIR  cmake
-  GIT_TAG        master
+  GIT_REPOSITORY https://github.com/odys-z/Anclient.cmake.git
+  GIT_TAG        main
 )
 
 set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(anclient.cmake)
+target_link_libraries(anclient INTERFACE EnTT::EnTT anson)
 
 FetchContent_Declare(
   googletest

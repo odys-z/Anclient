@@ -9,7 +9,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Generate compile_commands.json for clangd/IDE integration (single-config only)
-
 # we have network problem
 # This will save time for each clean build.
 # [try] Comment this out for the first time as the network condition is complicate in China, by the GFW.

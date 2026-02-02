@@ -13,10 +13,12 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 Svg Widgets)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
+# Add the app build directory (where FilesystModule is generated) to the QML import path
+list(APPEND QML_IMPORT_PATH "${CMAKE_BINARY_DIR}/app")
+set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator QML Import Paths" FORCE)
+
 qt_add_executable(${PROJECT_NAME}
     main.cpp
-    qml_cpp.h
-    qml_cpp.cpp
 )
 
 set_source_files_properties(qml/Colors.qml
@@ -52,13 +54,13 @@ qt_add_qml_module(${PROJECT_NAME}
         "icons/app_icon.svg"
         "icons/album.svg"
     SOURCES
+        qml_cpp.h
+        qml_cpp.cpp
         filesysmodel.cpp
         filesysmodel.h
         linenumbermodel.cpp
         linenumbermodel.h
         filelistview.h	#
-        qml_cpp.cpp
-        qml_cpp.h
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -80,6 +82,10 @@ set_target_properties(${PROJECT_NAME}
     WIN32_EXECUTABLE TRUE
 )
 
+if (MSVC)
+target_compile_options(album PRIVATE /utf-8)
+endif()
+
 if (APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         OUTPUT_NAME "File System Explorer"
@@ -91,6 +97,12 @@ if (APPLE)
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     )
 endif()
+
+# clangd helper, see also .clangd/index
+# set(ANSON_BUILD_TESTS ON) not working
+add_executable(album_clangd_helper dev/ping.cpp)
+target_link_libraries(album_clangd_helper PRIVATE anclient)
+
 
 install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
