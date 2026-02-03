@@ -12,8 +12,6 @@
 #include "io/oz/anclient/ipcagent.hpp"
 #include "io/oz/anclient/soketier.h"
 
-#define NL "\n"
-
 using namespace std;
 
 void ping(QWebSocket& skt, const string& msg) {
@@ -37,7 +35,7 @@ int main(int argc, char *argv[])
     qDebug() << "IPC Client:\n" ;
 
     for (auto arg : span(argv, argc))
-        qDebug() << arg; // << NL ;
+        qDebug() << arg;
 
     // ... inside a function or slot
     qDebug() << "Desktop-cli current directory:" << QDir::currentPath();

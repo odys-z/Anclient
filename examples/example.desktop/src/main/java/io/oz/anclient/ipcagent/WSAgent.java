@@ -41,7 +41,7 @@ public class WSAgent {
                         @SuppressWarnings("unchecked")
 						@Override
                         public <T> T getEndpointInstance(Class<T> clazz) {
-                            return (T) WSSocket.build(settings);
+                            return (T) WSSocket.build(server, settings);
                         }
                     })
                     .build();

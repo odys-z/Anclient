@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
+import org.eclipse.jetty.server.Server;
+
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
 import io.odysz.anson.JsonOpt;
@@ -38,10 +40,17 @@ public class WSSocket {
 	/** {"host:port": session} */
 	protected final HashMap<String, Session> sessions;
 
-	public static WSSocket build(AgentSettings settings) {
+
+	public static WSSocket build(Server server, AgentSettings settings) {
 		mustnonull(settings.tiers);
 		instance = new WSSocket(settings.tiers);
-		return instance;
+		return instance.server(server);
+	}
+	
+	Server server;
+	public WSSocket server(Server server) {
+		this.server = server;
+		return this;
 	}
 
 	public WSSocket(String[] tiernames) {
