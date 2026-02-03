@@ -42,13 +42,16 @@ ApplicationWindow {
         target: doclient
 
         function onFileStatusChanged(path, success) {
-            console.log("Update for:", path, "Success:", success);
+            console.log("Update for:", AppConstants.PUSHING, path, "Success:", success);
 
             // Update the status in the object
             // 3 = Success, 4 = Failed (or use your custom logic)
-            if (AppConstants.Synching === success) {
+            if (AppConstants.PUSHING === success) {
                 fileListView.selectedPaths[path] = 3;
-                console.log("OK", path)
+                console.log("Pushing", path)
+            } else if (AppConstants.PUBLISH === success) {
+                fileListView.selectedPaths[path] = 3;
+                console.log("Publish", path)
             } else {
                 fileListView.selectedPaths[path] = 4;
                 console.log("Failed", path)

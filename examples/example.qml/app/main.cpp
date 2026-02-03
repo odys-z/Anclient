@@ -1,9 +1,11 @@
-// Copyright (C) 2023 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+#if defined(_MSC_VER) && (_MSC_VER >= 1600)
+#pragma execution_character_set("utf-8")
+#endif
 
 #include "filesysmodel.h"
 
 #include <string>
+#include <windows.h>
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
@@ -14,6 +16,11 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
+
     // Initialize the static application object.
     QGuiApplication app(argc, argv);
     QGuiApplication::setOrganizationName("io.github.odys-z");
@@ -47,7 +54,15 @@ int main(int argc, char *argv[])
         fileSystemModel->setInitialDirectory(args[0]);
     }
 
-    qmlRegisterType<AppConstants>("FilesystModule", 1, 0, "AppConstants");
+    // qmlRegisterType<AppConstants>("FilesystModule", 1, 0, "AppConstants");
+    AppConstants qml_cpp;
+    qmlRegisterSingletonInstance ("FilesystModule", 1, 0, "AppConstants", &qml_cpp);
+
+    #ifdef QT_DEBUG
+        // qDebug() << "UTF-8: café naïve résumé こんにちは " << "Слава Україні!" << qml_cpp.publish() << qml_cpp.publish();
+        AppConstants::qlog("UTF-8: café naïve résumé こんにちは", anson::ShareFlag::pushing);
+        AppConstants::qlog("Слава Україні!" , anson::ShareFlag::publish);
+    #endif
 
     return QGuiApplication::exec(); // Start the event loop.
 }

@@ -12,22 +12,63 @@
 #include <QJSValue>
 #include <QJSValueIterator>
 
+#include <QFile>
+#include <QTextStream>
+#include <io/odysz/semantic/tier/docs.h>
+
+#define QMLConst QString
+/**
+ * @brief The AppConstants class
+ * Constants for communication between QML and C++.
+ *
+ * Usage:
+ * in main.cpp, qmlRegisterType<AppConstants>("FilesystModule", 1, 0, "AppConstants");
+ */
 class AppConstants : public QObject {
     Q_OBJECT
-    QML_SINGLETON
+    // 1. Define the property for QML
+    Q_PROPERTY(QString PUSHING READ pushing CONSTANT)
+    Q_PROPERTY(QString PUBLISH READ publish CONSTANT)
+    Q_PROPERTY(QString UNKNOWN READ unknown CONSTANT)
+
 public:
-    enum SyncState {
-        Synching = 1,
-        Synced = 2
-    };
-    Q_ENUM(SyncState)
-    
+    explicit AppConstants(QObject *parent = nullptr) : QObject(parent) {}
+
+    QString pushing() const { return QString::fromStdString(anson::ShareFlag::pushing); } // { return anson::ShareFlag::pushing.c_str(); }
+    QString publish() const { return anson::ShareFlag::publish.c_str(); }
+    QString unknown() const { return anson::ShareFlag::unknown.c_str(); }
+
     static bool check_jsvalue(QJSValue v);
-    static string nameof(SyncState s);
+    static QMLConst nameof(anson::ShareFlag s) { return s.name().c_str(); }
+
+    #ifdef QT_DEBUG
+    /**
+     * @brief qlog
+     * Adding logs to ./debug_log.txt. Can be useful as Qt Creator output pans has utf-8 encoding limits, say:
+     *
+     * UTF-8: café na?ve résumé こんにちは  Слава Укра?н?! "??" "??"
+     *               ï                             ї і   ⇈   🌎
+     * @param log
+     * @param log2
+     */
+    static void qlog(string log, string log2) {
+        QFile file("debug_log.txt");
+        if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+            QTextStream out(&file);
+            out.setEncoding(QStringConverter::Utf8);
+            QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            out << timestamp << " std: [" << log2.c_str() << "] " << log.c_str() << Qt::endl <<
+             "                    qt : [" << QString::fromStdString(log2)<< "] " << QString::fromStdString(log) << Qt::endl;
+            file.close();
+        }
+    }
+    #endif
+
 };
 
+
 using namespace anson;
-using synst = AppConstants::SyncState;
+// using synst = AppConstants::SyncState;
 
 class QDoclientier : public QObject {
     Q_OBJECT
@@ -70,7 +111,8 @@ public:
             std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
             // emit fileStatusChanged(currentPath, "synching");
-            emit fileStatusChanged(currentPath, AppConstants::SyncState::Synching);
+            AppConstants s;
+            emit fileStatusChanged(currentPath, s.pushing());
         }
     }
 
@@ -80,20 +122,21 @@ public:
 
         this->syncing_paths = map<string, vector<string>>{};
         QJSValueIterator it(paths);
-        while (it.hasNext()) {
-            // this->syncing_paths.push_back(it.name().toStdString());
-            this->syncing_paths[it.name().toStdString()] = {AppConstants::nameof(synst::Synching), ""};
+        while (it.next()) {
+            qDebug() << "cpp handling: " << it.name();
+            this->syncing_paths[it.name().toStdString()] = {anson::ShareFlag::pushing, _device.toStdString(), "now()"};
         }
 
         clientier.push_files(this->syncing_paths,
             [paths, this] (const string& p, string status) {
-                emit this->fileStatusChanged(p.c_str(), status.c_str());
+                #ifdef QT_DEBUG
+                    AppConstants::qlog(p, status);
+                #endif
+                emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
             });
     }
 
 signals:
     void deviceChanged(); // 4. The signal
-    // Signal sends the specific path and success/fail
-    void fileStatusChanged(QString path, QString status);
-    void fileStatusChanged(QString path, synst status);
+    void fileStatusChanged(QString path, QMLConst status);
 };

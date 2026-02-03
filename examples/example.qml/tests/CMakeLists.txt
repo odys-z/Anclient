@@ -4,18 +4,18 @@ find_package(Qt6 REQUIRED COMPONENTS Core Qml Test)
 
 add_executable(
     album_tests
-    test_01_hello_anson.cpp
     jsample.h
-    ../src/qml_cpp.cpp
-    ../src/qml_cpp.h
-    ../src/clients.cpp
-    ../src/clients.h
-    ../src/semantier.cpp
-    ../src/semantier.h
+    ../app/qml_cpp.cpp
+    ../app/qml_cpp.h
+    # ../app/semantier.cpp
+    # ../app/semantier.h
+    ../app/dev/ping.cpp
+    test_01_hello_anson.cpp
+    test_02_ipcagent.cpp
 )
 
 target_include_directories(album_tests PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../app"
 )
 
 add_custom_command(TARGET album_tests POST_BUILD

@@ -41,9 +41,8 @@ find_package(EnTT CONFIG REQUIRED)
 
 FetchContent_Declare(
   anson.cmake
-  GIT_REPOSITORY https://github.com/odys-z/antson.git
-  SOURCE_SUBDIR  antson.cmake
-  GIT_TAG        master # cmake-0.0.1 # 2026-01-30
+  GIT_REPOSITORY https://github.com/odys-z/anson.cmake.git
+  GIT_TAG        main
 )
 
 set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -65,6 +64,9 @@ FetchContent_Declare(
   GIT_TAG        v1.15.2
 )
 FetchContent_MakeAvailable(googletest)
+
+# add_compile_options(/utf-8)
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 # add_subdirectory(src)
 add_subdirectory(app)
