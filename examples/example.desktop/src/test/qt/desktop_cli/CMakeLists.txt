@@ -20,7 +20,7 @@ add_executable(desktop_cli
   io/oz/anclient/ipcagent.hpp
   io/odysz/semantics.hpp
   io/odysz/anson.hpp
-  io/odysz/glaze.hpp
+
   io/odysz/semantic/jprotocol.hpp
   io/odysz/module/rs.hpp
   io/oz/anclient/soketier.h

@@ -8,9 +8,10 @@
 #include <QString>
 #include <QDebug>
 #include <QProcess>
+#include <QtWebSockets/QtWebSockets>
 
 // #include <io/odysz/anson.h>
-
+using namespace anson;
 
 void start_agent(QProcess& myProcess, anson::TestSettings& settings) {
     string path2prj = ".";
@@ -50,7 +51,68 @@ void start_agent(QProcess& myProcess, anson::TestSettings& settings) {
     }
     else
         qDebug() << "JAVA PID:" << myProcess.processId();
+}
 
+void close_agent(QProcess& myProcess, anson::TestSettings& settings) {
+
+}
+
+#include <io/oz/anclient/socketier.h>
+
+void ping(QWebSocket& skt, const string& msg) {
+    WSEchoReq req {WSEchoReq::A::echo};
+    req.echo = msg;
+
+    qDebug() << "[Qt Clinet Ping].body" << req.toBlock<WSEchoReq>().c_str();
+
+    AnsonMsg<WSEchoReq> anmsg(Port::echo, req);
+    // anmsg.body.push_back(req);
+    string reqs = anmsg.toBlock<AnsonMsg<WSEchoReq>>();
+    qDebug() << "[Qt Clinet Ping]" << reqs.c_str();
+    skt.sendTextMessage(reqs.c_str());
+}
+
+
+void send_msg(char* argv[], TestSettings* settings) {
+    QWebSocket socket;
+    string hello = "";
+
+    QObject::connect(&socket, &QWebSocket::connected, [&]() {
+        qDebug() << "Connected to Jetty!";
+        // socket.sendTextMessage("Hello from Qt C++");
+        ping(socket, hello);
+    });
+
+
+    QObject::connect(&socket, &QWebSocket::textMessageReceived, [&socket](const QString &msg) {
+        qDebug() << "[Qt Client] Server replied:";
+        qDebug() << msg;
+
+        AnsonResp resp;
+        Anson::from_json(resp, msg.toStdString());
+
+        if (msg == "bye") {
+            socket.close();
+            QCoreApplication::quit();
+        }
+    });
+
+    QObject::connect(&socket, &QWebSocket::binaryMessageReceived, &a, [](const QByteArray &message) {
+        qDebug() << "[Qt Client] Full stream received. Total size:" << message.size();
+    });
+
+    // Match the Java servlet path /ws/
+    // socket.open(QUrl("ws://localhost:8080/ws/"));
+    QString wsurl = QString::fromStdString(settings->wsUri());
+    qDebug() << wsurl;
+    socket.open(QUrl(wsurl));
+
+    this_thread::sleep_for(chrono::seconds(10));
+
+    // socket.sendTextMessage(argv[3]);
+    // socket.sendTextMessage(argv[4]);
+    ping(socket, argv[3]);
+    ping(socket, argv[4]);
 }
 
 TEST(IPCAGENT, MANAGE) {
@@ -68,4 +130,5 @@ TEST(IPCAGENT, MANAGE) {
     qDebug() << "Stopping Java Process ...";
     this_thread::sleep_for(chrono::seconds(3));
 
+    close_agent(proc_agent, settings);
 }
