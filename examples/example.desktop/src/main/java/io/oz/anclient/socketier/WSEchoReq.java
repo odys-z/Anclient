@@ -3,12 +3,12 @@ package io.oz.anclient.socketier;
 import io.odysz.semantic.jserv.echo.EchoReq;
 
 public class WSEchoReq extends EchoReq {
-	static class A {
-		static final String echo = "e";
+	public static class A {
+		public static final String echo = "echo";
 		/**
 		 * Send me an ipc exception.
 		 */
-		static final String x = "x";
+		public static final String x = "x";
 	}
 
 	public String echo;
