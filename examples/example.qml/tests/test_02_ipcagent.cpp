@@ -63,9 +63,9 @@ void ping(QWebSocket& skt, const string& msg) {
     WSEchoReq req {WSEchoReq::A::echo};
     req.echo = msg;
 
-    qDebug() << "[Qt Clinet Ping].body" << req.toBlock<WSEchoReq>().c_str();
+    qDebug() << "[Qt Clinet Ping].body" << req.toBlock().c_str();
 
-    AnsonMsg<WSEchoReq> anmsg(Port::echo, req);
+    AnsonMsg<WSEchoReq> anmsg(Port(Port::echo), req);
     // anmsg.body.push_back(req);
     string reqs = anmsg.toBlock<AnsonMsg<WSEchoReq>>();
     qDebug() << "[Qt Clinet Ping]" << reqs.c_str();

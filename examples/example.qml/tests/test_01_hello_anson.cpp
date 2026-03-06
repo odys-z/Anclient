@@ -36,11 +36,13 @@ void register_jsample() {
 TEST(ANSON, Hello) {
     // deserialize settings.json
     using namespace  anson;
-    register_meta();
+
+    map<string, map<string, int>*> enum_types;
+    register_meta(enum_types);
     register_jsample();
 
     anson::TestSettings sets;
-    EnTTSaxParser handler(sets);
+    EnTTSaxParser<TestSettings> handler(sets);
 
     string json_file
         = R"("{"type": "io.odysz.jsample.SampleSettings", )"
