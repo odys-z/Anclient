@@ -41,7 +41,7 @@ public class Clients {
 	 */
 	public static boolean verbose = false;
 
-	/** @deprecated 0.5.18, replaced with JServUrl */
+	/** @deprecated 0.5.18, replaced with {@link io.odysz.semantic.jprotocol.JServUrl} */
 	public static String servRt;
 
 	/**Initialize configuration.
