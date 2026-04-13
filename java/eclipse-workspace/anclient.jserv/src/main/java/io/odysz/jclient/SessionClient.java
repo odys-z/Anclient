@@ -100,7 +100,7 @@ public class SessionClient {
 	/**
 	 * Login and return a client instance (with session managed by jserv).
 	 * 
-	 * <h5>Note: since 2.0.0, deprecating static way of {@link Clients#servRt}
+	 * <h5>Note: since 1.5.0, deprecating static way of {@link Clients#servRt}
 	 * since anclient.java 1.4.14</h5>
 	 * This class uses instance's url root jserv, which is copied from {@link Clients#servRt}
 	 * that is usually be initialized with {@link Clients#init(String, boolean...)}. 
@@ -114,7 +114,7 @@ public class SessionClient {
 	 * @throws SemanticException
 	 * @throws AnsonException
 	 * @throws SsException
-	 * @since 2.0.0
+	 * @since 1.5.0
 	 */
 	public static SessionClient loginWithUri(String servroot, String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
@@ -457,7 +457,7 @@ public class SessionClient {
     	
     	if (isblank(req.body(0).a()))
     		throw new AnsonException(0,
-    			"Since anclient.java 0.5, jserv 2.0.0, a non-empty a-tag is forced for session-required request.");
+    			"Since anclient.java 0.5, jserv 1.5.0, a non-empty a-tag is forced for session-required request.");
     	
     	HttpServClient httpClient = new HttpServClient();
   		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(myservRt, req.port()), req);
