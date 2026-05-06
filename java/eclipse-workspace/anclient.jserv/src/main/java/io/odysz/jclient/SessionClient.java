@@ -43,6 +43,7 @@ import io.odysz.transact.x.TransException;
  * @author odys-z@github.com
  *
  */
+@SuppressWarnings("deprecation")
 public class SessionClient {
 	static boolean verbose;
 	public static void verbose(boolean v) { verbose = v;}
