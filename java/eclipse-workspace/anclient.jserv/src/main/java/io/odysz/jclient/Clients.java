@@ -41,10 +41,15 @@ public class Clients {
 	 */
 	public static boolean verbose = false;
 
-	/** @deprecated 0.5.18, replaced with {@link io.odysz.semantic.jprotocol.JServUrl} */
+	/**
+	 * @deprecated 0.5.20 To connect to different service, that's how edge computation works,
+	 * this must be moved into client instance.
+	 * @deprecated 0.5.18, replaced with {@link io.odysz.semantic.jprotocol.JServUrl}
+	 */
 	public static String servRt;
 
-	/**Initialize configuration.
+	/**
+	 * Initialize configuration.
 	 * @param servRoot
 	 */
 	public static void init(String servRoot, boolean ... enableVerbose) {
@@ -181,7 +186,7 @@ public class Clients {
 	 */
 	public static AnsonResp pingLess(String funcUri, OnError errCtx)
 			throws SemanticException, AnsonException, IOException {
-		EchoReq req = new EchoReq(null);
+		EchoReq req = new EchoReq();
 		req.a(A.echo);
 
 		InsecureClient client = new InsecureClient(Clients.servRt);

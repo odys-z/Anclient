@@ -44,6 +44,9 @@ import io.oz.jsample.SampleApp;
 public class AnsonClientTest {
 	public static final String testUriClient = "test/anclient";
 	
+	/**
+	 * @deprecated 1.5.20 let's upgrade to the way of settings, like the docsync-jserv/SynssionPeer.
+	 */
 	private static String jserv = "http://localhost:8080/jserv-sample";
 	private static String pswd = "123456";
 	private static String filename = "src/test/res/Sun_Yat-sen_2.jpg";
@@ -122,7 +125,7 @@ public class AnsonClientTest {
 			Utils.warn("getEcho() can only work with jsample");
 			Utils.warn(jserv);
 		}
-		EchoReq req = (EchoReq) new EchoReq(null).a(A.echo);
+		EchoReq req = (EchoReq) new EchoReq().a(A.echo);
 
 		String t = "menu";
 		String[] act = AnsonHeader.usrAct("SemanticClientTest", "init", t,
