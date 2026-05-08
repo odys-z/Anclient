@@ -132,13 +132,13 @@ public class SessionClient {
 								e.getMessage(), e.getCause().getMessage());
 		}
 		
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
+		AnsonMsg<AnSessionReq> req = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
 										.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
 		String url = servUrl(servroot, Port.session); 
 
-		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+		AnsonMsg<AnsonResp> resp = httpClient.post(url, req);
 		if (Clients.verbose)
 			Utils.logi(resp.toString());
 

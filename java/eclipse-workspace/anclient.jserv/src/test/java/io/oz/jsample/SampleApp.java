@@ -51,8 +51,6 @@ public class SampleApp {
 		boolean[] ready = new boolean[] {false};
 		turnred(ready);
 
-		JProtocol.setup("jserv-sample", Port.echo);
-
 		Thread t = new Thread(() -> {
 			app = _main(null);
 			turngreen(ready);
@@ -97,6 +95,8 @@ public class SampleApp {
 	 */
 	public static SampleApp _main(String[] args) {
 		try {
+			JProtocol.setup("jserv-sample", Port.echo);
+
 			// For Eclipse's running as Java Application
 			// E. g. -DWEB-INF=src/main/webapp/WEB-INF
 			String srcwebinf = ifnull(System.getProperty("WEB-INF"), webinf);
