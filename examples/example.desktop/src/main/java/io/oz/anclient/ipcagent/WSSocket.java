@@ -47,7 +47,7 @@ public class WSSocket {
 		return instance.server(server);
 	}
 	
-	Server server;
+	public Server server;
 	public WSSocket server(Server server) {
 		this.server = server;
 		return this;
