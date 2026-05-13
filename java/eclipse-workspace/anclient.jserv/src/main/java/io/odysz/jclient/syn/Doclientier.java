@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
@@ -177,7 +177,7 @@ public class Doclientier extends Semantier {
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
  			String entityName, ShareFlag share, OnOk ok, OnProcess proc) throws Exception {
 
-		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
+		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc(null, "")
 					.share(doclient.robt.uid(), share.name(), new Date())
 					.shareflag(ShareFlag.publish.name())
 					.folder(atdev.tofolder)
@@ -248,7 +248,7 @@ public class Doclientier extends Semantier {
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper.blockSize(), template,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper2.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -347,7 +347,7 @@ public class Doclientier extends Semantier {
 
 				ifs = (FileInputStream) fileProvider.open(f);
 
-				String b64 = AESHelper.encode64(ifs, blocksize);
+				String b64 = AESHelper2.encode64(ifs, blocksize);
 				while (b64 != null) {
 					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, ssinf);
 					seq++;
@@ -358,7 +358,7 @@ public class Doclientier extends Semantier {
 					respi = client.commit(q, errHandler);
 					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
 
-					b64 = AESHelper.encode64(ifs, blocksize);
+					b64 = AESHelper2.encode64(ifs, blocksize);
 				}
 				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
 
