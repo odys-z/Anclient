@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Radix64;
 import io.odysz.common.Utils;
 import io.odysz.jclient.tier.ErrorCtx;
@@ -144,7 +144,7 @@ public class AnsonClientTest {
 			throws SemanticException, IOException, SQLException, AnsonException {
 		Path p = Paths.get(filename);
 		byte[] f = Files.readAllBytes(p);
-		String b64 = AESHelper.encode64(f);
+		String b64 = AESHelper2.encode64(f);
 
 		String furi = "test/Anclient";
 		AnsonMsg<? extends AnsonBody> jmsg = client.update(furi, "a_users");

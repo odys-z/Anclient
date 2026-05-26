@@ -8,7 +8,7 @@ import java.net.URL;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
@@ -36,7 +36,7 @@ class HttpServClientTest {
 		@SuppressWarnings("unchecked")
 		AnsonMsg<DocsReq> jreq = (AnsonMsg<DocsReq>) Anson.fromJson(req);
 
-		String[] parss = AESHelper.encode64(jreq.toBlock().getBytes()).split("\\+");
+		String[] parss = AESHelper2.encode64(jreq.toBlock().getBytes()).split("\\+");
 		assertTrue(parss != null && parss.length > 2);
 
  		URL url = new URL(f("%s?anson64=%s",

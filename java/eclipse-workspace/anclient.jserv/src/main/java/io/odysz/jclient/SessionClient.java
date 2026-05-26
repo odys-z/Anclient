@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
@@ -91,7 +91,7 @@ public class SessionClient {
 				throw new AnsonException(0, "Initialized final field myservRt is empty.");
 
 			ssInf = r.ssInf();
-			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
+			ssInf.ssToken = AESHelper2.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
 			profile = r.profile();
 		} catch (GeneralSecurityException | IOException e) {
 			throw new SsException(e.getMessage());
@@ -119,13 +119,13 @@ public class SessionClient {
 	 */
 	public static SessionClient loginWithUri(String servroot, String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
-		byte[] iv =   AESHelper.getRandom();
-		String iv64 = AESHelper.encode64(iv);
+		byte[] iv =   AESHelper2.getRandom();
+		String iv64 = AESHelper2.encode64(iv);
 		if (uid == null || pswdPlain == null)
 			throw new SemanticException("user id and password can not be null.");
 		String tk64;
 		try {
-			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+			tk64 = AESHelper2.encrypt(uid, pswdPlain, iv);
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 			throw new SsException("AES encrpyt failed: %s\nCause: %s",

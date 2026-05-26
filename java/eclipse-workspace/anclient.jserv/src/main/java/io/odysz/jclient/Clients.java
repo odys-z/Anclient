@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -115,12 +115,12 @@ public class Clients {
 	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
 		new Thread(new Runnable() {
 	        public void run() {
-				byte[] iv =   AESHelper.getRandom();
-				String iv64 = AESHelper.encode64(iv);
+				byte[] iv =   AESHelper2.getRandom();
+				String iv64 = AESHelper2.encode64(iv);
 				if (uid == null || pswdPlain == null)
 					onErr.err(MsgCode.exGeneral, "user id and password can not be null.");
 				try {
-					String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+					String tk64 = AESHelper2.encrypt(uid, pswdPlain, iv);
 					
 					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
