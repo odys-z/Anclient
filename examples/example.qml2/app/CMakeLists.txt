@@ -13,7 +13,7 @@ qt_add_executable(appalbum_qml
 )
 
 qt_add_qml_module(appalbum_qml
-    URI album_qml
+    URI portfolio_qml
     QML_FILES
         Main.qml
 )
