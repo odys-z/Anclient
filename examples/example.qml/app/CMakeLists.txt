@@ -58,7 +58,7 @@ qt_add_qml_module(${PROJECT_NAME}
         linenumbermodel.cpp
         linenumbermodel.h
         filelistview.h
-        SOURCES doctier.cpp	#
+        doctier.cpp	#
 )
 
 target_link_libraries(${PROJECT_NAME}

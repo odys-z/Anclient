@@ -69,9 +69,8 @@ public:
 };
 
 
-using namespace anson;
+// using namespace anson;
 // using synst = AppConstants::SyncState;
-
 
 class QDoclientier : public QObject {
     Q_OBJECT
@@ -81,17 +80,21 @@ class QDoclientier : public QObject {
     // 1. Define the property
     Q_PROPERTY(QString device READ device WRITE setDevice NOTIFY deviceChanged)
 
-    Doclientier clientier;
+    anson::Doclientier clientier;
 
     map<string, vector<string>> syncing_paths;
 
-    OnError err;
+    inline static anson::OnError onErr = [](anson::MsgCode c, string_view e, vector<string_view> &a) {
+        // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    };
 
 public:
-    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent),
-        clientier("", "", "", err) {}
+    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent)
+        // clientier("", "", "", onErr) {}
+        , clientier(onErr)
+    {}
 
-    QDoclientier(QString device) : clientier("", "", "device.toStdString()", err) {}
+    // QDoclientier(QString device) : clientier("", "", "device.toStdString()", onErr) {}
 
     // 2. Add Getter
     QString device() const { return _device; }
@@ -134,13 +137,13 @@ public:
             this->syncing_paths[it.name().toStdString()] = {anson::ShareFlag::pushing, _device.toStdString(), "now()"};
         }
 
-        clientier.push_files(this->syncing_paths,
-            [paths, this] (const string& p, const string& status) {
-                #ifdef QT_DEBUG
-                    AppConstants::qlog(p, status);
-                #endif
-                emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
-            });
+        // clientier.push_files(this->syncing_paths,
+        //     [paths, this] (const string& p, const string& status) {
+        //         #ifdef QT_DEBUG
+        //             AppConstants::qlog(p, status);
+        //         #endif
+        //         emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
+        //     });
     }
 
 signals:

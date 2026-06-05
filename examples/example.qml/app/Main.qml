@@ -1,3 +1,5 @@
+// Modified from Qt Template Lib
+// Template Lisence
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 import QtQuick
@@ -33,10 +35,10 @@ ApplicationWindow {
         return root.expandPath ? out : out.substring(out.lastIndexOf("/") + 1, out.length)
     }
 
-    // QDoclientier{
-    //     id: doclient
-    //     device: "test"
-    // }
+    QDoclientier{
+        id: doclient
+        device: "test"
+    }
 
     Connections {
         target: doclient

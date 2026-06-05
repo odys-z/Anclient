@@ -22,21 +22,23 @@ char*** __imp___argv = __p___argv();
 }
 #endif
 
-// int main(int argc, char *argv[])
-// {
-//     QGuiApplication app(argc, argv);
+/** The test stub, to be deleted:
+int main(int argc, char *argv[])
+{
+    QGuiApplication app(argc, argv);
 
-//     QQmlApplicationEngine engine;
-//     QObject::connect(
-//         &engine,
-//         &QQmlApplicationEngine::objectCreationFailed,
-//         &app,
-//         []() { QCoreApplication::exit(-1); },
-//         Qt::QueuedConnection);
-//     engine.loadFromModule("FilesystModule", "Main");
+    QQmlApplicationEngine engine;
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreationFailed,
+        &app,
+        []() { QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
+    engine.loadFromModule("FilesystModule", "Main");
 
-//     return app.exec();
-// }
+    return app.exec();
+}
+*/
 
 int main(int argc, char *argv[]) {
 #ifdef Q_OS_WIN

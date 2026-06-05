@@ -14,7 +14,6 @@
 TEST(ANSON, Query) {
     using namespace  anson;
 
-    cout << "--------------------------" << endl;
     AstMap asts;
     register_doctier(asts, "ast");
     register_qmltestsettingsAst(asts);
