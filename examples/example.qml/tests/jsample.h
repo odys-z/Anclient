@@ -19,18 +19,18 @@ namespace anson {
 
 // };
 
-class SessionInf : public Anson {
-    string type = "io.odysz.semantics.SessionInf";
+// class SessionInf : public Anson {
+//     string type = "io.odysz.semantics.SessionInf";
 
-    string ssid;
-    string uid;
-    string roleId;
-    string userName;
-    string roleName;
-    string ssToken;
-    int seq;
-    string device;
-};
+//     string ssid;
+//     string uid;
+//     string roleId;
+//     string userName;
+//     string roleName;
+//     string ssToken;
+//     int seq;
+//     string device;
+// };
 
 class TestSettings : public Anson {
     inline static const string _type_ = "io.odysz.anclient.TestSetttings";

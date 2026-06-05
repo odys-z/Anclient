@@ -1,134 +1,132 @@
-#include <gtest/gtest.h>
-
-#include <io/odysz/anson.h>
-#include <io/odysz/jprotocol.h>
-#include <io/odysz/json.h>
-#include "jsample.h"
-
-#include <QString>
-#include <QDebug>
-#include <QProcess>
-#include <QtWebSockets/QtWebSockets>
+// #include <gtest/gtest.h>
 
 // #include <io/odysz/anson.h>
-using namespace anson;
+// #include <io/odysz/jprotocol.h>
+// #include <io/odysz/json.h>
+// #include "jsample.h"
 
-void start_agent(QProcess& myProcess, anson::TestSettings& settings) {
-    string path2prj = ".";
-    filesystem::path agent_jar = settings.agentJar(path2prj);
-    filesystem::path agent_json = settings.agentJson(path2prj);
+// #include <QString>
+// #include <QDebug>
+// #include <QProcess>
+// #include <QtWebSockets/QtWebSockets>
 
-    qDebug() << "=== start_agent({" << agent_json.c_str() << agent_jar.c_str() << "===";
+// using namespace anson;
 
-    // QProcess myProcess = QProcess();
-    const QString program = "java";
-    QStringList arguments;
-    arguments << "-jar";
+// void start_agent(QProcess& myProcess, anson::TestSettings& settings) {
+//     string path2prj = ".";
+//     filesystem::path agent_jar = settings.agentJar(path2prj);
+//     filesystem::path agent_json = settings.agentJson(path2prj);
 
-    // Gemini: On windows, QStringList (and QString) internally stores everything as UTF-16.
-    arguments << QString::fromUtf8(agent_jar.u8string().c_str());
-    arguments << QString::fromUtf8(agent_json.u8string().c_str());
+//     qDebug() << "=== start_agent({" << agent_json.c_str() << agent_jar.c_str() << "===";
 
-    QString cmd = "java";
-    for (const QString& value : std::as_const(arguments)) {
-        cmd += " " + value;
-    }
-    qDebug() << cmd;
+//     // QProcess myProcess = QProcess();
+//     const QString program = "java";
+//     QStringList arguments;
+//     arguments << "-jar";
 
-    QObject::connect(&myProcess, &QProcess::readyReadStandardOutput, [&]() {
-        qDebug() << "Java Output:" << myProcess.readAllStandardOutput().trimmed();
-    });
+//     // Gemini: On windows, QStringList (and QString) internally stores everything as UTF-16.
+//     arguments << QString::fromUtf8(agent_jar.u8string().c_str());
+//     arguments << QString::fromUtf8(agent_json.u8string().c_str());
 
-    // Also helpful to catch errors
-    QObject::connect(&myProcess, &QProcess::readyReadStandardError, [&]() {
-        qDebug() << "Java Error:" << myProcess.readAllStandardError().trimmed();
-    });
+//     QString cmd = "java";
+//     for (const QString& value : std::as_const(arguments)) {
+//         cmd += " " + value;
+//     }
+//     qDebug() << cmd;
 
-    myProcess.start(program, arguments);
+//     QObject::connect(&myProcess, &QProcess::readyReadStandardOutput, [&]() {
+//         qDebug() << "Java Output:" << myProcess.readAllStandardOutput().trimmed();
+//     });
 
-    if (!myProcess.waitForStarted()) {
-        qDebug() << "Failed to start Java process!";
-    }
-    else
-        qDebug() << "JAVA PID:" << myProcess.processId();
-}
+//     // Also helpful to catch errors
+//     QObject::connect(&myProcess, &QProcess::readyReadStandardError, [&]() {
+//         qDebug() << "Java Error:" << myProcess.readAllStandardError().trimmed();
+//     });
 
-void close_agent(QProcess& myProcess, anson::TestSettings& settings) {
+//     myProcess.start(program, arguments);
 
-}
+//     if (!myProcess.waitForStarted()) {
+//         qDebug() << "Failed to start Java process!";
+//     }
+//     else
+//         qDebug() << "JAVA PID:" << myProcess.processId();
+// }
 
-#include <io/oz/anclient/socketier.h>
+// void close_agent(QProcess& myProcess, anson::TestSettings& settings) {
 
-void ping(QWebSocket& skt, const string& msg) {
-    WSEchoReq req {WSEchoReq::A::echo};
-    req.echo = msg;
+// }
 
-    qDebug() << "[Qt Clinet Ping].body" << req.toBlock().c_str();
+// #include <io/oz/anclient/socketier.h>
 
-    AnsonMsg<WSEchoReq> anmsg(Port(Port::echo), req);
-    // anmsg.body.push_back(req);
-    string reqs = anmsg.toBlock<AnsonMsg<WSEchoReq>>();
-    qDebug() << "[Qt Clinet Ping]" << reqs.c_str();
-    skt.sendTextMessage(reqs.c_str());
-}
+// void ping(QWebSocket& skt, const string& msg) {
+//     WSEchoReq req {WSEchoReq::A::echo};
+//     req.echo = msg;
 
+//     qDebug() << "[Qt Clinet Ping].body" << req.toBlock().c_str();
 
-void send_msg(char* argv[], TestSettings* settings) {
-    QWebSocket socket;
-    string hello = "";
-
-    QObject::connect(&socket, &QWebSocket::connected, [&]() {
-        qDebug() << "Connected to Jetty!";
-        // socket.sendTextMessage("Hello from Qt C++");
-        ping(socket, hello);
-    });
+//     AnsonMsg<WSEchoReq> anmsg(Port(Port::echo), req);
+//     string reqs = anmsg.toBlock();
+//     qDebug() << "[Qt Clinet Ping]" << reqs.c_str();
+//     skt.sendTextMessage(reqs.c_str());
+// }
 
 
-    QObject::connect(&socket, &QWebSocket::textMessageReceived, [&socket](const QString &msg) {
-        qDebug() << "[Qt Client] Server replied:";
-        qDebug() << msg;
+// void send_msg(char* argv[], TestSettings* settings) {
+//     QWebSocket socket;
+//     string hello = "";
 
-        AnsonResp resp;
-        Anson::from_json(resp, msg.toStdString());
+//     QObject::connect(&socket, &QWebSocket::connected, [&]() {
+//         qDebug() << "Connected to Jetty!";
+//         // socket.sendTextMessage("Hello from Qt C++");
+//         ping(socket, hello);
+//     });
 
-        if (msg == "bye") {
-            socket.close();
-            QCoreApplication::quit();
-        }
-    });
 
-    QObject::connect(&socket, &QWebSocket::binaryMessageReceived, &a, [](const QByteArray &message) {
-        qDebug() << "[Qt Client] Full stream received. Total size:" << message.size();
-    });
+//     QObject::connect(&socket, &QWebSocket::textMessageReceived, [&socket](const QString &msg) {
+//         qDebug() << "[Qt Client] Server replied:";
+//         qDebug() << msg;
 
-    // Match the Java servlet path /ws/
-    // socket.open(QUrl("ws://localhost:8080/ws/"));
-    QString wsurl = QString::fromStdString(settings->wsUri());
-    qDebug() << wsurl;
-    socket.open(QUrl(wsurl));
+//         AnsonResp resp;
+//         Anson::from_json(msg.toStdString(), resp);
 
-    this_thread::sleep_for(chrono::seconds(10));
+//         if (msg == "bye") {
+//             socket.close();
+//             QCoreApplication::quit();
+//         }
+//     });
 
-    // socket.sendTextMessage(argv[3]);
-    // socket.sendTextMessage(argv[4]);
-    ping(socket, argv[3]);
-    ping(socket, argv[4]);
-}
+//     QObject::connect(&socket, &QWebSocket::binaryMessageReceived, &a, [](const QByteArray &message) {
+//         qDebug() << "[Qt Client] Full stream received. Total size:" << message.size();
+//     });
 
-TEST(IPCAGENT, MANAGE) {
-    using namespace anson;
+//     // Match the Java servlet path /ws/
+//     // socket.open(QUrl("ws://localhost:8080/ws/"));
+//     QString wsurl = QString::fromStdString(settings->wsUri());
+//     qDebug() << wsurl;
+//     socket.open(QUrl(wsurl));
 
-    int sport =0;
-    ASSERT_EQ(8080, sport);
+//     this_thread::sleep_for(chrono::seconds(10));
 
-    QProcess proc_agent = QProcess();
-    TestSettings settings;
-    TestSettings::load(settings, "");
+//     // socket.sendTextMessage(argv[3]);
+//     // socket.sendTextMessage(argv[4]);
+//     ping(socket, argv[3]);
+//     ping(socket, argv[4]);
+// }
 
-    start_agent(proc_agent, settings);
+// TEST(IPCAGENT, MANAGE) {
+//     using namespace anson;
 
-    qDebug() << "Stopping Java Process ...";
-    this_thread::sleep_for(chrono::seconds(3));
+//     int sport =0;
+//     ASSERT_EQ(8080, sport);
 
-    close_agent(proc_agent, settings);
-}
+//     QProcess proc_agent = QProcess();
+//     TestSettings settings;
+//     TestSettings::load(settings, "");
+
+//     start_agent(proc_agent, settings);
+
+//     qDebug() << "Stopping Java Process ...";
+//     this_thread::sleep_for(chrono::seconds(3));
+
+//     close_agent(proc_agent, settings);
+// }

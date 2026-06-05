@@ -14,6 +14,8 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <io/odysz/jclient/syn.h>
+#include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 
 #define QMLConst QString
@@ -70,6 +72,7 @@ public:
 using namespace anson;
 // using synst = AppConstants::SyncState;
 
+
 class QDoclientier : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -82,9 +85,13 @@ class QDoclientier : public QObject {
 
     map<string, vector<string>> syncing_paths;
 
+    OnError err;
+
 public:
-    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent), clientier("NA") {}
-    QDoclientier(QString device) : clientier(device.toStdString()) {}
+    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent),
+        clientier("", "", "", err) {}
+
+    QDoclientier(QString device) : clientier("", "", "device.toStdString()", err) {}
 
     // 2. Add Getter
     QString device() const { return _device; }
@@ -128,7 +135,7 @@ public:
         }
 
         clientier.push_files(this->syncing_paths,
-            [paths, this] (const string& p, string status) {
+            [paths, this] (const string& p, const string& status) {
                 #ifdef QT_DEBUG
                     AppConstants::qlog(p, status);
                 #endif

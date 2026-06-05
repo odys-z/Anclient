@@ -1,0 +1,7 @@
+{ "type"    : "io.odysz.anclient.test.QMLTestSettings",
+  "synuri"  : "/syn/qmltest",
+  "sysuri"  : "/sys/qmltest",
+  "temp_dir": "temp",
+  "doctier_jar": "doctier-0.5.19.jar",
+  "synode_settings": "synode-7.10-reddish-instance.json"
+}
