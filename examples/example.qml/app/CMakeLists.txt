@@ -82,6 +82,12 @@ set_target_properties(${PROJECT_NAME}
     WIN32_EXECUTABLE TRUE
 )
 
+target_link_options(${PROJECT_NAME} PRIVATE
+    -static-libgcc
+    -static-libstdc++
+    -static
+)
+
 # if (MSVC)
 # target_compile_options(album PRIVATE /utf-8)
 # endif()

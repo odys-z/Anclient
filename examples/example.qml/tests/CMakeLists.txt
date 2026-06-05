@@ -1,3 +1,5 @@
+project(album_tests VERSION 1.0 LANGUAGES CXX)
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -12,14 +14,14 @@ include(GoogleTest)
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Test)
 
 add_executable(
-    album_tests
+    ${PROJECT_NAME}
     jsample.h
-    ../app/qml_cpp.cpp
-    ../app/qml_cpp.h
+    # ../app/qml_cpp.cpp
+    # ../app/qml_cpp.h
     ../app/doctier.cpp
     # ../app/semantier.cpp
     # ../app/semantier.h
-    ../app/dev/ping.cpp
+    # ../app/dev/ping.cpp
 
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
@@ -27,7 +29,7 @@ add_executable(
     test_01_file_uploader.cpp
 )
 
-target_include_directories(album_tests PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../app"
 )
 
@@ -37,14 +39,19 @@ target_include_directories(album_tests PRIVATE
 #             $<TARGET_FILE_DIR:album_tests>
 # )
 
-add_library(anson.cmake INTERFACE)
+# add_library(anson.cmake INTERFACE)
 
-if (MSVC)
-target_compile_options(album_tests PRIVATE /utf-8)
-endif()
+# if (MSVC)
+# target_compile_options(album_tests PRIVATE /utf-8)
+# endif()
 
+target_link_options(${PROJECT_NAME} PRIVATE
+    -static-libgcc
+    -static-libstdc++
+    -static
+)
 
-target_link_libraries(album_tests PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenSSL::Crypto
     EnTT::EnTT
     nlohmann_json::nlohmann_json
@@ -56,13 +63,13 @@ target_link_libraries(album_tests PRIVATE
     gtest_main
 )
 
-qt_generate_deploy_app_script(
-    TARGET album_tests
-    OUTPUT_SCRIPT deploy_script
-)
+# qt_generate_deploy_app_script(
+#     TARGET ${PROJECT_NAME}
+#     OUTPUT_SCRIPT deploy_script
+# )
 
-get_target_property(_qmake_executable Qt6::Core LOCATION)
-get_filename_component(QT_BIN_DIR "${_qmake_executable}" DIRECTORY)
+# get_target_property(_qmake_executable Qt6::Core LOCATION)
+# get_filename_component(QT_BIN_DIR "${_qmake_executable}" DIRECTORY)
 
 message(STATUS "=========================================== QT_BIN_DIR = ${QT_BIN_DIR}")
 
@@ -78,11 +85,11 @@ set(test_env ${CMAKE_COMMAND} -E env
     "PATH=${QT_BIN_DIR};$ENV{PATH}"
 )
 
-set_target_properties(album_tests PROPERTIES
-    TEST_LAUNCHER "${test_env}"
-)
+# set_target_properties(${${OPTION_NAME} PROPERTIES
+#     TEST_LAUNCHER "${test_env}"
+# )
 
 # gtest_discover_tests(album_tests)
-gtest_discover_tests(album_tests
+gtest_discover_tests(${PROJECT_NAME}
     DISCOVERY_MODE PRE_TEST
 )

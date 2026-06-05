@@ -33,10 +33,10 @@ ApplicationWindow {
         return root.expandPath ? out : out.substring(out.lastIndexOf("/") + 1, out.length)
     }
 
-    QDoclientier{
-        id: doclient
-        device: "test"
-    }
+    // QDoclientier{
+    //     id: doclient
+    //     device: "test"
+    // }
 
     Connections {
         target: doclient

@@ -77,6 +77,9 @@ FetchContent_MakeAvailable(anclient.cmake)
 
 # add_compile_options(/utf-8)
 # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+if(MINGW OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
+endif()
 
 # add_subdirectory(src)
 add_subdirectory(app)
