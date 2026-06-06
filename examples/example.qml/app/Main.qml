@@ -38,12 +38,13 @@ ApplicationWindow {
     QDoclientier{
         id: doclient
         device: "test"
-    }
+    // }
 
-    Connections {
-        target: doclient
+    // Connections {
+    //     target: doclient
 
-        function onFileStatusChanged(path, success) {
+        // function onFileStatusChanged(path, success) {
+        onFileStatusChanged: (path, success) => {
             console.log("Update for:", AppConstants.PUSHING, path, "Success:", success);
 
             // Update the status in the object

@@ -78,26 +78,28 @@ class QDoclientier : public QObject {
 
     QString _device;
     // 1. Define the property
-    Q_PROPERTY(QString device READ device WRITE setDevice NOTIFY deviceChanged)
+    Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
 
-    anson::Doclientier clientier;
+    // anson::Doclientier clientier;
 
     map<string, vector<string>> syncing_paths;
 
-    inline static anson::OnError onErr = [](anson::MsgCode c, string_view e, vector<string_view> &a) {
-        // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
-    };
+    // inline static anson::OnError onErr = [](anson::MsgCode c, string_view e, vector<string_view> &a) {
+    //     // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    // };
 
 public:
     explicit QDoclientier(QObject *parent = nullptr) : QObject(parent)
         // clientier("", "", "", onErr) {}
-        , clientier(onErr)
+    //     , clientier([](anson::MsgCode c, string_view e, vector<string_view> &a) {
+    //     // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    // })
     {}
 
     // QDoclientier(QString device) : clientier("", "", "device.toStdString()", onErr) {}
 
     // 2. Add Getter
-    QString device() const { return _device; }
+    QString getDevice() const { return _device; }
 
     // 3. Add Setter
     void setDevice(const QString &device) {

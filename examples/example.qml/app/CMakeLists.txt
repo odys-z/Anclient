@@ -37,7 +37,7 @@ qt_add_qml_module(${PROJECT_NAME}
         "qml/Sidebar.qml"
         "qml/ResizeButton.qml"
         "qml/WindowDragHandler.qml"
-        "qml/FileListView.qml"    #
+        "qml/FileListView.qml"
     RESOURCES
         "icons/folder_closed.svg"
         "icons/folder_open.svg"
