@@ -114,6 +114,12 @@ target_link_libraries(album_clangd_helper PRIVATE
     anson
     anclient)
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
+        "$<TARGET_FILE_DIR:album_tests>/ast"
+)
+
 install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
