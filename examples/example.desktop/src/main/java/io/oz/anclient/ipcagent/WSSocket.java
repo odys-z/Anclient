@@ -2,6 +2,7 @@ package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt.f;
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.Utils.logi;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,15 +24,19 @@ import io.odysz.transact.x.TransException;
 import io.oz.anclient.socketier.T_Doclient;
 import io.oz.anclient.socketier.WSEcho;
 import jakarta.websocket.CloseReason;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.MessageHandler;
 import jakarta.websocket.OnClose;
 import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
+import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.Session;
-import jakarta.websocket.server.ServerEndpoint;
 
-@ServerEndpoint(value = "/" + WSAgent.ipc_path)
-public class WSSocket {
+//@ServerEndpoint(value = "/" + WSAgent.ipc_path)
+public class WSSocket extends Endpoint // {
+					  implements MessageHandler.Whole<String> {
 
     static WSSocket instance;
     public static WSSocket instance() { return instance; }
@@ -48,6 +53,9 @@ public class WSSocket {
 	}
 	
 	public Server server;
+
+	private RemoteEndpoint.Async remote;
+
 	public WSSocket server(Server server) {
 		this.server = server;
 		return this;
@@ -68,6 +76,8 @@ public class WSSocket {
 	@OnOpen
     public void onOpen(Session session) {
 
+		this.remote = session.getAsyncRemote();
+		
 		InetSocketAddress remote = updateRemote(session);
 
 		if (remote != null) {
@@ -160,7 +170,8 @@ public class WSSocket {
 	}
 	
     @OnClose
-    public void onClose(CloseReason reason) {
+    public void onClose(Session session, CloseReason reason) {
+//    public void onClose(CloseReason reason) {
         System.out.println("Closed: " + reason);
     }
 
@@ -171,4 +182,16 @@ public class WSSocket {
 
 	public void sendEnvelope(String string, OnOk object) {
 	}
+
+	@Override
+	public void onOpen(Session session, EndpointConfig config) {
+		logi("Open: %s", session.getRequestURI().toString());
+	}
+
+    @Override
+    public void onMessage(String message)
+    {
+        logi("On message: {}", message);
+        this.remote.sendText(message);
+    }
 }

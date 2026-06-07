@@ -3,5 +3,6 @@
   "sysuri"  : "/sys/qmltest",
   "temp_dir": "temp",
   "doctier_jar": "doctier-0.5.19.jar",
-  "synode_settings": "synode-7.10-reddish-instance.json"
+  "synode_settings": "synode-7.10-reddish-instance.json",
+  "wsport": 8700
 }

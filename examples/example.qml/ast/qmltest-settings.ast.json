@@ -6,7 +6,8 @@
     "synuri": {"dataAnclass": "string"},
     "temp_dir": {"dataAnclass": "string"},
     "doctier_jar": {"dataAnclass": "string"},
-    "synode_settings": {"dataAnclass": "string"}
+    "synode_settings": {"dataAnclass": "string"},
+    "wsport": {"dataAnclass": "int"}
   },
   "ctorsemantics": [ ]
 }

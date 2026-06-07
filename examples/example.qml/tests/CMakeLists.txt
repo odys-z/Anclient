@@ -12,6 +12,7 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Test)
+find_package(Qt6 REQUIRED COMPONENTS WebSockets)
 
 add_executable(
     ${PROJECT_NAME}
@@ -26,6 +27,8 @@ add_executable(
     test_01_file_uploader.cpp
 )
 
+
+target_link_libraries(album_tests PRIVATE Qt6::WebSockets)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
@@ -82,3 +85,5 @@ set(test_env ${CMAKE_COMMAND} -E env
 gtest_discover_tests(${PROJECT_NAME}
     DISCOVERY_MODE PRE_TEST
 )
+
+add_compile_definitions(ANSON_VERBOSE=4)

@@ -90,7 +90,6 @@ class QDoclientier : public QObject {
 
 public:
     explicit QDoclientier(QObject *parent = nullptr) : QObject(parent)
-        // clientier("", "", "", onErr) {}
     //     , clientier([](anson::MsgCode c, string_view e, vector<string_view> &a) {
     //     // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
     // })

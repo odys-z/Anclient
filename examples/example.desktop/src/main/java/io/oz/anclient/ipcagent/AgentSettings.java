@@ -4,7 +4,7 @@ import io.odysz.jsample.SampleSettings;
 
 public class AgentSettings extends SampleSettings {
 	String[] whitelist;
-	int wsport;
+	public int wsport;
 	public String[] tiers;
 
 	public static AgentSettings check(String srcwebinf, String string) {

@@ -20,6 +20,7 @@ public:
     string temp_dir;
     string doctier_jar;
     string synode_settings;
+    int wsport;
 
     QMLTestSettings() : Anson() {
         Type(_type_);
@@ -35,6 +36,7 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         {"temp_dir", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
         {"synode_settings", {.dataAnclass="string"} },
+        {"wsport", {.dataAnclass="int"} },
        });
 
     entt::meta_factory <anson::QMLTestSettings> ()
@@ -46,6 +48,7 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         .data<&anson::QMLTestSettings::temp_dir>("temp_dir")
         .data<&anson::QMLTestSettings::doctier_jar>("doctier_jar")
         .data<&anson::QMLTestSettings::synode_settings>("synode_settings")
+        .data<&anson::QMLTestSettings::wsport>("wsport")
         ;
 
         //
@@ -62,6 +65,8 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.doctier_jar);
                 if ("synode_settings" == fieldname)
                     return entt::forward_as_meta(concrete.synode_settings);
+                if ("wsport" == fieldname)
+                    return entt::forward_as_meta(concrete.wsport);
             }
 
             if (IJsonable::contxt_ptr->has_ast(ast->baseAnclass)) {
