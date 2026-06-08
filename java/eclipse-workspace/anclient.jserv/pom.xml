@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>anclient.java</artifactId>
-  <version>0.5.18-SNAPSHOT</version>
+  <version>0.5.20-SNAPSHOT</version>
   <name>anclient.java</name>
   <description>[syndoc-lib] Anclient java version. A basic lib only depends on semantic.jserv</description>
   <packaging>jar</packaging>
@@ -55,13 +55,13 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>semantic.jserv</artifactId>
-	    <version>[1.5.16-SNAPSHOT,2.0.0-SNAPSHOT)</version>
+	    <version>[1.5.17-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 	</dependency>
 
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>jserv-sample</artifactId>
-	    <version>1.5.4</version>
+	    <version>1.5.8</version>
 	    <scope>test</scope>
 	</dependency>
 	    
@@ -77,7 +77,7 @@
       <groupId>org.eclipse.jetty.ee8</groupId>
       <artifactId>jetty-ee8-webapp</artifactId>
       <version>${jetty-ee8.version}</version>
-	    <scope>test</scope>
+	   <scope>test</scope>
     </dependency>
   </dependencies>
 

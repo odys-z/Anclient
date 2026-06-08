@@ -20,6 +20,8 @@ import io.odysz.common.Utils;
 import io.odysz.semantic.DATranscxt;
 import io.odysz.semantic.DA.Connects;
 import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jserv.ServPort;
 import io.odysz.semantic.jserv.R.AnQuery;
 import io.odysz.semantic.jserv.ServPort.PrintstreamProvider;
@@ -44,9 +46,11 @@ public class SampleApp {
 
 	public static SampleApp app;
 
+	@SuppressWarnings("deprecation")
 	public static Thread startSampleServ(boolean[] quit) throws InterruptedException {
 		boolean[] ready = new boolean[] {false};
 		turnred(ready);
+
 		Thread t = new Thread(() -> {
 			app = _main(null);
 			turngreen(ready);
@@ -91,11 +95,13 @@ public class SampleApp {
 	 */
 	public static SampleApp _main(String[] args) {
 		try {
+			JProtocol.setup("jserv-sample", Port.echo);
+
 			// For Eclipse's running as Java Application
 			// E. g. -DWEB-INF=src/main/webapp/WEB-INF
 			String srcwebinf = ifnull(System.getProperty("WEB-INF"), webinf);
 
-			SampleSettings settings = SampleSettings.check(srcwebinf, "settings.json", true);
+			SampleSettings settings = SampleSettings.check(srcwebinf, "settings.json");
 
 			SampleApp app = boot(settings)
 					.afterboot(settings)
@@ -112,7 +118,7 @@ public class SampleApp {
 	}
 
 	/**
-	 * Expose locally
+	 * E.g. for a Synode, expose jservs locally.
 	 * @return this
 	 */
 	SampleApp afterboot(SampleSettings settings) {

@@ -80,7 +80,7 @@ public class ExpDocRobot implements IUser {
 		public RobotMeta(String tbl, String conn) {
 			super(conn);
 
-			iv = "iv";
+//			iv = "iv";
 			device = "device";
 		}
 	}
@@ -166,10 +166,6 @@ public class ExpDocRobot implements IUser {
 		tempDirs.add(tempDir);
 		return tempDir;
 	}
-
-//	public String defaultAlbum() {
-//		return "a-001";
-//	}
 
 	public SessionInf sessionInf() {
 		return new SessionInf().device(deviceId);

@@ -86,7 +86,7 @@
     <string name="msg_repace_devname" >Using this device to replace old name %s [id: %s]?</string>
     <string name="msg_update_dev_err" >Update device name failed with %s [id: %s].\nDetails:  %s</string>
     <string name="msg_dev_err_null_id">Error of empty device [%s] response.</string>
-    <string name="log_prof_err"       >Correctly logged in, but got an empty profile or no web root.</string>
+    <string name="log_prof_err"       >Correctly logged in, but cannot find web root information.</string>
     <string name="msg_err_duplicate"  >Error: found duplicated files.</string>
 
     <array name="jserv_entries">

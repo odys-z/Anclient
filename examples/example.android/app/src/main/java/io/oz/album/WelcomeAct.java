@@ -85,7 +85,7 @@ import io.oz.fpick.activity.BaseActivity;
 import io.oz.fpick.activity.ComfirmDlg;
 import io.oz.fpick.activity.ImagePickActivity;
 import io.oz.fpick.activity.VideoPickActivity;
-import io.oz.syndoc.client.PhotoSyntier;
+import io.oz.syndoc.client.AsynClientier;
 
 public class WelcomeAct extends AppCompatActivity implements View.OnClickListener, JProtocol.OnError {
     // for error:
@@ -371,7 +371,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     clearStatus();
                     showDlg(R.string.txt_please_login);
                 }
-                else ((PhotoSyntier)clientext.tier
+                else ((AsynClientier)clientext.tier
                         .fileProvider(new IFileProvider() {
                             // private String saveFolder;
 
@@ -466,7 +466,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
                     showDlg(R.string.txt_please_login);
                 }
                 else {
-                    ((PhotoSyntier)clientext.tier
+                    ((AsynClientier)clientext.tier
                     .fileProvider(new IFileProvider() {
                         // private String saveFolder;
                         // https://developer.android.com/training/data-storage/shared/documents-files#examine-metadata

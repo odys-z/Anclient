@@ -1,20 +1,11 @@
-//
-// ========================================================================
-// Copyright (c) 1995 Mort Bay Consulting Pty Ltd and others.
-//
-// This program and the accompanying materials are made available under the
-// terms of the Eclipse Public License v. 2.0 which is available at
-// https://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
-// which is available at https://www.apache.org/licenses/LICENSE-2.0.
-//
-// SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
-// ========================================================================
-//
-// https://github.com/jetty/jetty-examples : example/endpoint
+/**
+ * Reference: https://github.com/jetty/jetty-examples : example/endpoint
+ */
 
 package io.oz.anclient.ipcagent;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
@@ -29,17 +20,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
+import io.odysz.jclient.SessionClient;
+import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jprotocol.JServUrl;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class T_WServPointTest {
     private Server server;
-    private WebSocketContainer wsClient;
 
-    @BeforeEach
+    @SuppressWarnings("serial")
+	@BeforeEach
     public void startServerAndClient() throws Exception {
 	    AgentSettings settings = Anson.fromPath("src/test/resources/WEB-INF/settings.json");
-        server = T_WSAgent._main2(ServerEndpointConfig.Builder
+        server = T_WSAgent._main2(new ArrayList<ServerEndpointConfig.Builder> () {
+        	{ add (ServerEndpointConfig.Builder
+        		.create(T_EchoEndpoint.class, "/" + T_EchoEndpoint.endpath));};
+        	{ add (ServerEndpointConfig.Builder
         		.create(WServPoint.class, "/" + T_WSAgent.ipc_path)
         		.configurator(new ServerEndpointConfig.Configurator() {
         				@SuppressWarnings("unchecked")
@@ -47,9 +48,9 @@ public class T_WServPointTest {
 	                    public <T> T getEndpointInstance(Class<T> clazz) {
 	                        return (T) WServPoint.build(server, settings);
 	                    }
-        		}));
+        		}));}
+        }, settings);
         server.start();
-        wsClient = ContainerProvider.getWebSocketContainer();
     }
 
     @AfterEach
@@ -59,11 +60,31 @@ public class T_WServPointTest {
 
     @Test
     public void testEcho() throws Exception {
-        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_WSAgent.ipc_path, null, null);
+
+    	WebSocketContainer wsClient;
+        wsClient = ContainerProvider.getWebSocketContainer();
+        T_EchoEndpoint.token = "token: Bonjour";
+
+        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_EchoEndpoint.endpath, null, null);
 
         List<String> msgs = EchoClient.performEcho(wsClient, uri);
-		String expected = "session openned: " + WServPoint.lastSession.getId();
+		// String expected = "session openned: " + T_EchoEndpoint.lastSession.getId();
+		String expected = "token: Bonjour";
 
         assertEquals(msgs.get(0), expected);
+    }
+
+    @Test
+    public void testServPoint() throws Exception {
+        // URI uri = new URI("ws", server.getURI().getAuthority(), "/" + WSAgent.ipc_path, null, null);
+        JProtocol p = new JProtocol(WSAgent.ipc_path);
+        JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
+
+        WSClient wsclient = new WSClient(jserv, true);
+        AnsonMsg<AnsonBody> msgs = SessionClient.userReq(null, "", Port.echo, null);
+        AnsonResp resp = wsclient.commit(msgs, null);
+		String expected = "session openned: " + WServPoint.lastSession.getId();
+
+        assertEquals(resp.msg(), expected);
     }
 }

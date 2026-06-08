@@ -13,8 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.vincent.filepicker.Constant;
 import com.vincent.filepicker.DividerGridItemDecoration;
 
-import io.odysz.semantic.tier.docs.ExpSyncDoc;
-import io.odysz.semantic.tier.docs.ShareFlag;
 import io.oz.fpick.R;
 import io.oz.fpick.adapter.VideoPickAdapter;
 
@@ -58,51 +56,6 @@ public class VideoPickActivity extends BaseActivity {
         mRecyclerView.setAdapter(adapter);
         linkAdapter(TYPE_VIDEO, adapter);
     }
-
-    /**
-     * @deprecated  test only
-     *
-     * @return
-    protected ArrayList<String> getPdfList() {
-        ArrayList<String> pdfList = new ArrayList<>();
-        Uri collection;
-
-        final String[] projection = new String[]{
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.DATE_ADDED,
-                MediaStore.Files.FileColumns.DATA,
-                MediaStore.Files.FileColumns.MIME_TYPE,
-        };
-
-        final String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
-
-        final String selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-
-        final String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
-        final String[] selectionArgs = new String[]{mimeType};
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            collection = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
-        }else{
-            collection = MediaStore.Files.getContentUri("external");
-        }
-
-
-        try (Cursor cursor = getContentResolver().query(collection, projection, selection, selectionArgs, sortOrder)) {
-            assert cursor != null;
-
-            if (cursor.moveToFirst()) {
-                int columnData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-                do {
-                    pdfList.add((cursor.getString(columnData)));
-                    Log.d("TAG", "getPdf: " + cursor.getString(columnData));
-                    //you can get your pdf files
-                } while (cursor.moveToNext());
-            }
-        }
-        return pdfList;
-    }
-     */
 
     protected String[] permissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)

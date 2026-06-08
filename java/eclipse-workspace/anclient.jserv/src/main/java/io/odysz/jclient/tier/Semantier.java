@@ -2,6 +2,9 @@ package io.odysz.jclient.tier;
 
 import io.odysz.semantic.CRUD;
 
+/**
+ * Semantier Abstract is only currently heavily depended by the Typescript peer.
+ */
 public class Semantier {
     /**main table name - replace with TableMeta? */
     protected String mtabl;

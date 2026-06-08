@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonHeader;
@@ -43,6 +43,7 @@ import io.odysz.transact.x.TransException;
  * @author odys-z@github.com
  *
  */
+@SuppressWarnings("deprecation")
 public class SessionClient {
 	static boolean verbose;
 	public static void verbose(boolean v) { verbose = v;}
@@ -70,7 +71,7 @@ public class SessionClient {
 	 * Session login response from server.
 	 * @param sessionInfo
 	 */
-	public SessionClient(final String jservRoot, SessionInf sessionInfo) {
+	SessionClient(final String jservRoot, SessionInf sessionInfo) {
 		this.ssInf = sessionInfo;
 		this.myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 		if (isblank(this.myservRt))
@@ -83,14 +84,14 @@ public class SessionClient {
 	 * @param pswdPlain 
 	 * @throws SsException 
 	 */
-	public SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
+	SessionClient(final String jservRoot, AnSessionResp r, String pswdPlain) throws SsException {
 		try {
 			myservRt = isblank(jservRoot) ? Clients.servRt : new String(jservRoot);
 			if (isblank(this.myservRt))
 				throw new AnsonException(0, "Initialized final field myservRt is empty.");
 
 			ssInf = r.ssInf();
-			ssInf.ssToken = AESHelper.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
+			ssInf.ssToken = AESHelper2.repackSessionToken(ssInf.ssToken, pswdPlain, ssInf.uid());
 			profile = r.profile();
 		} catch (GeneralSecurityException | IOException e) {
 			throw new SsException(e.getMessage());
@@ -100,7 +101,7 @@ public class SessionClient {
 	/**
 	 * Login and return a client instance (with session managed by jserv).
 	 * 
-	 * <h5>Note: since 2.0.0, deprecating static way of {@link Clients#servRt}
+	 * <h5>Note: since 1.5.0, deprecating static way of {@link Clients#servRt}
 	 * since anclient.java 1.4.14</h5>
 	 * This class uses instance's url root jserv, which is copied from {@link Clients#servRt}
 	 * that is usually be initialized with {@link Clients#init(String, boolean...)}. 
@@ -114,35 +115,36 @@ public class SessionClient {
 	 * @throws SemanticException
 	 * @throws AnsonException
 	 * @throws SsException
-	 * @since 2.0.0
+	 * @since 1.5.0
 	 */
-	public SessionClient loginWithUri(String uri, String uid, String pswdPlain, String... mac)
+	public static SessionClient loginWithUri(String servroot, String uri, String uid, String pswdPlain, String... mac)
 			throws IOException, SemanticException, AnsonException, SsException {
-		byte[] iv =   AESHelper.getRandom();
-		String iv64 = AESHelper.encode64(iv);
+		byte[] iv =   AESHelper2.getRandom();
+		String iv64 = AESHelper2.encode64(iv);
 		if (uid == null || pswdPlain == null)
 			throw new SemanticException("user id and password can not be null.");
 		String tk64;
 		try {
-			tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+			tk64 = AESHelper2.encrypt(uid, pswdPlain, iv);
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 			throw new SsException("AES encrpyt failed: %s\nCause: %s",
 								e.getMessage(), e.getCause().getMessage());
 		}
 		
-		AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
+		AnsonMsg<AnSessionReq> req = AnSessionReq.formatLogin(uid, tk64, iv64, mac)
 										.uri(uri);
 
 		HttpServClient httpClient = new HttpServClient();
-		String url = servUrl(Port.session); 
+		String url = servUrl(servroot, Port.session); 
 
-		AnsonMsg<AnsonResp> resp = httpClient.post(url, reqv11);
+		AnsonMsg<AnsonResp> resp = httpClient.post(url, req);
 		if (Clients.verbose)
 			Utils.logi(resp.toString());
 
 		if (AnsonMsg.MsgCode.ok == resp.code()) {
-			SessionClient c = new SessionClient(myservRt, (AnSessionResp) resp.body(0), pswdPlain);
+			SessionClient c = new SessionClient(servroot, // myservRt,
+								(AnSessionResp) resp.body(0), pswdPlain);
 
 			if (mac != null && mac.length > 0)
 				c.ssInfo().device(mac[0]);
@@ -154,8 +156,8 @@ public class SessionClient {
 				resp.code(), ((AnsonResp)resp.body(0)).msg());
 	}
 
-	String servUrl(IPort p) {
-		return String.format("%s/%s", myservRt, p.url());
+	static String servUrl(String servrt, IPort p) {
+		return String.format("%s/%s", servrt, p.url());
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class SessionClient {
 					syncFlag.wait(msInterval);
 				}
 				catch (InterruptedException e) { }
-				catch (TransException | AnsonException | IOException | SQLException e) {
+				catch (TransException | AnsonException | IOException e) {
 					failed++;
 					if (onBroken != null)
 						onBroken.err(MsgCode.exSession, "heart link broken");
@@ -307,15 +309,41 @@ public class SessionClient {
 	 */
 	public <T extends AnsonBody> AnsonMsg<T> userReq(String uri, IPort port, T bodyItem, LogAct... act)
 			throws AnsonException {
+//		if (port == null)
+//			throw new AnsonException(0, "AnsonMsg<UserReq> needs port explicitly specified.");
+//
+//		// let header = Protocol.formatHeader(this.ssInf);
+//		bodyItem.uri(uri);
+//		if (act != null && act.length > 0)
+//			header().act(act[0]); 
+//
+//		return new AnsonMsg<T>(port).header(header()).body(bodyItem);
+		return userReq(header, uri, port, bodyItem, act);
+	}
+	
+	/**
+	 * @param <T>
+	 * @param header
+	 * @param uri
+	 * @param port
+	 * @param bodyItem
+	 * @param act
+	 * @return usr-req
+	 * @throws AnsonException
+	 * @since 0.5.20
+	 */
+	static public <T extends AnsonBody> AnsonMsg<T> userReq(AnsonHeader header, String uri, IPort port, T bodyItem, LogAct... act)
+			throws AnsonException {
 		if (port == null)
 			throw new AnsonException(0, "AnsonMsg<UserReq> needs port explicitly specified.");
 
 		// let header = Protocol.formatHeader(this.ssInf);
 		bodyItem.uri(uri);
 		if (act != null && act.length > 0)
-			header().act(act[0]); 
+			if (header != null)
+				header.act(act[0]); 
 
-		return new AnsonMsg<T>(port).header(header()).body(bodyItem);
+		return new AnsonMsg<T>(port).header(header).body(bodyItem);
 	}
 
 	public AnsonMsg<?> insert(String conn, String tbl, String ... act) throws SemanticException {
@@ -336,6 +364,7 @@ public class SessionClient {
 	 * @param onblock 
 	 * 
 	 * @return the local path
+	 * @since 0.5.18
 	 */
 	public <T extends DocsReq> Path download206(String synuri, String peerjserv, IPort port,
 			String localpath, DocRef doc, OnProcess onblock) throws AnsonException, IOException, TransException, SQLException {
@@ -449,16 +478,16 @@ public class SessionClient {
 	public <R extends AnsonBody, A extends AnsonResp> A commit(AnsonMsg<R> req, OnError err)
 			throws SemanticException, IOException, AnsonException {
     	if (verbose) {
-    		Utils.logi(servUrl(req.port()));
+    		Utils.logi(servUrl(myservRt, req.port()));
     		Utils.logAnson(req);
     	}
     	
     	if (isblank(req.body(0).a()))
     		throw new AnsonException(0,
-    			"Since anclient.java 0.5, jserv 2.0.0, a non-empty a-tag is forced for session-required request.");
+    			"Since anclient.java 0.5, jserv 1.5.0, a non-empty a-tag is forced for session-required request.");
     	
     	HttpServClient httpClient = new HttpServClient();
-  		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(req.port()), req);
+  		AnsonMsg<AnsonResp> resp = httpClient.post(servUrl(myservRt, req.port()), req);
 
   		MsgCode code = resp.code();
 
@@ -475,6 +504,19 @@ public class SessionClient {
 			return null;
 		}
 	}
+
+	/**
+	 * TODO Commit over web socket.
+	 * @param <R>
+	 * @param <A>
+	 * @param req
+	 * @param err
+	 * @return response
+	 * @since 0.5.19
+	public <R extends AnsonBody, A extends AnsonResp> A commit_ws(AnsonMsg<R> req, OnError err) {
+		throw new AnsonException(0, "TODO");
+	}
+	 */
 
 	public void logout() {
 		closeLink();

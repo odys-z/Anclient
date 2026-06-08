@@ -46,9 +46,11 @@ public class AnPrefEntries extends Anson {
         String[] jss = jserv.split("\n");
         if (jss != null && jss.length >= 2 && !isblank(jss[0]) && !isblank(jss[1])) {
             int i = indexOf(entries, jss[0]);
-            if (i > 0) {
-                swap(entVals, 0, i);
-                swap(entries, 0, i);
+            if (i >= 0) {
+                if (i > 0) {
+                    swap(entVals, 0, i);
+                    swap(entries, 0, i);
+                }
                 ix = 0;
             }
             else if (i < 0) {

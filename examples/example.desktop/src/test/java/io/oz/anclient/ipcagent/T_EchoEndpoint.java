@@ -18,25 +18,27 @@ import jakarta.websocket.Session;
 public class T_EchoEndpoint extends Endpoint implements MessageHandler.Whole<String> {
     static String token;
 
-    private Session session;
+	protected static final String endpath = "t_echo";
+
+    static Session lastSession;
     private RemoteEndpoint.Async remote;
 
     @Override
     public void onClose(Session session, CloseReason close) {
         super.onClose(session, close);
-        this.session = null;
+        session = null;
         this.remote = null;
         logi("WebSocket Close: %s - %s", close.getCloseCode(), close.getReasonPhrase());
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
-        this.session = session;
-        this.remote = this.session.getAsyncRemote();
+        T_EchoEndpoint.lastSession = session;
+        this.remote = session.getAsyncRemote();
         logi("WebSocket Open: %s", session);
         // attach echo message handler
         session.addMessageHandler(this);
-        this.remote.sendText(token);
+        this.remote.sendText(token == null ? "" : token);
     }
 
     @Override

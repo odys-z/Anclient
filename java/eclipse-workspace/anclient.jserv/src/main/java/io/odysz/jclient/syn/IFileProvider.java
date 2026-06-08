@@ -34,12 +34,6 @@ public interface IFileProvider {
      * @return size
      */
     default long meta(IFileDescriptor f) throws IOException {
-//    	String uri64 = f.uri64();
-
-//    	return startsVolume(uri64) ?
-//    		Files.size(Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64))) :
-//    		Files.size(Paths.get(f.fullpath()))
-//    		;
     	return Files.size(pysicalPath(f));
     };
 
@@ -51,14 +45,12 @@ public interface IFileProvider {
      * @return readable stream
      */
     default InputStream open(IFileDescriptor f) throws IOException {
-    	// return (InputStream) new FileInputStream(new File(f.fullpath()));
     	return (InputStream) new FileInputStream(pysicalPath(f).toFile());
     };
     
     default Path pysicalPath(IFileDescriptor f) {
     	String uri64 = f.uri64();
     	return startsVolume(uri64) ?
-    		// Paths.get(ExtFilePaths.decodeUri(Transcxt.runtimeRoot(), uri64)) :
     		Paths.get(ExtFilePaths.decodeUriPath(uri64)) :
     		Paths.get(f.fullpath());
     }

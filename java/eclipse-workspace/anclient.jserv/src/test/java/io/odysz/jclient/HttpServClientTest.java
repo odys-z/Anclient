@@ -1,9 +1,6 @@
 package io.odysz.jclient;
 
 import static io.odysz.common.LangExt.f;
-import static io.odysz.common.Utils.turngreen;
-import static io.odysz.common.Utils.turnred;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URL;
@@ -11,24 +8,19 @@ import java.net.URL;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.tier.docs.DocsReq;
-import io.oz.jsample.SampleApp;
 
 class HttpServClientTest {
 
 	@Test
 	void testToUrlParam() throws Exception {
-//		boolean[] can_quit = new boolean[] {false};
-//		try {
-//		turnred(can_quit);
-//		SampleApp.startSampleServ(can_quit);
-//		String sample_jserv = SampleApp.sampleton().settings.jserv();
-
-		AnsonMsg.understandPorts(Port.echo);
+		// AnsonMsg.understandPorts(Port.echo);
+		JProtocol.setup("jserv-sample", Port.echo);
 		
 		String req = "{\"type\": \"io.odysz.semantic.jprotocol.AnsonMsg\", "
 				+ "\"code\": null, \"opts\": null, \"port\": \"syntier\", "
@@ -44,7 +36,7 @@ class HttpServClientTest {
 		@SuppressWarnings("unchecked")
 		AnsonMsg<DocsReq> jreq = (AnsonMsg<DocsReq>) Anson.fromJson(req);
 
-		String[] parss = AESHelper.encode64(jreq.toBlock().getBytes()).split("\\+");
+		String[] parss = AESHelper2.encode64(jreq.toBlock().getBytes()).split("\\+");
 		assertTrue(parss != null && parss.length > 2);
 
  		URL url = new URL(f("%s?anson64=%s",
@@ -55,6 +47,5 @@ class HttpServClientTest {
  		Utils.logT(new Object() {}, url.toString());
 
 		assertEquals(parss.length, url.toString().split("\\%2B").length);
-//		} finally { turngreen(can_quit); }
 	}
 }

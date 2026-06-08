@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
@@ -61,7 +61,7 @@ public class Doclientier extends Semantier {
 
 	public SessionClient client;
 	
-	/** @since 2.0.0 changed to static */
+	/** @since 0.5.0 changed to static */
 	protected static ErrorCtx errCtx;
 
 	protected ExpDocRobot robt;
@@ -116,29 +116,6 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
-	 * 
-	 * @deprecated use {@link #loginWithUri(String, String, String)} instead
-	 * 
-	 * @param workerId
-	 * @param device
-	 * @param pswd
-	 * @return this
-	 * @throws SemanticException 
-	 * @throws SQLException
-	 * @throws AnsonException
-	 * @throws IOException
-	 * @throws TransException 
-	 * @throws SsException 
-	 */
-	public Doclientier login(String workerId, String device, String pswd)
-			throws SemanticException, AnsonException, SsException, IOException {
-
-		client = Clients.login(workerId, pswd, device);
-
-		return onLogin(client);
-	}
-
-	/**
 	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
 	 * 
 	 * @param workerId
@@ -150,10 +127,11 @@ public class Doclientier extends Semantier {
 	 * @throws SsException
 	 * @throws IOException
 	 */
-	public Doclientier loginWithUri(String workerId, String device, String pswd)
+	public Doclientier loginWithUri(String jservrt, String workerId, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
-		client = Clients.loginWithUri(uri, workerId, pswd, device);
+		// client = Clients.loginWithUri(uri, workerId, pswd, device);
+		client = SessionClient.loginWithUri(jservrt, uri, workerId, pswd, device);
 
 		return onLogin(client);
 	}
@@ -199,7 +177,7 @@ public class Doclientier extends Semantier {
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
  			String entityName, ShareFlag share, OnOk ok, OnProcess proc) throws Exception {
 
-		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
+		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc(null, "")
 					.share(doclient.robt.uid(), share.name(), new Date())
 					.shareflag(ShareFlag.publish.name())
 					.folder(atdev.tofolder)
@@ -241,7 +219,7 @@ public class Doclientier extends Semantier {
 
 	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
 			OnProcess onProc, OnDocsOk... docsOk)
-			throws TransException, AnsonException, IOException, SQLException {
+			throws TransException, AnsonException, IOException {
 		return startPushs(
 				null, tabl, videos, onProc,
 				isNull(docsOk) ? new OnDocsOk() {
@@ -268,9 +246,9 @@ public class Doclientier extends Semantier {
 	 */
 	public List<DocsResp> startPushs(ExpSyncDoc template, String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
-				throws TransException, IOException, AnsonException, SQLException {
+				throws TransException, IOException, AnsonException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper.blockSize(), template,
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper2.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -294,10 +272,10 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws AnsonException 
 	 */
-	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
+	static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
-			throws TransException, IOException, AnsonException, SQLException {
+			throws TransException, IOException, AnsonException {
 
 		SessionInf ssinf = client.ssInfo();
 
@@ -369,7 +347,7 @@ public class Doclientier extends Semantier {
 
 				ifs = (FileInputStream) fileProvider.open(f);
 
-				String b64 = AESHelper.encode64(ifs, blocksize);
+				String b64 = AESHelper2.encode64(ifs, blocksize);
 				while (b64 != null) {
 					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, ssinf);
 					seq++;
@@ -380,7 +358,7 @@ public class Doclientier extends Semantier {
 					respi = client.commit(q, errHandler);
 					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
 
-					b64 = AESHelper.encode64(ifs, blocksize);
+					b64 = AESHelper2.encode64(ifs, blocksize);
 				}
 				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
 
@@ -417,10 +395,11 @@ public class Doclientier extends Semantier {
 							//   \"reasons\": [\"Found existing file for device & client path.\",
 							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
 
-							exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
-							SemanticObject exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
 							String reasons = exmsg;
+							SemanticObject exp = null; 
 							try {
+								exmsg = exmsg.replaceAll("^Code: .*, mess?age:\\s*", "").trim();
+								exp = (SemanticObject) Anson.fromJson(Anson.unescape(exmsg));
 								Object ress = exp.get("reasons");
 								reasons = ress == null ? null
 										: ress instanceof ArrayList<?> ? str((ArrayList<?>)ress)
@@ -428,9 +407,13 @@ public class Doclientier extends Semantier {
 										: ress.toString();
 							}
 							catch (Exception e) {
-								e.printStackTrace();
+								try {
+									Utils.warnT(new Object(){}, "\n[ERROR] Parsing exception message failed.\n%s\n%s",
+											e.getClass().getName(), e.getMessage());
+									Utils.warn("Message:\n%s", exmsg);
+								} catch (Exception x) {}
 							}
-							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp.get("code")));
+							errHandler.err(MsgCode.ext, reasons, String.valueOf(exp == null ? MsgCode.exGeneral : exp.get("code")));
 						}
 						catch (Exception exx) {
 							errHandler.err(MsgCode.exGeneral, ex.getMessage(),
@@ -573,14 +556,14 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException
 	 */
 	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
-			throws TransException, IOException, SQLException {
+			throws TransException, IOException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
 		
 		OnDocsOk follows = new OnDocsOk() {
 			@Override
 			public void ok(List<? extends AnsonResp> resps)
-					throws IOException, AnsonException, TransException, SQLException {
+					throws IOException, AnsonException, TransException {
 				follow.ok(isNull(resps) ? null : resps.get(0));
 			}
 		};
