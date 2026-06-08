@@ -1,0 +1,25 @@
+# Define the Interface Library
+add_library(anson INTERFACE)
+add_library(anson::anson ALIAS anson)
+
+# Headers and IDE support
+target_sources(anson INTERFACE
+    FILE_SET HEADERS
+    BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+    FILES 
+        io/odysz/anson.hpp
+        io/odysz/jprotocol.hpp
+        io/odysz/rttr.hpp
+)
+
+# Propagate dependencies to anyone linking to anson
+target_link_libraries(anson INTERFACE
+    RTTR::Core
+    nlohmann_json::nlohmann_json
+)
+
+# Ensure include paths are correct for local build and installation
+target_include_directories(anson INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)

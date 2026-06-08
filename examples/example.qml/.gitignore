@@ -1,0 +1,8 @@
+/target/
+.qtcreator
+build
+deploy
+*.user
+**/*.test-anson.cmake
+**/*.beautify
+tests/settings/*-instance.json

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, JsonHosts, AnQueryst, ExternalHosts
+import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, JsonHosts, AnQueryst, ExternalHosts, Langstrs
 } from '@anclient/anreact';
 import { AnsonMsg, AnsonResp, NV, SessionClient, SessionInf } from '@anclient/semantier';
 import { Theme } from '@material-ui/core/styles';
@@ -10,6 +10,7 @@ import QRCode from 'react-qr-code';
 import { IcoLoginAlbum } from './icons/android';
 import Box from '@material-ui/core/Box';
 import { formatJservQr } from './tiers/synode-utils';
+import Link from '@material-ui/core/Link';
 
 const styles = (theme: Theme) => ({
 	root: {
@@ -65,7 +66,6 @@ class LoginApp extends React.Component<LoginProps> {
 		// 	.filter(([x, v]) => x !== 'domain')
 		// 	.map(([k, v]) => {return {n: k, v}});
 		
-
 		this.errCtx.onError = this.errCtx.onError.bind(this);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.onLogin = this.onLogin.bind(this);
@@ -97,7 +97,8 @@ class LoginApp extends React.Component<LoginProps> {
 
 	render() {
 		let that = this;
-		let {domain, host, jserv, jservNvs} = this.servdoms as ExternalHosts;
+		let {domain, host, jserv, jservNvs, synodesetups} = this.servdoms as ExternalHosts;
+
 		return (
 			<AnContext.Provider value={{
 				pageOrigin: window ? window.origin : 'localhost',
@@ -138,8 +139,24 @@ class LoginApp extends React.Component<LoginProps> {
 				/>
 				<Login onLogin={this.onLogin} uri={this.uri}/>
 
+				<Typography variant='subtitle2' color='primary' gutterBottom>
+					{L('Download Synode Setup:')}.
+				</Typography>
+				<Typography variant='body2' color='textSecondary' gutterBottom>
+					{synodesetups && Object.keys(synodesetups).map((org) => {
+						return (
+						<Box key={org} style={{marginBottom: '1em'}}>
+							<strong>{org}</strong>: &nbsp;
+							{synodesetups[org] && synodesetups[org].length > 0 && synodesetups[org].map((zip, zx) => {
+								return <Link key={zx} href={zip} color="primary" underline="hover" download={true} >
+										{ExternalHosts.to_arch_os_readable(zip)}
+										</Link>})}
+						</Box>)
+					})} 	
+				</Typography>
+
 				{this.servdoms && this.servdoms.host && <>
-				<Typography variant='subtitle2' color='primary' gutterBottom>Scan here for login on Andriod.</Typography>
+				<Typography variant='subtitle2' color='primary' gutterBottom>{L('Scan here for login on Andriod:')}</Typography>
 				<Box style={{'justifyContent': 'center', 'width': '70vw', 'display': 'flex'}}>
 				<Card style={{'position': 'absolute'}}>
 					<QRCode value={formatJservQr(host, jserv as string)}
@@ -170,6 +187,10 @@ class LoginApp extends React.Component<LoginProps> {
 	 * optional opts.parent=undefined: parent window if for redirecting target
 	 */
 	static bindHtml(elem: string, opts: AnreactAppOptions = {serv: 'localhost'}) {
+		try {
+			Langstrs.load('res-vol/lang.json', navigator.language);
+		} catch (e) {}
+
 		AnReact.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {

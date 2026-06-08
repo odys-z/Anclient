@@ -1,0 +1,7 @@
+{ "type"    : "io.odysz.semantier.PeerSettings",
+  "requests": [["ast/jsampl.ast.json", null],
+               ["ast/wsecho.ast.json", null]],
+  "header"  : "gen/cpp/t01-echo.hpp",
+  "json_h"  : "gen/cpp/t01-json.hpp",
+  "py"      : "gen/py/t01-echo.py"
+}

@@ -206,7 +206,6 @@ export class AnReact {
 	}
 
 	/**
-	 * @deprecated for the name is confusing. Use initPage() instead.
 	 * @since 0.4.50
 	 * @param elem 
 	 * @param opts 

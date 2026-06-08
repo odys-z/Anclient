@@ -1,11 +1,14 @@
 { "using": "zh-cn",
-  "zh-cn": {
+  "zh-CN": {
+    "Login": "登 录",
     "Folders": "文件夾",
     "Summary": "摘 要",
     "File Name": "文件名",
     "type": "类 型",
     "share by": "共享人",
     "Type {t} is not supported yet.": "暂不支持'{t}'文件类型。",
-    "Privilege": "权限"
+    "Privilege": "权限",
+    "Download Synode Setup:": "下载同步节点安装包：",
+    "Scan here for login on Andriod:": "在安卓设备上扫描QR码登录："
   }
 }

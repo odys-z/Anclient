@@ -72,5 +72,4 @@ public class ConfigIPC implements IPCPort {
 		return WSPort.configIPC;
 	}
 
-
 }

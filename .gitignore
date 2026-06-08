@@ -1,4 +1,6 @@
 *.zip
+*.exe
+
 !Anclient*.zip
 bin
 debug
@@ -16,3 +18,5 @@ dist
 *.egg-info
 *.egg
 py3/src/anclient/data
+vcpkg_installed
+vcpkg_packages
