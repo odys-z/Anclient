@@ -22,6 +22,51 @@ public class T_WSAgent {
         server.join();
 	}
 
+	public static Server _main2(ServerEndpointConfig.Builder cfgBuilder, String... args) throws Exception {
+	    JProtocol.setup(ipc_path, WSPort.echo);
+
+	    // settings = Anson.fromPath(_0(args));
+	    settings = new AgentSettings();
+	    settings.wsport = 8700;
+
+	    Server server = new Server(settings.wsport); 
+
+	    // 1. Create a clean EE10 ServletContextHandler
+	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+	    context.setContextPath("/");
+	    
+	    // Force a default servlet layout so the context is obligated to fully initialize on boot
+	    context.addServlet(org.eclipse.jetty.ee10.servlet.DefaultServlet.class, "/");
+	    
+	    // 2. Link the context directly to the server root handler
+	    server.setHandler(context);
+
+	    // 3. Setup the IP Whitelist Filter directly inside the active context pipeline
+	    InetAccessHandler ipHandler = new InetAccessHandler();
+	    ipHandler.include("127.0.0.1");
+	    ipHandler.include("::1"); // Essential for browser localhost loops
+	    ipHandler.include("192.168.0.0/24");
+	    ipHandler.include("10.0.0.0/24");
+	    context.insertHandler(ipHandler);
+
+	    // 4. Use the public initialiser configuration to map the WebSocket endpoint
+	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
+	        ServerEndpointConfig config = cfgBuilder.build();
+	        
+	        // Timeout configuration
+	        Map<String, Object> userProps = config.getUserProperties();
+	        userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
+	        
+	        container.addEndpoint(config);
+	    });
+
+	    return server;
+	}
+
+	// TODO
+	// TODO
+	// TODO
+	// TODO call _main2()
 	public static Server _main(Class<? extends Endpoint> endpointClass, String... args) throws Exception {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 

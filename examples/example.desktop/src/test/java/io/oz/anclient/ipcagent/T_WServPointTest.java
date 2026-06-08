@@ -19,6 +19,7 @@ import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 import jetty.examples.endpoint.EchoClient;
 
 import org.eclipse.jetty.server.Server;
@@ -26,6 +27,8 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import io.odysz.anson.Anson;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,7 +38,16 @@ public class T_WServPointTest {
 
     @BeforeEach
     public void startServerAndClient() throws Exception {
-        server = T_WSAgent._main(WServPoint.class);
+	    AgentSettings settings = Anson.fromPath("src/test/resources/WEB-INF/settings.json");
+        server = T_WSAgent._main2(ServerEndpointConfig.Builder
+        		.create(WServPoint.class, "/" + T_WSAgent.ipc_path)
+        		.configurator(new ServerEndpointConfig.Configurator() {
+        				@SuppressWarnings("unchecked")
+						@Override
+	                    public <T> T getEndpointInstance(Class<T> clazz) {
+	                        return (T) WServPoint.build(server, settings);
+	                    }
+        		}));
         server.start();
         wsClient = ContainerProvider.getWebSocketContainer();
     }
