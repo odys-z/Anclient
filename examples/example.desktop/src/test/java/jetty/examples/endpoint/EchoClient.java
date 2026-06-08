@@ -97,7 +97,7 @@ public class EchoClient {
 
         @Override
         public void onMessage(String message) {
-            logi("Text Message [{}]", message);
+            logi("EchoEclient onMessage: %s", message);
             messageQueue.offer(message);
         }
     }

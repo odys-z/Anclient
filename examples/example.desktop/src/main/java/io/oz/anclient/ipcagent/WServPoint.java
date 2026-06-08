@@ -203,7 +203,7 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
     @Override
     public void onMessage(String message)
     {
-        logi("On message: {}", message);
+        logi("WServPoint onMessage: {}", message);
         this.remote.sendText(message);
     }
 }
