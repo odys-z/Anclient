@@ -11,8 +11,12 @@
 // ========================================================================
 //
 // https://github.com/jetty/jetty-examples : example/endpoint
+// Modified by Ody Z
 
 package jetty.examples.endpoint;
+
+import static io.odysz.common.Utils.logi;
+import static io.odysz.common.Utils.warn;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,13 +36,9 @@ import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class EchoClient
-{
-    public static void main(String[] args) throws Exception
-    {
+public class EchoClient {
+    public static void main(String[] args) throws Exception {
         URI uri = URI.create("ws://localhost:8080/echo");
 
         if (args.length == 1)
@@ -46,64 +46,58 @@ public class EchoClient
 
         WebSocketContainer client = ContainerProvider.getWebSocketContainer();
 
-        try
-        {
+        try {
             EchoClient.performEcho(client, uri);
         }
-        finally
-        {
+        finally {
             LifeCycle.stop(client);
         }
     }
 
-    public static List<String> performEcho(WebSocketContainer client, URI uri) throws IOException, InterruptedException, DeploymentException
-    {
+    static int timeout = 100;
+
+    public static List<String> performEcho(WebSocketContainer client, URI uri)
+    		throws IOException, InterruptedException, DeploymentException {
         List<String> ret = new ArrayList<>();
         EchoClientEndpoint echoSocket = new EchoClientEndpoint();
         ClientEndpointConfig endpointConfig = ClientEndpointConfig.Builder.create().build();
-        try (Session session = client.connectToServer(echoSocket, endpointConfig, uri))
-        {
+        try (Session session = client.connectToServer(echoSocket, endpointConfig, uri)) {
+        	logi("client session: %s", session.getId());
             session.getBasicRemote().sendText("Hello from " + EchoClient.class.getName());
 
-            String msg = echoSocket.messageQueue.poll(5, TimeUnit.SECONDS);
+            String msg = echoSocket.messageQueue.poll(timeout, TimeUnit.SECONDS);
             ret.add(msg);
             session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Goodbye"));
-            if (!echoSocket.closeLatch.await(5, TimeUnit.SECONDS))
+            if (!echoSocket.closeLatch.await(timeout, TimeUnit.SECONDS))
                 throw new IOException("Failed to receive WebSocket close");
         }
         return ret;
     }
 
-    public static class EchoClientEndpoint extends Endpoint implements MessageHandler.Whole<String>
-    {
-        private static final Logger LOG = LoggerFactory.getLogger(EchoClientEndpoint.class);
+    public static class EchoClientEndpoint extends Endpoint implements MessageHandler.Whole<String> {
         private final LinkedBlockingDeque<String> messageQueue = new LinkedBlockingDeque<>();
         private final CountDownLatch closeLatch = new CountDownLatch(1);
 
         @Override
-        public void onClose(Session session, CloseReason closeReason)
-        {
-            LOG.info("WebSocket Close: {}", closeReason);
+        public void onClose(Session session, CloseReason closeReason) {
+            logi("WebSocket Close: %s", closeReason);
             closeLatch.countDown();
         }
 
         @Override
-        public void onError(Session session, Throwable cause)
-        {
-            LOG.warn("WebSocket Error", cause);
+        public void onError(Session session, Throwable cause) {
+            warn("WebSocket Error", cause);
         }
 
         @Override
-        public void onOpen(Session session, EndpointConfig config)
-        {
-            LOG.info("WebSocket Open: {}", session);
+        public void onOpen(Session session, EndpointConfig config) {
+            logi("WebSocket Open: {}", session);
             session.addMessageHandler(this);
         }
 
         @Override
-        public void onMessage(String message)
-        {
-            LOG.info("Text Message [{}]", message);
+        public void onMessage(String message) {
+            logi("Text Message [{}]", message);
             messageQueue.offer(message);
         }
     }

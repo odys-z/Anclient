@@ -19,7 +19,7 @@ import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCPort;
 import io.oz.anclient.ipcagent.WSAgent;
 import io.oz.anclient.ipcagent.WSPort;
-import io.oz.anclient.ipcagent.WSSocket;
+import io.oz.anclient.ipcagent.WServPoint;
 import jakarta.websocket.Session;
 
 public class Doclient implements IPCPort {
@@ -32,9 +32,9 @@ public class Doclient implements IPCPort {
 	
 	Doclientier doctier;
 
-	final WSSocket socket;
+	final WServPoint socket;
 
-	public Doclient(WSSocket wsSocket) {
+	public Doclient(WServPoint wsSocket) {
 		socket = wsSocket;
 	}
 

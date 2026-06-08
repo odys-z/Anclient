@@ -12,13 +12,15 @@
 //
 // https://github.com/jetty/jetty-examples : example/endpoint
 
-package jetty.examples.endpoint;
+package io.oz.anclient.ipcagent;
 
 import java.net.URI;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.WebSocketContainer;
+import jetty.examples.endpoint.EchoClient;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.junit.jupiter.api.AfterEach;
@@ -28,38 +30,30 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-public class EchoTest
-{
+public class T_WSAgent_EchoTest {
     private Server server;
     private WebSocketContainer wsClient;
 
     @BeforeEach
-    public void startServerAndClient() throws Exception
-    {
-         server = EchoServer.newServer(0);
-//        server = WSEchoAgent._main(new String[] {});
+    public void startServerAndClient() throws Exception {
+        T_EchoEndpoint.token = "token: 123456";
+        server = T_WSAgent._main(T_EchoEndpoint.class);
         server.start();
         wsClient = ContainerProvider.getWebSocketContainer();
     }
 
     @AfterEach
-    public void stopAll()
-    {
+    public void stopAll() {
         LifeCycle.stop(server);
     }
 
     @Test
-    public void testEcho() throws Exception
-    {
-        URI uri = new URI("ws", server.getURI().getAuthority(), "/echo", null, null);
-
-    	// Run T_WSAgent first
-//        URI uri = URI.create("ws://localhost:8700/ipc");
+    public void testEcho() throws Exception {
+        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_WSAgent.ipc_path, null, null);
 
         List<String> msgs = EchoClient.performEcho(wsClient, uri);
-		String[] expected = {
-            "You are now connected to " + EchoServerEndpoint.class.getName()
-        };
+		String[] expected = { "token: 123456" };
+
         assertThat(msgs, contains(expected));
     }
 }

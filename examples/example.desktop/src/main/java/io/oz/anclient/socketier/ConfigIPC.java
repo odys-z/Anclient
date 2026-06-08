@@ -16,14 +16,14 @@ import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IPCPort;
 import io.oz.anclient.ipcagent.WSPort;
-import io.oz.anclient.ipcagent.WSSocket;
+import io.oz.anclient.ipcagent.WServPoint;
 import io.oz.anclient.socketier.ConfigIPCReq.A;
 import jakarta.websocket.Session;
 
 public class ConfigIPC implements IPCPort {
-	final WSSocket socket;
+	final WServPoint socket;
 
-	public ConfigIPC(WSSocket wsSocket) {
+	public ConfigIPC(WServPoint wsSocket) {
 		this.socket = wsSocket;
 	}
 	

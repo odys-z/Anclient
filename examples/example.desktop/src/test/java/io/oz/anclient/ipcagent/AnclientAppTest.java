@@ -74,7 +74,7 @@ class AnclientAppTest {
 	}
 
 	static void byeQt(String bye) throws InterruptedException {
-		WSSocket.instance().sendEnvelope(bye, (resp) -> {
+		WServPoint.instance().sendEnvelope(bye, (resp) -> {
 			docsResponse.add(resp.msg());
 			byelatch.countDown();
 		});

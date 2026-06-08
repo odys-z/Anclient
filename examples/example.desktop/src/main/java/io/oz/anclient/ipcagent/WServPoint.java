@@ -35,33 +35,39 @@ import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.Session;
 
 //@ServerEndpoint(value = "/" + WSAgent.ipc_path)
-public class WSSocket extends Endpoint // {
-					  implements MessageHandler.Whole<String> {
+public class WServPoint extends Endpoint implements MessageHandler.Whole<String> {
 
-    static WSSocket instance;
-    public static WSSocket instance() { return instance; }
+    static WServPoint instance;
+    public static WServPoint instance() { return instance; }
 
 	protected final HashMap<IPort, IPCPort> ipcPorts;
 	/** {"host:port": session} */
 	protected final HashMap<String, Session> sessions;
 
 
-	public static WSSocket build(Server server, AgentSettings settings) {
+	public static WServPoint build(Server server, AgentSettings settings) {
 		mustnonull(settings.tiers);
-		instance = new WSSocket(settings.tiers);
+		instance = new WServPoint(settings.tiers);
 		return instance.server(server);
 	}
 	
 	public Server server;
 
 	private RemoteEndpoint.Async remote;
+	static Session lastSession;
 
-	public WSSocket server(Server server) {
+	public WServPoint server(Server server) {
 		this.server = server;
 		return this;
 	}
 
-	public WSSocket(String[] tiernames) {
+	public WServPoint() {
+		ipcPorts = new HashMap<IPort, IPCPort>();
+		sessions = new HashMap<String, Session>();
+		instance = this;
+	}
+
+	public WServPoint(String[] tiernames) {
 		ipcPorts = new HashMap<IPort, IPCPort>(tiernames.length);
 
 		T_Doclient p = new T_Doclient(this);
@@ -77,6 +83,7 @@ public class WSSocket extends Endpoint // {
     public void onOpen(Session session) {
 
 		this.remote = session.getAsyncRemote();
+		lastSession  = session;
 		
 		InetSocketAddress remote = updateRemote(session);
 
@@ -186,6 +193,11 @@ public class WSSocket extends Endpoint // {
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
 		logi("Open: %s", session.getRequestURI().toString());
+
+        lastSession = session;
+        this.remote  = session.getAsyncRemote();
+        session.addMessageHandler(this);
+        this.remote.sendText("session openned: " + session.getId());
 	}
 
     @Override

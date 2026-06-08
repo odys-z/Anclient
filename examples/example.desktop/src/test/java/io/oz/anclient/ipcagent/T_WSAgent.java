@@ -1,4 +1,4 @@
-package jetty.examples.endpoint;
+package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt._0;
 
@@ -8,11 +8,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.InetAccessHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
-import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.oz.anclient.ipcagent.AgentSettings;
-import io.oz.anclient.ipcagent.EchoEndpoint;
-import io.oz.anclient.ipcagent.WSPort;
+import jakarta.websocket.Endpoint;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 public class T_WSAgent {
@@ -20,16 +17,17 @@ public class T_WSAgent {
 	public static AgentSettings settings;
 	
 	public static void main(String[] args) throws Exception {
-		// working folder: anclient/examples/example.qml/tests/ipcagent
-		Server server = _main(_0(args, "WEB-INF/settings.json"));
+		Server server = _main(T_EchoEndpoint.class, _0(args, "WEB-INF/settings.json"));
         server.start();
         server.join();
 	}
 
-	public static Server _main(String... args) throws Exception {
+	public static Server _main(Class<? extends Endpoint> endpointClass, String... args) throws Exception {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 
-	    settings = Anson.fromPath(_0(args));
+	    // settings = Anson.fromPath(_0(args));
+	    settings = new AgentSettings();
+	    settings.wsport = 8700;
 
 	    Server server = new Server(settings.wsport); 
 
@@ -54,7 +52,7 @@ public class T_WSAgent {
 	    // 4. Use the public initialiser configuration to map the WebSocket endpoint
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
 	        ServerEndpointConfig config = ServerEndpointConfig.Builder
-//	                .create(WSSocket.class, "/" + ipc_path)
+	                .create(endpointClass, "/" + ipc_path)
 //	                .configurator(new ServerEndpointConfig.Configurator() {
 //	                    @SuppressWarnings("unchecked")
 //	                    @Override
@@ -62,7 +60,6 @@ public class T_WSAgent {
 //	                        return (T) WSSocket.build(server, settings);
 //	                    }
 //	                })
-	                .create(EchoEndpoint.class, "/" + ipc_path)
 	                .build();
 	        
 	        // Timeout configuration

@@ -11,30 +11,24 @@
 // ========================================================================
 //
 // https://github.com/jetty/jetty-examples : example/endpoint
+// Modified by Ody Z
 
 package jetty.examples.endpoint;
 
-import java.net.URL;
-import java.util.Objects;
 import jakarta.websocket.server.ServerEndpointConfig;
 
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.Server;
 
-public class EchoServer
-{
-    public static void main(String[] args) throws Exception
-    {
+public class EchoServer {
+    public static void main(String[] args) throws Exception {
         Server server = new Server(8080);
         server.start();
         server.join();
     }
 
-    public static Server newServer(int port)
-    {
+    public static Server newServer(int port) {
         Server server = new Server(port);
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -42,22 +36,11 @@ public class EchoServer
         server.setHandler(servletContextHandler);
 
         // Add jakarta.websocket support
-        JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) ->
-        {
+        JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
             // Add echo endpoint to server container
             ServerEndpointConfig echoConfig = ServerEndpointConfig.Builder.create(EchoServerEndpoint.class, "/echo").build();
             container.addEndpoint(echoConfig);
         });
-
-        // Add default servlet (to serve the html/css/js)
-        // Figure out where the static files are stored.
-//        URL urlStatics = Thread.currentThread().getContextClassLoader().getResource("echo-root/index.html");
-//        Objects.requireNonNull(urlStatics, "Unable to find index.html in classpath");
-//        String urlBase = urlStatics.toExternalForm().replaceFirst("/[^/]*$", "/");
-//        ServletHolder defHolder = new ServletHolder("default", new DefaultServlet());
-//        defHolder.setInitParameter("resourceBase", urlBase);
-//        defHolder.setInitParameter("dirAllowed", "true");
-//        servletContextHandler.addServlet(defHolder, "/");
 
         return server;
     }

@@ -1,4 +1,4 @@
-package io.oz.anclient.ipcagent;
+package jetty.examples.endpoint;
 
 import static io.odysz.common.LangExt._0;
 
@@ -8,11 +8,13 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.InetAccessHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
-import io.odysz.anson.Anson;
+
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.oz.anclient.ipcagent.AgentSettings;
+import io.oz.anclient.ipcagent.WSPort;
 import jakarta.websocket.server.ServerEndpointConfig;
 
-public class WSAgent {
+public class WSEchoAgent {
 	public static final String ipc_path = "ipc";
 	public static AgentSettings settings;
 	
@@ -25,7 +27,9 @@ public class WSAgent {
 	public static Server _main(String... args) throws Exception {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 
-	    settings = Anson.fromPath(_0(args));
+	    // settings = Anson.fromPath(_0(args));
+	    settings = new AgentSettings();
+	    settings.wsport = 8700;
 
 	    Server server = new Server(settings.wsport); 
 
@@ -40,18 +44,17 @@ public class WSAgent {
 	    server.setHandler(context);
 
 	    // 3. Setup the IP Whitelist Filter directly inside the active context pipeline
-//	    InetAccessHandler ipHandler = new InetAccessHandler();
-//	    ipHandler.include("127.0.0.1");
-//	    ipHandler.include("::1"); // Essential for browser localhost loops
-//	    ipHandler.include("192.168.0.0/24");
-//	    ipHandler.include("10.0.0.0/24");
-//	    context.insertHandler(ipHandler);
+	    InetAccessHandler ipHandler = new InetAccessHandler();
+	    ipHandler.include("127.0.0.1");
+	    ipHandler.include("::1"); // Essential for browser localhost loops
+	    ipHandler.include("192.168.0.0/24");
+	    ipHandler.include("10.0.0.0/24");
+	    context.insertHandler(ipHandler);
 
 	    // 4. Use the public initialiser configuration to map the WebSocket endpoint
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
-	        ServerEndpointConfig config = ServerEndpointConfig.Builder
-//	                .create(EchoEndpoint.class, "/" + ipc_path)
-	                .create(WServPoint.class, "/" + ipc_path)
+			ServerEndpointConfig config = ServerEndpointConfig.Builder
+//	                .create(WSSocket.class, "/" + ipc_path)
 //	                .configurator(new ServerEndpointConfig.Configurator() {
 //	                    @SuppressWarnings("unchecked")
 //	                    @Override
@@ -59,6 +62,7 @@ public class WSAgent {
 //	                        return (T) WSSocket.build(server, settings);
 //	                    }
 //	                })
+	                .create(EchoServerEndpoint.class, "/" + ipc_path)
 	                .build();
 	        
 	        // Timeout configuration
