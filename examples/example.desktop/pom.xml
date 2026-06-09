@@ -117,7 +117,7 @@
     <dependency>
       <groupId>io.github.odys-z</groupId>
       <artifactId>anclient.java</artifactId>
-	  <version>[0.5.19,)</version>
+	  <version>[0.5.20-SNAPSHOT,)</version>
     </dependency>
     
    	<dependency>
@@ -148,15 +148,44 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.1</version>
       </plugin>
+
+      <!--
       <plugin>
           <artifactId>maven-war-plugin</artifactId>
           <version>3.2.2</version>
       </plugin>
+	  -->
+
       <plugin>
           <artifactId>maven-install-plugin</artifactId>
           <version>2.5.2</version>
       </plugin>
 
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-assembly-plugin</artifactId>
+		<version>3.7.1</version>
+		<configuration>
+			<appendAssemblyId>false</appendAssemblyId>
+			<archive>
+				<manifest>
+					<mainClass>io.oz.anclient.ipcagent.WSAgent</mainClass>
+				</manifest>
+			</archive>
+			<descriptorRefs>
+				<descriptorRef>jar-with-dependencies</descriptorRef>
+			</descriptorRefs>
+		</configuration>
+		<executions>
+			<execution>
+				<id>make-assembly</id>
+				<phase>package</phase> 
+				<goals>
+					<goal>single</goal>
+				</goals>
+			</execution>
+		</executions>
+	  </plugin>
 
    	  <plugin>
 	  	<artifactId>maven-deploy-plugin</artifactId>
@@ -265,10 +294,7 @@
 			</execution>
 		</executions>
 	  </plugin>
-    <!-- </plugins>
-  </pluginManagement>
 
-    <plugins> -->
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-shade-plugin</artifactId>

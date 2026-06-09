@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-import org.eclipse.jetty.server.Server;
-
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
 import io.odysz.anson.JsonOpt;
@@ -27,7 +25,6 @@ import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.OnError;
-import jakarta.websocket.OnMessage;
 import jakarta.websocket.RemoteEndpoint;
 import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
@@ -43,22 +40,23 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	protected final HashMap<String, Session> sessions;
 
 
-	public static WServPoint build(Server server, AgentSettings settings) {
+	public static WServPoint build(AgentSettings settings) {
 		mustnonull(settings.tiers);
 		instance = new WServPoint(settings.tiers);
-		return instance.server(server);
+//		return instance.server(server);
+		return instance;
 	}
 	
-	public Server server;
 
 	private RemoteEndpoint.Async asyremote;
 	private RemoteEndpoint.Basic synremote;
 	static Session lastSession;
 
-	public WServPoint server(Server server) {
-		this.server = server;
-		return this;
-	}
+//	Server server;
+//	public WServPoint server(Server server) {
+//		this.server = server;
+//		return this;
+//	}
 
 	public WServPoint() {
 		ipcPorts = new HashMap<IPort, IPCPort>();
@@ -78,32 +76,6 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 		sessions = new HashMap<String, Session>();
 	}
 
-//	@OnOpen
-//    public void onOpen(Session session) {
-//
-//		this.remote = session.getAsyncRemote();
-//		lastSession  = session;
-//		
-//		InetSocketAddress remote = updateRemote(session);
-//
-//		if (remote != null) {
-//			// int port = remoteAddress.getPort();
-//			System.out.println("New connection from: " + remote.getHostString() + ":" + remote.getPort());
-//	        
-//        
-//			// Check if the address is a loopback address
-//			if (!remote.getAddress().isLoopbackAddress()) {
-//
-//				// white list is configured in WSAgent. This can still be used for priority I believe.
-//				System.out.println("1008: warning on non-local connection from: " + remote.getHostString());
-//				// session.close(1008, "Only local connections allowed");
-//				return;
-//			}
-//			
-//			System.out.println("Connected: " + remote.getHostString());
-//		}
-//    }
-	
 	public InetSocketAddress updateRemote(Session session) {
 	    InetSocketAddress addr = (InetSocketAddress) 
 	            session.getUserProperties().get("jakarta.websocket.endpoint.remoteAddress");
@@ -112,33 +84,6 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	    
 	    return addr;
 	}
-
-	@OnMessage
-    public void onMessage(Session session, String message) {
-//        System.out.println("[WS Agent] Received: " + message);
-//        try {
-//            // Echo the message back to the client
-//            // session.getRemote().sendString("Echo: " + message);
-//            AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
-//            IPort p = req.port();
-//
-//            if (ipcPorts.containsKey(p)) {
-//            	ipcPorts.get(p).onMessage(req.addr(updateRemote(session).getHostString()), session);
-//            }
-//            else ; //err(p);
-//        } catch (AnsonException e) {
-//			write(session, err(MsgCode.ext, e, e.code()));
-//        } catch (TransException e) {
-//			write(session, err(MsgCode.exSemantic, e));
-//        } catch (IOException e) {
-//			write(session, err(MsgCode.exIo, e));
-//        } catch (SsException e) {
-//			write(session, err(MsgCode.exSession, e));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//			write(session, err(MsgCode.exGeneral, e));
-//        }
-    }
 
 	protected AnsonMsg<AnsonResp> err(MsgCode code, Exception e, Object ... args) {
 		AnsonMsg<AnsonResp> msg = new AnsonMsg<AnsonResp>(null, code);
@@ -177,7 +122,7 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	
     @Override
     public void onClose(Session session, CloseReason reason) {
-        System.out.println("Closed: " + reason);
+        System.out.println("WSPoint Closed: " + reason);
     }
 
     @OnError
@@ -190,7 +135,7 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		logi("Open: %s", session.getRequestURI().toString());
+		logi("WSPoint onOpen: %s", session.getRequestURI().toString());
 
         lastSession = session;
         this.asyremote  = session.getAsyncRemote();
@@ -203,9 +148,6 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
     @Override
     public void onMessage(String message) {
         logi("WServPoint onMessage: %s", message);
-        // this.remote.sendText(message);
-
-//        System.out.println("[WS Agent] Received: " + message);
         try {
             AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
             IPort p = req.port();
@@ -227,9 +169,8 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	protected void write(RemoteEndpoint.Basic remote, AnsonMsg<? extends AnsonResp> msg, JsonOpt... opts) {
 		try {
 			if (msg != null) {
-				try (OutputStream o = remote.getSendStream()) {
-					msg.toBlock(o, opts);
-				}
+				// try (OutputStream o = remote.getSendStream()) { msg.toBlock(o, opts); }
+				remote.sendText(msg.toBlock(opts));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

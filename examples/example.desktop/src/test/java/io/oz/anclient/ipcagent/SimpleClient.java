@@ -22,7 +22,6 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.LogAct;
 import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantics.SessionInf;
-import io.oz.anclient.socketier.WSEchoReq;
 import jakarta.websocket.ClientEndpoint;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.ContainerProvider;
@@ -82,7 +81,7 @@ public class SimpleClient {
     
     public void asynEcho(String msg) throws IPCException, AnsonException {
         if (session != null && session.isOpen()) {
-        	EchoReq req = new WSEchoReq(msg);
+        	EchoReq req = new EchoReq(msg);
 			AnsonMsg<?> q = userReq(funcid, WSPort.echo, req)
 					.header(header);
             try {

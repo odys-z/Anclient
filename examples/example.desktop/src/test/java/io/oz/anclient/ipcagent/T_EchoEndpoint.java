@@ -18,7 +18,7 @@ import jakarta.websocket.Session;
 public class T_EchoEndpoint extends Endpoint implements MessageHandler.Whole<String> {
     static String token;
 
-	protected static final String endpath = "t_echo";
+	protected static final String pointpath = "t_echo";
 
     static Session lastSession;
     private RemoteEndpoint.Async remote;
