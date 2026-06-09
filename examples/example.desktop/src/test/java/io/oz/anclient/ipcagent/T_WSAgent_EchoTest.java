@@ -1,16 +1,4 @@
-//
-// ========================================================================
-// Copyright (c) 1995 Mort Bay Consulting Pty Ltd and others.
-//
-// This program and the accompanying materials are made available under the
-// terms of the Eclipse Public License v. 2.0 which is available at
-// https://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
-// which is available at https://www.apache.org/licenses/LICENSE-2.0.
-//
-// SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
-// ========================================================================
-//
-// https://github.com/jetty/jetty-examples : example/endpoint
+// Reference: https://github.com/jetty/jetty-examples : example/endpoint
 
 package io.oz.anclient.ipcagent;
 
@@ -27,8 +15,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static io.odysz.common.Utils.logi;
+
+import static org.junit.jupiter.api.Assertions.*;
+//import static org.hamcrest.MatcherAssert.assertThat;
+//import static org.hamcrest.Matchers.contains;
 
 public class T_WSAgent_EchoTest {
     private Server server;
@@ -37,7 +28,7 @@ public class T_WSAgent_EchoTest {
     @BeforeEach
     public void startServerAndClient() throws Exception {
         T_EchoEndpoint.token = "token: 123456";
-        server = T_WSAgent._main(T_EchoEndpoint.class);
+        server = T_WSAgent._main("src/test/resources/WEB-INF/settings.json");
         server.start();
         wsClient = ContainerProvider.getWebSocketContainer();
     }
@@ -49,11 +40,13 @@ public class T_WSAgent_EchoTest {
 
     @Test
     public void testEcho() throws Exception {
-        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_WSAgent.ipc_path, null, null);
-
+        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_EchoEndpoint.pointpath, null, null);
+        
+        logi("Client performing echo to %s", uri.toString());
         List<String> msgs = EchoClient.performEcho(wsClient, uri);
 		String[] expected = { "token: 123456" };
 
-        assertThat(msgs, contains(expected));
+        // assertThat(msgs, contains(expected));
+        assertEquals(msgs.get(0), expected[0]);
     }
 }

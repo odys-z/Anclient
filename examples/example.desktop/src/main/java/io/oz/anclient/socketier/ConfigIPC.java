@@ -6,6 +6,7 @@ import java.io.IOException;
 
 
 import io.odysz.anson.AnsonException;
+import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
@@ -18,6 +19,8 @@ import io.oz.anclient.ipcagent.IPCPort;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPoint;
 import io.oz.anclient.socketier.ConfigIPCReq.A;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
 
 public class ConfigIPC implements IPCPort {
@@ -27,7 +30,8 @@ public class ConfigIPC implements IPCPort {
 		this.socket = wsSocket;
 	}
 	
-	@Override
+
+	/*
 	public void onMessage(AnsonMsg<?> msg, Session session)
 			throws SemanticException, TransException, AnsonException, SsException, IOException {
 		ConfigIPCReq req = (ConfigIPCReq) msg.body(0); 
@@ -57,6 +61,10 @@ public class ConfigIPC implements IPCPort {
 		}
 		else
 			throw new IPCException(MsgCode.exGeneral, "Unsupported %s", req.a());
+	*/
+	@Override
+	public void onMessage(AnsonMsg<? extends AnsonBody> message, Basic synremote, Async asyremote)
+			throws IPCException, SemanticException, TransException, AnsonException, SsException, IOException {
 	}
 
 	@Override

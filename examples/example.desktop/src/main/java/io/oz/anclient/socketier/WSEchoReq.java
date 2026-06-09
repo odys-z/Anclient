@@ -2,6 +2,9 @@ package io.oz.anclient.socketier;
 
 import io.odysz.semantic.jserv.echo.EchoReq;
 
+/**
+ * @deprecated
+ */
 public class WSEchoReq extends EchoReq {
 	public static class A {
 		public static final String echo = "echo";

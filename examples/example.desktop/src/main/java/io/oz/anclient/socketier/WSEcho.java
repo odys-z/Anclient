@@ -9,6 +9,8 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jserv.echo.EchoReq;
+import io.odysz.semantic.jserv.echo.EchoReq.A;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -16,8 +18,8 @@ import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IPCPort;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPoint;
-import io.oz.anclient.socketier.WSEchoReq.A;
-import jakarta.websocket.Session;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.RemoteEndpoint.Basic;
 
 public class WSEcho implements IPCPort {
 	
@@ -29,14 +31,14 @@ public class WSEcho implements IPCPort {
 	}
 
 	@Override
-	public void onMessage(AnsonMsg<?> ansonMsg, Session session)
+	public void onMessage(AnsonMsg<?> ansonMsg, Basic synremote, Async asyremote)
 			throws SemanticException, TransException, AnsonException, SsException, IOException {
-		WSEchoReq msg = (WSEchoReq) ansonMsg.body(0); 
+		EchoReq msg = (EchoReq) ansonMsg.body(0); 
 
-		if (eq(msg.a(), A.x))
-			throw new IPCException(MsgCode.ext, msg.echo);
+		if (!eq(msg.a(), A.echo))
+			throw new IPCException(MsgCode.ext, "expecting act of msg.echo");
 		else
-			socket.<AnsonResp>ok(session, port(),
+			socket.<AnsonResp>ok(synremote, port(),
 				(AnsonResp)new AnsonResp(null, msg.echo)
 				.uri(msg.uri())
 				.a(msg.a()));

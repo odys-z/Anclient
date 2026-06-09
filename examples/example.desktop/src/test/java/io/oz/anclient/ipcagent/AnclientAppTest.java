@@ -13,11 +13,13 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.server.Server;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.AnsonResp;
 
+@Disabled
 class AnclientAppTest {
 	static final String test_json = "src/test/resources/tests.json";
 

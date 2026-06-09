@@ -1,16 +1,6 @@
-//
-// ========================================================================
-// Copyright (c) 1995 Mort Bay Consulting Pty Ltd and others.
-//
-// This program and the accompanying materials are made available under the
-// terms of the Eclipse Public License v. 2.0 which is available at
-// https://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
-// which is available at https://www.apache.org/licenses/LICENSE-2.0.
-//
-// SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
-// ========================================================================
-//
-// https://github.com/jetty/jetty-examples : example/endpoint
+/**
+ * Reference: https://github.com/jetty/jetty-examples : example/endpoint
+ */
 
 package io.oz.anclient.ipcagent;
 
@@ -27,17 +17,43 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.odysz.jclient.SessionClient;
+import io.odysz.semantic.jprotocol.AnsonBody;
+import io.odysz.semantic.jprotocol.AnsonMsg;
+import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
+import io.odysz.semantic.jserv.echo.EchoReq;
+import io.odysz.semantic.jserv.echo.EchoReq.A;
+import io.odysz.semantic.jprotocol.AnsonResp;
+import io.odysz.semantic.jprotocol.JProtocol;
+import io.odysz.semantic.jprotocol.JServUrl;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class T_WServPointTest {
     private Server server;
-    private WebSocketContainer wsClient;
 
-    @BeforeEach
+//    @SuppressWarnings("serial")
+	@BeforeEach
     public void startServerAndClient() throws Exception {
-        server = T_WSAgent._main(WServPoint.class);
+//	    AgentSettings settings = Anson.fromPath("src/test/resources/WEB-INF/settings.json");
+//        server = T_WSAgent.createServer(new ArrayList<ServerEndpointConfig.Builder> () {
+//        	{ add (ServerEndpointConfig.Builder
+//        		.create(T_EchoEndpoint.class, "/" + T_EchoEndpoint.pointpath));};
+//        	{ add (ServerEndpointConfig.Builder
+//        		.create(WServPoint.class, "/" + T_WSAgent.ipc_path)
+//        		.configurator(new ServerEndpointConfig.Configurator() {
+//        				@SuppressWarnings("unchecked")
+//						@Override
+//	                    public <T> T getEndpointInstance(Class<T> clazz) {
+//	                        return (T) WServPoint.build(settings);
+//	                    }
+//        		}));}
+//        }, settings);
+//        server.start();
+
+        server = T_WSAgent._main("src/test/resources/WEB-INF/settings.json");
         server.start();
-        wsClient = ContainerProvider.getWebSocketContainer();
     }
 
     @AfterEach
@@ -47,11 +63,35 @@ public class T_WServPointTest {
 
     @Test
     public void testEcho() throws Exception {
-        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_WSAgent.ipc_path, null, null);
+
+    	WebSocketContainer wsClient;
+        wsClient = ContainerProvider.getWebSocketContainer();
+        T_EchoEndpoint.token = "token: Bonjour";
+
+        URI uri = new URI("ws", server.getURI().getAuthority(), "/" + T_EchoEndpoint.pointpath, null, null);
 
         List<String> msgs = EchoClient.performEcho(wsClient, uri);
-		String expected = "session openned: " + WServPoint.lastSession.getId();
+		// String expected = "session openned: " + T_EchoEndpoint.lastSession.getId();
+		String expected = "token: Bonjour";
 
         assertEquals(msgs.get(0), expected);
+    }
+
+    @Test
+    public void testServPoint() throws Exception {
+        JProtocol p = new JProtocol(T_WSAgent.ipc_path);
+        JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
+
+        WSClient wsclient = new WSClient(jserv, true);
+        
+		EchoReq req = new EchoReq("слава Україні");
+		req.a(A.echo);
+        AnsonMsg<AnsonBody> msgs = SessionClient.userReq(null, "/ipc/test.java", Port.echo, req);
+
+        AnsonResp resp = wsclient.commit(msgs, (MsgCode code, String m, String ... args) -> {
+        		fail(m);
+        	});
+
+        assertEquals(resp.msg(), "слава Україні");
     }
 }

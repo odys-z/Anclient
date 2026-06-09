@@ -1,17 +1,4 @@
-//
-// ========================================================================
-// Copyright (c) 1995 Mort Bay Consulting Pty Ltd and others.
-//
-// This program and the accompanying materials are made available under the
-// terms of the Eclipse Public License v. 2.0 which is available at
-// https://www.eclipse.org/legal/epl-2.0, or the Apache License, Version 2.0
-// which is available at https://www.apache.org/licenses/LICENSE-2.0.
-//
-// SPDX-License-Identifier: EPL-2.0 OR Apache-2.0
-// ========================================================================
-//
-// https://github.com/jetty/jetty-examples : example/endpoint
-// Modified by Ody Z
+// Reference: https://github.com/jetty/jetty-examples : example/endpoint
 
 package jetty.examples.endpoint;
 
@@ -28,44 +15,37 @@ import java.util.concurrent.TimeUnit;
 
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.CloseReason;
-import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
-import org.eclipse.jetty.util.component.LifeCycle;
 
 public class EchoClient {
-    public static void main(String[] args) throws Exception {
-        URI uri = URI.create("ws://localhost:8080/echo");
-
-        if (args.length == 1)
-            uri = new URI(args[0]);
-
-        WebSocketContainer client = ContainerProvider.getWebSocketContainer();
-
-        try {
-            EchoClient.performEcho(client, uri);
-        }
-        finally {
-            LifeCycle.stop(client);
-        }
-    }
-
     static int timeout = 100;
 
     public static List<String> performEcho(WebSocketContainer client, URI uri)
     		throws IOException, InterruptedException, DeploymentException {
         List<String> ret = new ArrayList<>();
-        EchoClientEndpoint echoSocket = new EchoClientEndpoint();
+        FlatTxtClient echoSocket = new FlatTxtClient();
         ClientEndpointConfig endpointConfig = ClientEndpointConfig.Builder.create().build();
         try (Session session = client.connectToServer(echoSocket, endpointConfig, uri)) {
         	logi("client session: %s", session.getId());
             session.getBasicRemote().sendText("Hello from " + EchoClient.class.getName());
 
-            String msg = echoSocket.messageQueue.poll(timeout, TimeUnit.SECONDS);
+            /**
+             * Gemini: 
+             * 
+             * If the message is within the allowed buffer limits (or you have increased the limits),
+             * the container will assemble the entire large text string and pass it to your onMessage
+             * method all at once.
+             * 
+             * Therefore:
+             * - Your messageQueue will contain exactly one entry.
+             * - That single entry will be the entire large text string.
+             */
+            String msg = echoSocket.q_msg.poll(timeout, TimeUnit.SECONDS);
             ret.add(msg);
             session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Goodbye"));
             if (!echoSocket.closeLatch.await(timeout, TimeUnit.SECONDS))
@@ -74,8 +54,8 @@ public class EchoClient {
         return ret;
     }
 
-    public static class EchoClientEndpoint extends Endpoint implements MessageHandler.Whole<String> {
-        private final LinkedBlockingDeque<String> messageQueue = new LinkedBlockingDeque<>();
+    public static class FlatTxtClient extends Endpoint implements MessageHandler.Whole<String> {
+        private final LinkedBlockingDeque<String> q_msg = new LinkedBlockingDeque<>();
         private final CountDownLatch closeLatch = new CountDownLatch(1);
 
         @Override
@@ -98,7 +78,7 @@ public class EchoClient {
         @Override
         public void onMessage(String message) {
             logi("EchoEclient onMessage: %s", message);
-            messageQueue.offer(message);
+            q_msg.offer(message);
         }
     }
 }
