@@ -20,6 +20,7 @@ public:
     string temp_dir;
     string doctier_jar;
     string synode_settings;
+    string wshost;
     int wsport;
 
     QMLTestSettings() : Anson() {
@@ -36,6 +37,7 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         {"temp_dir", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
         {"synode_settings", {.dataAnclass="string"} },
+        {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
        });
 
@@ -48,6 +50,7 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         .data<&anson::QMLTestSettings::temp_dir>("temp_dir")
         .data<&anson::QMLTestSettings::doctier_jar>("doctier_jar")
         .data<&anson::QMLTestSettings::synode_settings>("synode_settings")
+        .data<&anson::QMLTestSettings::wshost>("wshost")
         .data<&anson::QMLTestSettings::wsport>("wsport")
         ;
 
@@ -65,6 +68,8 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.doctier_jar);
                 if ("synode_settings" == fieldname)
                     return entt::forward_as_meta(concrete.synode_settings);
+                if ("wshost" == fieldname)
+                    return entt::forward_as_meta(concrete.wshost);
                 if ("wsport" == fieldname)
                     return entt::forward_as_meta(concrete.wsport);
             }

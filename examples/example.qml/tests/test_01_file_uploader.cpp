@@ -19,12 +19,16 @@ using namespace anson;
 
 class Ipcproxy : public ::testing::Test {
 protected:
-    static QWebSocket socket;
-    // static std::unique_ptr<QProcess> proc_agent;// = QProcess();
+    static std::unique_ptr<QWebSocket> socket; // Changed to pointer
     static std::unique_ptr<QCoreApplication> app;
+    static std::unique_ptr<QEventLoop> loop; // Make pointer for consistency
 
-    // This runs automatically before EACH TEST_F
+    // Before EACH TEST_F
     void SetUp() override {
+        if (app) {
+            // clean other tests
+            QCoreApplication::processEvents();
+        }
     }
 
     static void start_agent() {
@@ -39,22 +43,32 @@ protected:
         //     qDebug() << "Java Error:" << myProcess.readAllStandardError().trimmed();
         // });
 
-        QObject::connect(&socket, &QWebSocket::connected, [&]() {
+        QObject::connect(socket.get(), &QWebSocket::connected, [&]() {
             qDebug() << "Connected to Jetty!";
             // socket.sendTextMessage("Hello from Qt C++");
             // ping(socket, hello);
         });
 
-        QObject::connect(&socket, &QWebSocket::textMessageReceived, [](const QString &msg) {
+        QObject::connect(socket.get(), &QWebSocket::textMessageReceived, [](const QString &msg) {
             qDebug() << "[Qt Client] Server replied:";
             qDebug() << msg;
 
-            AnsonResp resp;
-            Anson::from_json(msg.toStdString(), resp);
+
+            // QRegularExpression enveloprefix(R"(^\{\"type\":)");
 
             if (msg == "bye") {
-                socket.close();
-                QCoreApplication::quit();
+                socket->close();
+                // QCoreApplication::quit();
+                loop->quit();
+            }
+            // else if (msg.contains(enveloprefix)) {
+            else if (LangExt::isenvelope(msg.toStdString())) {
+                AnsonMsg<AnsonResp> resp;
+                Anson::from_json(msg.toStdString(), resp);
+                // msgHandler(resp);
+            }
+            else {
+                qDebug() << "Message is not an envelope.";
             }
         });
 
@@ -62,6 +76,8 @@ protected:
         // if (!jarPath.isEmpty()) {
         //     myProcess.start("java", QStringList() << "-jar" << jarPath);
         // }
+
+        QTimer::singleShot(1000 * 8, loop.get(), &QEventLoop::quit);
     }
 
     // Runs once before the FIRST test in this file
@@ -71,19 +87,18 @@ protected:
         register_qmltestsettingsAst(asts);
 
         int argc = 0;
-        char* argv[] = {nullptr};
+        static char arg0[] = "album_tests.t01";
+        char* argv[] = {arg0, nullptr};
         app = std::make_unique<QCoreApplication>(argc, argv);
+        socket = std::make_unique<QWebSocket>();
+        loop = std::make_unique<QEventLoop>();
 
         start_agent();
-
-        // socket.open(QUrl("ws://localhost:8700"));
-
-        // Give the socket a moment to establish connection
         QCoreApplication::processEvents();
     }
 
     static void TearDownTestSuite() {
-        socket.close();
+        socket.get()->close();
 
         // Kill the background java process
         // if (proc_agent && proc_agent->state() != QProcess::NotRunning) {
@@ -98,25 +113,24 @@ protected:
     }
 
     void TearDown() override {
+        if (socket) {
+            socket.get()->close();
+        }
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 
     template <typename R>
     static void sendReq(AnsonMsg<R>& req) {
-
-        qDebug() << "[Qt Clinet Ping].body" << req.toBlock().c_str();
-
-        // AnsonMsg<EchoReq> anmsg(Port(Port::echo), req);
+        qDebug() << "[sent-req].body" << req.Body().toBlock().c_str();
+        qDebug() << "[sent-req].port url" << req.port.url();
 
         string reqs = req.toBlock();
-        qDebug() << "[Qt Clinet Ping]" << reqs.c_str();
-        socket.sendTextMessage(reqs.c_str());
+        socket.get()->sendTextMessage(reqs.c_str());
     }
 };
-
-// std::unique_ptr<QProcess> Ipcproxy::proc_agent = nullptr;
 std::unique_ptr<QCoreApplication> Ipcproxy::app = nullptr;
-QWebSocket Ipcproxy::socket;
+std::unique_ptr<QEventLoop> Ipcproxy::loop;
+std::unique_ptr<QWebSocket> Ipcproxy::socket;
 
 /**
  */
@@ -134,43 +148,51 @@ TEST_F(Ipcproxy, Config) {
 
     anwarn("You started the IPC Agent and the Synode?");
 
-    string wsjserv = std::format("ws://localhost:{}", settings.wsport);
-    socket.open(QUrl(wsjserv.c_str()));
+    string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
+    anlog(wsjserv);
+    socket.get()->open(QUrl(wsjserv.c_str()));
 }
 
 TEST_F(Ipcproxy, PING_Proxy) {
-    EchoReq req {EchoReq::A::echo};
-    req.echo = "TEST_F(Ipcproxy, PING_Proxy)... ";
+    EchoReq echo {EchoReq::A::echo};
+    echo.echo = "TEST_F(Ipcproxy, PING_Proxy)... ";
     // qDebug() << "[Qt Clinet Ping].body" << req.toBlock().c_str();
-    AnsonMsg<EchoReq> anmsg(Port(Port::echo), req);
+    AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
 
-    QEventLoop loop;
     bool receivedResponse = false;
     std::string receivedRawMsg = "";
 
-    auto conn = QObject::connect(&Ipcproxy::socket, &QWebSocket::textMessageReceived, &loop,
+    auto conn = QObject::connect(socket.get(), &QWebSocket::textMessageReceived, loop.get(),
             [&](const QString &msg) {
                 receivedRawMsg = msg.toStdString();
-                receivedResponse = true;
-                loop.quit(); // Break out of loop.exec()
+                qDebug() << msg;
+                qDebug() << "is envelope: " << LangExt::isenvelope(receivedRawMsg);
+
+                if (LangExt::isenvelope(receivedRawMsg)) {
+                    receivedResponse = true;
+                    qDebug() << "Quiting ...";
+                    loop->quit(); // Break out of loop.exec()
+                }
             });
 
     // 5-second failure safeguard
-    QTimer::singleShot(5000, &loop, &QEventLoop::quit);
+    // QTimer::singleShot(1000 * 8, &loop, &QEventLoop::quit);
 
-    Ipcproxy::sendReq(anmsg);
+    Ipcproxy::sendReq(echomsg);
 
     // Block here until loop.quit() occurs
-    loop.exec();
+    loop->exec();
 
     // Disconnect loop handler to keep subsequent tests clean
     QObject::disconnect(conn);
 
     // Assertions
-    ASSERT_TRUE(receivedResponse) << "WebSocket request timed out after 5 seconds.";
+    ASSERT_TRUE(receivedResponse) << "WebSocket request timed out after ... seconds.";
 
-    AnsonResp resp;
-    Anson::from_json(receivedRawMsg, resp);
+    if (receivedResponse) {
+        AnsonResp resp;
+        Anson::from_json(receivedRawMsg, resp);
+    }
     // Add your custom logic checks here:
     // EXPECT_EQ(resp.status(), "OK");
 }

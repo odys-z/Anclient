@@ -1,5 +1,6 @@
 { "type"     : "io.oz.anclient.ipcagent.AgentSettings",
   "whitelist": [],
+  "wshost"   : "127.0.0.1",
   "wsport"   : 8700,
   "tiers"    : ["io.oz.anclient.socketier.WSEcho", "io.oz.anclient.ipcagent.T_Doclient"]
 }

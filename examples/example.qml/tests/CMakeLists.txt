@@ -24,7 +24,9 @@ add_executable(
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
     gen/test_settings.hpp
-    test_01_file_uploader.cpp
+    # test_01_file_uploader.cpp
+    # test_01_websocket_client.cpp
+    test_01_websocket_client_simple.cpp
 )
 
 
