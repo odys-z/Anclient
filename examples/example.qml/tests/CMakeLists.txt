@@ -24,9 +24,6 @@ add_executable(
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
     gen/test_settings.hpp
-    # test_01_file_uploader.cpp
-    # test_01_websocket_client.cpp
-    # test_01_websocket_client_simple.cpp
     test_01_hello_ixwebsocket.cpp
     test_02_wsclient.cpp
     test_03_synode_client.cpp
@@ -74,18 +71,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 #     OUTPUT_SCRIPT deploy_script
 # )
 
-# get_target_property(_qmake_executable Qt6::Core LOCATION)
-# get_filename_component(QT_BIN_DIR "${_qmake_executable}" DIRECTORY)
-
 message(STATUS "=========================================== QT_BIN_DIR = ${QT_BIN_DIR}")
 
 set(test_env ${CMAKE_COMMAND} -E env
     "PATH=${QT_BIN_DIR};$ENV{PATH}"
 )
-
-# set_target_properties(${${OPTION_NAME} PROPERTIES
-#     TEST_LAUNCHER "${test_env}"
-# )
 
 # gtest_discover_tests(album_tests)
 gtest_discover_tests(${PROJECT_NAME}

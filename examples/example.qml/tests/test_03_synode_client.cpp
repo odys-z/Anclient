@@ -13,17 +13,6 @@
 #include <io/odysz/gen/doctier.hpp>
 #include "gen/test_settings.hpp"
 
-// namespace anson {
-// template <typename R>
-// static void sendReq(ix::WebSocket & socket, AnsonMsg<R>& req) {
-//     qDebug() << "[sent-req].body" << req.Body().toBlock().c_str();
-//     qDebug() << "[sent-req].port url" << req.port.url();
-
-//     string reqs = req.toBlock();
-//     socket.sendText(reqs);
-// }
-// }
-
 static anson::AstMap asts;
 static anson::JsonOpt opts{&asts};
 
