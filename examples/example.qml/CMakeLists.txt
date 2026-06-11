@@ -39,18 +39,8 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 include(FetchContent)
 
-# FetchContent_Declare(
-#     json
-#     URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
-#     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-# )
-# FetchContent_MakeAvailable(json)
-
 # try to auto-locate EnTT installed by vcpkg
 message(STATUS "=========================================== CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
-
-# ./vcpkg install entt:x64-windows --x-install-root="../anclient/examples/example.qml/vcpkg_packages"
-# find_package(EnTT CONFIG REQUIRED)
 
 FetchContent_Declare(
   anson.cmake
@@ -69,15 +59,6 @@ FetchContent_Declare(
 
 set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(anclient.cmake)
-
-# target_link_libraries(anclient INTERFACE EnTT::EnTT anson)
-
-# FetchContent_Declare(
-#   googletest
-#   GIT_REPOSITORY https://github.com/google/googletest.git
-#   GIT_TAG        v1.15.2
-# )
-# FetchContent_MakeAvailable(googletest)
 
 # add_compile_options(/utf-8)
 # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")

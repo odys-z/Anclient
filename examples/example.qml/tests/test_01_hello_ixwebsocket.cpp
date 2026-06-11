@@ -89,8 +89,6 @@ TEST(IXWEBSOKET, HELLO) {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     if (webSocket.getReadyState() == ix::ReadyState::Open) {
-        // webSocket.sendText("{\"type\": \"echo\", \"message\": \"Hello from OpenSSL C++ client!\"}");
-
         anson::EchoReq echo {anson::EchoReq::A::echo};
         echo.echo = "TEST_F(Ipcproxy, PING_Proxy)... ";
         anson::AnsonMsg<anson::EchoReq> echomsg(anson::Port(anson::Port::echo), echo);

@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Qml Test)
-find_package(Qt6 REQUIRED COMPONENTS WebSockets)
+find_package(Qt6 REQUIRED COMPONENTS)
 
 add_executable(
     ${PROJECT_NAME}
