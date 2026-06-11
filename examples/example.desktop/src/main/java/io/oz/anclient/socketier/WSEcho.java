@@ -1,6 +1,7 @@
 package io.oz.anclient.socketier;
 
 import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.Utils.logi;
 
 import java.io.IOException;
 
@@ -33,15 +34,19 @@ public class WSEcho implements IPCPort {
 	@Override
 	public void onMessage(AnsonMsg<?> ansonMsg, Basic synremote, Async asyremote)
 			throws SemanticException, TransException, AnsonException, SsException, IOException {
+		logi("WSEcho.onMessage()");
+
 		EchoReq msg = (EchoReq) ansonMsg.body(0); 
 
 		if (!eq(msg.a(), A.echo))
 			throw new IPCException(MsgCode.ext, "expecting act of msg.echo");
-		else
+		else {
+			logi("WSEcho.onMessage(), a = echo");
 			socket.<AnsonResp>ok(synremote, port(),
 				(AnsonResp)new AnsonResp(null, msg.echo)
 				.uri(msg.uri())
 				.a(msg.a()));
+		}
 	}
 
 	@Override

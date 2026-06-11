@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.30)
 set(ENV{CC} "gcc")
 set(ENV{CXX} "g++")
 
+set(VCPKG_MANIFEST_MODE OFF CACHE BOOL "" FORCE)
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/../../../vcpkg/installed" CACHE PATH "vcpkg install dir")
 set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
@@ -29,6 +30,9 @@ find_package(OpenSSL REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+
+# vcpkage install ixwebsocket[core,openssl]:x64-mingw-dynamic
+find_package(ixwebsocket REQUIRED)
 find_package(Qt6 REQUIRED COMPONENTS Core Qml)
 
 qt_standard_project_setup(REQUIRES 6.8)

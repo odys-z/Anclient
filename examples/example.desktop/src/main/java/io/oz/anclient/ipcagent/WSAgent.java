@@ -4,7 +4,6 @@ import static io.odysz.common.LangExt._0;
 import static io.odysz.common.Utils.logi;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ShutdownMonitor;
@@ -53,10 +52,12 @@ public class WSAgent {
 	    context.insertHandler(ipHandler);
 
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
+	    	container.setDefaultMaxSessionIdleTimeout(20000);
+	    	
 	    	for (ServerEndpointConfig.Builder b : cfgBuilders) {
 	    		ServerEndpointConfig config = b.build();
-				Map<String, Object> userProps = config.getUserProperties();
-				userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
+//				Map<String, Object> userProps = config.getUserProperties();
+//				userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
 				container.addEndpoint(config);
 	    	}
 	    });

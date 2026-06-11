@@ -50,7 +50,7 @@ Rectangle {
                 x: treeDelegate.leftMargin + (treeDelegate.depth * treeDelegate.indentation)
                 anchors.verticalCenter: parent.verticalCenter
                 source: treeDelegate.hasChildren ? (treeDelegate.expanded
-                            ? "../icons/folder_open.svg" : "../icons/folder_closed.svg")
+                        ? "../icons/folder_open.svg" : "../icons/folder_closed.svg")
                         : "../icons/generic_file.svg"
                 sourceSize.width: 20
                 sourceSize.height: 20

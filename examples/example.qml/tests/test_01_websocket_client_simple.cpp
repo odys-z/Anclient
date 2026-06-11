@@ -58,8 +58,6 @@ std::unique_ptr<QEventLoop> Ipcproxy::loop = nullptr;
 std::unique_ptr<QWebSocket> Ipcproxy::socket = nullptr;
 
 TEST_F(Ipcproxy, PureConnectionTest) {
-    // Hardcode the local loopback server address directly 
-    // (Adjust "127.0.0.1" or "8700" if your Jetty server runs elsewhere)
     QUrl serverUrl("ws://127.0.0.1:8700/ipc");
     qDebug() << "Attempting connection to:" << serverUrl.toString();
 

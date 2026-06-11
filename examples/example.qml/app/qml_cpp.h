@@ -80,7 +80,7 @@ class QDoclientier : public QObject {
     // 1. Define the property
     Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
 
-    // anson::Doclientier clientier;
+    std::shared_ptr<anson::Doclientier> clientier;
 
     map<string, vector<string>> syncing_paths;
 
@@ -89,11 +89,11 @@ class QDoclientier : public QObject {
     // };
 
 public:
-    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent)
-    //     , clientier([](anson::MsgCode c, string_view e, vector<string_view> &a) {
-    //     // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
-    // })
-    {}
+    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent) {}
+        // , clientier(
+        // [](anson::MsgCode c, string_view e, vector<string_view> &a) {
+        //     anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+        // }) {}
 
     // QDoclientier(QString device) : clientier("", "", "device.toStdString()", onErr) {}
 
@@ -145,6 +145,10 @@ public:
         //         #endif
         //         emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
         //     });
+    }
+
+    Q_INVOKABLE void query_synode(QJSValue paths) {
+        qDebug() << "'''''''''''''''''''''''''''''''''''''''''''''''";
     }
 
 signals:

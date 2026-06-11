@@ -26,11 +26,14 @@ add_executable(
     gen/test_settings.hpp
     # test_01_file_uploader.cpp
     # test_01_websocket_client.cpp
-    test_01_websocket_client_simple.cpp
+    # test_01_websocket_client_simple.cpp
+    test_01_hello_ixwebsocket.cpp
+    test_02_wsclient.cpp
+    test_03_synode_client.cpp
 )
 
 
-target_link_libraries(album_tests PRIVATE Qt6::WebSockets)
+# target_link_libraries(album_tests PRIVATE Qt6::WebSockets)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
@@ -57,6 +60,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenSSL::Crypto
     EnTT::EnTT
     nlohmann_json::nlohmann_json
+    ixwebsocket::ixwebsocket
     Qt6::Core
     Qt6::Qml
     Qt6::Test

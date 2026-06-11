@@ -123,7 +123,7 @@ Item {
                         // root.selectedPaths.clear();
                         root.selectedPaths = {};
                         root.selectedPaths[filePath] = AppConstants.Synching;
-                        // console.log(index, filePath, fileName);
+                        console.log(`index: ${index}`, filePath, fileName);
                     }
                     root.selecount++;
                     mouse.accepted = false;

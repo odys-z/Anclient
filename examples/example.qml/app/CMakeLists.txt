@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.30)
 project(album VERSION 1.0 LANGUAGES CXX)
 
-if (ANDROID OR IOS)
-    message(FATAL_ERROR "Platform is not supported")
-    return()
-endif ()
+# if (ANDROID OR IOS)
+#     message(FATAL_ERROR "Platform is not supported")
+#     return()
+# endif ()
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 Svg Widgets)
 
@@ -17,6 +17,15 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator QML Import Paths
 qt_add_executable(${PROJECT_NAME}
     main.cpp
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        -finput-charset=UTF-8
+        -fexec-charset=UTF-8
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
+endif()
 
 set_source_files_properties(qml/Colors.qml
     PROPERTIES
@@ -53,10 +62,10 @@ qt_add_qml_module(${PROJECT_NAME}
     SOURCES
         qml_cpp.h
         qml_cpp.cpp
-        filesysmodel.cpp
         filesysmodel.h
-        linenumbermodel.cpp
+        filesysmodel.cpp
         linenumbermodel.h
+        linenumbermodel.cpp
         filelistview.h
         doctier.cpp	#
 )

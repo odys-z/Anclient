@@ -38,10 +38,6 @@ ApplicationWindow {
     QDoclientier{
         id: doclient
         device: "test"
-    // }
-
-    // Connections {
-    //     target: doclient
 
         // function onFileStatusChanged(path, success) {
         onFileStatusChanged: (path, success) => {
@@ -211,9 +207,10 @@ ApplicationWindow {
                         onFileClicked: path => {
                             root.currentFilePath = path
                             root.show_dir_file = 0
+                            console.log(`File: ${path} ...`)
                         }
                         onFolderClicked: path => {
-                            console.log(`Add some items in the list view ${path} ...`)
+                            console.log(`Folder: ${path} ...`)
                             root.currentFilePath = path
                             root.show_dir_file = 1
                             // folderModel.folder = Qt.resolvedUrl("file:" + path)
@@ -259,11 +256,13 @@ ApplicationWindow {
                         onFileDoubleClicked: (path) => {
                             root.currentFilePath = path
                             root.show_dir_file = 0 // Switch to editor
+                            console.log("OnDouble file click: " + path)
                         }
 
                         onFolderDoubleClicked: (path) => {
                             root.currentFilePath = path
                             root.show_dir_file = 1 // Stay in gallery/folder view
+                            console.log("OnDouble Folder click: " + path)
                         }
                     }
                 }
