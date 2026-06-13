@@ -3,6 +3,8 @@
 #include <thread>
 
 #include <io/odysz/clients.h>
+#include <io/odysz/common.h>
+#include <io/odysz/jprotocol.h>
 
 #include <QObject>
 #include <QDebug>
@@ -68,27 +70,26 @@ public:
 
 };
 
-
-// using namespace anson;
-// using synst = AppConstants::SyncState;
-
 class QDoclientier : public QObject {
     Q_OBJECT
     QML_ELEMENT
+
+    inline static const QString funcuri = "/syn/cpp";
 
     QString _device;
     // 1. Define the property
     Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
 
-    std::shared_ptr<anson::Doclientier> clientier;
+    std::shared_ptr<anson::Doclientier> wsclient;
+    std::shared_ptr<anson::Doclientier> jservclient;
 
     map<string, vector<string>> syncing_paths;
 
-    // inline static anson::OnError onErr = [](anson::MsgCode c, string_view e, vector<string_view> &a) {
-    //     // anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
-    // };
-
 public:
+    inline static anson::OnError onErr = [](anson::MsgCode c, const string& e, const vector<string> &a) {
+        anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    };
+
     explicit QDoclientier(QObject *parent = nullptr) : QObject(parent) {}
         // , clientier(
         // [](anson::MsgCode c, string_view e, vector<string_view> &a) {
@@ -149,6 +150,28 @@ public:
 
     Q_INVOKABLE void query_synode(QJSValue paths) {
         qDebug() << "'''''''''''''''''''''''''''''''''''''''''''''''";
+    }
+
+    void login_synode(const anson::JServUrl & jserv, const string &uid, const string &pswd) noexcept {
+        try {
+            using namespace anson;
+            andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
+            SessionClient ssclient = SessionClient::loginWithUri(jserv,
+                        funcuri.toStdString(), uid, pswd, _device.toStdString(), onErr);
+            jservclient = make_shared<Doclientier>(onErr);
+            jservclient.get()->client = ssclient;
+        } catch (const std::logic_error e) {
+            anwarn(e.what());
+            onErr(anson::MsgCode::Code::exSession, e.what(), {});
+        } catch (const std::exception e) {
+            anerror(e.what());
+            onErr(anson::MsgCode::Code::exSession, e.what(), {});
+        }
+    }
+
+    vector<bool> connections() {
+        return {wsclient != nullptr && !anson::LangExt::isblank(jservclient.get()->client.ssInf.ssid),
+             jservclient != nullptr && !anson::LangExt::isblank(jservclient.get()->client.ssInf.ssid)};
     }
 
 signals:

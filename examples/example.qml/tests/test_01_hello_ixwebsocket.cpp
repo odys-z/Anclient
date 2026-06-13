@@ -29,7 +29,6 @@ TEST(IXWEBSOKET, HELLO) {
     register_jserv(asts, opts);
     register_doctier(asts, "ast");
     register_qmltestsettingsAst(asts);
-
     ix::initNetSystem();
 
     std::atomic<bool> keepRunning{true};
