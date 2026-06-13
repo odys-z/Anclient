@@ -29,8 +29,10 @@ TEST(SYNODE_CLIENT, Query) {
     QJSValue paths;
     QMLTestSettings settings;
     JProtocol syn_protocol;
+
+    CientSettings settings;
     syn_protocol.setup("jserv_album");
-    JServUrl jserv{"http:://127.0.0.1", syn_protocol};
+    JServUrl jserv{"http://127.0.0.1:8961", syn_protocol};
     doctier.login_synode(jserv, "ody", "123456");
 
     // ASSERT_TRUE(doctier.connections()[0]) << "ipc-agent connection";
