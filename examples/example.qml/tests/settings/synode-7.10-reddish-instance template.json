@@ -1,4 +1,4 @@
-{ "type": "io.oz.anclient.Settings",
+{ "type": "io.odysz.gen.AnclientSettings",
   "jserv": "http://localhost:8957/jserv-album",
   "domain": "******",
   "admin": "admin",

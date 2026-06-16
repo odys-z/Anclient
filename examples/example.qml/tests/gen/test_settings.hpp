@@ -18,8 +18,11 @@ public:
     string sysuri;
     string synuri;
     string temp_dir;
+    string java_path;
     string doctier_jar;
+    string wsagent_jar;
     string synode_settings;
+    string wsagent_settings;
     string wshost;
     int wsport;
 
@@ -35,8 +38,11 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         {"sysuri", {.dataAnclass="string"} },
         {"synuri", {.dataAnclass="string"} },
         {"temp_dir", {.dataAnclass="string"} },
+        {"java_path", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
+        {"wsagent_jar", {.dataAnclass="string"} },
         {"synode_settings", {.dataAnclass="string"} },
+        {"wsagent_settings", {.dataAnclass="string"} },
         {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
        });
@@ -48,8 +54,11 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         .data<&anson::QMLTestSettings::sysuri>("sysuri")
         .data<&anson::QMLTestSettings::synuri>("synuri")
         .data<&anson::QMLTestSettings::temp_dir>("temp_dir")
+        .data<&anson::QMLTestSettings::java_path>("java_path")
         .data<&anson::QMLTestSettings::doctier_jar>("doctier_jar")
+        .data<&anson::QMLTestSettings::wsagent_jar>("wsagent_jar")
         .data<&anson::QMLTestSettings::synode_settings>("synode_settings")
+        .data<&anson::QMLTestSettings::wsagent_settings>("wsagent_settings")
         .data<&anson::QMLTestSettings::wshost>("wshost")
         .data<&anson::QMLTestSettings::wsport>("wsport")
         ;
@@ -64,10 +73,16 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.synuri);
                 if ("temp_dir" == fieldname)
                     return entt::forward_as_meta(concrete.temp_dir);
+                if ("java_path" == fieldname)
+                    return entt::forward_as_meta(concrete.java_path);
                 if ("doctier_jar" == fieldname)
                     return entt::forward_as_meta(concrete.doctier_jar);
+                if ("wsagent_jar" == fieldname)
+                    return entt::forward_as_meta(concrete.wsagent_jar);
                 if ("synode_settings" == fieldname)
                     return entt::forward_as_meta(concrete.synode_settings);
+                if ("wsagent_settings" == fieldname)
+                    return entt::forward_as_meta(concrete.wsagent_settings);
                 if ("wshost" == fieldname)
                     return entt::forward_as_meta(concrete.wshost);
                 if ("wsport" == fieldname)

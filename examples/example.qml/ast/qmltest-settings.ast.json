@@ -4,9 +4,12 @@
   "fields" : {
     "sysuri": {"dataAnclass": "string"},
     "synuri": {"dataAnclass": "string"},
-    "temp_dir": {"dataAnclass": "string"},
+    "temp_dir"   : {"dataAnclass": "string"},
+    "java_path"  : {"dataAnclass": "string"},
     "doctier_jar": {"dataAnclass": "string"},
-    "synode_settings": {"dataAnclass": "string"},
+    "wsagent_jar": {"dataAnclass": "string"},
+    "synode_settings" : {"dataAnclass": "string"},
+    "wsagent_settings": {"dataAnclass": "string"},
     "wshost": {"dataAnclass": "string"},
     "wsport": {"dataAnclass": "int"}
   },

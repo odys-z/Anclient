@@ -74,39 +74,37 @@ class QDoclientier : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
-    inline static const QString funcuri = "/syn/cpp";
-
-    QString _device;
-    // 1. Define the property
-    Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
-
-    std::shared_ptr<anson::Doclientier> wsclient;
-    std::shared_ptr<anson::Doclientier> jservclient;
+    inline static const QString sysuri = "/sys/cpp";
+    inline static const QString synuri = "/syn/cpp";
 
     map<string, vector<string>> syncing_paths;
 
+    QString _device;
+    // property
+    Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
 public:
-    inline static anson::OnError onErr = [](anson::MsgCode c, const string& e, const vector<string> &a) {
-        anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
-    };
-
-    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent) {}
-        // , clientier(
-        // [](anson::MsgCode c, string_view e, vector<string_view> &a) {
-        //     anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
-        // }) {}
-
-    // QDoclientier(QString device) : clientier("", "", "device.toStdString()", onErr) {}
-
-    // 2. Add Getter
+    // Getter
     QString getDevice() const { return _device; }
 
-    // 3. Add Setter
+    // Setter
     void setDevice(const QString &device) {
         if (_device == device) return;
         _device = device;
         emit deviceChanged();
     }
+
+    std::shared_ptr<anson::Doclientier> wsclient;
+    std::shared_ptr<anson::Doclientier> jservclient;
+
+    inline static anson::OnError onErr = [](anson::MsgCode c, const string& e, const vector<string> &a) {
+        anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    };
+
+    inline static anson::OnProgress onprogress = [](const string& m, const string &a) {
+        aninfo(std::vformat(m, std::make_format_args(a)));
+    };
+
+    explicit QDoclientier(QObject *parent = nullptr) : QObject(parent) {}
 
     Q_INVOKABLE void push_files_TDD(QJSValue paths) {
 
@@ -139,13 +137,13 @@ public:
             this->syncing_paths[it.name().toStdString()] = {anson::ShareFlag::pushing, _device.toStdString(), "now()"};
         }
 
-        // clientier.push_files(this->syncing_paths,
-        //     [paths, this] (const string& p, const string& status) {
-        //         #ifdef QT_DEBUG
-        //             AppConstants::qlog(p, status);
-        //         #endif
-        //         emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
-        //     });
+        wsclient->push_files(this->syncing_paths,
+            [paths, this] (const string& p, const string& status) {
+                #ifdef QT_DEBUG
+                    AppConstants::qlog(p, status);
+                #endif
+                emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
+            });
     }
 
     Q_INVOKABLE void query_synode(QJSValue paths) {
@@ -157,7 +155,7 @@ public:
             using namespace anson;
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             SessionClient ssclient = SessionClient::loginWithUri(jserv,
-                        funcuri.toStdString(), uid, pswd, _device.toStdString(), onErr);
+                        sysuri.toStdString(), uid, pswd, _device.toStdString(), onErr);
             jservclient = make_shared<Doclientier>(onErr);
             jservclient.get()->client = ssclient;
         } catch (const std::logic_error e) {

@@ -276,7 +276,7 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
     	
         ClientEndpointConfig endpointConfig = ClientEndpointConfig.Builder.create().build();
 
-		this.session = wsContainer.connectToServer(this, endpointConfig, jserv.wsuri());
+		this.session = wsContainer.connectToServer(this, endpointConfig, jserv.wservUri());
 
         String msg = messageQueue.poll(timeout, TimeUnit.SECONDS);
 		if (verbose) logi("client session: %s, open-msg: %S", session.getId(), msg);

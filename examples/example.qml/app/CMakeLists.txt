@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 project(album VERSION 1.0 LANGUAGES CXX)
 
-# if (ANDROID OR IOS)
-#     message(FATAL_ERROR "Platform is not supported")
-#     return()
-# endif ()
-
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Quick QuickControls2 Svg Widgets)
 
 qt_standard_project_setup(REQUIRES 6.8)
@@ -16,6 +11,8 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator QML Import Paths
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
+    wsclients.h
+    wsclients.cpp
 )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -82,6 +79,7 @@ target_link_libraries(${PROJECT_NAME}
         EnTT::EnTT
         nlohmann_json::nlohmann_json
         cpr::cpr
+        ixwebsocket::ixwebsocket
         anson
         anclient
 )
@@ -123,11 +121,11 @@ target_link_libraries(album_clangd_helper PRIVATE
     anson
     anclient)
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
-        "$<TARGET_FILE_DIR:album_tests>/ast"
-)
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#         "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
+#         "$<TARGET_FILE_DIR:album_tests>/ast"
+# )
 
 install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .

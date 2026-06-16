@@ -20,15 +20,16 @@ add_executable(
     ../app/qml_cpp.cpp
     ../app/qml_cpp.h
     ../app/doctier.cpp
+    ../app/wsclients.h
+    ../app/wsclients.cpp
 
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
     gen/test_settings.hpp
-    test_01_hello_ixwebsocket.cpp
-    test_02_wsclient.cpp
-    test_03_synode_client.cpp
+    # test_01_hello_ixwebsocket.cpp
+    test_02_wsclient_ipcagent.cpp
+    # test_03_synode_client.cpp
 )
-
 
 # target_link_libraries(album_tests PRIVATE Qt6::WebSockets)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -39,6 +40,10 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/settings"
         "$<TARGET_FILE_DIR:album_tests>/settings"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/res"
+        "$<TARGET_FILE_DIR:album_tests>/res"
 
     COMMENT "Copying JSON settings to build directory"
 )
