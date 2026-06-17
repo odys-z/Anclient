@@ -47,8 +47,8 @@ public:
     int asynSend(const AnsonMsg<BD>& reqmsg);
 
     int poll();
-    int block_poll();
-    AnsonMsg<AnsonResp> pop();
+    int block_poll(int ms_timout = -1);
+    AnsonMsg<AnsonResp> pop_envelope();
 
 private:
     // Dependencies & Configuration

@@ -38,42 +38,6 @@ protected:
 
     }
 
-
-    /**
-     * @brief Resolves the tilde (~) prefix in file paths across different platforms.
-     * On Windows, it expands '~' to the USERPROFILE directory.
-     * On Unix/Linux/macOS, it expands '~' to the HOME directory.
-     */
-    static u8string resolveHomePath(const std::string& inputPath) {
-        if (inputPath.empty() || inputPath[0] != '~') {
-            return fs::path(inputPath).u8string();
-        }
-
-        std::string homeDir;
-
-        #ifdef _WIN32
-        // Windows conditional compilation
-        char* userProfile = std::getenv("USERPROFILE");
-        if (userProfile) {
-            homeDir = userProfile;
-        }
-        #else
-        // Linux / macOS conditional compilation
-        char* home = std::getenv("HOME");
-        if (home) {
-            homeDir = home;
-        }
-        #endif
-
-        if (homeDir.empty()) {
-            return fs::path(inputPath).u8string();
-        }
-
-        size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
-
-        return (fs::path(homeDir) / inputPath.substr(offset)).u8string();
-    }
-
     static void start_agent() {
         // filesystem::path path2prj{"."};
         // filesystem::path agent_jar  = path2prj / qmlsettings.wsagent_jar;
@@ -204,7 +168,7 @@ QMLTestSettings Ipclient::qmlsettings;
 WSClient        Ipclient::wsclient{{"127.0.0.1:8700", wsprotocol}, onmsg};
 QProcess        Ipclient::wsAgentProc;
 
-TEST_F(Ipclient, PING_Proxy) {
+TEST_F(Ipclient, Echo) {
     EchoReq echo{EchoReq::A::echo};
     echo.echo = "TEST_F(Ipcproxy, PING_Proxy) from Qt C++";
     AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
@@ -217,8 +181,44 @@ TEST_F(Ipclient, PING_Proxy) {
     // Anson::from_json(receivedRawMsg, resp);
     wsclient.block_poll();
 
-    AnsonMsg<AnsonResp> resp = wsclient.pop();
+    AnsonMsg<AnsonResp> resp;
+    try {
+        resp = wsclient.pop_envelope();
+        FAIL() << "expecting session open ...";
+    } catch(SemanticException e) {
+        wsclient.asynSend(echomsg);
+        if (wsclient.block_poll(3000) == 0)
+            FAIL() << "expecting echos ...";
+    }
 
+    resp = wsclient.pop_envelope();
     ASSERT_EQ(echo.echo, resp.Body().m);
     qDebug() << "✅ Ping response parsed successfully";
+}
+
+TEST_F(Ipclient, Place_Task) {
+    DocsReq uploadreq{"h_photos", {}}; //{DocsReq::A::syncdocs};
+    uploadreq.a = DocsReq::A::requestSyn;
+
+    map<string, vector<LangExt::VarType>> clientPaths {
+        {"path/a", {}}, {"path/b", {}}, {"path/c", {}},
+        {"path/d", {}}, {"path/e", {}}, {"path/f", {}} };
+    PathsPage pthpage;
+    pthpage.clientPaths = clientPaths;
+    uploadreq.syncingPage = {pthpage};
+    AnsonMsg<DocsReq> msg(Port(Port::docstier), uploadreq);
+
+    wsclient.asynSend(msg);
+
+    wsclient.block_poll();
+
+    AnsonMsg<AnsonResp> resp;
+    try {
+        resp = wsclient.pop_envelope();
+    } catch(SemanticException e) {
+        FAIL() << "expecting upload task replies ...";
+    }
+
+    resp.Body();
+
 }

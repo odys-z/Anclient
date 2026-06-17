@@ -82,16 +82,16 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
         } // auto-unlock
         // queueCv_.notify_one();
 
-        AnsonMsg<AnsonResp> env;
-        Anson::from_json(msg_queue.front(), env);
-        if (onMsg(env)) {
-            std::lock_guard<std::mutex> lock(queueMutex_);
-            msg_queue.pop();
-        }
+        // AnsonMsg<AnsonResp> env;
+        // Anson::from_json(msg_queue.front(), env);
+        // if (onMsg(env)) {
+        //     std::lock_guard<std::mutex> lock(queueMutex_);
+        //     msg_queue.pop();
+        // }
     } 
     else if (msg->type == ix::WebSocketMessageType::Open) {
         // queueCv_.notify_one(); // Wake up connection blocks
-        anlog("WebSocket Open: "s + msg->openInfo.uri.c_str());
+        anlog("WebSocket Open: uri = "s + msg->openInfo.uri.c_str());
     }
     else if (msg->type == ix::WebSocketMessageType::Close) {
         anlog(std::format("Connection closed. Code: {:d}. Reason: {:s}",
@@ -111,15 +111,20 @@ int WSClient::poll() {
     return msg_queue.size();
 }
 
-int WSClient::block_poll() {
-    using namespace std::chrono_literals;
+int WSClient::block_poll(int ms_timeout) {
     int s;
-    while ((s = msg_queue.size()) == 0)
+    while ((s = msg_queue.size()) == 0 && ms_timeout != 0) {
         this_thread::sleep_for(200ms);
+        if (ms_timeout > 0)
+            ms_timeout = max(0, ms_timeout - 200);
+    }
     return s;
 }
 
-AnsonMsg<AnsonResp> WSClient::pop() {
+AnsonMsg<AnsonResp> WSClient::pop_envelope() {
+    if (msg_queue.size() == 0)
+        throw SemanticException("Empty Queue");
+
 
     string top;
     {
@@ -127,11 +132,14 @@ AnsonMsg<AnsonResp> WSClient::pop() {
         top = msg_queue.front();
         msg_queue.pop();
     }
-    andebug("pop():\n=====");
-    andebug(top);
-    AnsonMsg<AnsonResp> r;
-    Anson::from_json(std::move(top), r);
-    return r;
+    anlog("TODO anlog -> andebug, pop():\n=============================");
+    anlog(top);
+    if (Regex::startEnvelope(top)) {
+        AnsonMsg<AnsonResp> r;
+        Anson::from_json(top, r);
+        return r;
+    }
+    else throw SemanticException("Message is not an envelope: " + top);
 }
 
 

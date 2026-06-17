@@ -26,8 +26,9 @@ add_executable(
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
     gen/test_settings.hpp
-    # test_01_hello_ixwebsocket.cpp
-    test_02_wsclient_ipcagent.cpp
+    # The Hello IXWebSocket requires stand alone ws-agent: test_01_hello_ixwebsocket.cpp
+    test_01_wsclient_ipcagent.cpp
+    test_common.h
     # test_03_synode_client.cpp
 )
 
