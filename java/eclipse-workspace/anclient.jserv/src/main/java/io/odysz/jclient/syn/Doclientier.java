@@ -174,6 +174,18 @@ public class Doclientier extends Semantier {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param doclient
+	 * @param atdev
+	 * @param respath
+	 * @param entityName
+	 * @param share
+	 * @param ok
+	 * @param proc
+	 * @throws Exception
+	 * @deprecated for test only?
+	 */
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
  			String entityName, ShareFlag share, OnOk ok, OnProcess proc) throws Exception {
 
@@ -202,6 +214,8 @@ public class Doclientier extends Semantier {
 	 * @throws TransException 
 	 * @throws AnsonException 
 	 * @throws IOException 
+	 * 
+	 * FIXME not used?
 	 */
 	List<DocsResp> syncUp(ExpDocTableMeta meta, AnResultset rs, OnProcess onProc)
 			throws TransException, AnsonException, IOException {
@@ -217,7 +231,7 @@ public class Doclientier extends Semantier {
 		}
 	}
 
-	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
+	private List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
 			OnProcess onProc, OnDocsOk... docsOk)
 			throws TransException, AnsonException, IOException {
 		return startPushs(
@@ -554,8 +568,11 @@ public class Doclientier extends Semantier {
 	 * @throws TransException
 	 * @throws IOException
 	 * @throws SQLException
+	 * 
+	 * @deprecated for test only?
 	 */
-	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
+	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc,
+			OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
 			throws TransException, IOException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
