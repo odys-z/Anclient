@@ -10,15 +10,14 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantics.x.SemanticException;
 
 public enum WSPort implements IPort {
-	doclient("doclient.ws"), configIPC("config.ws"), echo("echo.ws");
+	doclient("doclient.ws"), configIPC("config.ws"), echo("echo.ws"),
+	ping("ping.ws"),
+	/**
+	 * See jserv/ExpDoctier
+	 * @WebServlet(description = "Synode Tier: docs-sync", urlPatterns = { "/docs.tier" })
+	 */
+	doctier("docs.tier");
 
-//	static {
-//		JSONAnsonListener.registFactory(IPort.class, 
-//			(s) -> {
-//				return WSPort.valueOf(s);
-//			});
-//	}
-	
 	private String url;
 	WSPort(String v) { url = v; };
 	public String url() { return url; }

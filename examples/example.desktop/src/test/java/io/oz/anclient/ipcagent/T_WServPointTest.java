@@ -4,7 +4,9 @@
 
 package io.oz.anclient.ipcagent;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
@@ -17,6 +19,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.odysz.anson.Anson;
+import io.odysz.anson.AnsonException;
+import io.odysz.jclient.AnclientSettings;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -24,36 +29,27 @@ import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jserv.echo.EchoReq;
 import io.odysz.semantic.jserv.echo.EchoReq.A;
+import io.odysz.semantic.tier.docs.DocsReq;
+import io.odysz.semantic.tier.docs.DocsResp;
+import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JServUrl;
 
+//import static io.odysz.common.Utils.logi;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class T_WServPointTest {
     private Server server;
 
-//    @SuppressWarnings("serial")
+    AnclientSettings clientsettings;
+
 	@BeforeEach
     public void startServerAndClient() throws Exception {
-//	    AgentSettings settings = Anson.fromPath("src/test/resources/WEB-INF/settings.json");
-//        server = T_WSAgent.createServer(new ArrayList<ServerEndpointConfig.Builder> () {
-//        	{ add (ServerEndpointConfig.Builder
-//        		.create(T_EchoEndpoint.class, "/" + T_EchoEndpoint.pointpath));};
-//        	{ add (ServerEndpointConfig.Builder
-//        		.create(WServPoint.class, "/" + T_WSAgent.ipc_path)
-//        		.configurator(new ServerEndpointConfig.Configurator() {
-//        				@SuppressWarnings("unchecked")
-//						@Override
-//	                    public <T> T getEndpointInstance(Class<T> clazz) {
-//	                        return (T) WServPoint.build(settings);
-//	                    }
-//        		}));}
-//        }, settings);
-//        server.start();
-
         server = T_WSAgent._main("src/test/resources/WEB-INF/settings.json");
         server.start();
+        
+        clientsettings = Anson.fromPath("");
     }
 
     @AfterEach
@@ -94,4 +90,46 @@ public class T_WServPointTest {
 
         assertEquals(resp.msg(), "слава Україні");
     }
+    
+    @Test
+    public void testTaskPing() throws Exception {
+        JProtocol p = new JProtocol(T_WSAgent.ipc_path);
+        JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
+        
+        WSClient pinger = new WSClient(jserv, true);
+
+		ArrayList<String> paths = new ArrayList<String>() {
+			private static final long serialVersionUID = 1L;
+			{add("ping-path/a");}
+			{add("ping-path/b");}
+		};
+
+        List<DocsResp> reps = placeTasks(pinger, paths);
+
+
+		assertEquals(reps.size(), paths.size());
+
+		for (int i = 0; i < paths.size(); i++)
+			assertEquals(reps.get(0), paths.get(0));
+    }
+
+	private List<DocsResp> placeTasks(WSClient wsclient, ArrayList<String> paths)
+			throws AnsonException, IOException {
+		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
+		
+		DocsReq reqbd = new DocsReq(clientsettings.synuri);
+
+		for (String pth : paths)
+			reqbd.syncing(new PathsPage().add(pth));
+		
+		wsclient.asynRequest(WSPort.ping, reqbd);
+		
+		while (wsclient.block_poll(500) > 0) {
+			DocsResp resp = wsclient.pop_envelope();
+			pongs.add(resp);
+		}
+
+		return pongs;
+	}
+ 
 }

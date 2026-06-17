@@ -10,13 +10,13 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
-import io.oz.anclient.ipcagent.IPCPort;
+import io.oz.anclient.ipcagent.WSPointPort;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPoint;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public class Doclient implements IPCPort {
+public class Doclient implements WSPointPort {
 	public static final String func_uri = "/syn/ipc/doclient";
 	
 	public static class IPC_A {

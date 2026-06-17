@@ -237,12 +237,10 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 
 		session.getBasicRemote().sendText(reqmsg.toBlock());
 		
-        // String msg = messageQueue.poll(timeout, TimeUnit.SECONDS);
 		String msg = null;
 	    long deadLine = System.currentTimeMillis() + (timeout * 1000);
 	    
 	    while (System.currentTimeMillis() < deadLine) {
-	        // Check the queue quickly without blocking the thread execution context
 	        msg = messageQueue.poll(10, TimeUnit.MILLISECONDS);
 	        if (msg != null) {
 	            break; 
@@ -258,6 +256,16 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 	    }
 
 		return (AnsonMsg<AnsonResp>) Anson.fromJson(msg);
+	}
+
+	<T extends AnsonBody> void asynRequest(WSPort port, T reqbd) throws AnsonException, IOException {
+
+		mustnonull(this.wsClient);
+
+		AnsonMsg<T> reqmsg = new AnsonMsg<T>(port);
+		reqmsg.body(reqbd);
+
+		session.getBasicRemote().sendText(reqmsg.toBlock());
 	}
 	
 	/**
@@ -283,5 +291,16 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 
 		return wsContainer;
 	}
-	
+
+	public int block_poll(int... timeout) {
+		int size = 0;
+		while ((size = messageQueue.size()) == 0 && timeout != null && timeout[0] != 0) {
+			try { Thread.sleep(200); }
+			catch (InterruptedException e) {
+				return messageQueue.size();
+			} 
+			timeout[0] = Math.max(0, timeout[0] - 200);
+		}
+		return size;
+	}
 }

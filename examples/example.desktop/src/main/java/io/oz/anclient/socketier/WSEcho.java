@@ -16,16 +16,19 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
-import io.oz.anclient.ipcagent.IPCPort;
+import io.oz.anclient.ipcagent.WSPointPort;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPoint;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public class WSEcho implements IPCPort {
-	
-
+public class WSEcho implements WSPointPort {
 	final WServPoint socket;
+
+	@Override
+	public IPort port() {
+		return WSPort.echo;
+	}
 
 	public WSEcho(WServPoint wsSocket) {
 		this.socket = wsSocket;
@@ -47,11 +50,6 @@ public class WSEcho implements IPCPort {
 				.uri(msg.uri())
 				.a(msg.a()));
 		}
-	}
-
-	@Override
-	public IPort port() {
-		return WSPort.echo;
 	}
 
 }

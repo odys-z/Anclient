@@ -19,6 +19,7 @@ import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.transact.x.TransException;
+import io.oz.anclient.socketier.WSDoctier;
 import io.oz.anclient.socketier.WSEcho;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.Endpoint;
@@ -35,7 +36,7 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
     static WServPoint instance;
     public static WServPoint instance() { return instance; }
 
-	protected final HashMap<IPort, IPCPort> ipcPorts;
+	protected final HashMap<IPort, WSPointPort> ipcPorts;
 	/** {"host:port": session} */
 	protected final HashMap<String, Session> sessions;
 
@@ -43,7 +44,6 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	public static WServPoint build(AgentSettings settings) {
 		mustnonull(settings.tiers);
 		instance = new WServPoint(settings.tiers);
-//		return instance.server(server);
 		return instance;
 	}
 	
@@ -52,26 +52,20 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	private RemoteEndpoint.Basic synremote;
 	static Session lastSession;
 
-//	Server server;
-//	public WServPoint server(Server server) {
-//		this.server = server;
-//		return this;
-//	}
-
 	public WServPoint() {
-		ipcPorts = new HashMap<IPort, IPCPort>();
+		ipcPorts = new HashMap<IPort, WSPointPort>();
 		sessions = new HashMap<String, Session>();
 		instance = this;
 	}
 
 	public WServPoint(String[] tiernames) {
-		ipcPorts = new HashMap<IPort, IPCPort>(tiernames.length);
+		ipcPorts = new HashMap<IPort, WSPointPort>(tiernames.length);
 
-//		T_Doclient p = new T_Doclient(this);
-//		ipcPorts.put(p.port(), p);
-		
-		WSEcho e = new WSEcho(this);
-		ipcPorts.put(e.port(), e);
+		WSPointPort wsp = new WSEcho(this);
+		ipcPorts.put(wsp.port(), wsp);
+
+		wsp = new WSDoctier(this);
+		ipcPorts.put(wsp.port(), wsp);
 
 		sessions = new HashMap<String, Session>();
 	}
