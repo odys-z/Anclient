@@ -21,6 +21,7 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.socketier.WSDoctier;
 import io.oz.anclient.socketier.WSEcho;
+import io.oz.anclient.socketier.WSPing;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
@@ -31,41 +32,47 @@ import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
 
 //@ServerEndpoint(value = "/" + WSAgent.ipc_path)
-public class WServPoint extends Endpoint implements MessageHandler.Whole<String> {
+public class WServPort extends Endpoint implements MessageHandler.Whole<String> {
 
-    static WServPoint instance;
-    public static WServPoint instance() { return instance; }
+    static WServPort instance;
+    public static WServPort instance() { return instance; }
 
-	protected final HashMap<IPort, WSPointPort> ipcPorts;
+	protected final HashMap<IPort, IWSPoint> ipcPorts;
 	/** {"host:port": session} */
 	protected final HashMap<String, Session> sessions;
 
 
-	public static WServPoint build(AgentSettings settings) {
+	public static WServPort build(AgentSettings settings) {
 		mustnonull(settings.tiers);
-		instance = new WServPoint(settings.tiers);
+		instance = new WServPort(settings.tiers);
 		return instance;
 	}
 	
 
 	private RemoteEndpoint.Async asyremote;
 	private RemoteEndpoint.Basic synremote;
-	static Session lastSession;
+//	static Session lastSession;
 
-	public WServPoint() {
-		ipcPorts = new HashMap<IPort, WSPointPort>();
+	public WServPort() {
+		ipcPorts = new HashMap<IPort, IWSPoint>();
 		sessions = new HashMap<String, Session>();
 		instance = this;
 	}
 
-	public WServPoint(String[] tiernames) {
-		ipcPorts = new HashMap<IPort, WSPointPort>(tiernames.length);
+	public WServPort(String[] tiernames) {
+		ipcPorts = new HashMap<IPort, IWSPoint>(tiernames.length);
 
-		WSPointPort wsp = new WSEcho(this);
+		IWSPoint wsp = new WSEcho(this);
 		ipcPorts.put(wsp.port(), wsp);
+		logi("*** [Websocket end-point %-8s] %s", wsp.port().name(), wsp.getClass().getName());
 
 		wsp = new WSDoctier(this);
 		ipcPorts.put(wsp.port(), wsp);
+		logi("*** [Websocket end-point %-8s] %s", wsp.port().name(), wsp.getClass().getName());
+
+		wsp = new WSPing(this);
+		ipcPorts.put(wsp.port(), wsp);
+		logi("*** [Websocket end-point %-8s] %s", wsp.port().name(), wsp.getClass().getName());
 
 		sessions = new HashMap<String, Session>();
 	}
@@ -79,8 +86,8 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	    return addr;
 	}
 
-	protected AnsonMsg<AnsonResp> err(MsgCode code, Exception e, Object ... args) {
-		AnsonMsg<AnsonResp> msg = new AnsonMsg<AnsonResp>(null, code);
+	protected AnsonMsg<AnsonResp> err(IPort port, MsgCode code, Exception e, Object ... args) {
+		AnsonMsg<AnsonResp> msg = new AnsonMsg<AnsonResp>(port, code);
 		AnsonResp bd = new AnsonResp(msg,
 				// TODO let's send the e object back to client
 				e.getMessage());
@@ -131,7 +138,7 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 	public void onOpen(Session session, EndpointConfig config) {
 		logi("WSPoint onOpen: %s", session.getRequestURI().toString());
 
-        lastSession = session;
+//        lastSession = session;
         this.asyremote  = session.getAsyncRemote();
         this.synremote  = session.getBasicRemote();
         
@@ -141,22 +148,23 @@ public class WServPoint extends Endpoint implements MessageHandler.Whole<String>
 
     @Override
     public void onMessage(String message) {
-        logi("WServPoint onMessage: %s", message);
+        logi("WServPort onMessage: %s", message);
+        IPort p = null;
         try {
             AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
-            IPort p = req.port();
+            p = req.port();
             ipcPorts.get(p).onMessage(req, synremote, asyremote);
         } catch (AnsonException e) {
-			write(synremote, err(MsgCode.ext, e, e.code()));
+			write(synremote, err(p, MsgCode.ext, e, e.code()));
         } catch (TransException e) {
-			write(synremote, err(MsgCode.exSemantic, e));
+			write(synremote, err(p, MsgCode.exSemantic, e));
         } catch (IOException e) {
-			write(synremote, err(MsgCode.exIo, e));
+			write(synremote, err(p, MsgCode.exIo, e));
         } catch (SsException e) {
-			write(synremote, err(MsgCode.exSession, e));
+			write(synremote, err(p, MsgCode.exSession, e));
         } catch (Exception e) {
             e.printStackTrace();
-			write(synremote, err(MsgCode.exGeneral, e));
+			write(synremote, err(p, MsgCode.exGeneral, e));
         }
     }
     

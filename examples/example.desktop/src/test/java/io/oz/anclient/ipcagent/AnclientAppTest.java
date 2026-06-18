@@ -76,7 +76,7 @@ class AnclientAppTest {
 	}
 
 	static void byeQt(String bye) throws InterruptedException {
-		WServPoint.instance().sendEnvelope(bye, (resp) -> {
+		WServPort.instance().sendEnvelope(bye, (resp) -> {
 			docsResponse.add(resp.msg());
 			byelatch.countDown();
 		});
@@ -116,7 +116,7 @@ class AnclientAppTest {
 		byeQt("bye");
 		closeQt();
 		
-		List<String> msgs = docsResponse;
+		// List<String> msgs = docsResponse;
 		
 		// assertEquals(List.of(m0, m1), msgs);
 	}

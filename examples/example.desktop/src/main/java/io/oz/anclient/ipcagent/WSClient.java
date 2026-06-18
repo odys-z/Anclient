@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper2;
+import io.odysz.common.Regex;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -291,16 +292,24 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 
 		return wsContainer;
 	}
+	
+	public void connect() throws IOException, DeploymentException, InterruptedException {
+		this.wsClient = connect(jserv);
+	}
 
-	public int block_poll(int... timeout) {
-		int size = 0;
-		while ((size = messageQueue.size()) == 0 && timeout != null && timeout[0] != 0) {
-			try { Thread.sleep(200); }
-			catch (InterruptedException e) {
-				return messageQueue.size();
-			} 
-			timeout[0] = Math.max(0, timeout[0] - 200);
-		}
-		return size;
+	@SuppressWarnings("unchecked")
+	public <T extends AnsonResp> AnsonMsg<T> block_pop(int... wait_ms) throws InterruptedException, SemanticException {
+		String msg;
+		if (wait_ms == null || wait_ms[0] < 0) {
+            msg = messageQueue.take(); // Blocks the thread until an item becomes available
+        }
+		else
+			msg = messageQueue.poll(wait_ms[0], TimeUnit.MILLISECONDS);
+		
+		if (msg == null)
+			return null;
+		else if (Regex.startsEvelope(msg))
+			return (AnsonMsg<T>) Anson.fromJson(msg);
+		else throw new SemanticException("Message is not an envelope: %s", msg);
 	}
 }

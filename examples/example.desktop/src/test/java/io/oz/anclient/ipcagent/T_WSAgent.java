@@ -1,6 +1,7 @@
 package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt._0;
+import static io.odysz.common.Utils.logi;
 
 import java.util.ArrayList;
 import org.eclipse.jetty.server.Server;
@@ -15,17 +16,19 @@ public class T_WSAgent extends WSAgent {
 	public static Server _main(String... args) throws Exception {
 	    settings = Anson.fromPath(_0(args));
 
+	    logi("*** [Websocket endpoint %s] %s", T_EchoEndpoint.pointpath, WSAgent.class.getName());
+	    logi("*** [Websocket endpoint %s] %s", T_WSAgent.ipc_path, T_WSAgent.class.getName());
         return createServer(new ArrayList<ServerEndpointConfig.Builder> () {
 			private static final long serialVersionUID = 1L;
 			{ add (ServerEndpointConfig.Builder
         		.create(T_EchoEndpoint.class, "/" + T_EchoEndpoint.pointpath));};
         	{ add (ServerEndpointConfig.Builder
-        		.create(WServPoint.class, "/" + T_WSAgent.ipc_path)
+        		.create(WServPort.class, "/" + T_WSAgent.ipc_path)
         		.configurator(new ServerEndpointConfig.Configurator() {
         				@SuppressWarnings("unchecked")
 						@Override
 	                    public <T> T getEndpointInstance(Class<T> clazz) {
-	                        return (T) WServPoint.build(settings);
+	                        return (T) WServPort.build(settings);
 	                    }
         		}));}
         }, settings);

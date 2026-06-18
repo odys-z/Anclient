@@ -24,21 +24,21 @@ import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
-import io.oz.anclient.ipcagent.WSPointPort;
+import io.oz.anclient.ipcagent.IWSPoint;
 import io.oz.anclient.ipcagent.WSPort;
-import io.oz.anclient.ipcagent.WServPoint;
+import io.oz.anclient.ipcagent.WServPort;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public class WSDoctier implements WSPointPort {
-	final WServPoint socket;
+public class WSDoctier implements IWSPoint {
+	final WServPort socket;
 
 	@Override
 	public IPort port() {
 		return WSPort.doctier;
 	}
 
-	public WSDoctier(WServPoint wsSocket) {
+	public WSDoctier(WServPort wsSocket) {
 		this.socket = wsSocket;
 	}
 	

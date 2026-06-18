@@ -14,12 +14,7 @@
 
 package jetty.examples.annotated;
 
-import java.net.URL;
-import java.util.Objects;
-
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import jakarta.websocket.server.ServerEndpointConfig;
 import org.eclipse.jetty.server.Server;

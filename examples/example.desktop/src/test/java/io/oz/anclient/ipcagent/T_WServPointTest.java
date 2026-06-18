@@ -7,6 +7,7 @@ package io.oz.anclient.ipcagent;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jakarta.websocket.ContainerProvider;
@@ -32,11 +33,14 @@ import io.odysz.semantic.jserv.echo.EchoReq.A;
 import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.PathsPage;
+import io.odysz.semantics.x.SemanticException;
+import io.oz.anclient.socketier.WSPing;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol;
 import io.odysz.semantic.jprotocol.JServUrl;
 
-//import static io.odysz.common.Utils.logi;
+import static io.odysz.common.LangExt.eq;
+import static io.odysz.common.Utils.warn;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class T_WServPointTest {
@@ -49,7 +53,7 @@ public class T_WServPointTest {
         server = T_WSAgent._main("src/test/resources/WEB-INF/settings.json");
         server.start();
         
-        clientsettings = Anson.fromPath("");
+        clientsettings = Anson.fromPath("src/test/resources/wsclient-settings.gitignore.json");
     }
 
     @AfterEach
@@ -97,36 +101,51 @@ public class T_WServPointTest {
         JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
         
         WSClient pinger = new WSClient(jserv, true);
+        pinger.connect();
 
-		ArrayList<String> paths = new ArrayList<String>() {
-			private static final long serialVersionUID = 1L;
-			{add("ping-path/a");}
-			{add("ping-path/b");}
-		};
+		ArrayList<String> paths = new ArrayList<String>(Arrays.asList("ping-path/a", "ping-path/b"));
 
         List<DocsResp> reps = placeTasks(pinger, paths);
 
+		assertEquals(5, reps.size());
 
-		assertEquals(reps.size(), paths.size());
-
-		for (int i = 0; i < paths.size(); i++)
-			assertEquals(reps.get(0), paths.get(0));
+		assertEquals("ping-path/a", reps.get(1).xdoc.clientpath);
+		assertEquals("ping-path/a", reps.get(2).xdoc.clientpath);
+		assertEquals("ping-path/b", reps.get(3).xdoc.clientpath);
+		assertEquals("ping-path/b", reps.get(4).xdoc.clientpath);
     }
 
 	private List<DocsResp> placeTasks(WSClient wsclient, ArrayList<String> paths)
-			throws AnsonException, IOException {
+			throws AnsonException, IOException, SemanticException, InterruptedException {
 		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
 		
-		DocsReq reqbd = new DocsReq(clientsettings.synuri);
+		DocsReq reqbd = (DocsReq) new DocsReq(clientsettings.synuri)
+						.device(clientsettings.sysuri)
+						.a(DocsReq.A.requestSyn)
+						;
 
+		PathsPage pthpage = new PathsPage();
 		for (String pth : paths)
-			reqbd.syncing(new PathsPage().add(pth));
+			pthpage.add(pth);
+		reqbd.syncing(pthpage);
 		
 		wsclient.asynRequest(WSPort.ping, reqbd);
 		
-		while (wsclient.block_poll(500) > 0) {
-			DocsResp resp = wsclient.pop_envelope();
-			pongs.add(resp);
+		AnsonMsg<AnsonResp> resp = wsclient.block_pop(WSPing.msInterval + 500);
+		while (resp != null) {
+			if (resp.port() == WSPort.ping) {
+				AnsonResp repbd = resp.body(0);
+				if (!(repbd instanceof DocsResp))
+					warn("UNEXPECTED REPLY: %s\n\t%s", repbd.getClass().getName(), repbd.msg());
+				else {
+					DocsResp docrep = (DocsResp) repbd;
+					if (eq(docrep.a(), DocsReq.A.requestSyn))
+						pongs.add(docrep);
+					else warn("UNEXPECTED ACT in reply: %s", docrep.a());
+				}
+			}
+			else warn("UNEXPECTED REPLY, port: %s", resp.port());
+			resp = wsclient.block_pop(WSPing.msInterval + 1000);
 		}
 
 		return pongs;

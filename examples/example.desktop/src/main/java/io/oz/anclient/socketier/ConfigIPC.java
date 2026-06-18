@@ -15,18 +15,18 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
-import io.oz.anclient.ipcagent.WSPointPort;
+import io.oz.anclient.ipcagent.IWSPoint;
 import io.oz.anclient.ipcagent.WSPort;
-import io.oz.anclient.ipcagent.WServPoint;
+import io.oz.anclient.ipcagent.WServPort;
 import io.oz.anclient.socketier.ConfigIPCReq.A;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 import jakarta.websocket.Session;
 
-public class ConfigIPC implements WSPointPort {
-	final WServPoint socket;
+public class ConfigIPC implements IWSPoint {
+	final WServPort socket;
 
-	public ConfigIPC(WServPoint wsSocket) {
+	public ConfigIPC(WServPort wsSocket) {
 		this.socket = wsSocket;
 	}
 	

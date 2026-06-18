@@ -16,21 +16,21 @@ import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
-import io.oz.anclient.ipcagent.WSPointPort;
+import io.oz.anclient.ipcagent.IWSPoint;
 import io.oz.anclient.ipcagent.WSPort;
-import io.oz.anclient.ipcagent.WServPoint;
+import io.oz.anclient.ipcagent.WServPort;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public class WSEcho implements WSPointPort {
-	final WServPoint socket;
+public class WSEcho implements IWSPoint {
+	final WServPort socket;
 
 	@Override
 	public IPort port() {
 		return WSPort.echo;
 	}
 
-	public WSEcho(WServPoint wsSocket) {
+	public WSEcho(WServPort wsSocket) {
 		this.socket = wsSocket;
 	}
 

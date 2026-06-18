@@ -3,3 +3,4 @@ build
 *.user
 **/*.test-anson.cmake
 **/*.beautify
+*.gitignore.json

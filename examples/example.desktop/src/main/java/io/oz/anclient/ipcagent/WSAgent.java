@@ -33,7 +33,8 @@ public class WSAgent {
         // Nothing can be run here, e.e. logi("Stopped!");
 	}
 
-	public static Server createServer(ArrayList<ServerEndpointConfig.Builder> cfgBuilders, AgentSettings settings) throws Exception {
+	public static Server createServer(ArrayList<ServerEndpointConfig.Builder> cfgBuilders,
+			AgentSettings settings) throws Exception {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 	    Server server = new Server(settings.wsport); 
 
@@ -56,8 +57,8 @@ public class WSAgent {
 	    	
 	    	for (ServerEndpointConfig.Builder b : cfgBuilders) {
 	    		ServerEndpointConfig config = b.build();
-//				Map<String, Object> userProps = config.getUserProperties();
-//				userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
+				// Map<String, Object> userProps = config.getUserProperties();
+				// userProps.put("org.eclipse.jetty.websocket.client.connectTimeout", 60000 * 3);
 				container.addEndpoint(config);
 	    	}
 	    });
@@ -68,15 +69,16 @@ public class WSAgent {
 	public static Server _main(String... args) throws Exception {
 	    settings = Anson.fromPath(_0(args));
 
+	    logi("[Websocket endpoint %s] %s", WSAgent.ipc_path, WSAgent.class.getName());
         return createServer(new ArrayList<ServerEndpointConfig.Builder> () {
 			private static final long serialVersionUID = 1L;
         	{ add (ServerEndpointConfig.Builder
-        		.create(WServPoint.class, "/" + WSAgent.ipc_path)
+        		.create(WServPort.class, "/" + WSAgent.ipc_path)
         		.configurator(new ServerEndpointConfig.Configurator() {
         				@SuppressWarnings("unchecked")
 						@Override
 	                    public <T> T getEndpointInstance(Class<T> clazz) {
-	                        return (T) WServPoint.build(settings);
+	                        return (T) WServPort.build(settings);
 	                    }
         		}));}
         }, settings);

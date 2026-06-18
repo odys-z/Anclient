@@ -12,7 +12,7 @@ import io.odysz.transact.x.TransException;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public interface WSPointPort {
+public interface IWSPoint {
 
 	WSPort doclient = null;
 
