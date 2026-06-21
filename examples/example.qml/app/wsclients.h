@@ -47,7 +47,7 @@ public:
     int asynSend(const AnsonMsg<BD>& reqmsg);
 
     int poll();
-    int block_poll(int ms_timout = -1);
+    bool block_poll(int ms_timout = -1);
     AnsonMsg<AnsonResp> pop_envelope();
 
 private:
@@ -61,7 +61,7 @@ private:
     std::queue<std::string> msg_queue;
 
     std::mutex queueMutex_;
-    // std::condition_variable queueCv_;
+    std::condition_variable queueCv_;
 };
 
 // // Template method definition

@@ -35,7 +35,7 @@ public class WSDoctier implements IWSPoint {
 
 	@Override
 	public IPort port() {
-		return WSPort.doctier;
+		return WSPort.docstier;
 	}
 
 	public WSDoctier(WServPort wsSocket) {

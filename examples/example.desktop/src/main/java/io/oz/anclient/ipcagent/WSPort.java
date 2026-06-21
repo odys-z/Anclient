@@ -16,7 +16,7 @@ public enum WSPort implements IPort {
 	 * See jserv/ExpDoctier
 	 * @WebServlet(description = "Synode Tier: docs-sync", urlPatterns = { "/docs.tier" })
 	 */
-	doctier("docs.tier");
+	docstier("docs.tier");
 
 	private String url;
 	WSPort(String v) { url = v; };

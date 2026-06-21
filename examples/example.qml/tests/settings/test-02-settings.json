@@ -4,7 +4,7 @@
   "temp_dir": "temp",
   "java_path": "~/github/semantic-jserv/jserv-album/infor-17.1/jre17/bin/java.exe",
   "doctier_jar": "res/doctier-0.5.19.jar",
-  "wsagent_jar": "res/ipc-agent-0.1.0.jar",
+  "wsagent_jar": "res/ws-agent-0.1.0.jar",
   "synode_settings" : "settings/synode-7.10-reddish-instance.json",
   "wsagent_settings": "settings/ipc-agent-settings.json",
   "wshost": "localhost",

@@ -15,7 +15,9 @@
 #include <wsclients.h>
 #include <QProcess>
 
+#include "../app/gen/wsport.hpp"
 #include "gen/test_settings.hpp"
+#include "test_common.h"
 
 anson::AstMap asts;
 anson::JsonOpt opts{&asts};
@@ -35,40 +37,16 @@ protected:
     static QProcess wsAgentProc;
 
     void SetUp() override {
-
     }
 
     static void start_agent() {
-        // filesystem::path path2prj{"."};
-        // filesystem::path agent_jar  = path2prj / qmlsettings.wsagent_jar;
-        // filesystem::path agent_json = path2prj / qmlsettings.wsagent_settings;
-
-        // qDebug() << "=== start_agent({" << agent_json.c_str() << agent_jar.c_str() << "===";
-
-        // QProcess myProcess = QProcess();
-        // const QString program{qmlsettings.java_path.c_str()}; // = "java";
-        // QStringList arguments;
-        // arguments << "-jar";
-
-        // Gemini: On windows, QStringList (and QString) internally stores everything as UTF-16.
-        // arguments << QString::fromUtf8(agent_jar.u8string().c_str());
-        // arguments << QString::fromUtf8(agent_json.u8string().c_str());
-
-        // QString cmd{};
-        // for (const QString& value : std::as_const(arguments)) {
-        //     cmd += " " + value;
-        // }
-        // qDebug() << cmd;
-        // qDebug() << program << arguments;
-
-
         const u8string java = resolveHomePath(qmlsettings.java_path);
         QString qjava = QString::fromUtf8(java.c_str());
 
         QStringList arguments;
-        arguments << "-jar" <<
-            qmlsettings.wsagent_jar.c_str() <<
-            qmlsettings.wsagent_settings.c_str();
+        arguments << "-jar"
+                  << qmlsettings.wsagent_jar.c_str()
+                  << qmlsettings.wsagent_settings.c_str();
 
         QObject::connect(&wsAgentProc, &QProcess::readyReadStandardOutput, [&]() {
             qDebug() << "Java Output:" << wsAgentProc.readAllStandardOutput().trimmed();
@@ -104,6 +82,7 @@ protected:
         register_jserv(asts, opts);
         register_semantier(asts, "");
         register_doctier(asts, "ast");
+        register_port(asts, "ast/wsport.ast.json");
         register_qmltestsettingsAst(asts);
         register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
@@ -112,7 +91,7 @@ protected:
         Anson::from_file("settings/test-02-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
         ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
-        ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ipc-agent-[0-9.]+.jar"}));
+        ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
 
         anlog(std::format("Starting IPC Agent: {}", qmlsettings.wsagent_jar));
         start_agent();
@@ -196,7 +175,7 @@ TEST_F(Ipclient, Echo) {
     qDebug() << "✅ Ping response parsed successfully";
 }
 
-TEST_F(Ipclient, Place_Task) {
+TEST_F(Ipclient, PING_Place_Task) {
     DocsReq uploadreq{"h_photos", {}}; //{DocsReq::A::syncdocs};
     uploadreq.a = DocsReq::A::requestSyn;
 
@@ -206,19 +185,21 @@ TEST_F(Ipclient, Place_Task) {
     PathsPage pthpage;
     pthpage.clientPaths = clientPaths;
     uploadreq.syncingPage = {pthpage};
-    AnsonMsg<DocsReq> msg(Port(Port::docstier), uploadreq);
+    // AnsonMsg<DocsReq> msg(Port(Port::docstier), uploadreq);
+    AnsonMsg<DocsReq> msg(Port(WSPort::ping), uploadreq);
 
     wsclient.asynSend(msg);
 
-    wsclient.block_poll();
-
     AnsonMsg<AnsonResp> resp;
+    bool has_envl = wsclient.block_poll();
+    int c = 0;
+    while (has_envl)
     try {
         resp = wsclient.pop_envelope();
+        has_envl = wsclient.block_poll(500);
+        c ++;
     } catch(SemanticException e) {
         FAIL() << "expecting upload task replies ...";
     }
-
-    resp.Body();
-
+    ASSERT_EQ(5, c);
 }

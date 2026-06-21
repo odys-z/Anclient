@@ -54,7 +54,7 @@ void WSClient::disconnect() {
         std::swap(msg_queue, emptyQueue);
     } // auto-unlock
 
-    // queueCv_.notify_all();
+    queueCv_.notify_all();
 
     anlog("WSClient disconnected successfully.");
 }
@@ -80,7 +80,7 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
             std::lock_guard<std::mutex> lock(queueMutex_);
             msg_queue.push(msg->str);
         } // auto-unlock
-        // queueCv_.notify_one();
+        queueCv_.notify_one();
 
         // AnsonMsg<AnsonResp> env;
         // Anson::from_json(msg_queue.front(), env);
@@ -111,27 +111,46 @@ int WSClient::poll() {
     return msg_queue.size();
 }
 
-int WSClient::block_poll(int ms_timeout) {
-    int s;
-    while ((s = msg_queue.size()) == 0 && ms_timeout != 0) {
-        this_thread::sleep_for(200ms);
-        if (ms_timeout > 0)
-            ms_timeout = max(0, ms_timeout - 200);
+bool WSClient::block_poll(int wait_ms) {
+    // int s;
+    // while ((s = msg_queue.size()) == 0 && ms_timeout != 0) {
+    //     this_thread::sleep_for(200ms);
+    //     if (ms_timeout > 0)
+    //         ms_timeout = max(0, ms_timeout - 200);
+    // }
+    // return s;
+    std::unique_lock<std::mutex> lock(queueMutex_);
+
+    if (wait_ms <= -1) {
+        std::cout << "[Poller] No timeout specified. Waiting forever...\n";
+        // Wait indefinitely until the queue is not empty
+        queueCv_.wait(lock, [this]() { return !msg_queue.empty(); });
+    } else {
+        std::cout << "[Poller] Waiting up to " << wait_ms << "ms...\n";
+        // Wait for the specified duration or until the queue is not empty
+        bool success = queueCv_.wait_for(lock, std::chrono::milliseconds(wait_ms), [this]() {
+            return !msg_queue.empty();
+        });
+
+        // If the timeout expired and the queue is still empty, return nullopt
+        if (!success)
+            return false;
+
     }
-    return s;
+    return true;
 }
 
 AnsonMsg<AnsonResp> WSClient::pop_envelope() {
     if (msg_queue.size() == 0)
         throw SemanticException("Empty Queue");
 
-
     string top;
     {
         std::lock_guard<std::mutex> lock(queueMutex_);
-        top = msg_queue.front();
+        top = std::move(msg_queue.front());
         msg_queue.pop();
     }
+
     anlog("TODO anlog -> andebug, pop():\n=============================");
     anlog(top);
     if (Regex::startEnvelope(top)) {
@@ -141,6 +160,4 @@ AnsonMsg<AnsonResp> WSClient::pop_envelope() {
     }
     else throw SemanticException("Message is not an envelope: " + top);
 }
-
-
 }

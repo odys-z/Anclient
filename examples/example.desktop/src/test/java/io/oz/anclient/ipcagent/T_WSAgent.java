@@ -16,7 +16,7 @@ public class T_WSAgent extends WSAgent {
 	public static Server _main(String... args) throws Exception {
 	    settings = Anson.fromPath(_0(args));
 
-	    logi("*** [Websocket endpoint %s] %s", T_EchoEndpoint.pointpath, WSAgent.class.getName());
+	    logi("*** [Websocket endpoint %s] %s", T_EchoEndpoint.pointpath, T_EchoEndpoint.class.getName());
 	    logi("*** [Websocket endpoint %s] %s", T_WSAgent.ipc_path, T_WSAgent.class.getName());
         return createServer(new ArrayList<ServerEndpointConfig.Builder> () {
 			private static final long serialVersionUID = 1L;

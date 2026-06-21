@@ -4,3 +4,4 @@ build
 **/*.test-anson.cmake
 **/*.beautify
 *.gitignore.json
+dependency-reduced-pom.xml

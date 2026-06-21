@@ -11,6 +11,7 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator QML Import Paths
 
 qt_add_executable(${PROJECT_NAME}
     main.cpp
+    gen/wsport.hpp
     wsclients.h
     wsclients.cpp
 )
@@ -64,7 +65,8 @@ qt_add_qml_module(${PROJECT_NAME}
         linenumbermodel.h
         linenumbermodel.cpp
         filelistview.h
-        doctier.cpp	#
+        doctier.cpp
+        SOURCES gen/wsport.hpp	#
 )
 
 target_link_libraries(${PROJECT_NAME}

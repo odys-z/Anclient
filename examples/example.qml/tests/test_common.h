@@ -43,7 +43,7 @@ static u8string resolveHomePath(const std::string& inputPath) {
         // Windows conditional compilation
         char* userProfile = std::getenv("USERPROFILE");
         if (userProfile) {
-        homeDir = userProfile;
+            homeDir = userProfile;
         }
     #else
         // Linux / macOS conditional compilation

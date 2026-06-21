@@ -50,6 +50,7 @@ public class WSAgent {
 	    ipHandler.include("::1");
 	    ipHandler.include("192.168.0.0/24");
 	    ipHandler.include("10.0.0.0/24");
+	    ipHandler.include(server.getURI().getAuthority());
 	    context.insertHandler(ipHandler);
 
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {

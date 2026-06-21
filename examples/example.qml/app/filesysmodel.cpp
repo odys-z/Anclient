@@ -8,14 +8,12 @@
 #include <QTextDocument>
 #include <QTextObject>
 
-FilesystModel::FilesystModel(QObject *parent) : QFileSystemModel(parent)
-{
+FilesystModel::FilesystModel(QObject *parent) : QFileSystemModel(parent) {
     setFilter(QDir::AllEntries | QDir::Hidden | QDir::NoDotAndDotDot);
     setInitialDirectory();
 }
 
-QString FilesystModel::readFile(const QString &filePath)
-{
+QString FilesystModel::readFile(const QString &filePath) {
     // Don't issue errors for an empty path, as the initial binding
     // will result in an empty path, and that's OK.
     if (filePath.isEmpty())
@@ -45,8 +43,7 @@ QString FilesystModel::readFile(const QString &filePath)
 }
 
 // This function gets called from Editor.qml
-int FilesystModel::currentLineNumber(QQuickTextDocument *textDocument, int cursorPosition)
-{
+int FilesystModel::currentLineNumber(QQuickTextDocument *textDocument, int cursorPosition) {
     if (QTextDocument *td = textDocument->textDocument()) {
         QTextBlock tb = td->findBlock(cursorPosition);
         return tb.blockNumber();
@@ -54,27 +51,23 @@ int FilesystModel::currentLineNumber(QQuickTextDocument *textDocument, int curso
     return -1;
 }
 
-int FilesystModel::columnCount(const QModelIndex &parent) const
-{
+int FilesystModel::columnCount(const QModelIndex &parent) const {
     Q_UNUSED(parent)
     return 1;
 }
 
-QModelIndex FilesystModel::rootIndex() const
-{
+QModelIndex FilesystModel::rootIndex() const {
     return m_rootIndex;
 }
 
-void FilesystModel::setRootIndex(const QModelIndex index)
-{
+void FilesystModel::setRootIndex(const QModelIndex index) {
     if (index == m_rootIndex)
         return;
     m_rootIndex = index;
     emit rootIndexChanged();
 }
 
-void FilesystModel::setInitialDirectory(const QString &path)
-{
+void FilesystModel::setInitialDirectory(const QString &path) {
     QDir dir(path);
     if (dir.makeAbsolute())
         setRootPath(dir.path());
@@ -83,7 +76,6 @@ void FilesystModel::setInitialDirectory(const QString &path)
     setRootIndex(QFileSystemModel::index(dir.path(), 0));
 }
 
-QString FilesystModel::getDefaultRootDir()
-{
+QString FilesystModel::getDefaultRootDir() {
     return QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
 }
