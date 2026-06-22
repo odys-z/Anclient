@@ -18,8 +18,6 @@ import org.junit.jupiter.api.Test;
 import static io.odysz.common.Utils.logi;
 
 import static org.junit.jupiter.api.Assertions.*;
-//import static org.hamcrest.MatcherAssert.assertThat;
-//import static org.hamcrest.Matchers.contains;
 
 public class T_WSAgent_EchoTest {
     private Server server;
@@ -46,7 +44,6 @@ public class T_WSAgent_EchoTest {
         List<String> msgs = EchoClient.performEcho(wsClient, uri);
 		String[] expected = { "token: 123456" };
 
-        // assertThat(msgs, contains(expected));
         assertEquals(msgs.get(0), expected[0]);
     }
 }

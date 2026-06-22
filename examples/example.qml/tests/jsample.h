@@ -34,7 +34,6 @@ namespace anson {
 
 class TestSettings : public Anson {
     inline static const string _type_ = "io.odysz.anclient.TestSetttings";
-    // inline static const string _ipc_path_ = "wsagent";
 
 public:
     string type;

@@ -16,7 +16,6 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.IPort;
-import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.socketier.WSDoctier;
@@ -131,14 +130,13 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
         cause.printStackTrace();
     }
 
-	public void sendEnvelope(String string, OnOk object) {
-	}
+//	public void sendEnvelope(String string, OnOk object) {
+//	}
 
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
 		logi("WSPoint onOpen: %s", session.getRequestURI().toString());
 
-//        lastSession = session;
         this.asyremote  = session.getAsyncRemote();
         this.synremote  = session.getBasicRemote();
         
@@ -153,6 +151,9 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
         try {
             AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
             p = req.port();
+            if (!ipcPorts.containsKey(p))
+            	throw new AnsonException(AnsonException.general, "Port (wspoint) not found: %s", p.name());
+
             ipcPorts.get(p).onMessage(req, synremote, asyremote);
         } catch (AnsonException e) {
 			write(synremote, err(p, MsgCode.ext, e, e.code()));

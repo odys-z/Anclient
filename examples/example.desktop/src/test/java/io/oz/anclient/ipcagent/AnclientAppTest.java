@@ -76,12 +76,12 @@ class AnclientAppTest {
 	}
 
 	static void byeQt(String bye) throws InterruptedException {
-		WServPort.instance().sendEnvelope(bye, (resp) -> {
-			docsResponse.add(resp.msg());
-			byelatch.countDown();
-		});
-		logi("Waiting Qt quit ...");
-		byelatch.await();
+//		WServPort.instance().sendEnvelope(bye, (resp) -> {
+//			docsResponse.add(resp.msg());
+//			byelatch.countDown();
+//		});
+//		logi("Waiting Qt quit ...");
+//		byelatch.await();
 	}
 	
 	static void closeQt() {

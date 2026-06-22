@@ -15,6 +15,7 @@ public:
     inline static const std::string configIPC = "config.ws";
     inline static const std::string echo = "echo.ws";
     inline static const std::string ping = "ping.ws";
+    // inline static const std::string ping2 = "ping"; // to be deleted
 
     WSPort(): JavaEnum(_type_, "na") {
         andebug("WSPort Default Cosntructor");

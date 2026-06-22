@@ -92,6 +92,7 @@ private:
 
 template <typename BD>
 int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
+    anwarn(reqmsg.toBlock());
     websocket.sendText(reqmsg.toBlock());
 
     // std::unique_lock<std::mutex> lock(queueMutex_);

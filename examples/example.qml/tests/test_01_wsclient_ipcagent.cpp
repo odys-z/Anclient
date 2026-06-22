@@ -185,8 +185,9 @@ TEST_F(Ipclient, PING_Place_Task) {
     PathsPage pthpage;
     pthpage.clientPaths = clientPaths;
     uploadreq.syncingPage = {pthpage};
-    // AnsonMsg<DocsReq> msg(Port(Port::docstier), uploadreq);
-    AnsonMsg<DocsReq> msg(Port(WSPort::ping), uploadreq);
+    uploadreq.syncingPage.end = clientPaths.size();
+    uploadreq.syncingPage.start = 0;
+    AnsonMsg<DocsReq> msg(WSPort::ping, uploadreq);
 
     wsclient.asynSend(msg);
 
@@ -197,9 +198,10 @@ TEST_F(Ipclient, PING_Place_Task) {
     try {
         resp = wsclient.pop_envelope();
         has_envl = wsclient.block_poll(500);
-        c ++;
+        c++;
     } catch(SemanticException e) {
         FAIL() << "expecting upload task replies ...";
     }
-    ASSERT_EQ(5, c);
+    ASSERT_EQ(pthpage.clientPaths.size() * 2 + 1, // see java WSPing.placePushsTask()
+              c);
 }
