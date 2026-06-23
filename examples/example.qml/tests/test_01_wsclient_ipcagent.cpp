@@ -82,7 +82,7 @@ protected:
         register_jserv(asts, opts);
         register_semantier(asts, "");
         register_doctier(asts, "ast");
-        register_port(asts, "ast/wsport.ast.json");
+        register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_qmltestsettingsAst(asts);
         register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
@@ -187,7 +187,7 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
-    AnsonMsg<DocsReq> msg(WSPort::ping, uploadreq);
+    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
 
     wsclient.asynSend(msg);
 
