@@ -1,5 +1,6 @@
 #pragma once
 
+#include "wsclients.h"
 #include <thread>
 
 #include <io/odysz/clients.h>
@@ -21,6 +22,9 @@
 #include <io/odysz/semantic/tier/docs.h>
 
 #define QMLConst QString
+
+using namespace anson;
+
 /**
  * @brief The AppConstants class
  * Constants for communication between QML and C++.
@@ -38,12 +42,12 @@ class AppConstants : public QObject {
 public:
     explicit AppConstants(QObject *parent = nullptr) : QObject(parent) {}
 
-    QString pushing() const { return QString::fromStdString(anson::ShareFlag::pushing); } // { return anson::ShareFlag::pushing.c_str(); }
-    QString publish() const { return anson::ShareFlag::publish.c_str(); }
-    QString unknown() const { return anson::ShareFlag::unknown.c_str(); }
+    QString pushing() const { return QString::fromStdString(ShareFlag::pushing); } // { return anson::ShareFlag::pushing.c_str(); }
+    QString publish() const { return ShareFlag::publish.c_str(); }
+    QString unknown() const { return ShareFlag::unknown.c_str(); }
 
     static bool check_jsvalue(QJSValue v);
-    static QMLConst nameof(anson::ShareFlag s) { return s.name().c_str(); }
+    static QMLConst nameof(ShareFlag s) { return s.name().c_str(); }
 
     #ifdef QT_DEBUG
     /**
@@ -70,14 +74,16 @@ public:
 
 };
 
+
 class QDoclientier : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
+
     inline static const QString sysuri = "/sys/cpp";
     inline static const QString synuri = "/syn/cpp";
 
-    map<string, vector<string>> syncing_paths;
+    map<string, vector<LangExt::VarType>> syncing_paths;
 
     QString _device;
     // property
@@ -93,14 +99,14 @@ public:
         emit deviceChanged();
     }
 
-    std::shared_ptr<anson::Doclientier> wsclient;
-    std::shared_ptr<anson::Doclientier> jservclient;
+    std::shared_ptr<WSClient> wsclient;
+    std::shared_ptr<Doclientier> jservclient;
 
-    inline static anson::OnError onErr = [](anson::MsgCode c, const string& e, const vector<string> &a) {
-        anerror(std::format("[ERROR code {}], error: {}", anson::AnsonJavaEnumAst::name<anson::MsgCode>(c), e));
+    inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
+        anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
     };
 
-    inline static anson::OnProgress onprogress = [](const string& m, const string &a) {
+    inline static OnProgress onprogress = [](const string& m, const string &a) {
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
@@ -130,29 +136,35 @@ public:
 
         if (!AppConstants::check_jsvalue(paths)) return;
 
-        this->syncing_paths = map<string, vector<string>>{};
+        // this->syncing_paths = map<string, vector<string>>{};
         QJSValueIterator it(paths);
         while (it.next()) {
             qDebug() << "cpp handling: " << it.name();
-            this->syncing_paths[it.name().toStdString()] = {anson::ShareFlag::pushing, _device.toStdString(), "now()"};
+            this->syncing_paths[it.name().toStdString()] = {ShareFlag::pushing, _device.toStdString(), "now()"};
         }
 
-        wsclient->push_files(this->syncing_paths,
-            [paths, this] (const string& p, const string& status) {
-                #ifdef QT_DEBUG
-                    AppConstants::qlog(p, status);
-                #endif
-                emit this->fileStatusChanged(QString::fromStdString(p), QString::fromStdString(status));
-            });
-    }
+        PathsPage syncingpage;
+        syncingpage.clientPaths = syncing_paths;
+        wsclient->on_msg([this]() -> void {
+            if (wsclient->block_poll(200) > 0) {
+                AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
+                if (rep.code == MsgCode::Code::ok) {
+                for (const auto& kv : rep.Body().syncingPage.clientPaths) {
+                    optional<string> s = LangExt::var_str(kv.second[0]);
+                    emit this->fileStatusChanged(QString::fromStdString(kv.first),
+                                 QString::fromStdString(s ? s.value() : ""));
+                }
+                }
+            }})
+            ->place_tasks(syncingpage);
+}
 
     Q_INVOKABLE void query_synode(QJSValue paths) {
         qDebug() << "'''''''''''''''''''''''''''''''''''''''''''''''";
     }
 
-    void login_synode(const anson::JServUrl & jserv, const string &uid, const string &pswd) noexcept {
+    void login_synode(const JServUrl & jserv, const string &uid, const string &pswd) noexcept {
         try {
-            using namespace anson;
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             SessionClient ssclient = SessionClient::loginWithUri(jserv,
                         sysuri.toStdString(), uid, pswd, _device.toStdString(), onErr);
@@ -160,16 +172,20 @@ public:
             jservclient.get()->client = ssclient;
         } catch (const std::logic_error e) {
             anwarn(e.what());
-            onErr(anson::MsgCode::Code::exSession, e.what(), {});
+            onErr(MsgCode::Code::exSession, e.what(), {});
         } catch (const std::exception e) {
             anerror(e.what());
-            onErr(anson::MsgCode::Code::exSession, e.what(), {});
+            onErr(MsgCode::Code::exSession, e.what(), {});
         }
     }
 
+    /**
+     * @brief connections
+     * @return [is ws conn ok, is synode conn ok]
+     */
     vector<bool> connections() {
-        return {wsclient != nullptr && !anson::LangExt::isblank(jservclient.get()->client.ssInf.ssid),
-             jservclient != nullptr && !anson::LangExt::isblank(jservclient.get()->client.ssInf.ssid)};
+        return {wsclient != nullptr && !LangExt::isblank(jservclient.get()->client.ssInf.ssid),
+             jservclient != nullptr && !LangExt::isblank(jservclient.get()->client.ssInf.ssid)};
     }
 
 signals:

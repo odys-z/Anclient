@@ -121,9 +121,9 @@ Item {
                     } else {
                         // root.selectedIndices = [index];
                         // root.selectedPaths.clear();
-                        root.selectedPaths = {};
+                        // root.selectedPaths = {};
                         root.selectedPaths[filePath] = AppConstants.Synching;
-                        console.log(`index: ${index}`, filePath, fileName);
+                        console.log(`[${String(index).padStart(3, " ")}]`, filePath, fileName);
                     }
                     root.selecount++;
                     mouse.accepted = false;

@@ -66,6 +66,10 @@ if(MINGW OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)
 endif()
 
+if(WIN32)
+    add_compile_definitions(WIN32_LEAN_AND_MEAN _AMD64_)
+endif()
+
 # add_subdirectory(src)
 add_subdirectory(app)
 

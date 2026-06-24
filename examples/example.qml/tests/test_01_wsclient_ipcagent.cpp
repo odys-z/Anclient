@@ -26,7 +26,7 @@ using namespace anson;
 namespace fs = std::filesystem;
 
 JProtocol wsprotocol{"ipc"};
-OnMsg onmsg = [](AnsonMsg<AnsonResp> r) { return false; };
+OnMsg onmsg = []() { return false; };
 
 class Ipclient : public ::testing::Test {
     static QMLTestSettings qmlsettings;
@@ -162,7 +162,7 @@ TEST_F(Ipclient, Echo) {
 
     AnsonMsg<AnsonResp> resp;
     try {
-        resp = wsclient.pop_envelope();
+        resp = wsclient.pop_envelope<AnsonResp>();
         FAIL() << "expecting session open ...";
     } catch(SemanticException e) {
         wsclient.asynSend(echomsg);
@@ -170,7 +170,7 @@ TEST_F(Ipclient, Echo) {
             FAIL() << "expecting echos ...";
     }
 
-    resp = wsclient.pop_envelope();
+    resp = wsclient.pop_envelope<AnsonResp>();
     ASSERT_EQ(echo.echo, resp.Body().m);
     qDebug() << "✅ Ping response parsed successfully";
 }
@@ -191,12 +191,12 @@ TEST_F(Ipclient, PING_Place_Task) {
 
     wsclient.asynSend(msg);
 
-    AnsonMsg<AnsonResp> resp;
+    AnsonMsg<DocsResp> resp;
     bool has_envl = wsclient.block_poll();
     int c = 0;
     while (has_envl)
     try {
-        resp = wsclient.pop_envelope();
+        resp = wsclient.pop_envelope<DocsResp>();
         has_envl = wsclient.block_poll(500);
         c++;
     } catch(SemanticException e) {

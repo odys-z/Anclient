@@ -24,10 +24,10 @@ public:
     // Q_INVOKABLE makes this function accessible from QML
     Q_INVOKABLE void on_double_click(const QString &path, bool isDir) {
         if (isDir) {
-            qDebug() << "C++ handling directory navigation:" << path;
+            qDebug() << "C++ FileHandler: handling directory navigation:" << path;
             // You could perform additional checks or logging here
         } else {
-            qDebug() << "C++ handling file opening:" << path;
+            qDebug() << "C++ FileHandler: handling file opening:" << path;
             // You could trigger system processes to open the file here
         }
     }

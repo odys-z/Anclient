@@ -3,17 +3,20 @@
 #include <string>
 #include <queue>
 #include <mutex>
-#include <memory>
 #include <ixwebsocket/IXWebSocket.h>
 #include <io/odysz/semantic/x.h>
 #include <io/odysz/jprotocol.h>
+#include <io/odysz/gen/doctier.hpp>
+
+#include "gen/wsport.hpp"
 
 namespace anson {
 
+// using OnMsg = std::function<bool(AnsonMsg<AnsonResp> resp)>;
 /**
  * @return true if the message needs to be dropped
  */
-using OnMsg = std::function<bool(AnsonMsg<AnsonResp> resp)>;
+using OnMsg = std::function<void()>;
 
 /**
  * @brief The WSClient class
@@ -37,7 +40,7 @@ public:
     // template<typename R, typename A>
     // std::shared_ptr<A> commit(const AnsonMsg<R>& req, const OnError& err);
 
-    ix::ReadyState state();
+    string state();
     void connect();
     void disconnect();
     bool shouldReconnect(int code) const;
@@ -48,7 +51,10 @@ public:
 
     int poll();
     bool block_poll(int ms_timout = -1);
-    AnsonMsg<AnsonResp> pop_envelope();
+    template <typename R> AnsonMsg<R> pop_envelope();
+
+    WSClient* on_msg(OnMsg on) { onMsg = on; return this; }
+    void place_tasks(PathsPage& tasks, const WSPort port = WSPort{WSPort::ping});
 
 private:
     // Dependencies & Configuration
@@ -94,25 +100,29 @@ template <typename BD>
 int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
     anwarn(reqmsg.toBlock());
     websocket.sendText(reqmsg.toBlock());
-
-    // std::unique_lock<std::mutex> lock(queueMutex_);
-
-    // Instead of the Java while-loop Thread.sleep combo, C++ uses condition variables
-    // linked directly to the system hardware clock for ultra-accurate, zero-CPU timed waits.
-    // bool dataReady = queueCv_.wait_for(lock, std::chrono::seconds(TIMEOUT_SECS), [this]() {
-    //     return !msg_queue.empty();
-    // });
-
-    // if (!dataReady) {
-    //     throw std::runtime_error("WS sync send timed out waiting for response");
-    // }
-
-    // std::string msg = msg_queue.front();
-    // msg_queue.pop();
-
-    // AnsonMsg<AnsonResp> anmsg;
-    // Anson::from_json(msg, anmsg);
-    // return anmsg;
     return msg_queue.size();
 }
+}
+
+template <typename R>
+anson::AnsonMsg<R> anson::WSClient::pop_envelope() {
+    if (msg_queue.size() == 0)
+        throw SemanticException("Empty Queue");
+
+    string top;
+    {
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        top = std::move(msg_queue.front());
+        msg_queue.pop();
+    }
+
+    // anlog("TODO anlog -> andebug, pop():\n=============================");
+    anlog(top);
+    if (Regex::startEnvelope(top)) {
+        // AnsonMsg<AnsonResp> r;
+        AnsonMsg<R> r;
+        Anson::from_json<AnsonMsg<R>>(top, r);
+        return r;
+    }
+    else throw SemanticException("Message is not an envelope: " + top);
 }

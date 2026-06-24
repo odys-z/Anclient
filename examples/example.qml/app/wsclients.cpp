@@ -1,5 +1,7 @@
 #include "wsclients.h"
 
+#include <gen/wsport.hpp>
+
 namespace anson {
 
 WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
@@ -27,20 +29,11 @@ WSClient::~WSClient() {
 
 void WSClient::connect() {
     websocket.start();
-
-    // Emulate waiting for the connection event or initial welcome packet if required
-    // std::unique_lock<std::mutex> lock(queueMutex_);
-    // bool success = queueCv_.wait_for(lock, std::chrono::seconds(TIMEOUT_SECS), [this] {
-    //     return websocket.getReadyState() == ix::ReadyState::Open;
-    // });
-
-    // if (!success && verbose_) {
-    //     std::cerr << "WS connection timed out or failed initialization." << std::endl;
-    // }
 }
 
-ix::ReadyState WSClient::state() {
-    return websocket.getReadyState();
+string WSClient::state() {
+    string stats[] = {"Connecting", "Open", "Closing", "Closed"};
+    return stats[(int)websocket.getReadyState()];
 }
 
 void WSClient::disconnect() {
@@ -82,12 +75,7 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
         } // auto-unlock
         queueCv_.notify_one();
 
-        // AnsonMsg<AnsonResp> env;
-        // Anson::from_json(msg_queue.front(), env);
-        // if (onMsg(env)) {
-        //     std::lock_guard<std::mutex> lock(queueMutex_);
-        //     msg_queue.pop();
-        // }
+        onMsg();
     } 
     else if (msg->type == ix::WebSocketMessageType::Open) {
         // queueCv_.notify_one(); // Wake up connection blocks
@@ -112,13 +100,6 @@ int WSClient::poll() {
 }
 
 bool WSClient::block_poll(int wait_ms) {
-    // int s;
-    // while ((s = msg_queue.size()) == 0 && ms_timeout != 0) {
-    //     this_thread::sleep_for(200ms);
-    //     if (ms_timeout > 0)
-    //         ms_timeout = max(0, ms_timeout - 200);
-    // }
-    // return s;
     std::unique_lock<std::mutex> lock(queueMutex_);
 
     if (wait_ms <= -1) {
@@ -140,24 +121,13 @@ bool WSClient::block_poll(int wait_ms) {
     return true;
 }
 
-AnsonMsg<AnsonResp> WSClient::pop_envelope() {
-    if (msg_queue.size() == 0)
-        throw SemanticException("Empty Queue");
-
-    string top;
-    {
-        std::lock_guard<std::mutex> lock(queueMutex_);
-        top = std::move(msg_queue.front());
-        msg_queue.pop();
-    }
-
-    anlog("TODO anlog -> andebug, pop():\n=============================");
-    anlog(top);
-    if (Regex::startEnvelope(top)) {
-        AnsonMsg<AnsonResp> r;
-        Anson::from_json(top, r);
-        return r;
-    }
-    else throw SemanticException("Message is not an envelope: " + top);
+void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
+    DocsReq uploadreq{"h_photos", {}};
+    uploadreq.syncingPage = {pthpage};
+    uploadreq.syncingPage.end = pthpage.clientPaths.size();
+    uploadreq.syncingPage.start = 0;
+    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
+    asynSend(msg);
 }
+
 }

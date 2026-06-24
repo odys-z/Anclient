@@ -14,6 +14,7 @@ qt_add_executable(${PROJECT_NAME}
     gen/wsport.hpp
     wsclients.h
     wsclients.cpp
+    doctier.cpp
 )
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -65,8 +66,6 @@ qt_add_qml_module(${PROJECT_NAME}
         linenumbermodel.h
         linenumbermodel.cpp
         filelistview.h
-        doctier.cpp
-        SOURCES gen/wsport.hpp	#
 )
 
 target_link_libraries(${PROJECT_NAME}
