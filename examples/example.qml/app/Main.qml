@@ -22,8 +22,8 @@ ApplicationWindow {
 
     width: 1100
     height: 600
-    minimumWidth: 200
-    minimumHeight: 100
+    minimumWidth: 480
+    minimumHeight: 320
     visible: true
     color: Colors.background
     flags: Qt.Window | Qt.FramelessWindowHint
@@ -79,15 +79,24 @@ ApplicationWindow {
             //     onTriggered: editor.text.font.pixelSize -= 1
             // }
             Action {
+                text: qsTr("Connect / Ping")
+                shortcut: StandardKey.Save
+                onTriggered: () => {
+                        console.log(`Check connections ...`)
+                        doclient.reconnect_ipc();
+                    }
+            }
+
+            Action {
                 text: qsTr("Upload")
                 shortcut: StandardKey.Save
                 onTriggered: () => {
-                        console.log(`Uploading ${Object.keys(fileListView.selectedPaths).length} files ....`)
-                        Object.keys(fileListView.selectedPaths).forEach(p => {
-                            console.log(p, fileListView.selectedPaths[p]); });
-                        // doclient.push_files_TDD(fileListView.selectedPaths);
-                        doclient.push_files(fileListView.selectedPaths);
-                    }
+                    console.log(`Uploading ${Object.keys(fileListView.selectedPaths).length} files ...`)
+                    Object.keys(fileListView.selectedPaths).forEach(p => {
+                        console.log(p, fileListView.selectedPaths[p]); });
+                    // doclient.push_files_TDD(fileListView.selectedPaths);
+                    doclient.push_files(fileListView.selectedPaths);
+                }
             }
             Action {
                 text: root.showLineNumbers ? qsTr("Toggle Line Numbers OFF")

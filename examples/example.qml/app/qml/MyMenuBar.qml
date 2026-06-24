@@ -130,7 +130,14 @@ MenuBar {
             InteractionButton {
                 id: maximize
 
-                onAction: root.dragWindow.showMaximized()
+                // onAction: root.dragWindow.showMaximized()
+                onAction: {
+                    if (root.dragWindow.visibility === Window.Maximized) {
+                            root.dragWindow.visibility = Window.Windowed
+                        } else {
+                            root.dragWindow.showMaximized()
+                        }
+                }
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 7

@@ -12,7 +12,7 @@
 
 namespace anson {
 
-class QMLTestSettings : public anson::Anson {
+class QMLAppSettings : public anson::Anson {
 public:
     inline static const std::string _type_ = "io.odysz.anclient.test.QMLTestSettings";
     string sysuri;
@@ -26,14 +26,14 @@ public:
     string wshost;
     int wsport;
 
-    QMLTestSettings() : Anson() {
+    QMLAppSettings() : Anson() {
         Type(_type_);
     }
 };
 
 inline static void register_qmltestsettingsAst(AstMap & asts) {
 
-    AnsonAst * ast = createAST <QMLTestSettings, AnsonAst> (
+    AnsonAst * ast = createAST <QMLAppSettings, AnsonAst> (
         asts, Anson::_type_, map <string, AnsonField> {
         {"sysuri", {.dataAnclass="string"} },
         {"synuri", {.dataAnclass="string"} },
@@ -47,26 +47,26 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         {"wsport", {.dataAnclass="int"} },
        });
 
-    entt::meta_factory <anson::QMLTestSettings> ()
+    entt::meta_factory <anson::QMLAppSettings> ()
         .type(ast->enttypeid)
         .base<Anson>()
 
-        .data<&anson::QMLTestSettings::sysuri>("sysuri")
-        .data<&anson::QMLTestSettings::synuri>("synuri")
-        .data<&anson::QMLTestSettings::temp_dir>("temp_dir")
-        .data<&anson::QMLTestSettings::java_path>("java_path")
-        .data<&anson::QMLTestSettings::doctier_jar>("doctier_jar")
-        .data<&anson::QMLTestSettings::wsagent_jar>("wsagent_jar")
-        .data<&anson::QMLTestSettings::synode_settings>("synode_settings")
-        .data<&anson::QMLTestSettings::wsagent_settings>("wsagent_settings")
-        .data<&anson::QMLTestSettings::wshost>("wshost")
-        .data<&anson::QMLTestSettings::wsport>("wsport")
+        .data<&anson::QMLAppSettings::sysuri>("sysuri")
+        .data<&anson::QMLAppSettings::synuri>("synuri")
+        .data<&anson::QMLAppSettings::temp_dir>("temp_dir")
+        .data<&anson::QMLAppSettings::java_path>("java_path")
+        .data<&anson::QMLAppSettings::doctier_jar>("doctier_jar")
+        .data<&anson::QMLAppSettings::wsagent_jar>("wsagent_jar")
+        .data<&anson::QMLAppSettings::synode_settings>("synode_settings")
+        .data<&anson::QMLAppSettings::wsagent_settings>("wsagent_settings")
+        .data<&anson::QMLAppSettings::wshost>("wshost")
+        .data<&anson::QMLAppSettings::wsport>("wsport")
         ;
 
         //
         ast->get_field_instance = [ast](const IJsonable& ans, const string& fieldname) -> meta_any {
             if (ast->fields.contains(fieldname)) {
-                auto& concrete = static_cast<const QMLTestSettings&>(ans);
+                auto& concrete = static_cast<const QMLAppSettings&>(ans);
                 if ("sysuri" == fieldname)
                     return entt::forward_as_meta(concrete.sysuri);
                 if ("synuri" == fieldname)

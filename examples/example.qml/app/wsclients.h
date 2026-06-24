@@ -28,6 +28,11 @@ protected:
     OnMsg onMsg;
 
 public:
+    inline static const string Connecting = "Connecting";
+    inline static const string Open = "Open";
+    inline static const string Closing = "Closing";
+    inline static const string Closed = "Closed";
+
     WSClient() : jserv_({"", {}}) {}
     WSClient(const JServUrl& jserv, const OnMsg& onmsg);
     ~WSClient();
@@ -40,7 +45,8 @@ public:
     // template<typename R, typename A>
     // std::shared_ptr<A> commit(const AnsonMsg<R>& req, const OnError& err);
 
-    string state();
+    string ipconn_state();
+    string syncon_state();
     void connect();
     void disconnect();
     bool shouldReconnect(int code) const;
@@ -69,32 +75,6 @@ private:
     std::mutex queueMutex_;
     std::condition_variable queueCv_;
 };
-
-// // Template method definition
-// template<typename R, typename A>
-// std::shared_ptr<A> WSClient::commit(const AnsonMsg<R>& req, const OnError& err2) {
-//     andebug(std::format("JServ URI: {}", jserv_.jserv().c_str()));
-
-//     if (req.body(0)->a.empty()) {
-//         throw anson::SemanticException("A non-empty a-tag is forced for session-required request.");
-//     }
-
-//     if (websocket.getReadyState() != ix::ReadyState::Open) {
-//         connect();
-//     }
-
-//     // Cast payload slice up to the generic base body signature
-//     AnsonMsg<AnsonResp> resp = synSend(req);
-
-//     MsgCode::Code code = resp.code;
-
-//     if (MsgCode::Code::ok == code) {
-//         return std::static_pointer_cast<A>(resp.Body());
-//     } else {
-//         err2(code, resp.Body().m, {});
-//         return nullptr;
-//     }
-// }
 
 template <typename BD>
 int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
@@ -126,3 +106,30 @@ anson::AnsonMsg<R> anson::WSClient::pop_envelope() {
     }
     else throw SemanticException("Message is not an envelope: " + top);
 }
+
+// // Template method definition
+// template<typename R, typename A>
+// std::shared_ptr<A> WSClient::commit(const AnsonMsg<R>& req, const OnError& err2) {
+//     andebug(std::format("JServ URI: {}", jserv_.jserv().c_str()));
+
+//     if (req.body(0)->a.empty()) {
+//         throw anson::SemanticException("A non-empty a-tag is forced for session-required request.");
+//     }
+
+//     if (websocket.getReadyState() != ix::ReadyState::Open) {
+//         connect();
+//     }
+
+//     // Cast payload slice up to the generic base body signature
+//     AnsonMsg<AnsonResp> resp = synSend(req);
+
+//     MsgCode::Code code = resp.code;
+
+//     if (MsgCode::Code::ok == code) {
+//         return std::static_pointer_cast<A>(resp.Body());
+//     } else {
+//         err2(code, resp.Body().m, {});
+//         return nullptr;
+//     }
+// }
+
