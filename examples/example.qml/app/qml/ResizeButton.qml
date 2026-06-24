@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 import QtQml
+import QtQuick
 import QtQuick.Controls
 import FilesystModule
 
@@ -17,8 +18,22 @@ Button {
     icon.source: "../icons/resize.svg"
     icon.color: hovered ? Colors.iconIndicator : Colors.icon
 
-    background: null
+    background: null //Rectangle { color: "red" }
     checkable: false
     display: AbstractButton.IconOnly
-    onPressed: resizeWindow.startSystemResize(Qt.BottomEdge | Qt.RightEdge)
+    // onPressed: resizeWindow.startSystemResize(Qt.BottomEdge | Qt.RightEdge)
+
+    // visible: resizeWindow.visibility !== Window.Maximized
+    // enabled: resizeWindow.visibility !== Window.Maximized
+
+    onClicked: {
+        console.log("oncliecked ...")
+        if (resizeWindow.visibility === Window.Maximized) {
+            resizeWindow.visibility = Window.Windowed
+            console.log("restore")
+        } else {
+            resizeWindow.visibility = Window.Maximized
+            console.log("maximize")
+        }
+    }
 }

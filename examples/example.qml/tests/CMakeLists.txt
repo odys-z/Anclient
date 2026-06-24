@@ -17,15 +17,17 @@ find_package(Qt6 REQUIRED COMPONENTS)
 add_executable(
     ${PROJECT_NAME}
     jsample.h
-    ../app/qml_cpp.cpp
-    ../app/qml_cpp.h
+    ../app/qdoclientier.cpp
+    ../app/qdoclientier.h
     ../app/doctier.cpp
     ../app/wsclients.h
     ../app/wsclients.cpp
 
     # cd test
     # py -m semantier_gen ast/gen-settings.json ast
-    gen/test_settings.hpp
+    # gen/test_settings.hpp
+    ../app/gen/app_settings.hpp
+
     # The Hello IXWebSocket requires stand alone ws-agent: test_01_hello_ixwebsocket.cpp
     test_01_wsclient_ipcagent.cpp
     test_common.h

@@ -11,12 +11,12 @@
 #include <ixwebsocket/IXWebSocket.h>
 #include <QTimer>
 #include <QThread>  // Added for thread checks
-#include <qml_cpp.h>
+#include <qdoclientier.h>
 #include <wsclients.h>
 #include <QProcess>
 
 #include "../app/gen/wsport.hpp"
-#include "gen/test_settings.hpp"
+#include "../app/gen/app_settings.hpp"
 #include "test_common.h"
 
 anson::AstMap asts;
@@ -29,7 +29,7 @@ JProtocol wsprotocol{"ipc"};
 OnMsg onmsg = []() { return false; };
 
 class Ipclient : public ::testing::Test {
-    static QMLTestSettings qmlsettings;
+    static QMLAppSettings qmlsettings;
 protected:
     // static ix::WebSocket webSocket;
     // static ix::SocketTLSOptions tlsOptions;
@@ -143,7 +143,7 @@ protected:
     }
 };
 
-QMLTestSettings Ipclient::qmlsettings;
+QMLAppSettings Ipclient::qmlsettings;
 WSClient        Ipclient::wsclient{{"127.0.0.1:8700", wsprotocol}, onmsg};
 QProcess        Ipclient::wsAgentProc;
 

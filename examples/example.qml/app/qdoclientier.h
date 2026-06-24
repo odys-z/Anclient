@@ -1,6 +1,5 @@
 #pragma once
 
-#include "wsclients.h"
 #include <thread>
 
 #include <io/odysz/clients.h>
@@ -14,12 +13,17 @@
 #include <QQmlEngine>
 #include <QJSValue>
 #include <QJSValueIterator>
+#include <QProcess>
 
 #include <QFile>
 #include <QTextStream>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
+#include <gen/app_settings.hpp>
+
+#include "wsclients.h"
+#include "wsclients.h"
 
 #define QMLConst QString
 
@@ -74,6 +78,40 @@ public:
 
 };
 
+/**
+ * @brief Resolves the tilde (~) prefix in file paths across different platforms.
+ * On Windows, it expands '~' to the USERPROFILE directory.
+ * On Unix/Linux/macOS, it expands '~' to the HOME directory.
+ */
+static u8string resolveHomePath(const std::string& inputPath) {
+    if (inputPath.empty() || inputPath[0] != '~') {
+        return fs::path(inputPath).u8string();
+    }
+
+    std::string homeDir;
+
+    #ifdef _WIN32
+        // Windows conditional compilation
+        char* userProfile = std::getenv("USERPROFILE");
+        if (userProfile) {
+            homeDir = userProfile;
+        }
+    #else
+        // Linux / macOS conditional compilation
+        char* home = std::getenv("HOME");
+        if (home) {
+        homeDir = home;
+        }
+    #endif
+
+    if (homeDir.empty()) {
+        return fs::path(inputPath).u8string();
+    }
+
+    size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
+
+    return (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+}
 
 class QDoclientier : public QObject {
     Q_OBJECT
@@ -88,6 +126,12 @@ class QDoclientier : public QObject {
     QString _device;
     // property
     Q_PROPERTY(QString device READ getDevice WRITE setDevice NOTIFY deviceChanged)
+
+    QProcess wsAgentProc;
+    OnMsg onmsg;
+
+    QMLAppSettings qmlsettings;
+
 public:
     // Getter
     QString getDevice() const { return _device; }
@@ -99,8 +143,8 @@ public:
         emit deviceChanged();
     }
 
-    std::shared_ptr<WSClient> wsclient;
-    std::shared_ptr<Doclientier> jservclient;
+    std::unique_ptr<WSClient> wsclient;
+    std::unique_ptr<Doclientier> jservclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
         anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
@@ -132,6 +176,57 @@ public:
         }
     }
 
+    bool load_settings();
+    bool startIPC();
+    bool stopIPC();
+
+    Q_INVOKABLE void reconnect_ipc() {
+        load_settings();
+        if (!wsclient) {
+            if (wsAgentProc.state() != QProcess::Running)
+                startIPC();
+
+            // connect
+            anlog("Re-connect IPC Agent...");
+            onmsg = [this]() -> void {
+            if (wsclient->block_poll(200) > 0) {
+                AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
+                if (rep.code == MsgCode::Code::ok)
+                    for (const auto& kv : rep.Body().syncingPage.clientPaths) {
+                        optional<string> s = LangExt::var_str(kv.second[0]);
+                        emit this->fileStatusChanged(QString::fromStdString(kv.first),
+                             QString::fromStdString(s ? s.value() : ""));
+                    }
+                else
+                    emit this->fileStatusChanged(
+                        QString::fromStdString(rep.Body().m),
+                        QString::fromStdString(map2str(rep.Body().syncingPage.clientPaths)));
+            }};
+
+            WSClient* wsclient = new WSClient{JServUrl{"127.0.0.1:8700", {"ipc"}}, onmsg};
+            try {
+                wsclient->connect();
+                this->wsclient.reset(wsclient);
+            }
+            catch (...) {
+                delete wsclient;
+                throw;
+            }
+        }
+
+        while (wsclient && wsclient->ipconn_state() == WSClient::Connecting
+            || wsclient && wsclient->ipconn_state() == WSClient::Closing)
+            std::this_thread::sleep_for(250ms);
+
+        if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
+            return;
+        }
+        if (wsclient && wsclient->ipconn_state() == WSClient::Closed) {
+            wsclient->connect();
+        }
+
+    }
+
     Q_INVOKABLE void push_files(QJSValue paths) {
 
         if (!AppConstants::check_jsvalue(paths)) return;
@@ -145,19 +240,12 @@ public:
 
         PathsPage syncingpage;
         syncingpage.clientPaths = syncing_paths;
-        wsclient->on_msg([this]() -> void {
-            if (wsclient->block_poll(200) > 0) {
-                AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
-                if (rep.code == MsgCode::Code::ok) {
-                for (const auto& kv : rep.Body().syncingPage.clientPaths) {
-                    optional<string> s = LangExt::var_str(kv.second[0]);
-                    emit this->fileStatusChanged(QString::fromStdString(kv.first),
-                                 QString::fromStdString(s ? s.value() : ""));
-                }
-                }
-            }})
+        if (!wsclient)
+            reconnect_ipc();
+
+        wsclient->on_msg(onmsg)
             ->place_tasks(syncingpage);
-}
+    }
 
     Q_INVOKABLE void query_synode(QJSValue paths) {
         qDebug() << "'''''''''''''''''''''''''''''''''''''''''''''''";
@@ -168,7 +256,7 @@ public:
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             SessionClient ssclient = SessionClient::loginWithUri(jserv,
                         sysuri.toStdString(), uid, pswd, _device.toStdString(), onErr);
-            jservclient = make_shared<Doclientier>(onErr);
+            jservclient = make_unique<Doclientier>(onErr);
             jservclient.get()->client = ssclient;
         } catch (const std::logic_error e) {
             anwarn(e.what());

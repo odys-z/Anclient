@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <qml_cpp.h>
+#include <qdoclientier.h>
 
 namespace fs = std::filesystem;
 
@@ -26,39 +26,3 @@ fs::path getTestPushFile(const string& src) {
 
     return target_path;
 }
-
-/**
- * @brief Resolves the tilde (~) prefix in file paths across different platforms.
- * On Windows, it expands '~' to the USERPROFILE directory.
- * On Unix/Linux/macOS, it expands '~' to the HOME directory.
- */
-static u8string resolveHomePath(const std::string& inputPath) {
-    if (inputPath.empty() || inputPath[0] != '~') {
-        return fs::path(inputPath).u8string();
-    }
-
-    std::string homeDir;
-
-    #ifdef _WIN32
-        // Windows conditional compilation
-        char* userProfile = std::getenv("USERPROFILE");
-        if (userProfile) {
-            homeDir = userProfile;
-        }
-    #else
-        // Linux / macOS conditional compilation
-        char* home = std::getenv("HOME");
-        if (home) {
-        homeDir = home;
-        }
-    #endif
-
-    if (homeDir.empty()) {
-        return fs::path(inputPath).u8string();
-    }
-
-    size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
-
-    return (fs::path(homeDir) / inputPath.substr(offset)).u8string();
-}
-

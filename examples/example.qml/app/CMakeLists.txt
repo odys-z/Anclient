@@ -12,6 +12,7 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH} CACHE STRING "Qt Creator QML Import Paths
 qt_add_executable(${PROJECT_NAME}
     main.cpp
     gen/wsport.hpp
+    gen/app_settings.hpp
     wsclients.h
     wsclients.cpp
     doctier.cpp
@@ -59,8 +60,8 @@ qt_add_qml_module(${PROJECT_NAME}
         "icons/app_icon.svg"
         "icons/album.svg"
     SOURCES
-        qml_cpp.h
-        qml_cpp.cpp
+        qdoclientier.h
+        qdoclientier.cpp
         filesysmodel.h
         filesysmodel.cpp
         linenumbermodel.h
@@ -122,11 +123,18 @@ target_link_libraries(album_clangd_helper PRIVATE
     anson
     anclient)
 
-# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_directory
-#         "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
-#         "$<TARGET_FILE_DIR:album_tests>/ast"
-# )
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/../ast"
+        "$<TARGET_FILE_DIR:album_tests>/ast"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/settings"
+        "$<TARGET_FILE_DIR:album_tests>/settings"
+
+    COMMENT "Copying  resources to build directory"
+)
+
 
 install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .

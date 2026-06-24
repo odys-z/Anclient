@@ -119,7 +119,7 @@ Rectangle {
                 id: qtWebsiteButton
                 icon.source: "../icons/globe.svg"
                 checkable: false
-                onClicked: Qt.openUrlExternally("https://www.qt.io/")
+                onClicked: Qt.openUrlExternally("http://127.0.0.1:8960/login.html")
             }
 
             // Opens the About Qt Window.

@@ -31,8 +31,13 @@ void WSClient::connect() {
     websocket.start();
 }
 
-string WSClient::state() {
-    string stats[] = {"Connecting", "Open", "Closing", "Closed"};
+string WSClient::ipconn_state() {
+    string stats[] = {Connecting, Open, Closing, Closed};
+    return stats[(int)websocket.getReadyState()];
+}
+
+string WSClient::syncon_state() {
+    string stats[] = {Connecting, Open, Closing, Closed};
     return stats[(int)websocket.getReadyState()];
 }
 
@@ -76,7 +81,7 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
         queueCv_.notify_one();
 
         onMsg();
-    } 
+    }
     else if (msg->type == ix::WebSocketMessageType::Open) {
         // queueCv_.notify_one(); // Wake up connection blocks
         anlog("WebSocket Open: uri = "s + msg->openInfo.uri.c_str());
@@ -89,7 +94,7 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
             anlog("Fatal or intentional closure. Reconnection aborted.");
             websocket.disableAutomaticReconnection(); // Abort engine retries
         }
-    } 
+    }
     else if (msg->type == ix::WebSocketMessageType::Error) {
         anwarn("WebSocket Error: "s + msg->errorInfo.reason);
     }
@@ -116,7 +121,6 @@ bool WSClient::block_poll(int wait_ms) {
         // If the timeout expired and the queue is still empty, return nullopt
         if (!success)
             return false;
-
     }
     return true;
 }

@@ -12,7 +12,7 @@
 
 #define FilesystMod "FilesystModule"
 
-#include "qml_cpp.h"
+#include "qdoclientier.h"
 
 // WinMain() => main()
 #if defined(_WIN32) && defined(__GNUC__)
