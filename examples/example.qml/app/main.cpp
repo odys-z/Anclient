@@ -89,5 +89,16 @@ int main(int argc, char *argv[]) {
         AppConstants::qlog("Слава Україні!" , anson::ShareFlag::publish);
     #endif
 
+
+    anson::AstMap asts;
+    anson::JsonOpt opts{&asts};
+
+    register_jserv(asts, opts);
+    register_semantier(asts, "");
+    register_doctier(asts, "ast");
+    register_iport<WSPort>(asts, "ast/wsport.ast.json");
+    register_qmltestsettingsAst(asts);
+    register_doctier(asts, "ast");
+
     return QGuiApplication::exec(); // Start the event loop.
 }

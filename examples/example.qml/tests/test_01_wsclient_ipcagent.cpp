@@ -25,7 +25,7 @@ anson::JsonOpt opts{&asts};
 using namespace anson;
 namespace fs = std::filesystem;
 
-JProtocol wsprotocol{"ipc"};
+// JProtocol wsprotocol{"ipc"};
 OnMsg onmsg = []() { return false; };
 
 class Ipclient : public ::testing::Test {
@@ -87,6 +87,8 @@ protected:
         register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
 
+        wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
+
         //
         Anson::from_file("settings/test-02-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
@@ -144,7 +146,7 @@ protected:
 };
 
 QMLAppSettings Ipclient::qmlsettings;
-WSClient        Ipclient::wsclient{{"127.0.0.1:8700", wsprotocol}, onmsg};
+WSClient        Ipclient::wsclient{{"127.0.0.1:8700", {"ipc"}}, onmsg};
 QProcess        Ipclient::wsAgentProc;
 
 TEST_F(Ipclient, Echo) {

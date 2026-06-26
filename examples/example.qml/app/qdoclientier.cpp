@@ -20,7 +20,12 @@ bool AppConstants::check_jsvalue(QJSValue v) {
 }
 
 bool QDoclientier::load_settings() {
-    Anson::from_file("settings/app-settings.json", qmlsettings);
+    try {
+        Anson::from_file("settings/app-settings.json", qmlsettings);
+    } catch (AnsonException e) {
+        anerror(e.what());
+        return false;
+    }
     return true;
 }
 

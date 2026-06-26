@@ -12,7 +12,6 @@
 
 namespace anson {
 
-// using OnMsg = std::function<bool(AnsonMsg<AnsonResp> resp)>;
 /**
  * @return true if the message needs to be dropped
  */

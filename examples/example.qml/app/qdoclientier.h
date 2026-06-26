@@ -181,7 +181,10 @@ public:
     bool stopIPC();
 
     Q_INVOKABLE void reconnect_ipc() {
-        load_settings();
+        if (!load_settings()) {
+            anerror("Failed to load settings.");
+            return;
+        }
         if (!wsclient) {
             if (wsAgentProc.state() != QProcess::Running)
                 startIPC();

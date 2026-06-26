@@ -135,12 +135,13 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Copying  resources to build directory"
 )
 
-
 install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+add_compile_definitions(ANSON_VERBOSE=4)
 
 qt_generate_deploy_qml_app_script(
     TARGET ${PROJECT_NAME}
