@@ -9,6 +9,7 @@
 #include <QGuiApplication>
 #include <QCommandLineParser>
 #include <QQmlApplicationEngine>
+#include <ixwebsocket/IXNetSystem.h>
 
 #define FilesystMod "FilesystModule"
 
@@ -100,5 +101,8 @@ int main(int argc, char *argv[]) {
     register_qmltestsettingsAst(asts);
     register_doctier(asts, "ast");
 
-    return QGuiApplication::exec(); // Start the event loop.
+    ix::initNetSystem();
+    int ret = QGuiApplication::exec(); // Start the event loop.
+    ix::uninitNetSystem();
+    return ret;
 }

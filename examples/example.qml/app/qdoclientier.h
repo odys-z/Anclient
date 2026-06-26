@@ -17,6 +17,8 @@
 
 #include <QFile>
 #include <QTextStream>
+#include <thread>
+#include <chrono>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
@@ -180,75 +182,9 @@ public:
     bool startIPC();
     bool stopIPC();
 
-    Q_INVOKABLE void reconnect_ipc() {
-        if (!load_settings()) {
-            anerror("Failed to load settings.");
-            return;
-        }
-        if (!wsclient) {
-            if (wsAgentProc.state() != QProcess::Running)
-                startIPC();
+    Q_INVOKABLE void reconnect_ipc();
 
-            // connect
-            anlog("Re-connect IPC Agent...");
-            onmsg = [this]() -> void {
-            if (wsclient->block_poll(200) > 0) {
-                AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
-                if (rep.code == MsgCode::Code::ok)
-                    for (const auto& kv : rep.Body().syncingPage.clientPaths) {
-                        optional<string> s = LangExt::var_str(kv.second[0]);
-                        emit this->fileStatusChanged(QString::fromStdString(kv.first),
-                             QString::fromStdString(s ? s.value() : ""));
-                    }
-                else
-                    emit this->fileStatusChanged(
-                        QString::fromStdString(rep.Body().m),
-                        QString::fromStdString(map2str(rep.Body().syncingPage.clientPaths)));
-            }};
-
-            WSClient* wsclient = new WSClient{JServUrl{"127.0.0.1:8700", {"ipc"}}, onmsg};
-            try {
-                wsclient->connect();
-                this->wsclient.reset(wsclient);
-            }
-            catch (...) {
-                delete wsclient;
-                throw;
-            }
-        }
-
-        while (wsclient && wsclient->ipconn_state() == WSClient::Connecting
-            || wsclient && wsclient->ipconn_state() == WSClient::Closing)
-            std::this_thread::sleep_for(250ms);
-
-        if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
-            return;
-        }
-        if (wsclient && wsclient->ipconn_state() == WSClient::Closed) {
-            wsclient->connect();
-        }
-
-    }
-
-    Q_INVOKABLE void push_files(QJSValue paths) {
-
-        if (!AppConstants::check_jsvalue(paths)) return;
-
-        // this->syncing_paths = map<string, vector<string>>{};
-        QJSValueIterator it(paths);
-        while (it.next()) {
-            qDebug() << "cpp handling: " << it.name();
-            this->syncing_paths[it.name().toStdString()] = {ShareFlag::pushing, _device.toStdString(), "now()"};
-        }
-
-        PathsPage syncingpage;
-        syncingpage.clientPaths = syncing_paths;
-        if (!wsclient)
-            reconnect_ipc();
-
-        wsclient->on_msg(onmsg)
-            ->place_tasks(syncingpage);
-    }
+    Q_INVOKABLE void push_files(QJSValue paths);
 
     Q_INVOKABLE void query_synode(QJSValue paths) {
         qDebug() << "'''''''''''''''''''''''''''''''''''''''''''''''";

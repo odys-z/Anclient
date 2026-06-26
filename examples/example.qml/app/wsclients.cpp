@@ -9,13 +9,15 @@ WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     
     // IXWebSocket automatically handles backoff and reconnection policies in a background thread.
     // We bind its configuration parameters natively to achieve what ReconnectionManager did.
-    websocket.setUrl(jserv_.wservUri());
+
+    string ipcurl = jserv_.wservUri();
+    // Regex::valid_jserv(ipcurl);
+    anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
+    websocket.setUrl(ipcurl);
     websocket.setPingInterval(30); // 30 seconds keepalive
     
     // Configure automatic reconnection parameters mirroring the Java custom rules
     websocket.enableAutomaticReconnection();
-    // webSocket_.setMaxReconnectionAttempts(10);
-    // webSocket_.setMinWaitBetweenReconnections(1000); // 1 Second base delay
 
     // Bind event callback
     websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {

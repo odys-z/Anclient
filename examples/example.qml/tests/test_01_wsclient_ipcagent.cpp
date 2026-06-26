@@ -10,14 +10,14 @@
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
 #include <QTimer>
-#include <QThread>  // Added for thread checks
+// #include <QThread>  // Added for thread checks
 #include <qdoclientier.h>
 #include <wsclients.h>
 #include <QProcess>
 
 #include "../app/gen/wsport.hpp"
 #include "../app/gen/app_settings.hpp"
-#include "test_common.h"
+// #include "test_common.h"
 
 anson::AstMap asts;
 anson::JsonOpt opts{&asts};

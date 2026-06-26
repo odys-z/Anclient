@@ -41,9 +41,6 @@ public:
         onMsg = onmsg;
     }
 
-    // template<typename R, typename A>
-    // std::shared_ptr<A> commit(const AnsonMsg<R>& req, const OnError& err);
-
     string ipconn_state();
     string syncon_state();
     void connect();
@@ -62,13 +59,11 @@ public:
     void place_tasks(PathsPage& tasks, const WSPort port = WSPort{WSPort::ping});
 
 private:
-    // Dependencies & Configuration
     JServUrl jserv_;
     bool verbose_;
     ix::WebSocket websocket;
     static constexpr int TIMEOUT_SECS = 120;
 
-    // Thread-safe Message Queue
     std::queue<std::string> msg_queue;
 
     std::mutex queueMutex_;
@@ -81,10 +76,9 @@ int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
     websocket.sendText(reqmsg.toBlock());
     return msg_queue.size();
 }
-}
 
 template <typename R>
-anson::AnsonMsg<R> anson::WSClient::pop_envelope() {
+AnsonMsg<R> WSClient::pop_envelope() {
     if (msg_queue.size() == 0)
         throw SemanticException("Empty Queue");
 
@@ -95,40 +89,19 @@ anson::AnsonMsg<R> anson::WSClient::pop_envelope() {
         msg_queue.pop();
     }
 
-    // anlog("TODO anlog -> andebug, pop():\n=============================");
     anlog(top);
     if (Regex::startEnvelope(top)) {
-        // AnsonMsg<AnsonResp> r;
         AnsonMsg<R> r;
         Anson::from_json<AnsonMsg<R>>(top, r);
+        return r;
+    }
+    if (Regex::start_with(top, "session openned: ")) {
+        aninfo("Popping and ignoring expected message: "s + top);
+        AnsonMsg<R> r;
+        r.code = MsgCode::Code::_sentinel_;
         return r;
     }
     else throw SemanticException("Message is not an envelope: " + top);
 }
 
-// // Template method definition
-// template<typename R, typename A>
-// std::shared_ptr<A> WSClient::commit(const AnsonMsg<R>& req, const OnError& err2) {
-//     andebug(std::format("JServ URI: {}", jserv_.jserv().c_str()));
-
-//     if (req.body(0)->a.empty()) {
-//         throw anson::SemanticException("A non-empty a-tag is forced for session-required request.");
-//     }
-
-//     if (websocket.getReadyState() != ix::ReadyState::Open) {
-//         connect();
-//     }
-
-//     // Cast payload slice up to the generic base body signature
-//     AnsonMsg<AnsonResp> resp = synSend(req);
-
-//     MsgCode::Code code = resp.code;
-
-//     if (MsgCode::Code::ok == code) {
-//         return std::static_pointer_cast<A>(resp.Body());
-//     } else {
-//         err2(code, resp.Body().m, {});
-//         return nullptr;
-//     }
-// }
-
+}
