@@ -54,7 +54,7 @@ public class WSAgent {
 	    context.insertHandler(ipHandler);
 
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
-	    	container.setDefaultMaxSessionIdleTimeout(20000);
+	    	container.setDefaultMaxSessionIdleTimeout(settings.wstimeout);
 	    	
 	    	for (ServerEndpointConfig.Builder b : cfgBuilders) {
 	    		ServerEndpointConfig config = b.build();

@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
+import io.odysz.common.LangExt;
 import io.odysz.jclient.AnclientSettings;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonBody;
@@ -110,9 +111,13 @@ public class T_WServPointTest {
 		assertEquals(5, reps.size());
 
 		assertEquals("ping-path/a", reps.get(1).xdoc.clientpath);
+		assertArrayEquals(new String[] {"0", "2", "0", "2", "rx rows bx blocks"}, LangExt.split(reps.get(1).msg()));
 		assertEquals("ping-path/a", reps.get(2).xdoc.clientpath);
+		assertArrayEquals(new String[] {"1", "2", "0", "2", "rx rows bx blocks"}, LangExt.split(reps.get(2).msg()));
 		assertEquals("ping-path/b", reps.get(3).xdoc.clientpath);
+		assertArrayEquals(new String[] {"0", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(3).msg()));
 		assertEquals("ping-path/b", reps.get(4).xdoc.clientpath);
+		assertArrayEquals(new String[] {"1", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(4).msg()));
     }
 
 	private List<DocsResp> placeTasks(WSClient wsclient, ArrayList<String> paths)

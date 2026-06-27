@@ -83,7 +83,7 @@ public class WSPing implements IWSPoint {
 				placePushsTask(templtDoc, req.docTabl, make_videos_uploaded(req),
 					// onProcess
 					(rx, rows, bx, blocks, rep) -> {
-						rep.msg(String.format("%d/%d, %d/%d", rx, rows, bx, blocks));
+						rep.msg(String.format("%d,%d,%d,%d,rx rows bx blocks", rx, rows, bx, blocks));
 						socket.<AnsonResp>ok(sr, port(), rep);
 						return false;
 					}, 
@@ -113,10 +113,12 @@ public class WSPing implements IWSPoint {
 		int px = 0;
 		for (IFileDescriptor p : docs) {
 			try { Thread.sleep(msInterval); } catch (InterruptedException e) { }
-			proc.proc(px, docs.size(), 0, 2, (DocsResp) new DocsResp().doc((ExpSyncDoc)p).a(DocsReq.A.requestSyn));
+			proc.proc(0, 2, px, docs.size(), (DocsResp) new DocsResp()
+											 .doc(((ExpSyncDoc)p).size(2)).blockSeq(0).a(DocsReq.A.requestSyn));
 
 			try { Thread.sleep(msInterval); } catch (InterruptedException e) { }
-			proc.proc(px, docs.size(), 1, 2, (DocsResp) new DocsResp().doc((ExpSyncDoc)p).a(DocsReq.A.requestSyn));
+			proc.proc(1, 2, px, docs.size(), (DocsResp) new DocsResp()
+											 .doc(((ExpSyncDoc)p).size(2)).blockSeq(1).a(DocsReq.A.requestSyn));
 			px++;
 		}
 	}
