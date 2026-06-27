@@ -47,13 +47,13 @@ ApplicationWindow {
             // Update the status in the object
             // 3 = Success, 4 = Failed (or use your custom logic)
             if (AppConstants.PUSHING === success) {
-                fileListView.selectedPaths[path] = 3;
+                fileListView.selectedPaths[path] = AppConstants.PUSHING;
                 console.log("Pushing", path)
             } else if (AppConstants.PUBLISH === success) {
-                fileListView.selectedPaths[path] = 3;
+                fileListView.selectedPaths[path] = AppConstants.PUBLISH;
                 console.log("Publish", path)
             } else {
-                fileListView.selectedPaths[path] = 4;
+                fileListView.selectedPaths[path] = AppConstants.UNKNOWN;
                 console.log("Failed", path)
             }
 

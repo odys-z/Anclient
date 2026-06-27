@@ -48,7 +48,7 @@ class AppConstants : public QObject {
 public:
     explicit AppConstants(QObject *parent = nullptr) : QObject(parent) {}
 
-    QString pushing() const { return QString::fromStdString(ShareFlag::pushing); } // { return anson::ShareFlag::pushing.c_str(); }
+    QString pushing() const { return ShareFlag::pushing.c_str(); }
     QString publish() const { return ShareFlag::publish.c_str(); }
     QString unknown() const { return ShareFlag::unknown.c_str(); }
 
@@ -218,4 +218,16 @@ public:
 signals:
     void deviceChanged(); // 4. The signal
     void fileStatusChanged(QString path, QMLConst status);
+
+private:
+    QString format_proc_report(const string& proc_msg) {
+        vector<string_view> report = LangExt::split(proc_msg, ',');
+        if (report.size() >= 4) {
+            int rows = std::stoi(string{report[1]});
+            if (rows > 0)
+                return QString("File %1/%2, %3")
+                    .arg(report[2], report[3], QString::number(std::stof(string{report[1]}) / rows, 'f', 2));
+        }
+        return QString::fromStdString(proc_msg);
+    }
 };

@@ -1,5 +1,6 @@
 #include "wsclients.h"
 
+#include <QDebug>
 #include <gen/wsport.hpp>
 
 namespace anson {
@@ -7,19 +8,13 @@ namespace anson {
 WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     : jserv_(jserv), onMsg(onmsg) {
     
-    // IXWebSocket automatically handles backoff and reconnection policies in a background thread.
-    // We bind its configuration parameters natively to achieve what ReconnectionManager did.
-
     string ipcurl = jserv_.wservUri();
-    // Regex::valid_jserv(ipcurl);
     anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
     websocket.setUrl(ipcurl);
-    websocket.setPingInterval(30); // 30 seconds keepalive
+    websocket.setPingInterval(15);
     
-    // Configure automatic reconnection parameters mirroring the Java custom rules
-    websocket.enableAutomaticReconnection();
+    websocket.disableAutomaticReconnection();
 
-    // Bind event callback
     websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         this->onMessage(msg);
     });
@@ -33,7 +28,7 @@ void WSClient::connect() {
     websocket.start();
 }
 
-string WSClient::ipconn_state() {
+string WSClient::ipconn_state() {//     enum class ReadyState { Connecting = 0, Open = 1, Closing = 2, Closed = 3 };
     string stats[] = {Connecting, Open, Closing, Closed};
     return stats[(int)websocket.getReadyState()];
 }
@@ -87,6 +82,8 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
     else if (msg->type == ix::WebSocketMessageType::Open) {
         // queueCv_.notify_one(); // Wake up connection blocks
         anlog("WebSocket Open: uri = "s + msg->openInfo.uri.c_str());
+    } else if (msg->type == ix::WebSocketMessageType::Pong) {
+        andebug("Ping-pong (connection is alive) ...");
     }
     else if (msg->type == ix::WebSocketMessageType::Close) {
         anlog(std::format("Connection closed. Code: {:d}. Reason: {:s}",
@@ -132,6 +129,7 @@ void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = pthpage.clientPaths.size();
     uploadreq.syncingPage.start = 0;
+    uploadreq.a = DocsReq::A::requestSyn;
     AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
     asynSend(msg);
 }

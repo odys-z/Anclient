@@ -32,8 +32,9 @@ public:
     inline static const string Closing = "Closing";
     inline static const string Closed = "Closed";
 
-    WSClient() : jserv_({"", {}}) {}
     WSClient(const JServUrl& jserv, const OnMsg& onmsg);
+    // WSClient() : jserv_({"", {}}) {}
+
     ~WSClient();
 
     void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {
@@ -72,7 +73,7 @@ private:
 
 template <typename BD>
 int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
-    anwarn(reqmsg.toBlock());
+    anlog(reqmsg.toBlock());
     websocket.sendText(reqmsg.toBlock());
     return msg_queue.size();
 }

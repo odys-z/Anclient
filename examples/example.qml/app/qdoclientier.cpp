@@ -114,13 +114,28 @@ Q_INVOKABLE void QDoclientier::reconnect_ipc() {
         onmsg = [this]() -> void {
             if (wsclient->block_poll(200) > 0) {
                 AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
-                if (rep.code == MsgCode::Code::ok)
-                    for (const auto& kv : rep.Body().syncingPage.clientPaths) {
-                    optional<string> s = LangExt::var_str(kv.second[0]);
-                    emit this->fileStatusChanged(QString::fromStdString(kv.first),
-                     QString::fromStdString(s ? s.value() : ""));
-                }
+                if (rep.code == MsgCode::Code::ok) {
+                    // for (const auto& kv : rep.Body().syncingPage.clientPaths) {
+                    //     optional<string> s = LangExt::var_str(kv.second[0]);
+                    //     emit this->fileStatusChanged(
+                    //     QString::fromStdString(rep.Body().xdoc.clientpath),
+                    //     QString::fromStdString(s ? s.value() : ShareFlag::publish.c_str()));
+                    // }
 
+                    anlog(rep.Body().m);
+                    QString proc_report = format_proc_report(rep.Body().m);
+                    anlog(proc_report.toStdString());
+                    // emit this->fileStatusChanged(
+                    //     QString::fromStdString(rep.Body().xdoc.clientpath),
+                    //     proc_report);
+
+                    // This pushes the execution of the lambda onto the main GUI thread's event loop,
+                    // ensuring that the actual 'emit' happens safely on the thread that owns QML.
+                    QMetaObject::invokeMethod(this, [this, path = rep.Body().xdoc.clientpath, proc_report]() {
+                        // emit this->fileStatusChanged(QString::fromStdString(path), proc_report);
+                        emit this->fileStatusChanged("QString::fromStdString(path)", "proc_report");
+                    }, Qt::QueuedConnection);
+                }
                 else if (rep.code == MsgCode::Code::_sentinel_) {
                     // show be the ws connection reports
                     // anlog("Show be the ws connection report ...");
@@ -128,21 +143,22 @@ Q_INVOKABLE void QDoclientier::reconnect_ipc() {
                 else if (!rep.body.empty()) {
                     anlog(std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, map2str(rep.Body().syncingPage.clientPaths)));
                     emit this->fileStatusChanged(
-                        QString::fromStdString(rep.Body().m),
-                        QString::fromStdString(map2str(rep.Body().syncingPage.clientPaths)));
+                        // QString::fromStdString(rep.Body().m),
+                        QString::fromStdString(rep.Body().xdoc.clientpath),
+                        QString{ShareFlag::unknown.c_str()});
                 }
                 else
                     anlog("on DocsResp: emptyp response body.");
             }
         };
 
-        WSClient* wsclient = new WSClient{JServUrl{qmlsettings.wshost, qmlsettings.wsport, {"ipc"}}, onmsg};
+        WSClient* _wsclient = new WSClient{JServUrl{qmlsettings.wshost, qmlsettings.wsport, {"ipc"}}, onmsg};
         try {
-            wsclient->connect();
-            this->wsclient.reset(wsclient);
+            _wsclient->connect();
+            this->wsclient.reset(_wsclient);
         }
         catch (...) {
-            delete wsclient;
+            delete _wsclient;
         throw;
         }
     }
@@ -168,15 +184,8 @@ Q_INVOKABLE void QDoclientier::push_files(QJSValue paths) {
         qDebug() << "cpp handling: " << it.name();
         // Debug Notes: This is makes SHE
         // this->syncing_paths[it.name().toStdString()] = {ShareFlag::pushing, _device.toStdString(), "now()"};
-
-        std::string stdPath = it.name().toUtf8().constData();
-        std::string stdDevice = _device.toUtf8().constData();
-        LangExt::VarType flag = ShareFlag::pushing;
-        LangExt::VarType dev = stdDevice;
-        LangExt::VarType time = "now()";
-
-        std::vector<LangExt::VarType> row = {flag, dev, time};
-        this->syncing_paths[stdPath] = row;
+        this->syncing_paths[it.name().toStdString()] = {
+            LangExt::VarType{ShareFlag::pushing}, LangExt::VarType{_device.toStdString()}, LangExt::VarType{"now()"}};
     }
 
     PathsPage syncingpage;
