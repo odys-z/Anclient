@@ -113,9 +113,9 @@ public class T_WServPointTest {
 		assertEquals("ping-path/a", reps.get(1).xdoc.clientpath);
 		assertArrayEquals(new String[] {"0", "2", "0", "2", "rx rows bx blocks"}, LangExt.split(reps.get(1).msg()));
 		assertEquals("ping-path/a", reps.get(2).xdoc.clientpath);
-		assertArrayEquals(new String[] {"1", "2", "0", "2", "rx rows bx blocks"}, LangExt.split(reps.get(2).msg()));
+		assertArrayEquals(new String[] {"0", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(2).msg()));
 		assertEquals("ping-path/b", reps.get(3).xdoc.clientpath);
-		assertArrayEquals(new String[] {"0", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(3).msg()));
+		assertArrayEquals(new String[] {"1", "2", "0", "2", "rx rows bx blocks"}, LangExt.split(reps.get(3).msg()));
 		assertEquals("ping-path/b", reps.get(4).xdoc.clientpath);
 		assertArrayEquals(new String[] {"1", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(4).msg()));
     }

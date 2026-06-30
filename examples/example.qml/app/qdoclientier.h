@@ -123,7 +123,8 @@ class QDoclientier : public QObject {
     inline static const QString sysuri = "/sys/cpp";
     inline static const QString synuri = "/syn/cpp";
 
-    map<string, vector<LangExt::VarType>> syncing_paths;
+    // map<string, vector<LangExt::VarType>> syncing_paths;
+    // map<string, vector<string>> syncing_paths;
 
     QString _device;
     // property

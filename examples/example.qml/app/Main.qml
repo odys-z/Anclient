@@ -41,24 +41,26 @@ ApplicationWindow {
         device: "test"
 
         // function onFileStatusChanged(path, success) {
-        onFileStatusChanged: (path, success) => {
-            console.log("Update for:", AppConstants.PUSHING, path, "Success:", success);
+        // onFileStatusChanged: (path, success) => {
+        onFileStatusChanged: function (path, success) {
+            console.log("Update for:", "AppConstants.PUSHING", "path", "Success:", "success");
+            // console.log("Update for:", AppConstants.PUSHING, path, "Success:", success);
 
-            // Update the status in the object
-            // 3 = Success, 4 = Failed (or use your custom logic)
-            if (AppConstants.PUSHING === success) {
-                fileListView.selectedPaths[path] = AppConstants.PUSHING;
-                console.log("Pushing", path)
-            } else if (AppConstants.PUBLISH === success) {
-                fileListView.selectedPaths[path] = AppConstants.PUBLISH;
-                console.log("Publish", path)
-            } else {
-                fileListView.selectedPaths[path] = AppConstants.UNKNOWN;
-                console.log("Failed", path)
-            }
+            // // Update the status in the object
+            // // 3 = Success, 4 = Failed (or use your custom logic)
+            // if (AppConstants.PUSHING === success) {
+            //     fileListView.selectedPaths[path] = AppConstants.PUSHING;
+            //     console.log("Pushing", path)
+            // } else if (AppConstants.PUBLISH === success) {
+            //     fileListView.selectedPaths[path] = AppConstants.PUBLISH;
+            //     console.log("Publish", path)
+            // } else {
+            //     fileListView.selectedPaths[path] = AppConstants.UNKNOWN;
+            //     console.log("Failed", path)
+            // }
 
-            // Force the CheckBox/Icon in the delegate to re-draw
-            fileListView.selecount++;
+            // // Force the CheckBox/Icon in the delegate to re-draw
+            // fileListView.selecount++;
         }
     }
 

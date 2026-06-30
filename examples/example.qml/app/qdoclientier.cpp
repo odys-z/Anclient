@@ -125,15 +125,18 @@ Q_INVOKABLE void QDoclientier::reconnect_ipc() {
                     anlog(rep.Body().m);
                     QString proc_report = format_proc_report(rep.Body().m);
                     anlog(proc_report.toStdString());
+                    // anlog("clientpath: "s + rep.Body().xdoc.clientpath);
+
                     // emit this->fileStatusChanged(
                     //     QString::fromStdString(rep.Body().xdoc.clientpath),
                     //     proc_report);
 
                     // This pushes the execution of the lambda onto the main GUI thread's event loop,
                     // ensuring that the actual 'emit' happens safely on the thread that owns QML.
-                    QMetaObject::invokeMethod(this, [this, path = rep.Body().xdoc.clientpath, proc_report]() {
+                    QMetaObject::invokeMethod(this, [this, path = "rep.Body().xdoc.clientpath", proc_report]() {
                         // emit this->fileStatusChanged(QString::fromStdString(path), proc_report);
-                        emit this->fileStatusChanged("QString::fromStdString(path)", "proc_report");
+                        // emit this->fileStatusChanged("QString::fromStdString(path)", "proc_report");
+                        qDebug() << R"(// emit this->fileStatusChanged("QString::fromStdString(path, ...)";
                     }, Qt::QueuedConnection);
                 }
                 else if (rep.code == MsgCode::Code::_sentinel_) {
@@ -179,23 +182,39 @@ Q_INVOKABLE void QDoclientier::reconnect_ipc() {
 Q_INVOKABLE void QDoclientier::push_files(QJSValue paths) {
     if (!AppConstants::check_jsvalue(paths)) return;
 
+    map<string, vector<string>> syncing_paths;
+
     QJSValueIterator it(paths);
     while (it.next()) {
         qDebug() << "cpp handling: " << it.name();
-        // Debug Notes: This is makes SHE
+        // Debug Notes: This is makes "Invalid address specified to RtlFreeHeap".
         // this->syncing_paths[it.name().toStdString()] = {ShareFlag::pushing, _device.toStdString(), "now()"};
-        this->syncing_paths[it.name().toStdString()] = {
-            LangExt::VarType{ShareFlag::pushing}, LangExt::VarType{_device.toStdString()}, LangExt::VarType{"now()"}};
+        QString v = it.name();
+        QString w = "c:/Users/Alice/.docker/canary.json";
+        qDebug() << "v" << v;
+        qDebug() << "w" << w;
+        // string pth{it.name().toStdString()};
+        string pth = "c:/Users/Alice/.docker/canary.json";
+        aninfo("task preparing ................ "s + pth);
+
+        // auto flag = LangExt::VarType{ShareFlag::pushing};
+        // auto device = LangExt::VarType{_device.toStdString()};
+        // auto dt = LangExt::VarType{"now()"};
+        // this->syncing_paths[pth] = {
+        //     // LangExt::VarType{ShareFlag::pushing}, LangExt::VarType{_device.toStdString()}, LangExt::VarType{"now()"}};
+        //     flag, device, dt};
+
+        syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
+        aninfo("now destructing pth ................"s + pth);
     }
+    aninfo("task prepared ................");
 
     PathsPage syncingpage;
-    syncingpage.clientPaths = syncing_paths;
+    syncingpage.clientPaths = std::move(syncing_paths);
     if (!wsclient)
         reconnect_ipc();
 
     wsclient->on_msg(onmsg)
         ->place_tasks(syncingpage);
+
 }
-
-
-

@@ -113,11 +113,11 @@ public class WSPing implements IWSPoint {
 		int px = 0;
 		for (IFileDescriptor p : docs) {
 			try { Thread.sleep(msInterval); } catch (InterruptedException e) { }
-			proc.proc(0, 2, px, docs.size(), (DocsResp) new DocsResp()
+			proc.proc(px, docs.size(), 0, 2, (DocsResp) new DocsResp()
 											 .doc(((ExpSyncDoc)p).size(2)).blockSeq(0).a(DocsReq.A.requestSyn));
 
 			try { Thread.sleep(msInterval); } catch (InterruptedException e) { }
-			proc.proc(1, 2, px, docs.size(), (DocsResp) new DocsResp()
+			proc.proc(px, docs.size(), 1, 2, (DocsResp) new DocsResp()
 											 .doc(((ExpSyncDoc)p).size(2)).blockSeq(1).a(DocsReq.A.requestSyn));
 			px++;
 		}

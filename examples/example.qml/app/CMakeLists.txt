@@ -60,6 +60,8 @@ qt_add_qml_module(${PROJECT_NAME}
         "icons/app_icon.svg"
         "icons/album.svg"
     SOURCES
+        # qdoclientier_queued.h
+        # qdoclientier_queued.cpp
         qdoclientier.h
         qdoclientier.cpp
         filesysmodel.h

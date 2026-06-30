@@ -126,11 +126,11 @@ bool WSClient::block_poll(int wait_ms) {
 
 void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
     DocsReq uploadreq{"h_photos", {}};
-    uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = pthpage.clientPaths.size();
     uploadreq.syncingPage.start = 0;
+    uploadreq.syncingPage = pthpage;
     uploadreq.a = DocsReq::A::requestSyn;
-    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
+    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, std::move(uploadreq));
     asynSend(msg);
 }
 

@@ -181,7 +181,8 @@ TEST_F(Ipclient, PING_Place_Task) {
     DocsReq uploadreq{"h_photos", {}}; //{DocsReq::A::syncdocs};
     uploadreq.a = DocsReq::A::requestSyn;
 
-    map<string, vector<LangExt::VarType>> clientPaths {
+    // map<string, vector<LangExt::VarType>> clientPaths {
+    map<string, vector<string>> clientPaths {
         {"path/a", {}}, {"path/b", {}}, {"path/c", {}},
         {"path/d", {}}, {"path/e", {}}, {"path/f", {}} };
     PathsPage pthpage;
