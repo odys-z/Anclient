@@ -1,0 +1,9 @@
+{ "type": "io.odysz.gen.AnclientSettings",
+  "jserv": "http://localhost:8957/jserv-album",
+  "domain": "******",
+  "admin": "admin",
+  "domain_token": "******",
+
+  "regiserv": "http://182.150.29.34:1990/regist-alpha",
+  "centralPswd": "******"
+}
