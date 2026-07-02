@@ -1,3 +1,7 @@
+# Deprecated
+
+Switches to example.slint.
+
 # Test with AST
 
 

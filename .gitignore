@@ -7,6 +7,7 @@ debug
 release
 .vs
 .vscode
+!examples/example.slint/app/.vscode
 **/temp*
 commit.comments*
 *.comments
