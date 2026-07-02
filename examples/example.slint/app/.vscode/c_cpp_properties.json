@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
-                "~/CMakeCache/slint-build/generated_include"
+                "~/CMakeCache/slint-build/generated_include",
+                "~/github/vcpkg/installed/x64-mingw-dynamic/include"
             ],
             "defines": [
                 "_DEBUG",
