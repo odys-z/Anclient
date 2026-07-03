@@ -15,6 +15,7 @@
 #include <io/odysz/entt_jserv.h>
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/gen/semantier.hpp>
+#include <io/odysz/semantic/tier/docs.h>
 
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
@@ -112,7 +113,7 @@ protected:
 
         wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
 
-        Anson::from_file("settings/test-02-settings.json", qmlsettings);
+        Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
         ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
         ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
@@ -203,7 +204,7 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.a = DocsReq::A::requestSyn;
 
     std::map<std::string, std::vector<LangExt::VarType>> clientPaths {
-        {"path/a", {}}, {"path/b", {}}, {"path/c", {}},
+        {"path/a", {ShareFlag::pushing}}, {"path/b", {}}, {"path/c", {}},
         {"path/d", {}}, {"path/e", {}}, {"path/f", {}} 
     };
 
