@@ -203,7 +203,6 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.a = DocsReq::A::requestSyn;
 
     std::map<std::string, std::vector<LangExt::VarType>> clientPaths {
-    // std::map<std::string, std::vector<std::string>> clientPaths {
         {"path/a", {}}, {"path/b", {}}, {"path/c", {}},
         {"path/d", {}}, {"path/e", {}}, {"path/f", {}} 
     };
