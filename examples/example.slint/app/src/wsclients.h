@@ -35,14 +35,15 @@ public:
     inline static const string Closed = "Closed";
 
     WSClient(const JServUrl& jserv, const OnMsg& onmsg);
-    // WSClient() : jserv_({"", {}}) {}
+    WSClient() : jserv_({"", {}}) {}
 
     ~WSClient();
 
-    void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {
-        jserv_ = JServUrl(jserv, {protocol_root});
-        onMsg = onmsg;
-    }
+    void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg);
+    // {
+    //     jserv_ = JServUrl(jserv, {protocol_root});
+    //     onMsg = onmsg;
+    // }
 
     string ipconn_state();
     string syncon_state();

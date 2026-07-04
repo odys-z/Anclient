@@ -46,6 +46,23 @@ u8string resolveHomePath(const std::string& inputPath) {
 WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     : jserv_(jserv), onMsg(onmsg) {
     
+    // string ipcurl = jserv_.wservUri();
+    // anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
+    // websocket.setUrl(ipcurl);
+    // websocket.setPingInterval(15);
+    
+    // websocket.disableAutomaticReconnection();
+
+    // websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+    //     this->onMessage(msg);
+    // });
+    setup(jserv_.wservUri(), jserv_.jprotocol->protocolpath, onmsg);
+}
+
+void WSClient::setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {
+    jserv_ = JServUrl(jserv, {protocol_root});
+    onMsg = onmsg;
+
     string ipcurl = jserv_.wservUri();
     anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
     websocket.setUrl(ipcurl);
@@ -57,6 +74,7 @@ WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
         this->onMessage(msg);
     });
 }
+
 
 WSClient::~WSClient() {
     websocket.stop();
@@ -80,6 +98,7 @@ void WSClient::disconnect() {
     andebug("WSClient disconnecting...");
 
     websocket.close();
+    websocket.stop();
 
     {
         std::lock_guard<std::mutex> lock(queueMutex_);
@@ -124,9 +143,6 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
         andebug("Ping-pong (connection is alive) ...");
     }
     else if (msg->type == ix::WebSocketMessageType::Close) {
-        anlog(std::format("Connection closed. Code: {:d}. Reason: {:s}",
-                          msg->closeInfo.code, msg->closeInfo.reason));
-
         if (!shouldReconnect(msg->closeInfo.code)) {
             anlog("Fatal or intentional closure. Reconnection aborted.");
             websocket.disableAutomaticReconnection(); // Abort engine retries
@@ -136,6 +152,9 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
             std::lock_guard<std::mutex> lock(queueMutex_);
         }
         queueCv_.notify_all();
+
+        anlog(std::format("Connection closed. Code: {:d}. Reason: {:s}",
+                          msg->closeInfo.code, msg->closeInfo.reason));
     }
     else if (msg->type == ix::WebSocketMessageType::Error) {
         anwarn("WebSocket Error: "s + msg->errorInfo.reason);

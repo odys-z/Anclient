@@ -111,7 +111,6 @@ protected:
         register_qmltestsettingsAst(asts);
 
         // wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
-        wsclient = new WSClient({"", {}}, onmsg);
 
         Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
@@ -123,24 +122,47 @@ protected:
 
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
-        wsclient->setup(wsjserv, {"ipc"}, onmsg);
+        wsclient = new WSClient({wsjserv, {"ipc"}}, onmsg);
+        // wsclient->setup(wsjserv, {"ipc"}, onmsg);
         wsclient->connect();
     }
 
+    // static void TearDownTestSuite() {
+    //     wsclient->disconnect();
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    //     delete wsclient;
+    //     cout.flush();
+
+    //     stop_agent();
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     cout << "Tearing down TestSuite Ipclient Done." << std::endl;
+    //     cout.flush();
+
+    //     // ix::uninitNetSystem();
+    //     // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     // cout.flush();
+
+    //     cerr.flush();
+    // }
     static void TearDownTestSuite() {
+        std::cout << "[DEBUG] Disconnecting..." << std::endl;
         wsclient->disconnect();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        
+        std::cout << "[DEBUG] Deleting wsclient..." << std::endl;
         delete wsclient;
-        cout.flush();
+        wsclient = nullptr; 
 
-        ix::uninitNetSystem();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        cout.flush();
-
+        std::cout << "[DEBUG] Stopping agent..." << std::endl;
         stop_agent();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        cout << "Tearing down TestSuite Ipclient Done." << std::endl;
-        cout.flush();
+        
+        asts.clear();
+        qmlsettings = QMLAppSettings();
+
+        std::cout << "[DEBUG] Reached the end of Teardown!" << std::endl;
+        std::cout << "Tearing down TestSuite Ipclient Done." << std::endl;
+
+        std::cout.flush(); 
+        std::cerr.flush();
     }
 
     static void stop_agent() {
@@ -160,10 +182,13 @@ protected:
         java_path.make_preferred();
         jar_path.make_preferred();
 
-        // TODO test in linux
-        const std::string stop_cmd = std::format(
-            "cmd.exe /c \"{} -cp {} io.oz.anclient.ipcagent.StopAgent\"",
-            java_path.string(), jar_path.string());
+        // TODO conditional compilation in linux
+        const std::string 
+        // stop_cmd = std::format(
+        //     "cmd.exe /c \"{} -cp {} io.oz.anclient.ipcagent.StopAgent\"",
+        //     java_path.string(), jar_path.string());
+        
+        stop_cmd = "java -cp res/ws-agent-0.1.0.jar io.oz.anclient.ipcagent.StopAgent";
 
         std::cout << "Executing Stop Hook: " << stop_cmd << std::endl;
         std::system(stop_cmd.c_str());
@@ -295,4 +320,24 @@ TEST_F(Ipclient, PING_Place_Task) {
         }
     }
     ASSERT_EQ(pthpage.clientPaths.size() * 2 + 1, c);
+}
+
+int main(int argc, char** argv) {
+    // === FORCE FLUSH EVERYTHING ===
+    std::cout.setf(std::ios::unitbuf);
+    std::cerr.setf(std::ios::unitbuf);
+    setvbuf(stdout, nullptr, _IONBF, 0);
+    setvbuf(stderr, nullptr, _IONBF, 0);
+    setvbuf(stdin,  nullptr, _IONBF, 0);
+
+    ::testing::InitGoogleTest(&argc, argv);
+    // optionally: ::testing::AddGlobalTestEnvironment(...);
+
+    cout << "---------------- ------------------------------------- ----------------" << std::endl;
+    int c = RUN_ALL_TESTS();
+    cout << "---------------- Tearing down TestSuite Ipclient Done. ----------------" << std::endl;
+
+
+    // return c;
+    _exit(c);
 }
