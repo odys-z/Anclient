@@ -43,7 +43,7 @@ OnMsg onmsg = []() { return false; };
 class Ipclient : public ::testing::Test {
     static QMLAppSettings qmlsettings;
 protected:
-    static WSClient wsclient;
+    static WSClient* wsclient;
  
 #ifdef _WIN32
     static HANDLE piProcessHandle;
@@ -110,7 +110,8 @@ protected:
         register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
 
-        wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
+        // wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
+        wsclient = new WSClient({"", {}}, onmsg);
 
         Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
@@ -122,13 +123,14 @@ protected:
 
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
-        wsclient.setup(wsjserv, {"ipc"}, onmsg);
-        wsclient.connect();
+        wsclient->setup(wsjserv, {"ipc"}, onmsg);
+        wsclient->connect();
     }
 
     static void TearDownTestSuite() {
-        wsclient.disconnect();
+        wsclient->disconnect();
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        delete wsclient;
         cout.flush();
 
         ix::uninitNetSystem();
@@ -230,7 +232,7 @@ QMLAppSettings Ipclient::qmlsettings;
  * wsclient = nullptr;
  * ix::uninitNetSystem();
  */
-WSClient       Ipclient::wsclient{{"127.0.0.1:8700", {"ipc"}}, onmsg};
+WSClient*      Ipclient::wsclient; // {{"127.0.0.1:8700", {"ipc"}}, onmsg};
 
 #ifdef _WIN32
 HANDLE Ipclient::piProcessHandle = NULL;
@@ -243,21 +245,21 @@ TEST_F(Ipclient, Echo) {
     echo.echo = "TEST_F(Ipcproxy, PING_Proxy) from C++";
     AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
 
-    wsclient.asynSend(echomsg);
-    wsclient.block_poll();
+    wsclient->asynSend(echomsg);
+    wsclient->block_poll();
 
     AnsonMsg<AnsonResp> resp;
     // try {
-        resp = wsclient.pop_envelope<AnsonResp>();
+        resp = wsclient->pop_envelope<AnsonResp>();
         ASSERT_EQ(MsgCode::Code::_sentinel_, resp.code) << "expecting session open ...";
         anlog("✅ Echo Opening message verified");
     // } catch(SemanticException& e) {
-        wsclient.asynSend(echomsg);
-        if (!wsclient.block_poll(3000))
+        wsclient->asynSend(echomsg);
+        if (!wsclient->block_poll(3000))
             FAIL() << "expecting echos ...";
     // }
 
-    resp = wsclient.pop_envelope<AnsonResp>();
+    resp = wsclient->pop_envelope<AnsonResp>();
     ASSERT_EQ(echo.echo, resp.Body().m);
     std::cout << "✅ Ping response parsed successfully" << std::endl;
 }
@@ -278,15 +280,15 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.syncingPage.start = 0;
     AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
 
-    wsclient.asynSend(msg);
+    wsclient->asynSend(msg);
 
     AnsonMsg<DocsResp> resp;
-    bool has_envl = wsclient.block_poll();
+    bool has_envl = wsclient->block_poll();
     int c = 0;
     while (has_envl) {
         try {
-            resp = wsclient.pop_envelope<DocsResp>();
-            has_envl = wsclient.block_poll(500);
+            resp = wsclient->pop_envelope<DocsResp>();
+            has_envl = wsclient->block_poll(500);
             c++;
         } catch(SemanticException& e) {
             FAIL() << "expecting upload task replies ...";

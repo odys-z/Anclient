@@ -4,8 +4,10 @@
             "name": "Win32",
             "includePath": [
                 "${default}",
+                "${workspaceFolder}/**",
                 "~/CMakeCache/slint-build/generated_include",
-                "~/github/vcpkg/installed/x64-mingw-dynamic/include"
+                "c:/Qt-6.10/mingw64-gcc16.1.0/include/**",
+                "~/github/vcpkg/installed/x64-mingw-dynamic/include/**"
             ],
             "defines": [
                 "_DEBUG",

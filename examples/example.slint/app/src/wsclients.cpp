@@ -131,9 +131,15 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
             anlog("Fatal or intentional closure. Reconnection aborted.");
             websocket.disableAutomaticReconnection(); // Abort engine retries
         }
+
+        {
+            std::lock_guard<std::mutex> lock(queueMutex_);
+        }
+        queueCv_.notify_all();
     }
     else if (msg->type == ix::WebSocketMessageType::Error) {
         anwarn("WebSocket Error: "s + msg->errorInfo.reason);
+        queueCv_.notify_all();
     }
 }
 
