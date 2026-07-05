@@ -13,9 +13,11 @@ namespace fs = std::filesystem;
  * On Windows, it expands '~' to the USERPROFILE directory.
  * On Unix/Linux/macOS, it expands '~' to the HOME directory.
  */
-u8string resolveHomePath(const std::string& inputPath) {
+string resolveHomePath(const std::string& inputPath) {
     if (inputPath.empty() || inputPath[0] != '~') {
-        return fs::path(inputPath).u8string();
+        u8string u8_str = fs::path(inputPath).u8string();
+        std::string regular_str(u8_str.begin(), u8_str.end());
+        return regular_str;
     }
 
     std::string homeDir;
@@ -35,28 +37,30 @@ u8string resolveHomePath(const std::string& inputPath) {
     #endif
 
     if (homeDir.empty()) {
-        return fs::path(inputPath).u8string();
+        u8string u8_str = fs::path(inputPath).u8string();
+        return std::string(u8_str.begin(), u8_str.end());
     }
 
     size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
 
-    return (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+    u8string u8_str = (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+    return std::string(u8_str.begin(), u8_str.end());
 }
 
 WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     : jserv_(jserv), onMsg(onmsg) {
     
-    // string ipcurl = jserv_.wservUri();
-    // anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
-    // websocket.setUrl(ipcurl);
-    // websocket.setPingInterval(15);
+    string ipcurl = jserv_.wservUri();
+    anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
+    websocket.setUrl(ipcurl);
+    websocket.setPingInterval(15);
     
-    // websocket.disableAutomaticReconnection();
+    websocket.disableAutomaticReconnection();
 
-    // websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
-    //     this->onMessage(msg);
-    // });
-    setup(jserv_.wservUri(), jserv_.jprotocol->protocolpath, onmsg);
+    websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+        this->onMessage(msg);
+    });
+    // setup(jserv_.wservUri(), jserv_.jprotocol->protocolpath, onmsg);
 }
 
 void WSClient::setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {

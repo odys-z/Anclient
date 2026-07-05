@@ -23,6 +23,7 @@
 #include "../app/src/wsclients.h"
 #include "../app/src/gen/wsport.hpp"
 #include "../app/src/gen/app_settings.hpp"
+#include "javaproc_manager.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -40,31 +41,39 @@ namespace fs = std::filesystem;
 
 OnMsg onmsg = []() { return false; };
 
+static JavaAgentController* agentController = nullptr;
+
 class Ipclient : public ::testing::Test {
     static QMLAppSettings qmlsettings;
 protected:
     static WSClient* wsclient;
  
-#ifdef _WIN32
-    static HANDLE piProcessHandle;
-#else
-    static pid_t agentPid;
-#endif
+// #ifdef _WIN32
+//     static HANDLE piProcessHandle;
+// #else
+//     static pid_t agentPid;
+// #endif
 
     void SetUp() override {}
 
     static void start_agent() {
-        const u8string java = resolveHomePath(qmlsettings.java_path);
-        std::string java_cmd = std::string(java.begin(), java.end());
+        const string java = resolveHomePath(qmlsettings.java_path);
+        // std::string java_cmd = std::string(java.begin(), java.end());
 
         // Asynchronous Launch
-        std::string cmd = std::format("\"{}\" -jar \"{}\" \"{}\"", 
-                                      java_cmd, 
-                                      qmlsettings.wsagent_jar, 
-                                      qmlsettings.wsagent_settings);
+        // std::string cmd = std::format("\"{}\" -jar \"{}\" \"{}\"", 
+        //                               java_cmd, 
+        //                               qmlsettings.wsagent_jar, 
+        //                               qmlsettings.wsagent_settings);
 
-        std::cout << "Launching Command: " << cmd << std::endl;
+        // std::cout << "Launching Command: " << cmd << std::endl;
 
+        agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
+        if (!agentController->start_agent(qmlsettings.wsagent_settings)) {
+            FAIL() << "Failed to initialize IPC Java Agent process context.";
+        }
+
+        /*
     #ifdef _WIN32
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         PROCESS_INFORMATION pi = { 0, 0, 0, 0 };
@@ -91,6 +100,7 @@ protected:
             std::cout << "JAVA PID (POSIX): " << agentPid << std::endl;
         }
     #endif
+    */
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
@@ -124,6 +134,7 @@ protected:
         string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
         wsclient = new WSClient({wsjserv, {"ipc"}}, onmsg);
         // wsclient->setup(wsjserv, {"ipc"}, onmsg);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
     }
 
@@ -158,9 +169,9 @@ protected:
         asts.clear();
         qmlsettings = QMLAppSettings();
 
-        std::cout << "[DEBUG] Reached the end of Teardown!" << std::endl;
-        std::cout << "Tearing down TestSuite Ipclient Done." << std::endl;
+        std::cout << "Teardown[*]" << std::endl;
 
+        std::cout << "\n\n";
         std::cout.flush(); 
         std::cerr.flush();
     }
@@ -176,69 +187,61 @@ protected:
         //                                         // qmlsettings.java_path,
         //                                         qmlsettings.wsagent_jar);
 
-        fs::path java_path = fs::path(reinterpret_cast<const char*>(resolveHomePath(qmlsettings.java_path).c_str()));
-        fs::path jar_path = fs::path(reinterpret_cast<const char*>(qmlsettings.wsagent_jar.c_str()));
+        // fs::path java_path = fs::path(reinterpret_cast<const char*>(resolveHomePath(qmlsettings.java_path).c_str()));
+        // fs::path jar_path = fs::path(reinterpret_cast<const char*>(qmlsettings.wsagent_jar.c_str()));
 
-        java_path.make_preferred();
-        jar_path.make_preferred();
+        // java_path.make_preferred();
+        // jar_path.make_preferred();
 
         // TODO conditional compilation in linux
-        const std::string 
+        // const std::string 
         // stop_cmd = std::format(
         //     "cmd.exe /c \"{} -cp {} io.oz.anclient.ipcagent.StopAgent\"",
         //     java_path.string(), jar_path.string());
-        
-        stop_cmd = "java -cp res/ws-agent-0.1.0.jar io.oz.anclient.ipcagent.StopAgent";
+        // stop_cmd = "chcp 65001 && java -cp res/ws-agent-0.1.0.jar io.oz.anclient.ipcagent.StopAgent > java_agent_stop.log 2>&1";
+        // std::cout << "Executing Stop Hook: " << stop_cmd << std::endl;
 
-        std::cout << "Executing Stop Hook: " << stop_cmd << std::endl;
-        std::system(stop_cmd.c_str());
+        // std::system(stop_cmd.c_str());
+        if (agentController) {
+            agentController->stop_agent();
+            delete agentController;
+            agentController = nullptr;
+        }
 
         // Give the Java agent a brief window to process the command and exit naturally
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    #ifdef _WIN32
-        // if (piProcessHandle != NULL) {
-        //     // Check if it's still alive. If it didn't exit gracefully, force close it.
-        //     DWORD exitCode;
-        //     if (GetExitCodeProcess(piProcessHandle, &exitCode) && exitCode == STILL_ACTIVE) {
-        //         std::cout << "Agent didn't exit gracefully. Forcing termination..." << std::endl;
-        //         TerminateProcess(piProcessHandle, 0);
-        //     }
-            
-        //     // CRITICAL: Always close the handle to prevent OS leaks!
-        //     CloseHandle(piProcessHandle);
-        //     piProcessHandle = NULL;
-        // }
-        if (piProcessHandle != NULL) {
-            // Wait up to 2000 milliseconds for the Java process to exit on its own
-            DWORD waitResult = WaitForSingleObject(piProcessHandle, 2000);
+    // #ifdef _WIN32
+    //     if (piProcessHandle != NULL) {
+    //         // Wait up to 2000 milliseconds for the Java process to exit on its own
+    //         DWORD waitResult = WaitForSingleObject(piProcessHandle, 2000);
 
-            if (waitResult == WAIT_TIMEOUT) {
-                // The 2 seconds expired and it's STILL running. Force it closed.
-                std::cout << "Agent didn't exit gracefully within timeout. Forcing termination..." << std::endl;
-                TerminateProcess(piProcessHandle, 0);
-            } else {
-                std::cout << "Agent exited gracefully on its own." << std::endl;
-            }
+    //         if (waitResult == WAIT_TIMEOUT) {
+    //             // The 2 seconds expired and it's STILL running. Force it closed.
+    //             std::cout << "Agent didn't exit gracefully within timeout. Forcing termination..." << std::endl;
+    //             TerminateProcess(piProcessHandle, 0);
+    //         } else {
+    //             std::cout << "Agent Exited." << std::endl;
+    //         }
             
-            // Clean up the kernel handle safely
-            CloseHandle(piProcessHandle);
-            piProcessHandle = NULL;
-        }
-    #else
-        if (agentPid > 0) {
-            int status;
-            // WNOHANG checks if the process has already exited without blocking
-            if (waitpid(agentPid, &status, WNOHANG) == 0) {
-                std::cout << "Agent didn't exit gracefully. Sending SIGKILL..." << std::endl;
-                kill(agentPid, SIGKILL);
-                waitpid(agentPid, &status, 0); // Reap the zombie process
-            }
-            agentPid = -1;
-        }
-    #endif
+    //         // Clean up the kernel handle safely
+    //         CloseHandle(piProcessHandle);
+    //         piProcessHandle = NULL;
+    //     }
+    // #else
+    //     if (agentPid > 0) {
+    //         int status;
+    //         // WNOHANG checks if the process has already exited without blocking
+    //         if (waitpid(agentPid, &status, WNOHANG) == 0) {
+    //             std::cout << "Agent didn't exit gracefully. Sending SIGKILL..." << std::endl;
+    //             kill(agentPid, SIGKILL);
+    //             waitpid(agentPid, &status, 0); // Reap the zombie process
+    //         }
+    //         agentPid = -1;
+    //     }
+    // #endif
 
-        std::cout << "Java Agent stopped successfully." << std::endl;
+        std::cout << "Java Agent stopped." << std::endl;
         std::cout.flush();
     }
 
@@ -259,11 +262,11 @@ QMLAppSettings Ipclient::qmlsettings;
  */
 WSClient*      Ipclient::wsclient; // {{"127.0.0.1:8700", {"ipc"}}, onmsg};
 
-#ifdef _WIN32
-HANDLE Ipclient::piProcessHandle = NULL;
-#else
-pid_t  Ipclient::agentPid = -1;
-#endif
+// #ifdef _WIN32
+// HANDLE Ipclient::piProcessHandle = NULL;
+// #else
+// pid_t  Ipclient::agentPid = -1;
+// #endif
 
 TEST_F(Ipclient, Echo) {
     EchoReq echo{EchoReq::A::echo};
