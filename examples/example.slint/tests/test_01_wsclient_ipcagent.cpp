@@ -48,66 +48,16 @@ class Ipclient : public ::testing::Test {
 protected:
     static WSClient* wsclient;
  
-// #ifdef _WIN32
-//     static HANDLE piProcessHandle;
-// #else
-//     static pid_t agentPid;
-// #endif
-
     void SetUp() override {}
 
     static void start_agent() {
         const string java = resolveHomePath(qmlsettings.java_path);
-        // std::string java_cmd = std::string(java.begin(), java.end());
-
-        // Asynchronous Launch
-        // std::string cmd = std::format("\"{}\" -jar \"{}\" \"{}\"", 
-        //                               java_cmd, 
-        //                               qmlsettings.wsagent_jar, 
-        //                               qmlsettings.wsagent_settings);
-
-        // std::cout << "Launching Command: " << cmd << std::endl;
-
         agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
         if (!agentController->start_agent(qmlsettings.wsagent_settings)) {
             FAIL() << "Failed to initialize IPC Java Agent process context.";
         }
 
-        /*
-    #ifdef _WIN32
-        STARTUPINFOA si = { sizeof(STARTUPINFOA) };
-        PROCESS_INFORMATION pi = { 0, 0, 0, 0 };
-        if (CreateProcessA(NULL, const_cast<char*>(cmd.c_str()), NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi)) {
-            piProcessHandle = pi.hProcess;
-            CloseHandle(pi.hThread); // Release resources, not stop thread.
-            std::cout << "JAVA PID (Windows): " << pi.dwProcessId << std::endl;
-        } else {
-            std::cerr << "Failed to start Java process! Error: " << GetLastError() << std::endl;
-        }
-    #else
-        agentPid = fork();
-        if (agentPid == 0) {
-            // Child process: Redirect output if needed, then execute
-            execl(java_cmd.c_str(), java_cmd.c_str(), "-jar", 
-                  qmlsettings.wsagent_jar.c_str(), 
-                  qmlsettings.wsagent_settings.c_str(), (char*)NULL);
-            // If execl fails:
-            std::cerr << "Failed to execute Java process!" << std::endl;
-            exit(1);
-        } else if (agentPid < 0) {
-            std::cerr << "Failed to fork process!" << std::endl;
-        } else {
-            std::cout << "JAVA PID (POSIX): " << agentPid << std::endl;
-        }
-    #endif
-    */
-
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        // std::string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
-        // std::cout << "Opening WS: " << wsjserv << std::endl;
-        // wsclient.connect();
-
         anlog(std::format("Synode Settings: {}", qmlsettings.synode_settings));
     }
 
@@ -120,8 +70,6 @@ protected:
         register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
 
-        // wsclient.setup({"127.0.0.1:8700"}, "ipc", onmsg);
-
         Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
         ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
@@ -133,28 +81,10 @@ protected:
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
         wsclient = new WSClient({wsjserv, {"ipc"}}, onmsg);
-        // wsclient->setup(wsjserv, {"ipc"}, onmsg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
     }
 
-    // static void TearDownTestSuite() {
-    //     wsclient->disconnect();
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    //     delete wsclient;
-    //     cout.flush();
-
-    //     stop_agent();
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     cout << "Tearing down TestSuite Ipclient Done." << std::endl;
-    //     cout.flush();
-
-    //     // ix::uninitNetSystem();
-    //     // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     // cout.flush();
-
-    //     cerr.flush();
-    // }
     static void TearDownTestSuite() {
         std::cout << "[DEBUG] Disconnecting..." << std::endl;
         wsclient->disconnect();
@@ -179,94 +109,21 @@ protected:
     static void stop_agent() {
         std::cout << "Stopping Java Agent gracefully..." << std::endl;
 
-        // 1. VS Code bash is not happy with "c:/..."
-        // u8string java = resolveHomePath(qmlsettings.java_path);
-        // std:string java_cmd = std::string(java.begin(), java.end());
-        // const std::string stop_cmd = std::format("\"{}\" -cp \"{}\" io.oz.anclient.ipcagent.StopAgent",
-        //                                         java_cmd,
-        //                                         // qmlsettings.java_path,
-        //                                         qmlsettings.wsagent_jar);
-
-        // fs::path java_path = fs::path(reinterpret_cast<const char*>(resolveHomePath(qmlsettings.java_path).c_str()));
-        // fs::path jar_path = fs::path(reinterpret_cast<const char*>(qmlsettings.wsagent_jar.c_str()));
-
-        // java_path.make_preferred();
-        // jar_path.make_preferred();
-
-        // TODO conditional compilation in linux
-        // const std::string 
-        // stop_cmd = std::format(
-        //     "cmd.exe /c \"{} -cp {} io.oz.anclient.ipcagent.StopAgent\"",
-        //     java_path.string(), jar_path.string());
-        // stop_cmd = "chcp 65001 && java -cp res/ws-agent-0.1.0.jar io.oz.anclient.ipcagent.StopAgent > java_agent_stop.log 2>&1";
-        // std::cout << "Executing Stop Hook: " << stop_cmd << std::endl;
-
-        // std::system(stop_cmd.c_str());
         if (agentController) {
             agentController->stop_agent();
             delete agentController;
             agentController = nullptr;
         }
 
-        // Give the Java agent a brief window to process the command and exit naturally
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-    // #ifdef _WIN32
-    //     if (piProcessHandle != NULL) {
-    //         // Wait up to 2000 milliseconds for the Java process to exit on its own
-    //         DWORD waitResult = WaitForSingleObject(piProcessHandle, 2000);
-
-    //         if (waitResult == WAIT_TIMEOUT) {
-    //             // The 2 seconds expired and it's STILL running. Force it closed.
-    //             std::cout << "Agent didn't exit gracefully within timeout. Forcing termination..." << std::endl;
-    //             TerminateProcess(piProcessHandle, 0);
-    //         } else {
-    //             std::cout << "Agent Exited." << std::endl;
-    //         }
-            
-    //         // Clean up the kernel handle safely
-    //         CloseHandle(piProcessHandle);
-    //         piProcessHandle = NULL;
-    //     }
-    // #else
-    //     if (agentPid > 0) {
-    //         int status;
-    //         // WNOHANG checks if the process has already exited without blocking
-    //         if (waitpid(agentPid, &status, WNOHANG) == 0) {
-    //             std::cout << "Agent didn't exit gracefully. Sending SIGKILL..." << std::endl;
-    //             kill(agentPid, SIGKILL);
-    //             waitpid(agentPid, &status, 0); // Reap the zombie process
-    //         }
-    //         agentPid = -1;
-    //     }
-    // #endif
-
         std::cout << "Java Agent stopped." << std::endl;
-        std::cout.flush();
     }
 
     void TearDown() override {}
 };
 
 QMLAppSettings Ipclient::qmlsettings;
-/**
- * TODO:
- * static WSClient* wsclient;
- * wsclient = new WSClient({"127.0.0.1:8700", {"ipc"}}, onmsg);
- * 
- * // In your TearDownTestSuite:
- * wsclient->disconnect();
- * delete wsclient; // <--- Explicitly destroy it BEFORE uninitNetSystem
- * wsclient = nullptr;
- * ix::uninitNetSystem();
- */
-WSClient*      Ipclient::wsclient; // {{"127.0.0.1:8700", {"ipc"}}, onmsg};
-
-// #ifdef _WIN32
-// HANDLE Ipclient::piProcessHandle = NULL;
-// #else
-// pid_t  Ipclient::agentPid = -1;
-// #endif
+WSClient*      Ipclient::wsclient;
 
 TEST_F(Ipclient, Echo) {
     EchoReq echo{EchoReq::A::echo};
@@ -276,16 +133,12 @@ TEST_F(Ipclient, Echo) {
     wsclient->asynSend(echomsg);
     wsclient->block_poll();
 
-    AnsonMsg<AnsonResp> resp;
-    // try {
-        resp = wsclient->pop_envelope<AnsonResp>();
-        ASSERT_EQ(MsgCode::Code::_sentinel_, resp.code) << "expecting session open ...";
-        anlog("✅ Echo Opening message verified");
-    // } catch(SemanticException& e) {
-        wsclient->asynSend(echomsg);
-        if (!wsclient->block_poll(3000))
-            FAIL() << "expecting echos ...";
-    // }
+    AnsonMsg<AnsonResp> resp = wsclient->pop_envelope<AnsonResp>();
+    ASSERT_EQ(MsgCode::Code::_sentinel_, resp.code) << "expecting session open ...";
+    anlog("✅ Echo Opening message verified");
+    wsclient->asynSend(echomsg);
+    if (!wsclient->block_poll(3000))
+        FAIL() << "expecting echos ...";
 
     resp = wsclient->pop_envelope<AnsonResp>();
     ASSERT_EQ(echo.echo, resp.Body().m);
@@ -325,8 +178,10 @@ TEST_F(Ipclient, PING_Place_Task) {
     ASSERT_EQ(pthpage.clientPaths.size() * 2 + 1, c);
 }
 
+/**
+ * Override the main function for ensure gtest outputs.
+ */
 int main(int argc, char** argv) {
-    // === FORCE FLUSH EVERYTHING ===
     std::cout.setf(std::ios::unitbuf);
     std::cerr.setf(std::ios::unitbuf);
     setvbuf(stdout, nullptr, _IONBF, 0);
@@ -334,13 +189,11 @@ int main(int argc, char** argv) {
     setvbuf(stdin,  nullptr, _IONBF, 0);
 
     ::testing::InitGoogleTest(&argc, argv);
-    // optionally: ::testing::AddGlobalTestEnvironment(...);
 
     cout << "---------------- ------------------------------------- ----------------" << std::endl;
     int c = RUN_ALL_TESTS();
     cout << "---------------- Tearing down TestSuite Ipclient Done. ----------------" << std::endl;
 
-
-    // return c;
-    _exit(c);
+    return c;
+    // _exit(c);
 }

@@ -35,7 +35,7 @@ public:
         : m_java_exe(java_exe), m_agent_jar(agent_jar) {}
 
     ~JavaAgentController() {
-        // Fallback protection: ensure we don't leave zombie processes behind
+        // Fallback protection
         if (m_is_running) {
             stop_agent();
         }

@@ -28,7 +28,6 @@ bool AsynClienter::stopIPC() {
 
     const u8string java = resolveHomePath(qmlsettings.java_path);
     string qjava = string::fromUtf8(java.c_str());
-    // QProcess stopProc;
     stopProc.start(qjava, arguments);
 
     wsAgentProc.terminate();
@@ -54,14 +53,6 @@ bool AsynClienter::startIPC() {
     arguments << "-jar"
               << qmlsettings.wsagent_jar.c_str()
               << qmlsettings.wsagent_settings.c_str();
-
-    // QObject::connect(&wsAgentProc, &QProcess::readyReadStandardOutput, this, [this]() {
-    //     qDebug() << "Java Output:" << wsAgentProc.readAllStandardOutput().trimmed();
-    // });
-
-    // QObject::connect(&wsAgentProc, &QProcess::readyReadStandardError, this, [this]() {
-    //     qDebug() << "Java Error:" << wsAgentProc.readAllStandardError().trimmed();
-    // });
 
     anlog(qjava);
     anlog(arguments);
@@ -155,8 +146,6 @@ void AsynClienter::push_files(QJSValue paths) {
         anlog("w: " + w);
         string pth = "c:/Users/Alice/.docker/canary.json";
         aninfo("task preparing ................ "s + pth);
-
-
 
         syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
         aninfo("now destructing pth ................"s + pth);
