@@ -23,6 +23,16 @@ int main(int argc, char **argv)
         }
     });
 
+    ui->on_pingws([&]() {
+        std::cout << "Ping IPC Agent clicked!" << std::endl;
+        // if (jservclient) {
+        //     jservclient->reconnect_ipc();
+        // } else {
+        //     std::cout << "jservclient is not initialized." << std::endl;
+        // }
+        ui->invoke_update_syncing_status("From CPP: ping ...");
+    });
+
     ui->run();
     return 0;
 }

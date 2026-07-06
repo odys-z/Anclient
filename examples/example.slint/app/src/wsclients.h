@@ -12,7 +12,7 @@
 
 namespace anson {
 
-string resolveHomePath(const std::string& inputPath);
+// string resolveHomePath(const std::string& inputPath);
 
 /**
  * @return true if the message needs to be dropped

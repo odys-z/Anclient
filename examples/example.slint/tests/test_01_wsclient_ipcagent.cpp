@@ -22,8 +22,10 @@
 
 #include "../app/src/wsclients.h"
 #include "../app/src/gen/wsport.hpp"
+#include "../app/src/doclientier.h"
 #include "../app/src/gen/app_settings.hpp"
-#include "javaproc_manager.hpp"
+// #include "javaproc_manager.hpp"
+#include "../app/src/ipcagent_manager.h"
 
 #ifdef _WIN32
 #include <windows.h>

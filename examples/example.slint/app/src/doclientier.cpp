@@ -1,5 +1,7 @@
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
+
+#include <io/odysz/utils.h>
 #include "doclientier.h"
 #include "gen/app_settings.hpp"
 
@@ -14,56 +16,26 @@ bool AsynClienter::load_settings() {
     return true;
 }
 
-bool AsynClienter::stopIPC() {
+bool AsynClienter::stop_ipcagent() {
 
-    anlog("Stopping Java Agent...");
+    aninfo("Stopping IPC Agent...");
+    agentController.stop_agent();
 
-    const string stop_cmd {std::format("{} -cp {} io.oz.anclient.ipcagent.StopAgent",
-                qmlsettings.java_path, qmlsettings.wsagent_jar).c_str()};
-    anlog(stop_cmd.toStdString());
-
-    vector<string> arguments;
-    arguments << "-cp" <<
-        qmlsettings.wsagent_jar.c_str() << "io.oz.anclient.ipcagent.StopAgent";
-
-    const u8string java = resolveHomePath(qmlsettings.java_path);
-    string qjava = string::fromUtf8(java.c_str());
-    stopProc.start(qjava, arguments);
-
-    wsAgentProc.terminate();
-
-    if (!wsAgentProc.waitForFinished(5000)) {
-        anlog("Java Agent did not exit gracefully. Forcing kill...");
-        wsAgentProc.kill();
-        wsAgentProc.waitForFinished();
-    }
-
-    anlog("Java Agent stopped successfully.");
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    aninfo("IPC Agent stopped.");
     return true;
 }
 
-bool AsynClienter::startIPC() {
-    if (wsAgentProc.state() == "QProcess::Running")
-        stopIPC();
-
-    const u8string java = resolveHomePath(qmlsettings.java_path);
-    string qjava = std::format(java.c_str());
-
-    vector<string> arguments;
-    arguments << "-jar"
-              << qmlsettings.wsagent_jar.c_str()
-              << qmlsettings.wsagent_settings.c_str();
-
-    anlog(qjava);
-    anlog(arguments);
-    wsAgentProc.start(qjava, arguments);
-
-    if (!wsAgentProc.waitForStarted()) {
-        anerror("Failed to start Java process!");
+bool AsynClienter::start_ipcagent() {
+    const string java = resolveHomePath(appsettings.java_path);
+    agentController = JavaAgentController(java, appsettings.wsagent_jar);
+    if (!agentController.start_agent(appsettings.wsagent_settings)) {
+        anerror("Failed to initialize IPC Java Agent process context.");
+        throw AnsonException("Failed to initialize IPC Java Agent process context.");
     }
-    else
-        anlog(std::format("JAVA PID: {}", wsAgentProc.processId()));
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    anlog(std::format("Synode Settings: {}", qmlsettings.synode_settings));
     return true;
 }
 
@@ -73,12 +45,6 @@ void AsynClienter::reconnect_ipc() {
         return;
     }
     if (!wsclient) {
-        if (wsAgentProc.state() != QProcess::Running) {
-            startIPC();
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        }
-
-        // connect
         anlog("Re-connect IPC Agent...");
         onmsg = [this]() -> void {
             if (wsclient->block_poll(200) > 0) {
@@ -87,21 +53,26 @@ void AsynClienter::reconnect_ipc() {
 
                     anlog(rep.Body().m);
                     string proc_report = format_proc_report(rep.Body().m);
-                    anlog(proc_report.toStdString());
-                    QMetaObject::invokeMethod(this, [this, path = "rep.Body().xdoc.clientpath", proc_report]() {
-                        anlog(std::format("Emitting fileStatusChanged for path: {}", path));
-                    }, Qt::QueuedConnection);
+                    anlog(proc_report);
+
+                    slint::invoke_from_event_loop([this, proc_report]() {
+                        if (auto handle = window_weak.lock()) {
+                            (*handle)->set_syncing_status(proc_report.c_str());
+                        }
+                    });
                 }
                 else if (rep.code == MsgCode::Code::_sentinel_) {
                     // show be the ws connection reports
                     // anlog("Show be the ws connection report ...");
                 }
                 else if (!rep.body.empty()) {
-                    anlog(std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, map2str(rep.Body().syncingPage.clientPaths)));
-                    emit this->fileStatusChanged(
-                        // QString::fromStdString(rep.Body().m),
-                        QString::fromStdString(rep.Body().xdoc.clientpath),
-                        QString{ShareFlag::unknown.c_str()});
+                    string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
+                    anlog(std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state));
+                    slint::invoke_from_event_loop([this, clientpath_state]() {
+                        if (auto handle = window_weak.lock()) {
+                            (*handle)->set_syncing_status(clientpath_state.c_str());
+                        }
+                    });
                 }
                 else
                     anlog("on DocsResp: emptyp response body.");
@@ -132,32 +103,32 @@ void AsynClienter::reconnect_ipc() {
     }
 }
 
-void AsynClienter::push_files(QJSValue paths) {
-    if (!AppConstants::check_jsvalue(paths)) return;
+void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& paths) {
+    // if (!AppConstants::check_jsvalue(paths)) return;
 
-    map<string, vector<string>> syncing_paths;
+    // map<string, vector<string>> syncing_paths;
 
-    QJSValueIterator it(paths);
-    while (it.next()) {
-        anlog("cpp handling: " + it.name().toStdString());
-        string v = it.name().toStdString();
-        string w = "c:/Users/Alice/.docker/canary.json";
-        anlog("v: " + v);
-        anlog("w: " + w);
-        string pth = "c:/Users/Alice/.docker/canary.json";
-        aninfo("task preparing ................ "s + pth);
+    // iterator<map<string, vector<LangExt::VarType>>, string> it(paths);
+    // while (it.next()) {
+    //     anlog("cpp handling: "s + it.name().toStdString());
+    //     string v = it.name().toStdString();
+    //     string w = "c:/Users/Alice/.docker/canary.json";
+    //     anlog("v: " + v);
+    //     anlog("w: " + w);
+    //     string pth = "c:/Users/Alice/.docker/canary.json";
+    //     aninfo("task preparing ................ "s + pth);
 
-        syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
-        aninfo("now destructing pth ................"s + pth);
-    }
-    aninfo("task prepared ................");
+    //     syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
+    //     aninfo("now destructing pth ................"s + pth);
+    // }
+    // aninfo("task prepared ................");
 
-    PathsPage syncingpage;
-    syncingpage.clientPaths = std::move(syncing_paths);
-    if (!wsclient)
-        reconnect_ipc();
+    // PathsPage syncingpage;
+    // syncingpage.clientPaths = std::move(syncing_paths);
+    // if (!wsclient)
+    //     reconnect_ipc();
 
-    wsclient->on_msg(onmsg)
-        ->place_tasks(syncingpage);
+    // wsclient->on_msg(onmsg)
+    //     ->place_tasks(syncingpage);
 
 }

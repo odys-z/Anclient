@@ -1,13 +1,16 @@
-import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag } from "@surrealism/index.slint";
+import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
 
-// import { TreeData } from "./file-tree.slint";
 import { FilesystemExplorer } from "./file-explorer.slint";
 import { TableViewPage } from "./table_view_page.slint";
 import { CustomTableViewPage } from "./custom-table.slint";
 
 
 export component HomeForm {
+
+    in-out property <string> ws-status: "Ready";
+    callback pingws-clicked();
+
     Rectangle {
         height: 100%; width: 100%;
         VerticalLayout {
@@ -18,7 +21,7 @@ export component HomeForm {
                 height:header.height ;
                 width: parent.width - 16px;
                 header:=SHeader {
-                value: [{label:"SurrealismUI",value:"1"},{label:"menu:Index",value:"2"}];
+                value: [{label:"SurrealismUI", value:"1"}, {label:"menu:Index", value:"2"}];
                 }
             }
           }
@@ -27,18 +30,18 @@ export component HomeForm {
             alignment: space-around;
             STag {
                 theme: Warning;
-                text: "SurrealismUI V0.5.3";
+                text: "Warning";
             }
             STag {
                 theme: Success;
-                text: "MIT License";
+                text: "Success";
             }
             STag {
                 theme: Error;
-                text: "Slint for CMake!";
+                text: "Error";
             }
             STag {
-                theme: Error;
+                theme: Info;
                 text: "Credit to: syf20020816@outlook.com";
             }
           }
@@ -58,9 +61,9 @@ export component HomeForm {
             padding: 24px;
             alignment: space-around;
             SButton {
-                text: "Try SurrealismUI";
+                text: "Ping IPC Agent";
                 clicked => {
-                // popup.success("Try SurrealismUI!!! Let's GO!");
+                    pingws-clicked();
                 }
             }
 
@@ -69,6 +72,9 @@ export component HomeForm {
                 icon: UseIcons.icons.Smiling-face;
                 theme: Primary;
                 text: "Star on Github!";
+                clicked => {
+                    popup.open();
+                }
             }
             STip {
                 text: "GO TO SurrealismUI WIKI?\n Click here!";
@@ -84,6 +90,17 @@ export component HomeForm {
                 }
             }
           }
+        }
+
+        popup := SPopup {
+            background: #d5f371;
+            VerticalLayout {
+                padding: 12px;
+                alignment: center;
+                Text{ horizontal-alignment: center; font-size: 24pt; text: root.ws-status; }
+                Text{ horizontal-alignment: center; font-size: 16pt; color: #223623;
+                      text: "Click to close this popup.";}
+            }
         }
     }
 }

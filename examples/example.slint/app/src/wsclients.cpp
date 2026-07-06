@@ -12,7 +12,6 @@ namespace fs = std::filesystem;
  * @brief Resolves the tilde (~) prefix in file paths across different platforms.
  * On Windows, it expands '~' to the USERPROFILE directory.
  * On Unix/Linux/macOS, it expands '~' to the HOME directory.
- */
 string resolveHomePath(const std::string& inputPath) {
     if (inputPath.empty() || inputPath[0] != '~') {
         u8string u8_str = fs::path(inputPath).u8string();
@@ -46,7 +45,11 @@ string resolveHomePath(const std::string& inputPath) {
     u8string u8_str = (fs::path(homeDir) / inputPath.substr(offset)).u8string();
     return std::string(u8_str.begin(), u8_str.end());
 }
+ */
 
+/**
+ * @brief Constructs a WSClient instance with the specified JServUrl and message callback.
+ */
 WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     : jserv_(jserv), onMsg(onmsg) {
     

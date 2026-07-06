@@ -13,8 +13,9 @@
 #include <io/odysz/semantic/tier/docs.h>
 #include <gen/app_settings.hpp>
 
+#include "app-window.h"
 #include "wsclients.h"
-#include "wsclients.h"
+#include "ipcagent_manager.h"
 
 using namespace anson;
 
@@ -22,9 +23,12 @@ using namespace anson;
  * @brief Resolves the tilde (~) prefix in file paths across different platforms.
  * On Windows, it expands '~' to the USERPROFILE directory.
  * On Unix/Linux/macOS, it expands '~' to the HOME directory.
-static u8string resolveHomePath(const std::string& inputPath) {
+ */
+inline static string resolveHomePath(const std::string& inputPath) {
     if (inputPath.empty() || inputPath[0] != '~') {
-        return fs::path(inputPath).u8string();
+        u8string u8_str = fs::path(inputPath).u8string();
+        std::string regular_str(u8_str.begin(), u8_str.end());
+        return regular_str;
     }
 
     std::string homeDir;
@@ -44,24 +48,31 @@ static u8string resolveHomePath(const std::string& inputPath) {
     #endif
 
     if (homeDir.empty()) {
-        return fs::path(inputPath).u8string();
+        u8string u8_str = fs::path(inputPath).u8string();
+        return std::string(u8_str.begin(), u8_str.end());
     }
 
     size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
 
-    return (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+    u8string u8_str = (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+    return std::string(u8_str.begin(), u8_str.end());
 }
- */
-
+ 
 class AsynClienter : public Doclientier {
+protected:
     inline static const string sysuri = "/sys/cpp";
     inline static const string synuri = "/syn/cpp";
+
+    QMLAppSettings appsettings;
+    JavaAgentController agentController;
 
     string _device;
 
     OnMsg onmsg;
 
     QMLAppSettings qmlsettings;
+
+    slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
     // Getter
@@ -84,15 +95,19 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter() : Doclientier("h_photos", sysuri, synuri, onErr) {}
+    explicit AsynClienter() : Doclientier("h_photos", sysuri, synuri, onErr),
+        agentController("java", "agent.jar"), window_weak(slint::ComponentWeakHandle<App>()) {}
+
+    explicit AsynClienter(OnError err) : Doclientier("h_photos", sysuri, synuri, err),
+        agentController("java", "agent.jar"), window_weak(slint::ComponentWeakHandle<App>()) {}
 
     bool load_settings();
-    bool startIPC();
-    bool stopIPC();
+    bool start_ipcagent();
+    bool stop_ipcagent();
 
     void reconnect_ipc();
 
-    void push_files(vector<std::string> paths);
+    void push_files(const map<string, vector<LangExt::VarType>>& paths);
 
     void query_synode(vector<std::string> paths) {
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
