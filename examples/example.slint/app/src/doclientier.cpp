@@ -17,7 +17,6 @@ bool AsynClienter::load_settings() {
 }
 
 bool AsynClienter::stop_ipcagent() {
-
     aninfo("Stopping IPC Agent...");
     agentController.stop_agent();
 
@@ -104,31 +103,28 @@ void AsynClienter::reconnect_ipc() {
 }
 
 void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& paths) {
-    // if (!AppConstants::check_jsvalue(paths)) return;
+    map<string, vector<LangExt::VarType>> syncing_paths;
 
-    // map<string, vector<string>> syncing_paths;
+    auto it = syncing_paths.begin();
+    while (it != syncing_paths.end()) {
+        anlog("cpp handling: "s + it->first);
+        string v = it->first;
+        string w = "~/.docker/canary.json";
+        anlog("v: " + v);
+        anlog("w: " + w);
+        string pth = "~/.docker/canary.json";
+        aninfo("task preparing ................ "s + pth);
 
-    // iterator<map<string, vector<LangExt::VarType>>, string> it(paths);
-    // while (it.next()) {
-    //     anlog("cpp handling: "s + it.name().toStdString());
-    //     string v = it.name().toStdString();
-    //     string w = "c:/Users/Alice/.docker/canary.json";
-    //     anlog("v: " + v);
-    //     anlog("w: " + w);
-    //     string pth = "c:/Users/Alice/.docker/canary.json";
-    //     aninfo("task preparing ................ "s + pth);
+        syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device, "now()"};
+        aninfo("now destructing pth ................"s + pth);
+    }
+    aninfo("task prepared ................");
 
-    //     syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
-    //     aninfo("now destructing pth ................"s + pth);
-    // }
-    // aninfo("task prepared ................");
+    PathsPage syncingpage;
+    syncingpage.clientPaths = std::move(syncing_paths);
+    if (!wsclient)
+        reconnect_ipc();
 
-    // PathsPage syncingpage;
-    // syncingpage.clientPaths = std::move(syncing_paths);
-    // if (!wsclient)
-    //     reconnect_ipc();
-
-    // wsclient->on_msg(onmsg)
-    //     ->place_tasks(syncingpage);
-
+    wsclient->on_msg(onmsg)
+        ->place_tasks(syncingpage);
 }

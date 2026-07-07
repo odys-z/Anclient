@@ -40,10 +40,6 @@ public:
     ~WSClient();
 
     void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg);
-    // {
-    //     jserv_ = JServUrl(jserv, {protocol_root});
-    //     onMsg = onmsg;
-    // }
 
     string ipconn_state();
     string syncon_state();
@@ -99,6 +95,7 @@ AnsonMsg<R> WSClient::pop_envelope() {
         Anson::from_json<AnsonMsg<R>>(top, r);
         return r;
     }
+
     if (Regex::start_with(top, "session openned: ")) {
         aninfo("Popping and ignoring expected message: "s + top);
         AnsonMsg<R> r;

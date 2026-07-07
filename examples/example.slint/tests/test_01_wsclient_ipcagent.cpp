@@ -24,7 +24,6 @@
 #include "../app/src/gen/wsport.hpp"
 #include "../app/src/doclientier.h"
 #include "../app/src/gen/app_settings.hpp"
-// #include "javaproc_manager.hpp"
 #include "../app/src/ipcagent_manager.h"
 
 #ifdef _WIN32
@@ -68,8 +67,6 @@ protected:
         register_semantier(asts, "");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_qmltestsettingsAst(asts);
-        register_doctier(asts, "ast");
         register_qmltestsettingsAst(asts);
 
         Anson::from_file("settings/test-01-settings.json", qmlsettings);

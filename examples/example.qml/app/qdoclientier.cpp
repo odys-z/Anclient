@@ -190,19 +190,12 @@ Q_INVOKABLE void QDoclientier::push_files(QJSValue paths) {
         // Debug Notes: This is makes "Invalid address specified to RtlFreeHeap".
         // this->syncing_paths[it.name().toStdString()] = {ShareFlag::pushing, _device.toStdString(), "now()"};
         QString v = it.name();
-        QString w = "c:/Users/Alice/.docker/canary.json";
+        QString w = "~/.docker/canary.json";
         qDebug() << "v" << v;
         qDebug() << "w" << w;
         // string pth{it.name().toStdString()};
-        string pth = "c:/Users/Alice/.docker/canary.json";
+        string pth = "~/.docker/canary.json";
         aninfo("task preparing ................ "s + pth);
-
-        // auto flag = LangExt::VarType{ShareFlag::pushing};
-        // auto device = LangExt::VarType{_device.toStdString()};
-        // auto dt = LangExt::VarType{"now()"};
-        // this->syncing_paths[pth] = {
-        //     // LangExt::VarType{ShareFlag::pushing}, LangExt::VarType{_device.toStdString()}, LangExt::VarType{"now()"}};
-        //     flag, device, dt};
 
         syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device.toStdString(), "now()"};
         aninfo("now destructing pth ................"s + pth);

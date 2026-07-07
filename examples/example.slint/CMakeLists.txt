@@ -50,7 +50,6 @@ if(WIN32)
     add_compile_definitions(WIN32_LEAN_AND_MEAN _AMD64_)
 endif()
 
-# find_package(Slint REQUIRED)
 include(FetchContent)
 FetchContent_Declare(
     Slint
@@ -71,27 +70,6 @@ FetchContent_Declare(
     GIT_TAG 0.12.0
 )
 FetchContent_MakeAvailable(webview)
-
-# target_include_directories(${PROJECT_NAME} PRIVATE 
-#     ${webview_SOURCE_DIR}
-# )
-
-# target_link_libraries(${PROJECT_NAME} PRIVATE
-#     webview::core # V0.12.0 Not webview::webview or webview.
-#     Slint::Slint
-# )
-
-# On Windows, copy the Slint DLL next to the application binary so that it's found.
-# if (WIN32)
-#     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#         COMMAND ${CMAKE_COMMAND} -E copy
-#             $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-#             $<TARGET_FILE_DIR:${PROJECT_NAME}> COMMAND_EXPAND_LISTS)
-# endif()
-
-# target_include_directories(${PROJECT_NAME} PRIVATE
-#     "${CMAKE_CURRENT_SOURCE_DIR}/../app"
-# )
 
 add_subdirectory(app)
 add_subdirectory(tests)

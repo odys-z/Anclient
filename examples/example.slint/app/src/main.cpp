@@ -1,8 +1,11 @@
 #include "app-window.h"
 #include "webview-ext.h"
+#include "slingleton.h"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
+    using namespace anson;
+    Slingleton slingle = Slingleton::get_instance();
+
     auto ui = App::create();
 
     ui->set_window_title("SurrealTree Explorer v1.0");
@@ -10,26 +13,17 @@ int main(int argc, char **argv)
     std::unique_ptr<webview::webview> wv = nullptr;
 
     ui->on_menu_changed([&](int index, slint::SharedString page_ix, slint::SharedString page_name) {
-        // Converts perfectly now!
-        std::string converted_id = page_ix.data();
-        std::cout << "Menu changed! Index: " << index << ", ID: " << converted_id << std::endl;
+        std::string menu_id = page_ix.data();
+        anlog(std::format("Menu changed! Index: {}, ID: {}", index, menu_id));
 
-        if (index == 0) {
-        } else if (index == 1) {
-            // show_and_align_webview(ui.operator->(), wv, "https://github.com/odys-z");
+        if (menu_id == "1") {
             launch_webview_window(ui);
-        } else if (index == 2) {
-        } else {
         }
     });
 
     ui->on_pingws([&]() {
-        std::cout << "Ping IPC Agent clicked!" << std::endl;
-        // if (jservclient) {
-        //     jservclient->reconnect_ipc();
-        // } else {
-        //     std::cout << "jservclient is not initialized." << std::endl;
-        // }
+        anlog("Ping IPC Agent clicked!");
+        slingle.doclientier->push_files({});
         ui->invoke_update_syncing_status("From CPP: ping ...");
     });
 

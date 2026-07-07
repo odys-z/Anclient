@@ -6,15 +6,10 @@ get_filename_component(SURREALISM_UI_DIR
 )
 message(STATUS "=========================================== app: CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
-# add_library(${PROJECT_NAME} STATIC
-#     src/doctier.cpp
-#     src/wsclients.h
-#     src/wsclients.cpp
-#     src/gen/app_settings.hpp   # header-only
-# )
-
-add_executable(album_gui
+add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/slingleton.cpp
+    src/slingleton.h
     src/gen/app_settings.hpp
     src/gen/wsport.hpp
     src/doctier.cpp
@@ -49,14 +44,7 @@ slint_target_sources(${PROJECT_NAME}
     LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
 )
 
-
-
-# if (WIN32)
-#     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#         COMMAND ${CMAKE_COMMAND} -E copy
-#             $<TARGET_FILE:${PROJECT_NAME}>
-#             $<TARGET_FILE_DIR:${PROJECT_NAME}> COMMAND_EXPAND_LISTS)
-# endif()
+add_compile_definitions(ANSON_VERBOSE=4)
 
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -66,3 +54,17 @@ if (WIN32)
         COMMAND_EXPAND_LISTS
     )
 endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/ast"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/ast"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/app/settings"   # or move settings to root
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/settings"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/tests/res"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/res"
+)

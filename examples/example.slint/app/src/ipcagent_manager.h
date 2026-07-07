@@ -18,10 +18,48 @@
 #endif
 
 #include <io/odysz/utils.h>
-#include "doclientier.h"
 #include "gen/app_settings.hpp"
 #include "wsclients.h"
 
+/**
+ * @brief Resolves the tilde (~) prefix in file paths across different platforms.
+ * On Windows, it expands '~' to the USERPROFILE directory.
+ * On Unix/Linux/macOS, it expands '~' to the HOME directory.
+ */
+inline static string resolveHomePath(const std::string& inputPath) {
+    if (inputPath.empty() || inputPath[0] != '~') {
+        u8string u8_str = fs::path(inputPath).u8string();
+        std::string regular_str(u8_str.begin(), u8_str.end());
+        return regular_str;
+    }
+
+    std::string homeDir;
+
+    #ifdef _WIN32
+        // Windows conditional compilation
+        char* userProfile = std::getenv("USERPROFILE");
+        if (userProfile) {
+            homeDir = userProfile;
+        }
+    #else
+        // Linux / macOS conditional compilation
+        char* home = std::getenv("HOME");
+        if (home) {
+        homeDir = home;
+        }
+    #endif
+
+    if (homeDir.empty()) {
+        u8string u8_str = fs::path(inputPath).u8string();
+        return std::string(u8_str.begin(), u8_str.end());
+    }
+
+    size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
+
+    u8string u8_str = (fs::path(homeDir) / inputPath.substr(offset)).u8string();
+    return std::string(u8_str.begin(), u8_str.end());
+}
+ 
 class JavaAgentController {
 private:
     std::string m_java_exe;
@@ -57,14 +95,14 @@ public:
 
     #ifdef _WIN32
         std::string cmd = std::format("{} -jar {} {}", 
-                                      m_java_exe, m_agent_jar, setting_path);
+                                      resolveHomePath(m_java_exe), m_agent_jar, setting_path);
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         si.dwFlags = STARTF_USESHOWWINDOW;
         si.wShowWindow = SW_HIDE; // Completely invisible window context
         PROCESS_INFORMATION pi = { 0, 0, 0, 0 };
 
-        std::string full_cmd = std::format("cmd.exe /c {}", cmd);
+        std::string full_cmd = std::format("cmd.exe /c \"{}\" > java_agent_start.log 2>&1", cmd);
         anlog("[AgentUtil]: "s + full_cmd);
 
         if (CreateProcessA(NULL, const_cast<char*>(full_cmd.c_str()), NULL, NULL, TRUE, 
