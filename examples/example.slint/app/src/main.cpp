@@ -40,13 +40,11 @@ int main(int argc, char **argv) {
                 table_model->push_back(p);
             }
             for (const auto& entry : fs::directory_iterator(root)) {
-                std::string name = entry.path().filename().string();
                 std::string type = entry.is_directory() ? "Folder" : (entry.is_regular_file() ? "File" : "Other");
-                std::string size = entry.is_regular_file() ? std::to_string(entry.file_size()) : "-";
                 PathItemData row {.is_folder{entry.is_directory()},
                             .indent = {},
-                            .fname{name},
-                            .size{size},
+                            .fname{entry.path().filename().string()},
+                            .size{entry.is_regular_file() ? std::to_string(entry.file_size()) : "-"},
                             .type{type},
                             .fullpath{entry.path().string()} };
 

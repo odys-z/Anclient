@@ -19,6 +19,7 @@ export component FileTable {
     in-out property <[PathItemData]> row_data: [];
 
     callback row-selected(PathItemData);
+    callback row-double-click(PathItemData);
 
     pure callback filter_sort_model([PathItemData], string, int, bool) -> [PathItemData];
     filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
@@ -26,7 +27,18 @@ export component FileTable {
     }
 
     function icons(idx: string) -> image {
-        return @image-url("");
+        if ("d" == idx) {
+            return @image-url("@surrealism/icons/folder-open.svg");
+        }
+        if ("|" == idx) {
+            // return @image-url("icons/ind-vbar.svg");
+            return @image-url("@surrealism/icons/right.svg");
+        }
+        if ("e" == idx) {
+            return @image-url("@surrealism/icons/left-link.svg");
+        }
+        
+        return @image-url("@surrealism/icons/more.svg");
     }
 
     HorizontalBox {
@@ -50,11 +62,9 @@ export component FileTable {
                             background: rgba(0, 0, 0, 0.02);
                             height: 40px;
                             TouchArea {
-                                clicked => {
-                                    root.row_selected(row);
-                                }
+                                clicked => { root.row_selected(row); }
+                                double-clicked => { root.row_double_click(row); }
                                 
-                                // Optional visual feedback: changes background color on hover
                                 Rectangle {
                                     background: parent.has-hover ? rgba(0, 0, 0, 0.08) : transparent;
                                     animate background { duration: 150ms; }
@@ -64,6 +74,7 @@ export component FileTable {
                             HorizontalLayout {
                                 padding: 8px;
                                 // vertical-alignment: center;
+                                alignment: LayoutAlignment.start;
 
                                 HorizontalLayout {
                                     width: 30%;
@@ -73,10 +84,11 @@ export component FileTable {
                                         width: 32px;
                                         height: 32px;
                                     }
-                                    if (!row.is-folder) : Image {
+                                    if (row.is-folder) : Image {
                                         source: root.icons("d");
                                     }
-                                    Text { text: row.fname; }
+                                    Text { color: #fff;
+                                        text: row.fname; }
                                 }
 
                                 Text { width: 35%; text: row.type; vertical-alignment: center; }
