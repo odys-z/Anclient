@@ -87,12 +87,11 @@ export component FileTable {
                                     if (row.is-folder) : Image {
                                         source: root.icons("d");
                                     }
-                                    Text { color: #fff;
-                                        text: row.fname; }
+                                    Text { color: #bbb; text: row.fname; }
                                 }
 
-                                Text { width: 35%; text: row.type; vertical-alignment: center; }
-                                Text { width: 35%; text: row.size; vertical-alignment: center; }
+                                Text { width: 35%; color: #bbb; text: row.type; vertical-alignment: center; }
+                                Text { width: 35%; color: #bbb; text: row.size; vertical-alignment: center; }
                             }
                         }
                     }
