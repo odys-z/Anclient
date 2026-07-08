@@ -26,6 +26,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${webview_SOURCE_DIR}
 )
 
+# Slint UI
+slint_target_sources(${PROJECT_NAME}
+    ui/app-window.slint
+    LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
+)
+
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
     OpenSSL::Crypto
     Boost::url
@@ -36,12 +43,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     anclient
     Slint::Slint
     webview::core
-)
-
-# Slint UI
-slint_target_sources(${PROJECT_NAME}
-    ui/app-window.slint
-    LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
 )
 
 add_compile_definitions(ANSON_VERBOSE=4)

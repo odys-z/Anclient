@@ -1,0 +1,80 @@
+import { HorizontalBox, StandardTableView, GroupBox, StyleMetrics, LineEdit } from "std-widgets.slint";
+export global TableViewPageAdapter {
+    // in-out property <[[StandardListViewItem]]> row_data: [];
+
+    pure callback filter_sort_model([[StandardListViewItem]], string, int, bool) -> [[StandardListViewItem]];
+    filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
+        return row-data; 
+    }
+
+    // callback load_init_folder();
+}
+
+export component FileTable {
+    width: 600px;
+    height: 400px;
+    
+    property <int> sort-index: -1;
+    property <bool> sort-ascending;
+
+    in-out property <[[StandardListViewItem]]> row_data: [];
+    callback row-selected(int);
+
+    // init => {
+    //     TableViewPageAdapter.load_init_folder();
+    // }
+    pure callback filter_sort_model([[StandardListViewItem]], string, int, bool) -> [[StandardListViewItem]];
+    filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
+        return row-data; 
+    }
+
+    HorizontalBox {
+        vertical-stretch: 1;
+        GroupBox {
+            title: @tr("Current Directory Items");
+            vertical-stretch: 1;
+            VerticalLayout {
+                spacing: StyleMetrics.layout-spacing;
+                StandardTableView {
+                    sort-ascending(index) => {
+                        root.sort-index = index;
+                        root.sort-ascending = true;
+                    }
+
+                    sort-descending(index) => {
+                        root.sort-index = index;
+                        root.sort-ascending = false;
+                    }
+
+                    // Adjusted headers for file listing
+                    columns: [
+                        { title: @tr("Name") },
+                        { title: @tr("Type") },
+                        { title: @tr("Size (Bytes)") }
+                    ];
+
+                    current-row-changed(index) => {
+                        root.row-selected(index);
+                    }
+
+                    // rows: TableViewPageAdapter.filter_sort_model(
+                    rows: root.filter_sort_model(
+                            // TableViewPageAdapter.row_data,
+                            root.row_data,
+                            filter-edit.text,
+                            root.sort-index, root.sort-ascending);
+                }
+
+                VerticalLayout {
+                    Text {
+                        text: @tr("Filter by Name:");
+                    }
+
+                    filter-edit := LineEdit {
+                        placeholder-text: @tr("Enter filter text");
+                    }
+                }
+            }
+        }
+    }
+}

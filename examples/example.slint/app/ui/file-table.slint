@@ -1,22 +1,34 @@
-import { HorizontalBox, ScrollView, GroupBox, StyleMetrics } from "std-widgets.slint";
+import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit } from "std-widgets.slint";
 
-export struct CustomRowData {
-    has_icon: bool,
-    icons: [image],
-    text_col1: string,
-    text_col2: string,
+export struct PathItemData {
+    is_folder: bool,
+    indent   : [string], // [+, |, T, L, -]
+    fname    : string,
+    size     : string,
+    type     : string,
+    fullpath : string
 }
 
-export component CustomTableViewPage {
-    // 1. Define your own structured data
-    property <[CustomRowData]> custom_rows: [
-        { has_icon: true,
-          icons: [@image-url("imgs/add.svg"), @image-url("imgs/dash.svg")],
-          text_col1: "Item 1.2", text_col2: "Item 1.3" },
-        { has_icon: false, icons: [], text_col1: "Item 2.2", text_col2: "Item 2.3" },
-    ];
+export component FileTable {
+    width: 600px;
+    height: 400px;
+    
+    property <int> sort-index: -1;
+    property <bool> sort-ascending;
 
-    callback row_clicked(CustomRowData);
+    // in-out property <[[StandardListViewItem]]> row_data: [];
+    in-out property <[PathItemData]> row_data: [];
+
+    callback row-selected(PathItemData);
+
+    pure callback filter_sort_model([PathItemData], string, int, bool) -> [PathItemData];
+    filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
+        return row-data; 
+    }
+
+    function icons(idx: string) -> image {
+        return @image-url("");
+    }
 
     HorizontalBox {
         vertical-stretch: 1;
@@ -35,13 +47,12 @@ export component CustomTableViewPage {
                 // Table Body Rows
                 ScrollView {
                     VerticalLayout {
-                        for row in root.custom_rows : Rectangle {
+                        for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
                             background: rgba(0, 0, 0, 0.02);
                             height: 40px;
-
                             TouchArea {
                                 clicked => {
-                                    root.row_clicked(row);
+                                    root.row_selected(row);
                                 }
                                 
                                 // Optional visual feedback: changes background color on hover
@@ -59,23 +70,31 @@ export component CustomTableViewPage {
                                 HorizontalLayout {
                                     width: 30%;
                                     spacing: 8px;
-                                    for icon in row.icons : Image {
-                                        source: icon;
+                                    for icon in row.indent : Image {
+                                        source: root.icons(icon);
                                         width: 32px;
                                         height: 32px;
                                     }
-                                    if (!row.has_icon) : Text {
-                                        text: row.text_col1;
+                                    if (!row.is-folder) : Image {
+                                        source: root.icons("d");
                                     }
+                                    Text { text: row.fname; }
                                 }
 
                                 // Column 2
-                                Text { width: 35%; text: row.text_col1; vertical-alignment: center; }
+                                Text { width: 35%; text: row.type; vertical-alignment: center; }
 
                                 // Column 3
-                                Text { width: 35%; text: row.text_col2; vertical-alignment: center; }
+                                Text { width: 35%; text: row.size; vertical-alignment: center; }
                             }
                         }
+                    }
+                }
+
+                VerticalLayout {
+                    Text { text: @tr("Filter by Name:"); }
+                    filter-edit := LineEdit {
+                        placeholder-text: @tr("Enter filter text");
                     }
                 }
             }
