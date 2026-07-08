@@ -16,7 +16,6 @@ export component FileTable {
     property <int> sort-index: -1;
     property <bool> sort-ascending;
 
-    // in-out property <[[StandardListViewItem]]> row_data: [];
     in-out property <[PathItemData]> row_data: [];
 
     callback row-selected(PathItemData);
@@ -66,7 +65,6 @@ export component FileTable {
                                 padding: 8px;
                                 // vertical-alignment: center;
 
-                                // Column 1: Renders the SVG if present
                                 HorizontalLayout {
                                     width: 30%;
                                     spacing: 8px;
@@ -81,10 +79,7 @@ export component FileTable {
                                     Text { text: row.fname; }
                                 }
 
-                                // Column 2
                                 Text { width: 35%; text: row.type; vertical-alignment: center; }
-
-                                // Column 3
                                 Text { width: 35%; text: row.size; vertical-alignment: center; }
                             }
                         }

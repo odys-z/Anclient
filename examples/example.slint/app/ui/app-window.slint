@@ -24,7 +24,6 @@ export component App inherits Window {
     in-out property <string> webview-status: "Webview not started";
     in-out property <string> syncing-status: "Ready";
 
-    // in-out property <[[StandardListViewItem]]> filelist: [];
     in-out property <[PathItemData]> filelist: [];
 
     callback menu-changed(int, string, string);
@@ -84,14 +83,11 @@ export component App inherits Window {
 
           if (router-index == 2) : Rectangle {
             background: #b0d0d0;
-            // Uncomment the following line to reproduce slint compiler bug.
-            // FilesystemExplorer { width: 100%; height: 100%; }
             CustomTableViewPage { width: 100%; height: 100%; }
           }
 
           if (router-index == 3) : Rectangle {
             background: #b0d0d0;
-            // TableViewPage { width: 100%; height: 100%; }
             FileTable { width: 100%; height: 100%;
               row_data: root.filelist;
               init => { root.load_folder("."); }
