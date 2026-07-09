@@ -102,26 +102,25 @@ void AsynClienter::reconnect_ipc() {
     }
 }
 
-void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& paths) {
-    map<string, vector<LangExt::VarType>> syncing_paths;
+void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths) {
+    // map<string, vector<LangExt::VarType>> syncing_paths;
+    // auto it = syncing_paths.begin();
+    // while (it != syncing_paths.end()) {
+    //     anlog("cpp handling: "s + it->first);
+    //     string v = it->first;
+    //     string w = "~/.docker/canary.json";
+    //     anlog("v: " + v);
+    //     anlog("w: " + w);
+    //     string pth = "~/.docker/canary.json";
+    //     aninfo("task preparing ................ "s + pth);
 
-    auto it = syncing_paths.begin();
-    while (it != syncing_paths.end()) {
-        anlog("cpp handling: "s + it->first);
-        string v = it->first;
-        string w = "~/.docker/canary.json";
-        anlog("v: " + v);
-        anlog("w: " + w);
-        string pth = "~/.docker/canary.json";
-        aninfo("task preparing ................ "s + pth);
-
-        syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device, "now()"};
-        aninfo("now destructing pth ................"s + pth);
-    }
-    aninfo("task prepared ................");
+    //     syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device, "now()"};
+    //     aninfo("now destructing pth ................"s + pth);
+    // }
+    // aninfo("task prepared ................");
 
     PathsPage syncingpage;
-    syncingpage.clientPaths = std::move(syncing_paths);
+    syncingpage.clientPaths = syncing_paths;
     if (!wsclient)
         reconnect_ipc();
 

@@ -7,8 +7,12 @@ import { HomeForm } from "home.slint";
 import { PathItemData, FileTable } from "file-table.slint";
 
 export component App inherits Window {
-    height: 600px;
-    width: 800px;
+    preferred-height: 800px;
+    preferred-width: 1280px;
+
+    // Optional: Add a minimum size constraint so users can't shrink it to zero
+    min-height: 600px;
+    min-width: 800px;
 
     in-out property <string> window-title: "Anclient.slint";
     title: window-title;
@@ -23,13 +27,15 @@ export component App inherits Window {
     in-out property <string> webview-status: "Webview not started";
     in-out property <string> syncing-status: "Ready";
 
+    in-out property <string> current_pth;
     in-out property <[PathItemData]> filelist: [];
 
     callback menu-changed(int, string, string);
     callback item_clicked(string, bool);
     callback pingws();
-
     callback load_folder(string);
+    callback select_file(PathItemData, bool);
+    callback upload_files();
 
     public function update-syncing-status(status: string) {
         syncing-status = status;
@@ -46,10 +52,10 @@ export component App inherits Window {
         clip: false;
         menu:=SMenu {
           menu-data:[
-            {id:"0",icon:UseIcons.icons.FileCode,name:"Code"},
-            {id:"1",icon:UseIcons.icons.Search,name:"Search"},
-            {id:"2",icon:UseIcons.icons.Folder,name:"Help"},
-            {id:"3",icon:UseIcons.icons.Help,name:"Help"},
+            { id: "0", icon:UseIcons.icons.FileCode, name: "Home" },
+            { id: "1", icon:UseIcons.icons.Share,    name: "Album"},
+            { id: "2", icon:UseIcons.icons.Folder,   name: "Files"},
+            { id: "3", icon:UseIcons.icons.Help,     name: "Help" },
           ];
 
           change(index, data) => {
@@ -90,9 +96,21 @@ export component App inherits Window {
             FileTable { width: 100%; height: 100%;
               row_data: root.filelist;
               init => { root.load_folder("."); }
+              current_path: root.current_pth;
+              row-double-click(row) => {
+                if (row.is-folder) {
+                  debug("[App Window] callback, loading: " + row.fname);
+                  root.load_folder(row.fullpath);
+                }
+              }
               row-selected(row) => {
-                debug("[App Window] callback: " + row.fname);
-                root.load_folder(row.fullpath);
+                if (!row.is-folder) {
+                  debug("[App Window] callback, synching: " + row.fname);
+                  root.select_file(row, row.iselected);
+                }
+              }
+              upload => {
+                root.upload_files();
               }
             }
           }

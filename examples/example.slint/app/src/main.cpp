@@ -4,13 +4,20 @@
 #include "webview-ext.h"
 #include "slingleton.h"
 
+// This order is to avoid compile error
+#include <io/odysz/anserializer.h>
+
 int main(int argc, char **argv) {
     using namespace anson;
+
+    map<string, vector<LangExt::VarType>> fileselection;
+
     Slingleton slingle = Slingleton::get_instance();
 
     auto ui = App::create();
 
     ui->set_window_title("SurrealTree Explorer v1.0");
+    ui->window().set_maximized(false);
 
     std::unique_ptr<webview::webview> wv = nullptr;
 
@@ -30,7 +37,10 @@ int main(int argc, char **argv) {
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {
-        anlog("load folder: "s + std::string(pth));
+        if (pth == ".")
+            pth = fs::absolute(fs::path{string{pth}}).string();
+
+        anlog(std::format("load folder: {}, selected files: {}", std::string(pth), fileselection.size()));
 
         auto table_model = std::make_shared<slint::VectorModel<PathItemData>>();
         fs::path root{std::string(pth)};
@@ -46,15 +56,32 @@ int main(int argc, char **argv) {
                             .fname{entry.path().filename().string()},
                             .size{entry.is_regular_file() ? std::to_string(entry.file_size()) : "-"},
                             .type{type},
-                            .fullpath{entry.path().string()} };
+                            .fullpath{entry.path().string()},
+                            .iselected{fileselection.find(string{row.fullpath}) != fileselection.end()} };
 
                 table_model->push_back(row);
             }
 
             ui->set_filelist(table_model);
+            ui->set_current_pth(pth);
         } catch (const fs::filesystem_error& e) {
             anerror("Filesystem error: "s + e.what());
         }
+    });
+
+    ui->on_select_file([&](PathItemData fileitem, bool selected) {
+        if (!selected)
+            fileselection.erase(string{fileitem.fullpath});
+        else
+            fileselection.emplace(string{fileitem.fullpath}, std::vector<LangExt::VarType>{"syncing"});
+        
+        string status = std::format("Total selected files: \n{}.", map2str(fileselection));
+        anlog(status);
+        ui->set_syncing_status(slint::SharedString{status});
+    });
+
+    ui->on_upload_files([&]() {
+        slingle.doclientier->push_files(fileselection);
     });
 
     ui->run();

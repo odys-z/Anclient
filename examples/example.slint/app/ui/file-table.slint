@@ -1,4 +1,6 @@
 import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit } from "std-widgets.slint";
+import { SCheckbox } from "@surrealism/index.slint";
+import { SButton } from "../../surrealism-0.5.3/index.slint";
 
 export struct PathItemData {
     is_folder: bool,
@@ -6,7 +8,8 @@ export struct PathItemData {
     fname    : string,
     size     : string,
     type     : string,
-    fullpath : string
+    fullpath : string,
+    iselected: bool
 }
 
 export component FileTable {
@@ -16,10 +19,16 @@ export component FileTable {
     property <int> sort-index: -1;
     property <bool> sort-ascending;
 
-    in-out property <[PathItemData]> row_data: [];
+    in-out property <string> current_path;
+
+    in-out property <[PathItemData]> row_data: [
+        {is_folder: false, indent: [], fname: "test",   type: "test-type", size: "0", fullpath: "~/x/y.z", iselected: false},
+        {is_folder: true,  indent: [], fname: "folder", type: "folder",    size: "",  fullpath: "~/x/dir", iselected: false}
+    ];
 
     callback row-selected(PathItemData);
     callback row-double-click(PathItemData);
+    callback upload();
 
     pure callback filter_sort_model([PathItemData], string, int, bool) -> [PathItemData];
     filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
@@ -31,79 +40,112 @@ export component FileTable {
             return @image-url("@surrealism/icons/folder-open.svg");
         }
         if ("|" == idx) {
-            // return @image-url("icons/ind-vbar.svg");
             return @image-url("@surrealism/icons/right.svg");
         }
         if ("e" == idx) {
-            return @image-url("@surrealism/icons/left-link.svg");
+            return @image-url("@surrealism/icons/link-left.svg");
         }
-        
         return @image-url("@surrealism/icons/more.svg");
     }
 
     HorizontalBox {
-        vertical-stretch: 1;
-        GroupBox {
-            title: "Custom Table View with Icons";
+      vertical-stretch: 1;
 
-            VerticalLayout {
-                // Table Header
+      VerticalLayout {
+        Text { text: root.current_path; }
+
+        // Table Header
+        HorizontalLayout {
+            padding: 8px;
+            Text { text: @tr("Name"); width: 30%; color: #bbb; font-weight: 700; }
+            Text { text: @tr("Type"); width: 35%; color: #bbb; font-weight: 700; }
+            Text { text: @tr("Size"); width: 35%; color: #bbb; font-weight: 700; }
+        }
+
+        // Table Body Rows
+        ScrollView {
+          VerticalLayout {
+            for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
+                init => {
+                    debug(row.iselected ? "ON" : "OFF", row.fullpath);
+                }
+
+                background: row.iselected ? rgba(0, 120, 215, 0.2) : rgba(0, 0, 0, 0.02);
+                height: 24pt;
+                touchbox := TouchArea {
+                    clicked => {
+                        debug("TouchArea.cliced()");
+                        row.iselected = !row.iselected;
+                        chkbox.actived = row.iselected;
+                        root.row_selected(row);
+                    }
+                    double-clicked => { root.row_double_click(row); }
+                    
+                    Rectangle {
+                        background: parent.has-hover ? rgba(0.2, 0.2, 0.2, 0.08) : transparent;
+                        animate background { duration: 150ms; }
+                    }
+                }
+
                 HorizontalLayout {
                     padding: 8px;
-                    Text { text: "Icon / Col 1"; width: 30%; font-weight: 700; }
-                    Text { text: "Header 2"; width: 35%; font-weight: 700; }
-                    Text { text: "Header 3"; width: 35%; font-weight: 700; }
-                }
+                    HorizontalLayout {
+                        width: 30%; height: parent.height;
+                        padding-top: 6pt;
+                        padding-bottom: 6pt;
+                        for icon in row.indent : Image {
+                            source: root.icons(icon);
+                            width: 12pt;
+                            height: 12pt;
+                        }
 
-                // Table Body Rows
-                ScrollView {
-                    VerticalLayout {
-                        for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
-                            background: rgba(0, 0, 0, 0.02);
-                            height: 40px;
-                            TouchArea {
-                                clicked => { root.row_selected(row); }
-                                double-clicked => { root.row_double_click(row); }
-                                
-                                Rectangle {
-                                    background: parent.has-hover ? rgba(0, 0, 0, 0.08) : transparent;
-                                    animate background { duration: 150ms; }
-                                }
-                            }
-
-                            HorizontalLayout {
-                                padding: 8px;
-                                // vertical-alignment: center;
-                                alignment: LayoutAlignment.start;
-
-                                HorizontalLayout {
-                                    width: 30%;
-                                    spacing: 8px;
-                                    for icon in row.indent : Image {
-                                        source: root.icons(icon);
-                                        width: 32px;
-                                        height: 32px;
-                                    }
-                                    if (row.is-folder) : Image {
-                                        source: root.icons("d");
-                                    }
-                                    Text { color: #bbb; text: row.fname; }
-                                }
-
-                                Text { width: 35%; color: #bbb; text: row.type; vertical-alignment: center; }
-                                Text { width: 35%; color: #bbb; text: row.size; vertical-alignment: center; }
+                        chkbox := SCheckbox {
+                            text: "";
+                            actived: row.iselected;
+                            disabled: row.is_folder;
+                            height: 22pt; width: 22pt;
+                            clicked(text, value, actived) => {
+                                touchbox.clicked();
                             }
                         }
-                    }
-                }
 
-                VerticalLayout {
-                    Text { text: @tr("Filter by Name:"); }
-                    filter-edit := LineEdit {
-                        placeholder-text: @tr("Enter filter text");
+                        if (row.is-folder) : Image {
+                            // horizontal-alignment: ImageHorizontalAlignment.left;
+                            source: root.icons("d");
+                            width: 14pt; height: 14pt;
+                        }
+                        if (!row.is-folder): Image {
+                            // horizontal-alignment: ImageHorizontalAlignment.left;
+                            source: root.icons("e");
+                            width: 14pt; height: 14pt;
+                        }
+                        Text {
+                            color: #e5ffff;
+                            text: row.fname;
+                            font-weight: 700;
+                            horizontal-stretch: 1;
+                            overflow: elide;
+                        }
                     }
+
+                    Text { width: 35%; color: #ccc; text: row.type; vertical-alignment: center; }
+                    Text { width: 35%; color: #ccc; text: row.size; vertical-alignment: center; }
                 }
             }
+          }
         }
+
+        HorizontalLayout {
+            // Text { text: @tr("Filter by Name:"); }
+            filter-edit := LineEdit {
+                placeholder-text: @tr("Enter filter text");
+            }
+
+            SButton {
+                text: @tr("Upload");
+                clicked => { root.upload(); }
+            }
+        }
+      }
     }
 }
