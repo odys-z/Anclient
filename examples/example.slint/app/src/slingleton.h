@@ -34,7 +34,7 @@ namespace anson {
 
     Slingleton() {}
 
-    static Slingleton& get_instance() {
+    static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin) {
       if (instance == nullptr) {
           instance = new Slingleton();
           register_jserv(asts, opts);
@@ -50,7 +50,7 @@ namespace anson {
 
           ix::initNetSystem();
 
-          instance->doclientier = new AsynClienter();
+          instance->doclientier = new AsynClienter(appwin);
       }
       return *instance;
     }

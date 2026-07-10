@@ -1,0 +1,70 @@
+import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
+import { UseIcons } from "@surrealism/use/index.slint";
+import { LineEdit } from "std-widgets.slint";
+
+export component GUIClientSettings {
+
+    in-out property <string> ws-status: "Ready";
+    callback pingws-clicked();
+    callback echows-clicked(string);
+
+    Rectangle {
+        height: 100%;
+        width: 100%;
+        VerticalLayout {
+          HorizontalLayout {
+            alignment: center;
+            SCard {
+                card-width: 48px;
+                card-height: 48px;
+                SIcon {
+                    height: parent.height;
+                    width: parent.width;
+                    source: @image-url("imgs/album.svg");
+                }
+            }
+          }
+          HorizontalLayout {
+            padding: 24px;
+            alignment: space-around;
+            vertical-stretch: 1;
+            SButton {
+                text: "Ping IPC Agent";
+                clicked => {
+                    pingws-clicked();
+                }
+            }
+
+            msg-edit:=LineEdit {
+                placeholder-text: @tr("Echo by Album Client");
+            }
+            SButton {
+                show-icon: true;
+                icon: UseIcons.icons.Smiling-face;
+                theme: Primary;
+                text: "Echo to IPC Agent";
+                clicked => {
+                    echows-clicked(msg-edit.text);
+                }
+            }
+            STip {
+                text: "GO TO SurrealismUI WIKI?\n Click here!";
+                height: wiki-btn.height;
+                width: wiki-btn.width;
+                position: Bottom;
+                wiki-btn:=SButton {
+                    theme: Success;
+                    text: "Read Wiki ...";
+                    clicked => {
+                        parent.clicked();
+                    }
+                }
+            }
+          }
+        }
+
+        Rectangle {
+            vertical-stretch: 1; // Pushes everything above it up to the top!
+        }
+    }
+}

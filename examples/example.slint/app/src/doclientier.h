@@ -56,11 +56,13 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter() : Doclientier("h_photos", sysuri, synuri, onErr),
-        agentController("java", "agent.jar"), window_weak(slint::ComponentWeakHandle<App>()) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin)
+        : Doclientier("h_photos", sysuri, synuri, onErr),
+        agentController("java", "agent.jar"), window_weak(appwin) {}
 
-    explicit AsynClienter(OnError err) : Doclientier("h_photos", sysuri, synuri, err),
-        agentController("java", "agent.jar"), window_weak(slint::ComponentWeakHandle<App>()) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
+        : Doclientier("h_photos", sysuri, synuri, err),
+        agentController("java", "agent.jar"), window_weak(appwin) {}
 
     bool load_settings();
     bool start_ipcagent();
@@ -79,7 +81,7 @@ public:
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             SessionClient ssclient = SessionClient::loginWithUri(jserv,
                                     sysuri, uid, pswd, _device, onErr);
-            jservclient = make_unique<AsynClienter>(onErr);
+            jservclient = make_unique<AsynClienter>(window_weak, onErr);
             jservclient.get()->client = ssclient;
         } catch (const std::logic_error e) {
             anwarn(e.what());
@@ -99,6 +101,8 @@ public:
              jservclient != nullptr && !LangExt::isblank(jservclient.get()->client.ssInf.ssid)};
     }
 
+    // void asy_echows(OnOk ok, OnError err);
+    void asy_echows(const string& echo = "Echo by Asynclientier from C++");
 private:
     string format_proc_report(const string& proc_msg) {
         vector<string_view> report = LangExt::split(proc_msg, ',');

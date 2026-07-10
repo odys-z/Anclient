@@ -12,9 +12,10 @@ int main(int argc, char **argv) {
 
     map<string, vector<LangExt::VarType>> fileselection;
 
-    Slingleton slingle = Slingleton::get_instance();
 
     auto ui = App::create();
+    slint::ComponentWeakHandle<App> ui_weak = ui;
+    Slingleton slingle = Slingleton::get_instance(ui_weak);
 
     ui->set_window_title("SurrealTree Explorer v1.0");
     ui->window().set_maximized(false);
@@ -25,15 +26,35 @@ int main(int argc, char **argv) {
         std::string menu_id = page_ix.data();
         anlog(std::format("Menu changed! Index: {}, ID: {}", index, menu_id));
 
-        if (menu_id == "1") {
+        if (menu_id == "album") {
             launch_webview_window(ui);
         }
     });
 
+    ui->on_echows([&](slint::SharedString msg) {
+        slingle.doclientier->asy_echows(string{msg});
+            // [&] (anson::AnsonResp& repbd) {
+            //     slint::SharedString slint_text(repbd.m);
+            //     slint::invoke_from_event_loop([&, slint_text]() {
+            //         if (auto handle = ui_weak.lock()) {
+            //             (*handle)->set_syncing_status(slint_text);
+            //         }
+            //     });
+            // },
+            // [&] (anson::MsgCode::Code c, const string& s, const vector<std::string>& args) {
+            //     slint::SharedString slint_text(s);
+            //     slint::invoke_from_event_loop([&, slint_text]() {
+            //         if (auto handle = ui_weak.lock()) {
+            //             (*handle)->set_syncing_status(slint_text);
+            //         }
+            //     });
+            // }); 
+        });
+
     ui->on_pingws([&]() {
         anlog("Ping IPC Agent clicked!");
         slingle.doclientier->push_files({});
-        ui->invoke_update_syncing_status("From CPP: ping ...");
+        ui->set_syncing_status("From CPP: pushing ...");
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {

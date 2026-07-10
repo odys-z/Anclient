@@ -46,7 +46,7 @@ void AsynClienter::reconnect_ipc() {
     if (!wsclient) {
         anlog("Re-connect IPC Agent...");
         onmsg = [this]() -> void {
-            if (wsclient->block_poll(200) > 0) {
+            if (wsclient->block_poll(200)) {
                 AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
                 if (rep.code == MsgCode::Code::ok) {
 
@@ -54,9 +54,10 @@ void AsynClienter::reconnect_ipc() {
                     string proc_report = format_proc_report(rep.Body().m);
                     anlog(proc_report);
 
-                    slint::invoke_from_event_loop([this, proc_report]() {
+                    slint::SharedString slint_text(proc_report);
+                    slint::invoke_from_event_loop([this, slint_text]() {
                         if (auto handle = window_weak.lock()) {
-                            (*handle)->set_syncing_status(proc_report.c_str());
+                            (*handle)->set_syncing_status(slint_text);
                         }
                     });
                 }
@@ -67,9 +68,11 @@ void AsynClienter::reconnect_ipc() {
                 else if (!rep.body.empty()) {
                     string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
                     anlog(std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state));
-                    slint::invoke_from_event_loop([this, clientpath_state]() {
+
+                    slint::SharedString slint_text(clientpath_state);
+                    slint::invoke_from_event_loop([this, slint_text]() {
                         if (auto handle = window_weak.lock()) {
-                            (*handle)->set_syncing_status(clientpath_state.c_str());
+                            (*handle)->set_syncing_status(slint_text);
                         }
                     });
                 }
@@ -103,22 +106,6 @@ void AsynClienter::reconnect_ipc() {
 }
 
 void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths) {
-    // map<string, vector<LangExt::VarType>> syncing_paths;
-    // auto it = syncing_paths.begin();
-    // while (it != syncing_paths.end()) {
-    //     anlog("cpp handling: "s + it->first);
-    //     string v = it->first;
-    //     string w = "~/.docker/canary.json";
-    //     anlog("v: " + v);
-    //     anlog("w: " + w);
-    //     string pth = "~/.docker/canary.json";
-    //     aninfo("task preparing ................ "s + pth);
-
-    //     syncing_paths[std::move(pth)] = {ShareFlag::pushing, _device, "now()"};
-    //     aninfo("now destructing pth ................"s + pth);
-    // }
-    // aninfo("task prepared ................");
-
     PathsPage syncingpage;
     syncingpage.clientPaths = syncing_paths;
     if (!wsclient)
@@ -126,4 +113,38 @@ void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& synci
 
     wsclient->on_msg(onmsg)
         ->place_tasks(syncingpage);
+}
+
+// void AsynClienter::asy_echows(OnOk ok, OnError err) {
+void AsynClienter::asy_echows(const string & echo_msg) {
+    std::thread bg_thread([this, echo_msg]() {
+        reconnect_ipc();
+        std::this_thread::sleep_for(500ms);
+
+        EchoReq echo{EchoReq::A::echo};
+        echo.echo = echo_msg;
+        AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
+
+        wsclient->asynSend(echomsg);
+        // wsclient->block_poll(500);
+
+        // try {
+        //     AnsonMsg<AnsonResp> resp = wsclient->pop_envelope<AnsonResp>();
+
+        //     anlog("✅ Echo Opening message verified");
+        //     wsclient->asynSend(echomsg);
+        //     if (!wsclient->block_poll(3000)) {
+        //         err(resp.code, "expecting echos ...", {});
+        //         return; // Exit early if error occurs
+        //     }
+
+        //     resp = wsclient->pop_envelope<AnsonResp>();
+        //     ok(resp.Body());
+
+        // } catch (SemanticException e) {
+        //     err(anson::MsgCode::Code::exIo, e.what(), {});
+        // }
+    });
+
+    bg_thread.detach();
 }
