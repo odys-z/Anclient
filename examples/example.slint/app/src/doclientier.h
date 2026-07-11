@@ -105,12 +105,17 @@ public:
     void asy_echows(const string& echo = "Echo by Asynclientier from C++");
 private:
     string format_proc_report(const string& proc_msg) {
-        vector<string_view> report = LangExt::split(proc_msg, ',');
+        std::vector<std::string_view> report = LangExt::split(proc_msg, ',');
         if (report.size() >= 4) {
-            int rows = std::stoi(string{report[1]});
-            if (rows > 0)
-                return std::format("File {}/{}, {}",
-                    report[2], report[3], std::stof(std::string(report[1])) / rows);
+            int current_row   = std::stoi(std::string(report[0]));
+            int total_rows     = std::stoi(std::string(report[1]));
+            int current_block  = std::stoi(std::string(report[2]));
+            int total_blocks   = std::stoi(std::string(report[3]));
+
+            if (total_blocks > 0) {
+                float percentage = (static_cast<float>(current_block + 1) / total_blocks) * 100.0f;
+                return std::format("File {}/{}, {:.0f}%", current_row + 1, total_rows, percentage);
+            }
         }
         return proc_msg;
     }

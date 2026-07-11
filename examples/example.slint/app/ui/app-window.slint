@@ -33,17 +33,10 @@ export component App inherits Window {
     callback menu-changed(int, string, string);
     callback item_clicked(string, bool);
     callback echows(string);
-    callback pingws();
+    callback pingws([string]);
     callback load_folder(string);
     callback select_file(PathItemData, bool);
     callback upload_files();
-
-    // public function update-syncing-status(status: string) {
-    //     syncing-status = status;
-    //     if (root.menu_id == "home") {
-    //         index-page.ws-status = status; 
-    //     }
-    // }
 
     HorizontalLayout {
       left-wrapper:=Rectangle {
@@ -78,7 +71,7 @@ export component App inherits Window {
           if (menu_id == "home") : index-page := HomeForm { 
             height: parent.height - 14pt;
             visible: root.menu_id == "home";
-            pingws-clicked => { root.pingws(); }
+            pingws-clicked => { root.pingws(["file-1", "file-2"]); }
           }
 
           if (menu_id == "album") : webview_slot := Rectangle {
@@ -120,6 +113,7 @@ export component App inherits Window {
             GUIClientSettings {
               width: 100%; height: 100%;
               echows-clicked(msg) => { root.echows(msg); }
+              pingws-clicked => { root.pingws(self.file_paths)}
             }
           }
 

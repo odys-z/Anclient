@@ -3,6 +3,7 @@ package io.oz.anclient.socketier;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.musteq;
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.LangExt.mustge;
 import static io.odysz.common.Utils.warn;
 
 import java.io.IOException;
@@ -126,7 +127,8 @@ public class WSPing implements IWSPoint {
 	private List<IFileDescriptor> make_videos_uploaded(DocsReq req) throws SemanticException {
 		mustnonull(req.syncingPage());
 		mustnonull(req.syncingPage().paths());
-
+		mustge(req.syncingPage().end() - req.syncingPage().start(), 0, "syncingPage().end < req.syncingPage.start");
+		
 		List<IFileDescriptor> vids = new ArrayList<IFileDescriptor>(req.syncingPage().end() - req.syncingPage().start());
 		for (String p : req.syncingPage().paths().keySet()) {
 			ExpSyncDoc d = new ExpSyncDoc();

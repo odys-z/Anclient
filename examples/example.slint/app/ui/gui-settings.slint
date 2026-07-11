@@ -4,13 +4,15 @@ import { LineEdit } from "std-widgets.slint";
 
 export component GUIClientSettings {
 
-    in-out property <string> ws-status: "Ready";
+    in-out property <[string]> file_paths;
+
     callback pingws-clicked();
     callback echows-clicked(string);
 
     Rectangle {
         height: 100%;
         width: 100%;
+        vertical-stretch: 1;
         VerticalLayout {
           HorizontalLayout {
             alignment: center;
@@ -24,18 +26,29 @@ export component GUIClientSettings {
                 }
             }
           }
+
+        //   f1 := LineEdit { text: "~/github/anclient/examples/example.slint/rst/docsreq.ast.json"; }
+        //   f2 := LineEdit { text: "~/github/anclient/examples/example.slint/rst/docsresp.ast.json"; }
+          // f0 := LineEdit { text: file_paths[0]; }
+          // f1 := LineEdit { text: file_paths[1]; }
+          SButton {
+            text: "Ping Task Placing";
+            width: 100%;
+            padding: 8pt;
+            clicked => {
+              file_paths = ["~/github/anclient/examples/ EXAMPLE.SLINT/RST/DOCSREQ.AST.JSON",
+                            "~/GITHUB/ANCLIENT/EXAMPLES/ example.slint/rst/docsresp.ast.json"];
+              pingws-clicked();
+            }
+          }
+
           HorizontalLayout {
             padding: 24px;
             alignment: space-around;
             vertical-stretch: 1;
-            SButton {
-                text: "Ping IPC Agent";
-                clicked => {
-                    pingws-clicked();
-                }
-            }
 
             msg-edit:=LineEdit {
+                width: 85%;
                 placeholder-text: @tr("Echo by Album Client");
             }
             SButton {
@@ -47,24 +60,11 @@ export component GUIClientSettings {
                     echows-clicked(msg-edit.text);
                 }
             }
-            STip {
-                text: "GO TO SurrealismUI WIKI?\n Click here!";
-                height: wiki-btn.height;
-                width: wiki-btn.width;
-                position: Bottom;
-                wiki-btn:=SButton {
-                    theme: Success;
-                    text: "Read Wiki ...";
-                    clicked => {
-                        parent.clicked();
-                    }
-                }
-            }
           }
-        }
 
-        Rectangle {
-            vertical-stretch: 1; // Pushes everything above it up to the top!
+          HorizontalLayout {
+            vertical-stretch: 50%;
+          }
         }
     }
 }

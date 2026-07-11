@@ -33,28 +33,27 @@ int main(int argc, char **argv) {
 
     ui->on_echows([&](slint::SharedString msg) {
         slingle.doclientier->asy_echows(string{msg});
-            // [&] (anson::AnsonResp& repbd) {
-            //     slint::SharedString slint_text(repbd.m);
-            //     slint::invoke_from_event_loop([&, slint_text]() {
-            //         if (auto handle = ui_weak.lock()) {
-            //             (*handle)->set_syncing_status(slint_text);
-            //         }
-            //     });
-            // },
-            // [&] (anson::MsgCode::Code c, const string& s, const vector<std::string>& args) {
-            //     slint::SharedString slint_text(s);
-            //     slint::invoke_from_event_loop([&, slint_text]() {
-            //         if (auto handle = ui_weak.lock()) {
-            //             (*handle)->set_syncing_status(slint_text);
-            //         }
-            //     });
-            // }); 
         });
 
-    ui->on_pingws([&]() {
+    ui->on_pingws([&](std::shared_ptr<slint::Model<slint::SharedString>> files) {
         anlog("Ping IPC Agent clicked!");
-        slingle.doclientier->push_files({});
-        ui->set_syncing_status("From CPP: pushing ...");
+        map<string, vector<LangExt::VarType>> filemap;
+
+        slint::SharedString status = "Pushing";
+        for (int i = 0; i < files->row_count(); ++i) {
+            auto f = files->row_data(i);
+            if (!f.has_value())
+                continue;
+
+            std::string file_str(*f);
+            filemap.emplace(file_str, std::vector<LangExt::VarType>{"syncing"});
+
+            std::string updated_status = std::string(std::string_view(status)) + std::string(std::string_view(*f));
+            status = slint::SharedString(" "s + updated_status);
+            anlog("Pinging: "s + file_str);
+        }
+        ui->set_syncing_status(status);
+        slingle.doclientier->push_files(filemap);
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {

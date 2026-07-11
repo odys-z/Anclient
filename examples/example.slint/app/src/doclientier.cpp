@@ -57,6 +57,7 @@ void AsynClienter::reconnect_ipc() {
                     slint::SharedString slint_text(proc_report);
                     slint::invoke_from_event_loop([this, slint_text]() {
                         if (auto handle = window_weak.lock()) {
+                            anlog("[onmsg] Updating statues report: "s + string{slint_text});
                             (*handle)->set_syncing_status(slint_text);
                         }
                     });
@@ -72,6 +73,7 @@ void AsynClienter::reconnect_ipc() {
                     slint::SharedString slint_text(clientpath_state);
                     slint::invoke_from_event_loop([this, slint_text]() {
                         if (auto handle = window_weak.lock()) {
+                            anlog("[onmsg] Updating statues report: "s + string{slint_text});
                             (*handle)->set_syncing_status(slint_text);
                         }
                     });
@@ -92,30 +94,49 @@ void AsynClienter::reconnect_ipc() {
         }
     }
 
-    while (wsclient && wsclient->ipconn_state() == WSClient::Connecting
-        || wsclient && wsclient->ipconn_state() == WSClient::Closing)
-        std::this_thread::sleep_for(250ms);
+    // while (wsclient && wsclient->ipconn_state() == WSClient::Connecting
+    //     || wsclient && wsclient->ipconn_state() == WSClient::Closing)
+    //     std::this_thread::sleep_for(250ms);
+
+    // if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
+    //     anlog("IPC Agent connection is opened.");
+    //     return;
+    // }
+    // if (wsclient && wsclient->ipconn_state() == WSClient::Closed) {
+    //     wsclient->connect();
+    // }
+
+    int timeout_attempts = 20; // 20 * 100ms = 2 seconds max wait
+    while (wsclient && timeout_attempts > 0) {
+        string state = wsclient->ipconn_state();
+        if (state == WSClient::Open) {
+            break;
+        }
+        std::this_thread::sleep_for(100ms);
+        timeout_attempts--;
+    }
 
     if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
-        anlog("IPC Agent connection is opened.");
+        anlog("IPC Agent connection is opened successfully.");
         return;
-    }
-    if (wsclient && wsclient->ipconn_state() == WSClient::Closed) {
-        wsclient->connect();
+    } else {
+        anerror("IPC Agent failed to open connection within timeout.");
     }
 }
 
 void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths) {
     PathsPage syncingpage;
     syncingpage.clientPaths = syncing_paths;
-    if (!wsclient)
+    syncingpage.start = 0;
+    syncingpage.end = syncing_paths.size();
+
+    // if (!wsclient)
         reconnect_ipc();
 
-    wsclient->on_msg(onmsg)
+    wsclient // ->on_msg(onmsg)
         ->place_tasks(syncingpage);
 }
 
-// void AsynClienter::asy_echows(OnOk ok, OnError err) {
 void AsynClienter::asy_echows(const string & echo_msg) {
     std::thread bg_thread([this, echo_msg]() {
         reconnect_ipc();
@@ -126,24 +147,6 @@ void AsynClienter::asy_echows(const string & echo_msg) {
         AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
 
         wsclient->asynSend(echomsg);
-        // wsclient->block_poll(500);
-
-        // try {
-        //     AnsonMsg<AnsonResp> resp = wsclient->pop_envelope<AnsonResp>();
-
-        //     anlog("✅ Echo Opening message verified");
-        //     wsclient->asynSend(echomsg);
-        //     if (!wsclient->block_poll(3000)) {
-        //         err(resp.code, "expecting echos ...", {});
-        //         return; // Exit early if error occurs
-        //     }
-
-        //     resp = wsclient->pop_envelope<AnsonResp>();
-        //     ok(resp.Body());
-
-        // } catch (SemanticException e) {
-        //     err(anson::MsgCode::Code::exIo, e.what(), {});
-        // }
     });
 
     bg_thread.detach();
