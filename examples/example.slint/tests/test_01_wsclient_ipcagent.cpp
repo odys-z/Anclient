@@ -59,7 +59,7 @@ protected:
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        anlog(std::format("Synode Settings: {}", qmlsettings.synode_settings));
+        anlog(std::format("Synode Volume: {}", qmlsettings.synode_vol));
     }
 
     static void SetUpTestSuite() {
@@ -67,7 +67,7 @@ protected:
         register_semantier(asts, "");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_qmltestsettingsAst(asts);
+        register_qmlappsettingsAst(asts);
 
         Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);

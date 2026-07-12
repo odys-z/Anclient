@@ -4,11 +4,13 @@ import { UseIcons } from "@surrealism/use/index.slint";
 import { TableViewPage } from "./table_view_page.slint";
 import { CustomTableViewPage } from "./custom-table.slint";
 
-
 export component HomeForm {
 
-    in-out property <string> ws-status: "Ready";
-    callback pingws-clicked();
+    in-out property <string> ws-status: @tr("Ready");
+    in-out property <bool> enable-vol: false;
+
+    callback navigate(string);
+    callback open-link(string);
 
     Rectangle {
         height: 100%; width: 100%;
@@ -16,89 +18,148 @@ export component HomeForm {
           HorizontalLayout {
             padding: 8px;
             alignment: center;
-            Rectangle {
-                height:header.height ;
-                width: parent.width - 16px;
-                header:=SHeader {
-                value: [{label:"SurrealismUI", value:"1"}, {label:"menu:Index", value:"2"}];
-                }
+            header := SHeader {
+                value: [{label:"Album Desktop", value:"1"}, {label:"Home", value:"2"}];
             }
           }
+
           HorizontalLayout {
-            padding: 24px;
-            alignment: space-around;
-            STag {
-                theme: Warning;
-                text: "Warning";
-            }
-            STag {
-                theme: Success;
-                text: "Success";
-            }
-            STag {
-                theme: Error;
-                text: "Error";
-            }
-            STag {
-                theme: Info;
-                text: "Credit to: syf20020816@outlook.com";
-            }
-          }
-          HorizontalLayout {
+            padding: 24pt;
             alignment: center;
-            SCard {
-                card-width: 460px;
-                card-height: 320px;
-                SIcon {
-                height: parent.height;
-                width: parent.width;
-                source: @image-url("imgs/album.svg");
+            spacing: 24pt;
+            // album
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("imgs/album.svg");
+                        clicked => { navigate("album") };
+                    }
                 }
-            }
-          }
-          HorizontalLayout {
-            padding: 24px;
-            alignment: space-around;
-            SButton {
-                text: "Ping IPC Agent";
-                clicked => {
-                    pingws-clicked();
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Album");
+                    font-size: 14pt;
                 }
             }
 
+            // setup
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    background: (root.enable-vol) ? black : grey;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/folder-open-filled.svg");
+                        clicked => { if (root.enable-vol) { navigate("volume"); } };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Volume");
+                    font-size: 14pt;
+                }
+            }
+          }
+
+          HorizontalLayout {
+            padding: 24pt;
+            alignment: center;
+            spacing: 24pt;
+
+            // resources
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/file-code.svg");
+                        clicked => { navigate("upload") };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Uploads");
+                    font-size: 14pt;
+                }
+            }
+ 
+            // volume
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/setting-two.svg");
+                        clicked => { navigate("2-2") };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Setup");
+                    font-size: 14pt;
+                }
+            }
+         }
+
+          HorizontalLayout {
+            padding: 24px;
+            alignment: space-around;
             SButton {
-                show-icon: true;
-                icon: UseIcons.icons.Smiling-face;
+                font-size: 9pt;
                 theme: Primary;
-                text: "Star on Github!";
+                text: "About Portfolio";
                 clicked => {
                     popup.open();
                 }
             }
-            STip {
-                text: "GO TO SurrealismUI WIKI?\n Click here!";
-                height: wiki-btn.height;
-                width: wiki-btn.width;
-                position: Bottom;
-                wiki-btn:=SButton {
-                    theme: Success;
-                    text: "Read Wiki ...";
-                    clicked => {
-                        parent.clicked();
-                    }
+
+            SButton {
+                icon: UseIcons.icons.Smiling-face;
+                font-size: 9pt;
+                text: "Data Privacy";
+                clicked => { root.open_link("https://odys-z.github.io/products/portfolio/privacy-policy.html"); }
+            }
+
+            SButton {
+                icon: UseIcons.icons.Share;
+                text: "Credits";
+                font-size: 9pt;
+                clicked => {
+                    root.open-link("https://odys-z.github.io/products/portfolio/credits.html");
                 }
             }
           }
         }
 
         popup := SPopup {
-            background: #d5f371;
-            VerticalLayout {
+            Rectangle {
+              background: #ad9678;
+              VerticalLayout {
                 padding: 12px;
                 alignment: center;
-                Text{ horizontal-alignment: center; font-size: 24pt; text: root.ws-status; }
-                Text{ horizontal-alignment: center; font-size: 16pt; color: #223623;
-                      text: "Click to close this popup.";}
+                Text{ horizontal-alignment: center; font-size: 24pt; text: "Portfolio 0.8 for Desktop"; }
+                Text{ horizontal-alignment: center; font-size: 18pt; color: #223623; text: "License: MIT";}
+                Text{ horizontal-alignment: center; font-size: 12pt; color: #223623; text: "Copyright @ odys-z.github.io, 2026";}
+                Text{ horizontal-alignment: center; font-size: 12pt; color: #223623; text: "All Rights Reserved";}
+              }
             }
         }
     }

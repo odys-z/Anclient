@@ -14,14 +14,15 @@ namespace anson {
 
 class QMLAppSettings : public anson::Anson {
 public:
-    inline static const std::string _type_ = "io.odysz.anclient.test.QMLTestSettings";
+    inline static const std::string _type_ = "io.odysz.anclient.slint.QMLAppSettings";
     string sysuri;
     string synuri;
     string temp_dir;
     string java_path;
     string doctier_jar;
     string wsagent_jar;
-    string synode_settings;
+    string synode_id;
+    string synode_vol;
     string wsagent_settings;
     string wshost;
     int wsport;
@@ -31,7 +32,7 @@ public:
     }
 };
 
-inline static void register_qmltestsettingsAst(AstMap & asts) {
+inline static void register_qmlappsettingsAst(AstMap & asts) {
 
     AnsonAst * ast = createAST <QMLAppSettings, AnsonAst> (
         asts, Anson::_type_, map <string, AnsonField> {
@@ -41,7 +42,8 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         {"java_path", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
         {"wsagent_jar", {.dataAnclass="string"} },
-        {"synode_settings", {.dataAnclass="string"} },
+        {"synode_id", {.dataAnclass="string"} },
+        {"synode_vol", {.dataAnclass="string"} },
         {"wsagent_settings", {.dataAnclass="string"} },
         {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
@@ -57,7 +59,8 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
         .data<&anson::QMLAppSettings::java_path>("java_path")
         .data<&anson::QMLAppSettings::doctier_jar>("doctier_jar")
         .data<&anson::QMLAppSettings::wsagent_jar>("wsagent_jar")
-        .data<&anson::QMLAppSettings::synode_settings>("synode_settings")
+        .data<&anson::QMLAppSettings::synode_id>("synode_id")
+        .data<&anson::QMLAppSettings::synode_vol>("synode_vol")
         .data<&anson::QMLAppSettings::wsagent_settings>("wsagent_settings")
         .data<&anson::QMLAppSettings::wshost>("wshost")
         .data<&anson::QMLAppSettings::wsport>("wsport")
@@ -79,8 +82,10 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.doctier_jar);
                 if ("wsagent_jar" == fieldname)
                     return entt::forward_as_meta(concrete.wsagent_jar);
-                if ("synode_settings" == fieldname)
-                    return entt::forward_as_meta(concrete.synode_settings);
+                if ("synode_id" == fieldname)
+                    return entt::forward_as_meta(concrete.synode_id);
+                if ("synode_vol" == fieldname)
+                    return entt::forward_as_meta(concrete.synode_vol);
                 if ("wsagent_settings" == fieldname)
                     return entt::forward_as_meta(concrete.wsagent_settings);
                 if ("wshost" == fieldname)
@@ -94,7 +99,7 @@ inline static void register_qmltestsettingsAst(AstMap & asts) {
                 return bast->get_field_instance(ans, fieldname);
             }
 
-            anerror("get_field_instance<QMLTestSettings>(): Failed to get entt instance (meta_any)");
+            anerror("get_field_instance<QMLAppSettings>(): Failed to get entt instance (meta_any)");
             return { };
         };
 }

@@ -8,6 +8,7 @@ message(STATUS "=========================================== app: CMAKE_CURRENT_S
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/helper.h
     src/slingleton.cpp
     src/slingleton.h
     src/gen/app_settings.hpp

@@ -7,6 +7,7 @@ import { HomeForm } from "home.slint";
 import { GUIClientSettings } from "gui-settings.slint";
 import { PathItemData, FileTable } from "file-table.slint";
 
+
 export component App inherits Window {
     preferred-height: 800px;
     preferred-width: 1280px;
@@ -29,14 +30,21 @@ export component App inherits Window {
 
     in-out property <string> current_pth;
     in-out property <[PathItemData]> filelist: [];
+    in-out property <bool> enable_vol;
 
-    callback menu-changed(int, string, string);
+    callback menu-changed(string);
     callback item_clicked(string, bool);
     callback echows(string);
     callback pingws([string]);
     callback load_folder(string);
     callback select_file(PathItemData, bool);
     callback upload_files();
+    callback open_link(string);
+    callback open_volume();
+
+    init => {
+      menu_id = "home";
+    }
 
     HorizontalLayout {
       left-wrapper:=Rectangle {
@@ -46,16 +54,16 @@ export component App inherits Window {
         clip: false;
         menu:=SMenu {
           menu-data:[
-            { id: "home",  icon:UseIcons.icons.FileCode, name: "Home" },
-            { id: "album", icon:UseIcons.icons.Share,    name: "Album"},
-            { id: "files", icon:UseIcons.icons.Folder,   name: "Files"},
-            { id: "help",  icon:UseIcons.icons.Help,     name: "Help" },
+            { id: "home",  icon: @image-url("imgs/home.svg"),  name: "Home" },
+            { id: "album", icon: @image-url("imgs/album-icon.svg"), name: "Album"},
+            { id: "volume",icon: UseIcons.icons.Folder,   name: "Volume" },
+            { id: "upload",icon: UseIcons.icons.FileCode, name: "Upload" },
           ];
 
           change(index, data) => {
             debug(index, data);
             menu_id = data.id;
-            menu-changed(index, data.id, data.name);
+            menu-changed(data.id);
           }
         }
       }
@@ -71,7 +79,12 @@ export component App inherits Window {
           if (menu_id == "home") : index-page := HomeForm { 
             height: parent.height - 14pt;
             visible: root.menu_id == "home";
-            pingws-clicked => { root.pingws(["file-1", "file-2"]); }
+            navigate(menuid) => {
+              root.menu-id = menuid;
+              menu-changed(menuid);
+            }
+            open-link(link) => { root.open_link(link); }
+            enable-vol: root.enable_vol;
           }
 
           if (menu_id == "album") : webview_slot := Rectangle {
@@ -79,12 +92,12 @@ export component App inherits Window {
             Text { text: "Page 2"; }
           }
 
-          if (menu_id == "files") : Rectangle {
+          if (menu_id == "volume") : Rectangle {
             background: #b0d0d0;
             CustomTableViewPage { width: 100%; height: 100%; }
           }
 
-          if (menu_id == "help") : Rectangle {
+          if (menu_id == "upload") : Rectangle {
             background: #202020;
             FileTable { width: 100%; height: 100%;
               row_data: root.filelist;

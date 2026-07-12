@@ -1,5 +1,5 @@
 { "type": "io.odysz.reflect.AnsonAst",
-  "dataAnclass": "io.odysz.anclient.test.QMLTestSettings",
+  "dataAnclass": "io.odysz.anclient.slint.QMLAppSettings",
   "baseAnclass": "io.odysz.anson.Anson",
   "fields" : {
     "sysuri": {"dataAnclass": "string"},
@@ -8,7 +8,8 @@
     "java_path"  : {"dataAnclass": "string"},
     "doctier_jar": {"dataAnclass": "string"},
     "wsagent_jar": {"dataAnclass": "string"},
-    "synode_settings" : {"dataAnclass": "string"},
+    "synode_id"  : {"dataAnclass": "string"},
+    "synode_vol" : {"dataAnclass": "string"},
     "wsagent_settings": {"dataAnclass": "string"},
     "wshost": {"dataAnclass": "string"},
     "wsport": {"dataAnclass": "int"}

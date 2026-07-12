@@ -23,36 +23,41 @@ namespace anson {
     static JsonOpt opts;
     static AstMap  asts;
     static Slingleton* instance;
-    static QMLAppSettings qmlsettings;
 
     JavaAgentController* agentController = nullptr;
 
     WSClient* wsclient = nullptr;
 
   public:
+    static QMLAppSettings qmlsettings;
     AsynClienter* doclientier = nullptr;
+    string volume_path;
 
     Slingleton() {}
 
     static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin) {
       if (instance == nullptr) {
-          instance = new Slingleton();
-          register_jserv(asts, opts);
-          register_semantier(asts, "");
-          register_doctier(asts, "ast");
-          register_iport<WSPort>(asts, "ast/wsport.ast.json");
-          register_qmltestsettingsAst(asts);
+        instance = new Slingleton();
+        register_jserv(asts, opts);
+        register_semantier(asts, "");
+        register_doctier(asts, "ast");
+        register_iport<WSPort>(asts, "ast/wsport.ast.json");
+        register_qmlappsettingsAst(asts);
 
-          Anson::from_file("settings/app-settings.json", qmlsettings);
+        Anson::from_file("settings/app-settings.json", qmlsettings);
 
-          instance->agentController = new JavaAgentController(qmlsettings.java_path, qmlsettings.wsagent_jar);
-          instance->agentController->start_agent(qmlsettings.wsagent_settings);
+        instance->agentController = new JavaAgentController(qmlsettings.java_path, qmlsettings.wsagent_jar);
+        instance->agentController->start_agent(qmlsettings.wsagent_settings);
 
-          ix::initNetSystem();
+        ix::initNetSystem();
 
-          instance->doclientier = new AsynClienter(appwin);
+        instance->doclientier = new AsynClienter(appwin);
       }
       return *instance;
+    }
+
+    bool has_synode_vol() {
+      return !LangExt::isblank(qmlsettings.synode_id) && std::filesystem::exists(qmlsettings.synode_vol);
     }
   };
 }

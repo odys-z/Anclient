@@ -6,6 +6,7 @@
 
 // This order is to avoid compile error
 #include <io/odysz/anserializer.h>
+#include "helper.h"
 
 int main(int argc, char **argv) {
     using namespace anson;
@@ -18,16 +19,20 @@ int main(int argc, char **argv) {
     Slingleton slingle = Slingleton::get_instance(ui_weak);
 
     ui->set_window_title("SurrealTree Explorer v1.0");
+    ui->set_enable_vol(slingle.has_synode_vol());
     ui->window().set_maximized(false);
 
     std::unique_ptr<webview::webview> wv = nullptr;
 
-    ui->on_menu_changed([&](int index, slint::SharedString page_ix, slint::SharedString page_name) {
+    ui->on_menu_changed([&](slint::SharedString page_ix) {
         std::string menu_id = page_ix.data();
-        anlog(std::format("Menu changed! Index: {}, ID: {}", index, menu_id));
+        anlog(std::format("Menu changed! ID: {}", menu_id));
 
         if (menu_id == "album") {
             launch_webview_window(ui);
+        }
+        else if (menu_id == "volume") {
+            anlog("TDD: Launch volume explorer");
         }
     });
 
@@ -102,6 +107,15 @@ int main(int argc, char **argv) {
 
     ui->on_upload_files([&]() {
         slingle.doclientier->push_files(fileselection);
+    });
+
+    ui->on_open_link([](slint::SharedString url) {
+        open_browser(std::string(url));
+    });
+
+    ui->on_open_volume([&slingle]() {
+        if (slingle.has_synode_vol())
+            open_file_explorer(slingle.qmlsettings.synode_vol);
     });
 
     ui->run();

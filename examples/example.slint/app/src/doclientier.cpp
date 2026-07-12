@@ -34,7 +34,7 @@ bool AsynClienter::start_ipcagent() {
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    anlog(std::format("Synode Settings: {}", qmlsettings.synode_settings));
+    anlog(std::format("Synode Volume: {}", qmlsettings.synode_vol));
     return true;
 }
 
@@ -94,18 +94,6 @@ void AsynClienter::reconnect_ipc() {
         }
     }
 
-    // while (wsclient && wsclient->ipconn_state() == WSClient::Connecting
-    //     || wsclient && wsclient->ipconn_state() == WSClient::Closing)
-    //     std::this_thread::sleep_for(250ms);
-
-    // if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
-    //     anlog("IPC Agent connection is opened.");
-    //     return;
-    // }
-    // if (wsclient && wsclient->ipconn_state() == WSClient::Closed) {
-    //     wsclient->connect();
-    // }
-
     int timeout_attempts = 20; // 20 * 100ms = 2 seconds max wait
     while (wsclient && timeout_attempts > 0) {
         string state = wsclient->ipconn_state();
@@ -130,11 +118,8 @@ void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& synci
     syncingpage.start = 0;
     syncingpage.end = syncing_paths.size();
 
-    // if (!wsclient)
-        reconnect_ipc();
-
-    wsclient // ->on_msg(onmsg)
-        ->place_tasks(syncingpage);
+    reconnect_ipc();
+    wsclient->place_tasks(syncingpage);
 }
 
 void AsynClienter::asy_echows(const string & echo_msg) {

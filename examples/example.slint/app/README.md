@@ -39,6 +39,6 @@
 1. Generate anclient.cmake
 
     ```
-      cd tests
+      cd ../tests
       py -m semantier_gen settings/gen-settings.json ../ast
     ```
