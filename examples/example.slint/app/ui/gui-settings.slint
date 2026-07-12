@@ -27,10 +27,6 @@ export component GUIClientSettings {
             }
           }
 
-        //   f1 := LineEdit { text: "~/github/anclient/examples/example.slint/rst/docsreq.ast.json"; }
-        //   f2 := LineEdit { text: "~/github/anclient/examples/example.slint/rst/docsresp.ast.json"; }
-          // f0 := LineEdit { text: file_paths[0]; }
-          // f1 := LineEdit { text: file_paths[1]; }
           SButton {
             text: "Ping Task Placing";
             width: 100%;
@@ -48,12 +44,12 @@ export component GUIClientSettings {
             vertical-stretch: 1;
 
             msg-edit:=LineEdit {
-                width: 85%;
+                width: 80%;
                 placeholder-text: @tr("Echo by Album Client");
             }
             SButton {
                 show-icon: true;
-                icon: UseIcons.icons.Smiling-face;
+                icon: UseIcons.icons.More;
                 theme: Primary;
                 text: "Echo to IPC Agent";
                 clicked => {
