@@ -46,11 +46,9 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 		instance = new WServPort(settings.tiers);
 		return instance;
 	}
-	
 
 	private RemoteEndpoint.Async asyremote;
 	private RemoteEndpoint.Basic synremote;
-//	static Session lastSession;
 
 	public WServPort() {
 		ipcPorts = new HashMap<IPort, IWSPoint>();
@@ -130,9 +128,6 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
         cause.printStackTrace();
     }
 
-//	public void sendEnvelope(String string, OnOk object) {
-//	}
-
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
 		logi("WSPoint onOpen: %s", session.getRequestURI().toString());
@@ -151,8 +146,8 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
         try {
             AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
             p = req.port();
-            if (!ipcPorts.containsKey(p))
-            	throw new AnsonException(AnsonException.general, "Port (wspoint) not found: %s", p.name());
+            if (p == null || !ipcPorts.containsKey(p))
+            	throw new AnsonException(AnsonException.general, "Port (wspoint) not found: %s", p == null ? "null" : p.name());
 
             ipcPorts.get(p).onMessage(req, synremote, asyremote);
         } catch (AnsonException e) {
