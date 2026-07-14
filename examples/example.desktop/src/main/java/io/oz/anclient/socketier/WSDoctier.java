@@ -91,7 +91,24 @@ public class WSDoctier implements IWSPoint {
 						rep.msg(String.format("%d/%d, %d/%d", rx, rows, bx, blocks));
 						sr.sendText(rep.toBlock());
 						return false;
-					}, pushsOk, onpushErr);
+					},
+					// pushsOk,
+					(synrep) -> {
+						sr.sendText(synrep.toBlock());
+					},
+					// onpushErr
+					(c, err, args) -> {
+						DocsResp rp = new DocsResp();
+						rp.msg(err);
+						AnsonMsg<DocsResp> rep = new AnsonMsg<DocsResp>(port(), c);
+						rep.body(rp);
+
+						try {
+							sr.sendText(rep.toBlock());
+						} catch (AnsonException | IOException e) {
+							e.printStackTrace();
+						}
+					});
 			} catch (DocsException e) {
 				onpushErr.err(MsgCode.ext, e.getMessage(), e.getClass().getName());
 			} catch (TransException e) {

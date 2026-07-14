@@ -147,7 +147,8 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
             AnsonMsg<?> req = (AnsonMsg<?>) Anson.fromJson(message);
             p = req.port();
             if (p == null || !ipcPorts.containsKey(p))
-            	throw new AnsonException(AnsonException.general, "Port (wspoint) not found: %s", p == null ? "null" : p.name());
+            	throw new AnsonException(AnsonException.general,
+            			"Port (wspoint) not found: %s", p == null ? "null" : p.name());
 
             ipcPorts.get(p).onMessage(req, synremote, asyremote);
         } catch (AnsonException e) {
