@@ -6,7 +6,7 @@ With VS Code, CMake & Slint Plugin, setup .vscode/settings.json,
 
 ```
     "cmake.debugConfig": {
-        "args": ["settings/app-settings-reddish.json"]
+        "args": ["settings/app-settings.json"]
     }
 ```
 
