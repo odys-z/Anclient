@@ -1,0 +1,22 @@
+{
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "Ninja",
+    "cmake.configureArgs": [
+        "-DCMAKE_CXX_STANDARD=20"
+    ],
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+    "slint.libraryPaths": {
+        "surrealism": "./surrealism-0.5.3"
+    },
+    "files.associations": {
+        "*.slint": "slint"
+    },
+    "cmake.debugConfig": {
+        "args": ["settings/app-settings-reddish.json"]
+    }
+}
