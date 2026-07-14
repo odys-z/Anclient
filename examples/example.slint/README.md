@@ -10,4 +10,4 @@ With VS Code, CMake & Slint Plugin, setup .vscode/settings.json,
     }
 ```
 
-Then debug with GDB.
+Create the configuration file, see *settings/app-settings-template.json*, then debug with GDB.
