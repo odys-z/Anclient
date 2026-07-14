@@ -10,6 +10,9 @@
     "wsagent_jar": {"dataAnclass": "string"},
     "synode_id"  : {"dataAnclass": "string"},
     "synode_vol" : {"dataAnclass": "string"},
+    "domain"     : {"dataAnclass": "string"},
+    "admin"      : {"dataAnclass": "string"},
+    "token"      : {"dataAnclass": "string"},
     "wsagent_settings": {"dataAnclass": "string"},
     "wshost": {"dataAnclass": "string"},
     "wsport": {"dataAnclass": "int"}

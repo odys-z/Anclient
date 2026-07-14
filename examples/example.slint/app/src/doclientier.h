@@ -70,7 +70,7 @@ public:
 
     void reconnect_ipc();
 
-    void push_files(const map<string, vector<LangExt::VarType>>& paths);
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::doctier});
 
     void query_synode(vector<std::string> paths) {
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
@@ -104,8 +104,9 @@ public:
     // void asy_echows(OnOk ok, OnError err);
     void asy_echows(const string& echo = "Echo by Asynclientier from C++");
 private:
-    string format_proc_report(const string& proc_msg) {
-        std::vector<std::string_view> report = LangExt::split(proc_msg, ',');
+    // string format_proc_report(const string& proc_msg) {
+    string format_proc_report(const DocsResp& resp) {
+        std::vector<std::string_view> report = LangExt::split(resp.m, ',');
         if (report.size() >= 4) {
             int current_row   = std::stoi(std::string(report[0]));
             int total_rows     = std::stoi(std::string(report[1]));
@@ -114,9 +115,9 @@ private:
 
             if (total_blocks > 0) {
                 float percentage = (static_cast<float>(current_block + 1) / total_blocks) * 100.0f;
-                return std::format("File {}/{}, {:.0f}%", current_row + 1, total_rows, percentage);
+                return std::format("File {}/{}, {:.0f}% [{}]", current_row + 1, total_rows, percentage, resp.xdoc.clientpath);
             }
         }
-        return proc_msg;
+        return resp.m;
     }
 };

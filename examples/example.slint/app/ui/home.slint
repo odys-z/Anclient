@@ -60,7 +60,9 @@ export component HomeForm {
                         width: 100%;
                         height: 100%;
                         source: @image-url("@surrealism/icons/folder-open-filled.svg");
-                        clicked => { if (root.enable-vol) { navigate("volume"); } };
+                        clicked => {
+                            debug("Volume Enabled:", root.enable-vol);
+                            if (root.enable-vol) { navigate("volume"); } };
                     }
                 }
                 Text {
@@ -117,7 +119,7 @@ export component HomeForm {
                     font-size: 14pt;
                 }
             }
-         }
+          }
 
           HorizontalLayout {
             padding: 24px;

@@ -23,6 +23,9 @@ public:
     string wsagent_jar;
     string synode_id;
     string synode_vol;
+    string domain;
+    string admin;
+    string token;
     string wsagent_settings;
     string wshost;
     int wsport;
@@ -44,6 +47,9 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
         {"wsagent_jar", {.dataAnclass="string"} },
         {"synode_id", {.dataAnclass="string"} },
         {"synode_vol", {.dataAnclass="string"} },
+        {"domain", {.dataAnclass="string"} },
+        {"admin", {.dataAnclass="string"} },
+        {"token", {.dataAnclass="string"} },
         {"wsagent_settings", {.dataAnclass="string"} },
         {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
@@ -61,6 +67,9 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
         .data<&anson::QMLAppSettings::wsagent_jar>("wsagent_jar")
         .data<&anson::QMLAppSettings::synode_id>("synode_id")
         .data<&anson::QMLAppSettings::synode_vol>("synode_vol")
+        .data<&anson::QMLAppSettings::domain>("domain")
+        .data<&anson::QMLAppSettings::admin>("admin")
+        .data<&anson::QMLAppSettings::token>("token")
         .data<&anson::QMLAppSettings::wsagent_settings>("wsagent_settings")
         .data<&anson::QMLAppSettings::wshost>("wshost")
         .data<&anson::QMLAppSettings::wsport>("wsport")
@@ -86,6 +95,12 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.synode_id);
                 if ("synode_vol" == fieldname)
                     return entt::forward_as_meta(concrete.synode_vol);
+                if ("domain" == fieldname)
+                    return entt::forward_as_meta(concrete.domain);
+                if ("admin" == fieldname)
+                    return entt::forward_as_meta(concrete.admin);
+                if ("token" == fieldname)
+                    return entt::forward_as_meta(concrete.token);
                 if ("wsagent_settings" == fieldname)
                     return entt::forward_as_meta(concrete.wsagent_settings);
                 if ("wshost" == fieldname)

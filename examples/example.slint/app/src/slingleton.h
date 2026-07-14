@@ -16,6 +16,7 @@
 #include "gen/wsport.hpp"
 #include "doclientier.h"
 #include "ipcagent_manager.h"
+#include "helper.h"
 
 namespace anson {
 
@@ -35,7 +36,7 @@ namespace anson {
 
     Slingleton() {}
 
-    static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin) {
+    static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin, const string & settings_path = "settings/app-settings.json") {
       if (instance == nullptr) {
         instance = new Slingleton();
         register_jserv(asts, opts);
@@ -44,7 +45,8 @@ namespace anson {
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_qmlappsettingsAst(asts);
 
-        Anson::from_file("settings/app-settings.json", qmlsettings);
+        aninfo("Loading settings from: "s + resolveHomePath(settings_path));
+        Anson::from_file(settings_path, qmlsettings);
 
         instance->agentController = new JavaAgentController(qmlsettings.java_path, qmlsettings.wsagent_jar);
         instance->agentController->start_agent(qmlsettings.wsagent_settings);
@@ -52,12 +54,24 @@ namespace anson {
         ix::initNetSystem();
 
         instance->doclientier = new AsynClienter(appwin);
+
+        anlog(std::format("Has volume: {}, {}: {}",
+          instance->has_synode_vol(), qmlsettings.synode_id, qmlsettings.synode_vol));
       }
       return *instance;
     }
 
     bool has_synode_vol() {
-      return !LangExt::isblank(qmlsettings.synode_id) && std::filesystem::exists(qmlsettings.synode_vol);
+      return !LangExt::isblank(qmlsettings.synode_id)
+           && std::filesystem::exists(resolveHomePath(qmlsettings.synode_vol));
+    }
+
+    bool open_volume() {
+      if (has_synode_vol()) {
+        open_file_explorer(qmlsettings.synode_vol);
+        return true;
+      }
+      return false;
     }
   };
 }

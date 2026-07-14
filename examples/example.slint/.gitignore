@@ -37,3 +37,6 @@
 # CMake build directory
 build
 surrealism-0.5.3
+app-settings-*.json
+app-settings.json
+!app-settings-template.json

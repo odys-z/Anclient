@@ -91,9 +91,15 @@ void WSClient::connect() {
     websocket.start();
 }
 
-string WSClient::ipconn_state() {//     enum class ReadyState { Connecting = 0, Open = 1, Closing = 2, Closed = 3 };
-    string stats[] = {Connecting, Open, Closing, Closed};
-    return stats[(int)websocket.getReadyState()];
+/**
+ * @return WSClient::Connecting | WSClient::Open | WSClient::Closing | WSClient::Closed;
+ */
+string WSClient::ipconn_state() {
+    const string stats[] = {Connecting, Open, Closing, Closed};
+    int s = static_cast<int>(websocket.getReadyState());
+    if (s >= 0 && s < static_cast<int>(sizeof(stats) / sizeof(stats[0])))
+        return stats[s];
+    else return Closed;
 }
 
 string WSClient::syncon_state() {
@@ -200,7 +206,7 @@ void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
     // uploadreq.syncingPage.start = 0;
     uploadreq.syncingPage = pthpage;
     uploadreq.a = DocsReq::A::requestSyn;
-    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, std::move(uploadreq));
+    AnsonMsg<DocsReq> msg(port, std::move(uploadreq));
     asynSend(msg);
 }
 

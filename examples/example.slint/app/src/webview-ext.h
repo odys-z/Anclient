@@ -1,7 +1,8 @@
 #pragma once
 
-#include "webview.h"
 #include "app-window.h"
+#include "webview.h"
+#include "gen/app_settings.hpp"
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -52,7 +53,8 @@ inline void set_webview_visible(webview::webview* wv, bool visible) {
  * @param wv  Reference to the persistent webview unique_ptr
  * @param url The target address to load on initial creation
  */
-std::unique_ptr<webview::webview>& show_and_align_webview(App* app, std::unique_ptr<webview::webview>& wv, const std::string& url) {
+std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
+        std::unique_ptr<webview::webview>& wv, const std::string& url) {
     if (!app) return wv;
 
     // 1. Fetch layout constraints dynamically from the Slint component
@@ -78,10 +80,8 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app, std::unique_
 
 std::atomic<bool> is_webview_open(false);
 
-void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle) {
-    // 1. Guard against opening multiple windows at the exact same time
+void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const anson::QMLAppSettings & settings) {
     if (is_webview_open.exchange(true)) {
-        // If it was already true, update Slint text and exit thread immediately
         slint::invoke_from_event_loop([weak_ui_handle]() {
             if (auto ui = weak_ui_handle.lock()) {
                 (*ui)->set_webview_status("A webview window is already open!");
@@ -90,11 +90,32 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle) {
         return;
     }
 
-    // 2. Initialize a brand new webview window instance
     webview::webview w(true, nullptr);
     w.set_title("Popup Webview");
-    w.set_size(600, 500, WEBVIEW_HINT_NONE);
-    w.navigate("http://127.0.0.1:8960/login.html");
+    w.set_size(800, 600, WEBVIEW_HINT_NONE);
+
+    /* Android snipet
+    f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android', serv: '%s'});",
+                                    client.ssInfo().uid(), pswd,
+                                    AlbumApp.prfConfig.jservlist.entry()
+    */
+
+    string script = std::format(R"(
+        window.addEventListener('DOMContentLoaded', () => {{
+                loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
+        }}); )", settings.admin, settings.token, settings.synode_id);
+
+    anlog(script);
+    w.init(script);
+
+    // w.init(R"(
+    //         window.addEventListener('DOMContentLoaded', () => {
+    //             loadAlbum('ody', '****************', {legacyPDF: true, platform: 'android', serv: '***********'});
+    //             alert('Injected JS from Slint Action!');
+    //         });
+    //     )"),
+
+    w.navigate("http://127.0.0.1:8960/webview.html");
 
     // 3. Notify Slint UI that the window is now active
     slint::invoke_from_event_loop([weak_ui_handle]() {
@@ -103,13 +124,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle) {
         }
     });
 
-    // 4. This blocks the background thread until the user closes this specific webview window
     w.run(); 
 
-    // 5. Cleanup: The user closed the window. Reset our guard flag so it can open again next click!
     is_webview_open.store(false);
 
-    // 6. Update Slint UI status text
     slint::invoke_from_event_loop([weak_ui_handle]() {
         if (auto ui = weak_ui_handle.lock()) {
             (*ui)->set_webview_status("Webview closed. Click button to reopen.");

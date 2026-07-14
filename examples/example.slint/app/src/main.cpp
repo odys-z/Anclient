@@ -7,16 +7,17 @@
 // This order is to avoid compile error
 #include <io/odysz/anserializer.h>
 #include "helper.h"
+#include "gen/wsport.hpp"
 
 int main(int argc, char **argv) {
     using namespace anson;
 
     map<string, vector<LangExt::VarType>> fileselection;
 
-
     auto ui = App::create();
     slint::ComponentWeakHandle<App> ui_weak = ui;
-    Slingleton slingle = Slingleton::get_instance(ui_weak);
+    Slingleton slingle = argc > 1 ? Slingleton::get_instance(ui_weak, string{argv[1]})
+                                  : Slingleton::get_instance(ui_weak);
 
     ui->set_window_title("SurrealTree Explorer v1.0");
     ui->set_enable_vol(slingle.has_synode_vol());
@@ -25,20 +26,21 @@ int main(int argc, char **argv) {
     std::unique_ptr<webview::webview> wv = nullptr;
 
     ui->on_menu_changed([&](slint::SharedString page_ix) {
-        std::string menu_id = page_ix.data();
+        std::string menu_id = string{page_ix}; //page_ix.data();
         anlog(std::format("Menu changed! ID: {}", menu_id));
 
         if (menu_id == "album") {
-            launch_webview_window(ui);
+            launch_webview_window(ui, slingle.qmlsettings);
         }
         else if (menu_id == "volume") {
             anlog("TDD: Launch volume explorer");
+            slingle.open_volume();
         }
     });
 
     ui->on_echows([&](slint::SharedString msg) {
         slingle.doclientier->asy_echows(string{msg});
-        });
+    });
 
     ui->on_pingws([&](std::shared_ptr<slint::Model<slint::SharedString>> files) {
         anlog("Ping IPC Agent clicked!");
@@ -58,7 +60,7 @@ int main(int argc, char **argv) {
             anlog("Pinging: "s + file_str);
         }
         ui->set_syncing_status(status);
-        slingle.doclientier->push_files(filemap);
+        slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {
@@ -114,8 +116,7 @@ int main(int argc, char **argv) {
     });
 
     ui->on_open_volume([&slingle]() {
-        if (slingle.has_synode_vol())
-            open_file_explorer(slingle.qmlsettings.synode_vol);
+        slingle.open_volume();
     });
 
     ui->run();

@@ -43,7 +43,7 @@ void AsynClienter::reconnect_ipc() {
         anerror("Failed to load settings.");
         return;
     }
-    if (!wsclient) {
+    if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
         onmsg = [this]() -> void {
             if (wsclient->block_poll(200)) {
@@ -51,7 +51,7 @@ void AsynClienter::reconnect_ipc() {
                 if (rep.code == MsgCode::Code::ok) {
 
                     anlog(rep.Body().m);
-                    string proc_report = format_proc_report(rep.Body().m);
+                    string proc_report = format_proc_report(rep.Body());
                     anlog(proc_report);
 
                     slint::SharedString slint_text(proc_report);
@@ -96,7 +96,7 @@ void AsynClienter::reconnect_ipc() {
 
     int timeout_attempts = 20; // 20 * 100ms = 2 seconds max wait
     while (wsclient && timeout_attempts > 0) {
-        string state = wsclient->ipconn_state();
+        string state = wsclient.get()->ipconn_state();
         if (state == WSClient::Open) {
             break;
         }
@@ -104,7 +104,7 @@ void AsynClienter::reconnect_ipc() {
         timeout_attempts--;
     }
 
-    if (wsclient && wsclient->ipconn_state() == WSClient::Open) {
+    if (wsclient && wsclient.get()->ipconn_state() == WSClient::Open) {
         anlog("IPC Agent connection is opened successfully.");
         return;
     } else {
@@ -112,14 +112,14 @@ void AsynClienter::reconnect_ipc() {
     }
 }
 
-void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths) {
+void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths, const WSPort& port) {
     PathsPage syncingpage;
     syncingpage.clientPaths = syncing_paths;
     syncingpage.start = 0;
     syncingpage.end = syncing_paths.size();
 
     reconnect_ipc();
-    wsclient->place_tasks(syncingpage);
+    wsclient->place_tasks(syncingpage, port);
 }
 
 void AsynClienter::asy_echows(const string & echo_msg) {

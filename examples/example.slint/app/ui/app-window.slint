@@ -1,4 +1,4 @@
-import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag } from "@surrealism/index.slint";
+import { SMenu, SCard, SHeader, SIcon, SButton, SPopup, STag } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
 
 import { TableViewPage } from "./table_view_page.slint";
@@ -49,7 +49,6 @@ export component App inherits Window {
     HorizontalLayout {
       left-wrapper:=Rectangle {
         z: 111;
-        height: 100%;
         width: menu.width;
         clip: false;
         menu:=SMenu {
@@ -89,12 +88,13 @@ export component App inherits Window {
 
           if (menu_id == "album") : webview_slot := Rectangle {
             background: #e0e0e0;
-            Text { text: "Page 2"; }
+            // Text { text: "Page 2"; }
           }
 
           if (menu_id == "volume") : Rectangle {
             background: #b0d0d0;
-            CustomTableViewPage { width: 100%; height: 100%; }
+            // Volume Information
+            // CustomTableViewPage { width: 100%; height: 100%; }
           }
 
           if (menu_id == "upload") : Rectangle {
@@ -133,14 +133,25 @@ export component App inherits Window {
           status-bar:= HorizontalLayout {
             padding-top: 1pt;
             padding-left: 12pt;
-            STag{ text: root.syncing_status; }
+            STag{ text: root.syncing_status;
+              clicked => { popup.open(); }
+            }
           }
         }
       }
     }
 
-    popup:=STip {
-      text: "Credits to: SurrealismUI";
-      position: Bottom;
+    popup:=SPopup {
+    Rectangle {
+      background: #222;
+      VerticalLayout {
+        padding: 12px;
+        alignment: center;
+        Text{ horizontal-alignment: left;
+            color: #ddd;
+            font-size: 12pt;
+            text: root.syncing-status; }
+      }
     }
+  }
 }
