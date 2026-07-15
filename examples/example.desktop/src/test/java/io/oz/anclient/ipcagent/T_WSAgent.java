@@ -8,10 +8,11 @@ import org.eclipse.jetty.server.Server;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 import io.odysz.anson.Anson;
+import io.oz.anclient.app.DesktopSettings;
 
 public class T_WSAgent extends WSAgent {
 	public static final String ipc_path = "ipc";
-	public static AgentSettings settings;
+	public static DesktopSettings settings;
 	
 	public static Server _main(String... args) throws Exception {
 	    settings = Anson.fromPath(_0(args));

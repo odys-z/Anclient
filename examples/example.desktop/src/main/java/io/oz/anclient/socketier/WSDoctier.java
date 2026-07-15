@@ -1,6 +1,8 @@
 package io.oz.anclient.socketier;
 
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.Utils.warn;
+import static io.oz.anclient.ipcagent.SingleAgent.getInstance;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,8 +14,8 @@ import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
+import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnError;
-import io.odysz.semantic.jprotocol.JProtocol.OnOk;
 import io.odysz.semantic.jprotocol.JProtocol.OnProcess;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantic.tier.docs.DocsException;
@@ -23,23 +25,29 @@ import io.odysz.semantic.tier.docs.ExpSyncDoc;
 import io.odysz.semantic.tier.docs.IFileDescriptor;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
+import io.oz.anclient.app.DesktopSettings;
 import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IWSPoint;
+import io.oz.anclient.ipcagent.SingleAgent;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPort;
+import io.oz.syndoc.client.AsynClientier;
+
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
 
-public class WSDoctier implements IWSPoint {
+public class WSDoctier implements IWSPoint  {
 	final WServPort socket;
+	final DesktopSettings settings;
 
 	@Override
 	public IPort port() {
 		return WSPort.docstier;
 	}
 
-	public WSDoctier(WServPort wsSocket) {
+	public WSDoctier(WServPort wsSocket) throws SemanticException {
 		this.socket = wsSocket;
+		settings = SingleAgent.getInstance().settings();
 	}
 	
 	@Override
@@ -59,80 +67,64 @@ public class WSDoctier implements IWSPoint {
 				.a(req.a()));
 	}
 
-	OnOk pushsOk = (resps) -> {
-//        clearStatus();
-//        int[] nums = Doclientier.parseErrorCodes((List<DocsResp>) resps);
-//        showDlg(R.string.t_synch_ok, nums[0], nums[1], nums[2]);
-    };
+    OnError getErr(Basic sr) {
+    	return (c, err, args) -> {
+			DocsResp rp = new DocsResp();
+			warn("%s, %s", c, err);
+			rp.msg(err);
+			AnsonMsg<DocsResp> rep = new AnsonMsg<DocsResp>(port(), c);
+			rep.body(rp);
 
-	OnError onpushErr = (c, err, args) -> {
-        if (c == AnsonMsg.MsgCode.ext) {
-//            errCtx.prepare(msgv, R.string.msg_err_duplicate);
-//            err(null, getString(R.string.msg_err_duplicate), args); // show it
-        }
-        else {
-//            errCtx.prepare(msgv, R.string.msg_upload_failed);
-//            err(null, getString(R.string.msg_upload_failed), err, args == null ? null : args[0]); // show it
-        }
-    };
-    
+			try { sr.sendText(getInstance().ver(rep).toBlock());
+			} catch (AnsonException | IOException e) {
+				e.printStackTrace();
+			}
+    	};
+    }
+
     ExpSyncDoc templtDoc = new ExpSyncDoc();
 	
-	DocsResp onResuestSyn(Basic sr, Async ar, DocsReq req) {
-		DocsResp resp = new DocsResp().doc(new ExpSyncDoc()
+	DocsResp onResuestSyn(Basic sr, Async ar, DocsReq req) throws SemanticException {
+		DocsResp resp = new DocsResp()
+							.doc(new ExpSyncDoc()
 							.device(req.doc().device()));
 
-		new Thread(() -> {
-			try {
-				// Doclienter.startPushs(ExpSyncDoc template, String tbl, List<IFileDescriptor> videos,
-				// 						 OnProcess proc, OnDocsOk docOk, OnError ... onErr)
-				placePushsTask(templtDoc, req.docTabl, videos(req),
-					(rx, rows, bx, blocks, rep) -> {
-						rep.msg(String.format("%d/%d, %d/%d", rx, rows, bx, blocks));
-						sr.sendText(rep.toBlock());
-						return false;
-					},
-					// pushsOk,
-					(synrep) -> {
-						sr.sendText(synrep.toBlock());
-					},
-					// onpushErr
-					(c, err, args) -> {
-						DocsResp rp = new DocsResp();
-						rp.msg(err);
-						AnsonMsg<DocsResp> rep = new AnsonMsg<DocsResp>(port(), c);
-						rep.body(rp);
-
-						try {
-							sr.sendText(rep.toBlock());
-						} catch (AnsonException | IOException e) {
-							e.printStackTrace();
-						}
-					});
-			} catch (DocsException e) {
-				onpushErr.err(MsgCode.ext, e.getMessage(), e.getClass().getName());
-			} catch (TransException e) {
-				e.printStackTrace();
-				onpushErr.err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
-			} catch (IOException e) {
-				e.printStackTrace();
-				onpushErr.err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
-			} catch (Exception e) {
-				e.printStackTrace();
-				onpushErr.err(MsgCode.exGeneral, e.getMessage(), e.getClass().getName());
-			}
-		}).start();
-		
+		placePushsTask(sr, templtDoc, req.docTabl, videos(req),
+			(rx, rows, bx, blocks, rep) -> {
+				rep.msg(String.format("%d,%d,%d,%d,rx rows bx blocks", rx, rows, bx, blocks));
+				sr.sendText(rep.toBlock());
+				return false;
+			},
+			// pushsOk,
+			(synrep) -> {
+				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>();
+				repmsg.bodys(synrep);
+				sr.sendText(repmsg.toBlock());
+			},
+			getErr(sr));
 		return resp;
 	}
 
-	private void placePushsTask(ExpSyncDoc doc0, String doctbl, List<IFileDescriptor> docs,
-			OnProcess proc, OnOk ok, OnError err) throws DocsException, TransException, IOException {
-		int px = 0;
-		for (IFileDescriptor p : docs) {
-			try { Thread.sleep(400); } catch (InterruptedException e) { }
-			proc.proc(px, docs.size(), 1, 1, (DocsResp)p);
-			px++;
+	private void placePushsTask(Basic sr, ExpSyncDoc doc0, String doctbl,
+			List<IFileDescriptor> docs, OnProcess proc, OnDocsOk ok, OnError err) {
+		if (docs.size() > 0) {
+			new Thread(() -> {
+				try {
+					AsynClientier asyclient = new AsynClientier(settings.sysuri, settings.synuri, getErr(sr));
+					asyclient.asyVideos(doc0, docs, proc, ok, err);
+				} catch (DocsException e) {
+					getErr(sr).err(MsgCode.ext, e.getMessage(), e.getClass().getName());
+				} catch (TransException e) {
+					e.printStackTrace();
+					getErr(sr).err(MsgCode.exTransct, e.getMessage(), e.getClass().getName());
+				} catch (IOException e) {
+					e.printStackTrace();
+					getErr(sr).err(MsgCode.exIo, e.getMessage(), e.getClass().getName());
+				} catch (Exception e) {
+					e.printStackTrace();
+					getErr(sr).err(MsgCode.exGeneral, e.getMessage(), e.getClass().getName());
+				}
+			}).start();
 		}
 	}
 

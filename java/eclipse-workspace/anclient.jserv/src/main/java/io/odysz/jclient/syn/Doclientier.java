@@ -62,7 +62,7 @@ public class Doclientier extends Semantier {
 	public SessionClient client;
 	
 	/** @since 0.5.0 changed to static */
-	protected static ErrorCtx errCtx;
+	protected static OnError errCtx;
 
 	protected ExpDocRobot robt;
 
@@ -86,7 +86,7 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws SemanticException 
 	 */
-	public Doclientier(String doctbl, String sysuri, String synuri, ErrorCtx errCtx)
+	public Doclientier(String doctbl, String sysuri, String synuri, OnError errCtx)
 			throws SemanticException, IOException {
 		mustnonull(doctbl);
 		mustnonull(sysuri);

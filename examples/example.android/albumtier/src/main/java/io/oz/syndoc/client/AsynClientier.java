@@ -37,7 +37,7 @@ import io.oz.album.peer.SynDocollPort;
  */
 public class AsynClientier extends Doclientier {
 
-	public AsynClientier(String sysuri, String synuri, ErrorCtx errCtx)
+	public AsynClientier(String sysuri, String synuri, OnError errCtx)
 			throws SemanticException, IOException {
 		super("h_photos", sysuri, synuri, errCtx);
 	}

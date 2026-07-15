@@ -2,7 +2,7 @@
 
 This is a cmake project.
 
-With VS Code, CMake & Slint Plugin, setup .vscode/settings.json,
+With VS Code, CMake & Slint Plugins, setup .vscode/settings.json as
 
 ```
     "cmake.debugConfig": {
@@ -10,12 +10,14 @@ With VS Code, CMake & Slint Plugin, setup .vscode/settings.json,
     }
 ```
 
+The *settings/app-settings.json* is the configuration where the user ID and token is saved. 
+
 Create the configuration file, see *settings/app-settings-template.json*, then debug with GDB.
 
-FYI, .vscode/c_cpp_properties.json
+FYI, the .vscode/c_cpp_properties.json example
 
 ```
-    {
+  {
     "configurations": [
         {
             "name": "MinGW",
@@ -33,5 +35,5 @@ FYI, .vscode/c_cpp_properties.json
         }
     ],
     "version": 4
-}
+  }
 ```

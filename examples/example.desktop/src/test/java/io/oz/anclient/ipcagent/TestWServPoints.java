@@ -44,7 +44,7 @@ import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.Utils.warn;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class T_WServPointTest {
+public class TestWServPoints {
     private Server server;
 
     AnclientSettings clientsettings;
@@ -106,7 +106,7 @@ public class T_WServPointTest {
 
 		ArrayList<String> paths = new ArrayList<String>(Arrays.asList("ping-path/a", "ping-path/b"));
 
-        List<DocsResp> reps = placeTasks(pinger, paths);
+        List<DocsResp> reps = placeTasks_ping(pinger, paths);
 
 		assertEquals(5, reps.size());
 
@@ -120,7 +120,7 @@ public class T_WServPointTest {
 		assertArrayEquals(new String[] {"1", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(4).msg()));
     }
 
-	private List<DocsResp> placeTasks(WSClient wsclient, ArrayList<String> paths)
+	private List<DocsResp> placeTasks_ping(WSClient wsclient, ArrayList<String> paths)
 			throws AnsonException, IOException, SemanticException, InterruptedException {
 		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
 		
@@ -154,6 +154,13 @@ public class T_WServPointTest {
 		}
 
 		return pongs;
+	}
+	
+	private List<DocsResp> placeTasks_upload(WSClient wsclient, ArrayList<String> paths)
+			throws AnsonException, IOException, SemanticException, InterruptedException {
+		ArrayList<DocsResp> oks = new ArrayList<DocsResp>(paths.size());
+
+		return oks;
 	}
  
 }

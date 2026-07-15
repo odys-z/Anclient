@@ -1,16 +1,11 @@
 package io.oz.anclient.socketier;
 
-import static io.odysz.common.LangExt.eq;
-
 import java.io.IOException;
-
 
 import io.odysz.anson.AnsonException;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
-import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
-import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jserv.x.SsException;
 import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
@@ -18,10 +13,8 @@ import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IWSPoint;
 import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPort;
-import io.oz.anclient.socketier.ConfigIPCReq.A;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
-import jakarta.websocket.Session;
 
 public class ConfigIPC implements IWSPoint {
 	final WServPort socket;

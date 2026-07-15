@@ -12,11 +12,13 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import io.odysz.anson.Anson;
 import io.odysz.semantic.jprotocol.JProtocol;
+import io.oz.anclient.app.DesktopSettings;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 public class WSAgent {
 	public static final String ipc_path = "ipc";
-	public static AgentSettings settings;
+//	public static AgentSettings settings;
+	public static SingleAgent single;
 	
 	public static void main(String[] args) throws Exception {
 		Server server = _main(_0(args, "WEB-INF/settings.json"));
@@ -34,7 +36,7 @@ public class WSAgent {
 	}
 
 	public static Server createServer(ArrayList<ServerEndpointConfig.Builder> cfgBuilders,
-			AgentSettings settings) throws Exception {
+			DesktopSettings settings) throws Exception {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 	    Server server = new Server(settings.wsport); 
 
@@ -68,7 +70,8 @@ public class WSAgent {
 	}
 
 	public static Server _main(String... args) throws Exception {
-	    settings = Anson.fromPath(_0(args));
+	    DesktopSettings settings = Anson.fromPath(_0(args));
+	    SingleAgent.getInstance().settings(settings); // and the same in tests?
 
 	    logi("[Websocket endpoint %s] %s", WSAgent.ipc_path, WSAgent.class.getName());
         return createServer(new ArrayList<ServerEndpointConfig.Builder> () {

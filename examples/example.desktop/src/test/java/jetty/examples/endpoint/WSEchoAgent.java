@@ -10,13 +10,13 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 
 import io.odysz.semantic.jprotocol.JProtocol;
-import io.oz.anclient.ipcagent.AgentSettings;
+import io.oz.anclient.app.DesktopSettings;
 import io.oz.anclient.ipcagent.WSPort;
 import jakarta.websocket.server.ServerEndpointConfig;
 
 public class WSEchoAgent {
 	public static final String ipc_path = "ipc";
-	public static AgentSettings settings;
+	public static DesktopSettings settings;
 	
 	public static void main(String[] args) throws Exception {
 		Server server = _main(_0(args, "WEB-INF/settings.json"));
@@ -28,7 +28,7 @@ public class WSEchoAgent {
 	    JProtocol.setup(ipc_path, WSPort.echo);
 
 	    // settings = Anson.fromPath(_0(args));
-	    settings = new AgentSettings();
+	    settings = new DesktopSettings();
 	    settings.wsport = 8700;
 
 	    Server server = new Server(settings.wsport); 

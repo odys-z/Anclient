@@ -81,7 +81,7 @@ public class WSPing implements IWSPoint {
 
 		new Thread(() -> {
 			try {
-				placePushsTask(templtDoc, req.docTabl, make_videos_uploaded(req),
+				placePushsTask(templtDoc, req.docTabl, reshapeList(req),
 					// onProcess
 					(rx, rows, bx, blocks, rep) -> {
 						rep.msg(String.format("%d,%d,%d,%d,rx rows bx blocks", rx, rows, bx, blocks));
@@ -124,7 +124,7 @@ public class WSPing implements IWSPoint {
 		}
 	}
 
-	private List<IFileDescriptor> make_videos_uploaded(DocsReq req) throws SemanticException {
+	private List<IFileDescriptor> reshapeList(DocsReq req) throws SemanticException {
 		mustnonull(req.syncingPage());
 		mustnonull(req.syncingPage().paths());
 		mustge(req.syncingPage().end() - req.syncingPage().start(), 0, "syncingPage().end < req.syncingPage.start");

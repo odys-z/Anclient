@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>ws-agent</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
   <name>Anclient.java Agent over Websocket</name>
   <url>https://odys-z.github.io/Anclient</url>
@@ -89,10 +89,17 @@
         <version>${jetty.version}</version>
     </dependency>
 
+	<!-- 
     <dependency>
       <groupId>io.github.odys-z</groupId>
       <artifactId>anclient.java</artifactId>
 	  <version>[0.5.20-SNAPSHOT,)</version>
+    </dependency>
+	-->
+    <dependency>
+      <groupId>io.github.odys-z</groupId>
+      <artifactId>albumtier</artifactId>
+	  <version>[0.5.3,)</version>
     </dependency>
     
    	<dependency>
@@ -100,6 +107,11 @@
 	    <artifactId>jserv-sample</artifactId>
 	    <version>[1.5.7,)</version>
 	</dependency>
+   	<dependency>
+   		<groupId>io.github.odys-z</groupId>
+   		<artifactId>semantic.DA</artifactId>
+   		<version>[1.5.23-SNAPSHOT,)</version>
+   	</dependency>
   </dependencies>
 
   <build>
@@ -109,10 +121,12 @@
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.1.0</version>
       </plugin>
+      <!-- 
       <plugin>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.0.2</version>
       </plugin>
+	  -->
       <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.0</version>

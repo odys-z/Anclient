@@ -1,5 +1,5 @@
 { "type": "io.odysz.reflect.AnsonAst",
-  "dataAnclass": "io.odysz.anclient.slint.QMLAppSettings",
+  "dataAnclass": "io.oz.anclient.app.DesktopSettings",
   "baseAnclass": "io.odysz.anson.Anson",
   "fields" : {
     "sysuri": {"dataAnclass": "string"},
@@ -14,8 +14,10 @@
     "admin"      : {"dataAnclass": "string"},
     "token"      : {"dataAnclass": "string"},
     "wsagent_settings": {"dataAnclass": "string"},
-    "wshost": {"dataAnclass": "string"},
-    "wsport": {"dataAnclass": "int"}
+    "wshost"     : {"dataAnclass": "string"},
+    "wsport"     : {"dataAnclass": "int"},
+    "wstimeout"  : {"dataAnclass": "int"},
+    "ipc_tiers"  : {"dataAnclass": "list<string"}
   },
   "ctorsemantics": [ ]
 }

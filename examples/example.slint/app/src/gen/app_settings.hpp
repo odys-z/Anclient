@@ -12,9 +12,9 @@
 
 namespace anson {
 
-class QMLAppSettings : public anson::Anson {
+class DesktopSettings : public anson::Anson {
 public:
-    inline static const std::string _type_ = "io.odysz.anclient.slint.QMLAppSettings";
+    inline static const std::string _type_ = "io.oz.anclient.app.DesktopSettings";
     string sysuri;
     string synuri;
     string temp_dir;
@@ -29,15 +29,17 @@ public:
     string wsagent_settings;
     string wshost;
     int wsport;
+    int wstimeout;
+    vector<string> ipc_tiers;
 
-    QMLAppSettings() : Anson() {
+    DesktopSettings() : Anson() {
         Type(_type_);
     }
 };
 
-inline static void register_qmlappsettingsAst(AstMap & asts) {
+inline static void register_desktopsettingsAst(AstMap & asts) {
 
-    AnsonAst * ast = createAST <QMLAppSettings, AnsonAst> (
+    AnsonAst * ast = createAST <DesktopSettings, AnsonAst> (
         asts, Anson::_type_, map <string, AnsonField> {
         {"sysuri", {.dataAnclass="string"} },
         {"synuri", {.dataAnclass="string"} },
@@ -53,32 +55,36 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
         {"wsagent_settings", {.dataAnclass="string"} },
         {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
+        {"wstimeout", {.dataAnclass="int"} },
+        {"ipc_tiers", {.dataAnclass="list<string"} },
        });
 
-    entt::meta_factory <anson::QMLAppSettings> ()
+    entt::meta_factory <anson::DesktopSettings> ()
         .type(ast->enttypeid)
         .base<Anson>()
 
-        .data<&anson::QMLAppSettings::sysuri>("sysuri")
-        .data<&anson::QMLAppSettings::synuri>("synuri")
-        .data<&anson::QMLAppSettings::temp_dir>("temp_dir")
-        .data<&anson::QMLAppSettings::java_path>("java_path")
-        .data<&anson::QMLAppSettings::doctier_jar>("doctier_jar")
-        .data<&anson::QMLAppSettings::wsagent_jar>("wsagent_jar")
-        .data<&anson::QMLAppSettings::synode_id>("synode_id")
-        .data<&anson::QMLAppSettings::synode_vol>("synode_vol")
-        .data<&anson::QMLAppSettings::domain>("domain")
-        .data<&anson::QMLAppSettings::admin>("admin")
-        .data<&anson::QMLAppSettings::token>("token")
-        .data<&anson::QMLAppSettings::wsagent_settings>("wsagent_settings")
-        .data<&anson::QMLAppSettings::wshost>("wshost")
-        .data<&anson::QMLAppSettings::wsport>("wsport")
+        .data<&anson::DesktopSettings::sysuri>("sysuri")
+        .data<&anson::DesktopSettings::synuri>("synuri")
+        .data<&anson::DesktopSettings::temp_dir>("temp_dir")
+        .data<&anson::DesktopSettings::java_path>("java_path")
+        .data<&anson::DesktopSettings::doctier_jar>("doctier_jar")
+        .data<&anson::DesktopSettings::wsagent_jar>("wsagent_jar")
+        .data<&anson::DesktopSettings::synode_id>("synode_id")
+        .data<&anson::DesktopSettings::synode_vol>("synode_vol")
+        .data<&anson::DesktopSettings::domain>("domain")
+        .data<&anson::DesktopSettings::admin>("admin")
+        .data<&anson::DesktopSettings::token>("token")
+        .data<&anson::DesktopSettings::wsagent_settings>("wsagent_settings")
+        .data<&anson::DesktopSettings::wshost>("wshost")
+        .data<&anson::DesktopSettings::wsport>("wsport")
+        .data<&anson::DesktopSettings::wstimeout>("wstimeout")
+        .data<&anson::DesktopSettings::ipc_tiers>("ipc_tiers")
         ;
 
         //
         ast->get_field_instance = [ast](const IJsonable& ans, const string& fieldname) -> meta_any {
             if (ast->fields.contains(fieldname)) {
-                auto& concrete = static_cast<const QMLAppSettings&>(ans);
+                auto& concrete = static_cast<const DesktopSettings&>(ans);
                 if ("sysuri" == fieldname)
                     return entt::forward_as_meta(concrete.sysuri);
                 if ("synuri" == fieldname)
@@ -107,6 +113,10 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.wshost);
                 if ("wsport" == fieldname)
                     return entt::forward_as_meta(concrete.wsport);
+                if ("wstimeout" == fieldname)
+                    return entt::forward_as_meta(concrete.wstimeout);
+                if ("ipc_tiers" == fieldname)
+                    return entt::forward_as_meta(concrete.ipc_tiers);
             }
 
             if (IJsonable::contxt_ptr->has_ast(ast->baseAnclass)) {
@@ -114,7 +124,7 @@ inline static void register_qmlappsettingsAst(AstMap & asts) {
                 return bast->get_field_instance(ans, fieldname);
             }
 
-            anerror("get_field_instance<QMLAppSettings>(): Failed to get entt instance (meta_any)");
+            anerror("get_field_instance<DesktopSettings>(): Failed to get entt instance (meta_any)");
             return { };
         };
 }

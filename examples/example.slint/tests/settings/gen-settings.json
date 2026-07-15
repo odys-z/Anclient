@@ -1,7 +1,7 @@
 { "type"       : "io.odysz.reflect.PeerSettings",
   "tier_name"  : "qmltest",
   "ansonMsg"   : "io.odysz.semantic.jprotocol.AnsonMsg",
-  "ansons"     : ["qml-appsettings.ast.json"],
+  "ansons"     : ["desktop-settings.ast.json"],
   "scopeEnums" : [],
   "javaEnums"  : [],
   "ansonBody"  : "io.odysz.semantic.jprotocol.AnsonBody",

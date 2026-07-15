@@ -17,7 +17,9 @@ import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jserv.x.SsException;
+import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
+import io.oz.anclient.app.DesktopSettings;
 import io.oz.anclient.socketier.WSDoctier;
 import io.oz.anclient.socketier.WSEcho;
 import io.oz.anclient.socketier.WSPing;
@@ -38,12 +40,16 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 
 	protected final HashMap<IPort, IWSPoint> ipcPorts;
 	/** {"host:port": session} */
-	protected final HashMap<String, Session> sessions;
+	protected final HashMap<String, Session> wsessions;
 
 
-	public static WServPort build(AgentSettings settings) {
-		mustnonull(settings.tiers);
-		instance = new WServPort(settings.tiers);
+	public static WServPort build(DesktopSettings settings) {
+		mustnonull(settings.ipc_tiers);
+		try {
+			instance = new WServPort(settings.ipc_tiers);
+		} catch (SemanticException e) {
+			e.printStackTrace();
+		}
 		return instance;
 	}
 
@@ -52,11 +58,11 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 
 	public WServPort() {
 		ipcPorts = new HashMap<IPort, IWSPoint>();
-		sessions = new HashMap<String, Session>();
+		wsessions= new HashMap<String, Session>();
 		instance = this;
 	}
 
-	public WServPort(String[] tiernames) {
+	public WServPort(String[] tiernames) throws SemanticException {
 		ipcPorts = new HashMap<IPort, IWSPoint>(tiernames.length);
 
 		IWSPoint wsp = new WSEcho(this);
@@ -71,14 +77,14 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 		ipcPorts.put(wsp.port(), wsp);
 		logi("*** [Websocket end-point %-8s] %s", wsp.port().name(), wsp.getClass().getName());
 
-		sessions = new HashMap<String, Session>();
+		wsessions = new HashMap<String, Session>();
 	}
 
 	public InetSocketAddress updateRemote(Session session) {
 	    InetSocketAddress addr = (InetSocketAddress) 
 	            session.getUserProperties().get("jakarta.websocket.endpoint.remoteAddress");
 	    
-	    sessions.put(f("%s:%s", addr.getHostString(), addr.getPort()), session);
+	    wsessions.put(f("%s:%s", addr.getHostString(), addr.getPort()), session);
 	    
 	    return addr;
 	}
