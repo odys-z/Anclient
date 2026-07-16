@@ -16,6 +16,7 @@ public class T_WSAgent extends WSAgent {
 	
 	public static Server _main(String... args) throws Exception {
 	    settings = Anson.fromPath(_0(args));
+	    SingleAgent.getInstance().settings(settings);
 
 	    logi("*** [Websocket endpoint %s] %s", T_EchoEndpoint.pointpath, T_EchoEndpoint.class.getName());
 	    logi("*** [Websocket endpoint %s] %s", T_WSAgent.ipc_path, T_WSAgent.class.getName());

@@ -161,7 +161,7 @@ public class SessionClient {
 	}
 
 	/**
-	 * Start a heart beat thread which is sleeping on thread signal {@link #syncFlag}.
+	 * Start a heart beat thread which is waken every msInterv = 60000. Break if {@link #stoplink} = false;
 	 * @param clientUri
 	 * @param onLink can be null
 	 * @param onBroken can be null

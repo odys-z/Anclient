@@ -47,7 +47,7 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 		mustnonull(settings.ipc_tiers);
 		try {
 			instance = new WServPort(settings.ipc_tiers);
-		} catch (SemanticException e) {
+		} catch (SemanticException | IOException e) {
 			e.printStackTrace();
 		}
 		return instance;
@@ -62,7 +62,7 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 		instance = this;
 	}
 
-	public WServPort(String[] tiernames) throws SemanticException {
+	public WServPort(String[] tiernames) throws SemanticException, IOException {
 		ipcPorts = new HashMap<IPort, IWSPoint>(tiernames.length);
 
 		IWSPoint wsp = new WSEcho(this);

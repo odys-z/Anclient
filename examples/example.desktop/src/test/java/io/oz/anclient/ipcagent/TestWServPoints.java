@@ -6,6 +6,8 @@ package io.oz.anclient.ipcagent;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
+import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.AnclientSettings;
 import io.odysz.jclient.SessionClient;
@@ -35,6 +38,7 @@ import io.odysz.semantic.tier.docs.DocsReq;
 import io.odysz.semantic.tier.docs.DocsResp;
 import io.odysz.semantic.tier.docs.PathsPage;
 import io.odysz.semantics.x.SemanticException;
+import io.oz.anclient.app.DesktopSettings;
 import io.oz.anclient.socketier.WSPing;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.JProtocol;
@@ -42,19 +46,20 @@ import io.odysz.semantic.jprotocol.JServUrl;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.Utils.warn;
+import static io.odysz.common.Utils.logi;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestWServPoints {
     private Server server;
 
-    AnclientSettings clientsettings;
+    DesktopSettings  appsettings;
 
 	@BeforeEach
     public void startServerAndClient() throws Exception {
-        server = T_WSAgent._main("src/test/resources/WEB-INF/settings.json");
+        server = T_WSAgent._main("src/test/resources/WEB-INF/desktop-settings.gitignore.json");
         server.start();
         
-        clientsettings = Anson.fromPath("src/test/resources/wsclient-settings.gitignore.json");
+        appsettings    = T_WSAgent.settings; 
     }
 
     @AfterEach
@@ -120,25 +125,36 @@ public class TestWServPoints {
 		assertArrayEquals(new String[] {"1", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(4).msg()));
     }
 
-	private List<DocsResp> placeTasks_ping(WSClient wsclient, ArrayList<String> paths)
+	private List<DocsResp> placeTasks_ping(
+			WSClient wsclient, ArrayList<String> paths)
+			throws AnsonException, IOException, SemanticException, InterruptedException {
+		return placeTasks(appsettings, WSPort.ping, wsclient, paths);
+	}
+
+	private List<DocsResp> placeTasks_upload(WSClient wsclient, ArrayList<String> paths)
+			throws AnsonException, IOException, SemanticException, InterruptedException {
+		return placeTasks(appsettings, WSPort.docstier, wsclient, paths);
+	}
+
+	static List<DocsResp> placeTasks(DesktopSettings settings, WSPort wsport,
+			WSClient wsclient, ArrayList<String> paths)
 			throws AnsonException, IOException, SemanticException, InterruptedException {
 		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
 		
-		DocsReq reqbd = (DocsReq) new DocsReq(clientsettings.synuri)
-						.device(clientsettings.sysuri)
-						.a(DocsReq.A.requestSyn)
-						;
+		DocsReq reqbd = (DocsReq) new DocsReq(settings.synuri)
+						.device(settings.sysuri)
+						.a(DocsReq.A.requestSyn);
 
 		PathsPage pthpage = new PathsPage();
 		for (String pth : paths)
 			pthpage.add(pth);
 		reqbd.syncing(pthpage);
 		
-		wsclient.asynRequest(WSPort.ping, reqbd);
+		wsclient.asynRequest(wsport, reqbd);
 		
 		AnsonMsg<AnsonResp> resp = wsclient.block_pop(WSPing.msInterval + 500);
 		while (resp != null) {
-			if (resp.port() == WSPort.ping) {
+			if (resp.port() == wsport) {
 				AnsonResp repbd = resp.body(0);
 				if (!(repbd instanceof DocsResp))
 					warn("UNEXPECTED REPLY: %s\n\t%s", repbd.getClass().getName(), repbd.msg());
@@ -156,11 +172,26 @@ public class TestWServPoints {
 		return pongs;
 	}
 	
-	private List<DocsResp> placeTasks_upload(WSClient wsclient, ArrayList<String> paths)
-			throws AnsonException, IOException, SemanticException, InterruptedException {
-		ArrayList<DocsResp> oks = new ArrayList<DocsResp>(paths.size());
+    @Test
+    public void testTaskUpload() throws Exception {
+    	logi("======================= test upload ==========================");
 
-		return oks;
-	}
- 
+        JProtocol p = new JProtocol(T_WSAgent.ipc_path);
+        JServUrl jserv = new JServUrl(p, false, appsettings.wshost, appsettings.wsport);
+        
+        WSClient pusher = new WSClient(jserv, true);
+        pusher.connect();
+
+		ArrayList<String> paths = new ArrayList<String>(Arrays
+									.asList("test/resources/182x121.png"));
+
+        List<DocsResp> reps = placeTasks_upload(pusher, paths);
+
+		assertEquals(3, reps.size());
+		String uri64 = reps.get(reps.size() - 1).xdoc.uri64;
+		logi(uri64);
+		String fullpath = EnvPath.decodeUri(".", uri64);
+		logi(fullpath);
+		assertTrue(Files.exists(Path.of(fullpath)));
+    }
 }

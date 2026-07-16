@@ -14,6 +14,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.ee10.websocket.jakarta.client.JakartaWebSocketClientContainer;
+
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
 import io.odysz.common.AESHelper2;
@@ -28,7 +31,6 @@ import io.odysz.semantic.jprotocol.JProtocol.OnError;
 import io.odysz.semantics.x.SemanticException;
 import jakarta.websocket.ClientEndpointConfig;
 import jakarta.websocket.CloseReason;
-import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.DeploymentException;
 import jakarta.websocket.Endpoint;
 import jakarta.websocket.EndpointConfig;
@@ -84,7 +86,7 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
     boolean verbose;
 	JServUrl jserv;
 	
-	static int timeout = 120;
+	static int timeout = 15000;
 
     public WSClient(JServUrl jserv, boolean... verbose) {
     	this.jserv = jserv;
@@ -239,7 +241,7 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 		session.getBasicRemote().sendText(reqmsg.toBlock());
 		
 		String msg = null;
-	    long deadLine = System.currentTimeMillis() + (timeout * 1000);
+	    long deadLine = System.currentTimeMillis() + timeout;
 	    
 	    while (System.currentTimeMillis() < deadLine) {
 	        msg = messageQueue.poll(10, TimeUnit.MILLISECONDS);
@@ -280,8 +282,31 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 	 * @throws InterruptedException 
 	 */
 	WebSocketContainer connect(JServUrl jserv) throws IOException, DeploymentException, InterruptedException {
-    	WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+    	// WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+		HttpClient httpClient = new HttpClient();
+	    httpClient.setConnectTimeout(timeout); // connection timeout
+	    try {
+			httpClient.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			try { httpClient.close(); } catch (Exception e1) { e1.printStackTrace(); }
+			throw new IOException(e.getMessage());
+		}
+
+	    // Instantiate Jetty's Jakarta WebSocket container of the custom client timeout
+	    JakartaWebSocketClientContainer wsContainer = new JakartaWebSocketClientContainer(httpClient);
+
     	wsContainer.setDefaultMaxTextMessageBufferSize(AESHelper2.blockSize() + 3 * 1024);
+
+    	// idle timeout
+    	wsContainer.setDefaultMaxSessionIdleTimeout(timeout * 10);
+    	
+    	try {
+    	    wsContainer.start();
+    	} catch (Exception e) {
+    	    throw new IOException("Failed to start JakartaWebSocketClientContainer", e);
+    	}
     	
         ClientEndpointConfig endpointConfig = ClientEndpointConfig.Builder.create().build();
 

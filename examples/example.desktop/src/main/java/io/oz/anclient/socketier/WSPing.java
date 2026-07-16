@@ -74,6 +74,8 @@ public class WSPing implements IWSPoint {
 	
 	DocsResp onTaskPing(Basic sr, Async ar, DocsReq req) {
 		musteq(A.requestSyn, req.a());
+		mustnonull(req.device());
+
 		DocsResp resp = (DocsResp) new DocsResp()
 									.doc(new ExpSyncDoc()
 											.device(req.device()))

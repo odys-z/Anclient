@@ -71,7 +71,7 @@ public class WSAgent {
 
 	public static Server _main(String... args) throws Exception {
 	    DesktopSettings settings = Anson.fromPath(_0(args));
-	    SingleAgent.getInstance().settings(settings); // and the same in tests?
+	    SingleAgent.getInstance().settings(settings);
 
 	    logi("[Websocket endpoint %s] %s", WSAgent.ipc_path, WSAgent.class.getName());
         return createServer(new ArrayList<ServerEndpointConfig.Builder> () {

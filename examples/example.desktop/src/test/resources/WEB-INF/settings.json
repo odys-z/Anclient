@@ -1,5 +1,17 @@
-{ "type"     : "io.oz.anclient.ipcagent.AgentSettings",
-  "whitelist": [],
+{ "type"     : "io.oz.anclient.app.DesktopSettings",
+  "wshost"   : "127.0.0.1",
   "wsport"   : 8700,
-  "tiers"    : ["io.oz.anclient.socketier.WSEcho", "io.oz.anclient.ipcagent.T_Doclient"]
+  "ipc_tiers": ["io.oz.anclient.socketier.WSEcho", "io.oz.anclient.ipcagent.T_Doclient"],
+  "sysuri": "/sys/desktop-test",
+  "synuri": "/syn/desktop-test",
+  "jserv" : "http://localhost:0000/jserv-album",
+  "jprotocolpath": "jserv-album",
+
+  "domain": "******",
+  "admin": "ody",
+  "domain_token": "********",
+
+  "regiserv": "http://.../regist-alpha",
+  "regiprotopath": "jserv-alpha",
+  "centralPswd": "**************"
 }

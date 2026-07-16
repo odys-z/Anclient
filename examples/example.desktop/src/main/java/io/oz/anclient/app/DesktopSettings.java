@@ -18,6 +18,7 @@ import io.odysz.anson.AnsonField;
  *       "wsagent_jar": {"dataAnclass": "string"},
  *       "synode_id"  : {"dataAnclass": "string"},
  *       "synode_vol" : {"dataAnclass": "string"},
+ *       "syn_jserv"  : {"dataAnclass": "string"},
  *       "domain"     : {"dataAnclass": "string"},
  *       "admin"      : {"dataAnclass": "string"},
  *       "token"      : {"dataAnclass": "string"},
@@ -33,6 +34,7 @@ public class DesktopSettings extends Anson {
 	@AnsonField(ignoreFrom=true)
 	public String json_path;
 
+	public String device;
 	public String sysuri;
 	public String synuri;
 	public String java_path;
@@ -41,15 +43,19 @@ public class DesktopSettings extends Anson {
 	/** Of the local synode, not the targeting synode. */
 	public String synode_id;
 	public String synode_vol;
+	public String synode_jserv;
 	public String domain;
 	public String admin;
 	public String token;
-	public String wsagent_settings;
-	public int wshost;
+	public String wshost;
 	public int wsport;
 
 	public int wstimeout;
 	public String[] ipc_tiers;
+
+	/** Path to settings the agent working as a synode client */
+	public String synclientjson;
+
 
 	public DesktopSettings() {
 		wstimeout = 60000;

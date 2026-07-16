@@ -1,6 +1,5 @@
 package io.oz.anclient.ipcagent;
 
-import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.oz.anclient.app.DesktopSettings;
 
 public class SingleAgent {
@@ -28,9 +27,9 @@ public class SingleAgent {
 		return settings;
 	}
 	
-	public AnsonMsg<?> ver(AnsonMsg<?> msg) {
-		try { msg.version = ver;
-		} catch (Exception e) {}
-		return msg;
-	}
+//	public AnsonMsg<?> ver(AnsonMsg<?> msg) {
+//		try { msg.version = ver;
+//		} catch (Exception e) {}
+//		return msg;
+//	}
 }

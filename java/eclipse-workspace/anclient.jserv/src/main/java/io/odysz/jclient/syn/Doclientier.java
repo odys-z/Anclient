@@ -118,20 +118,21 @@ public class Doclientier extends Semantier {
 	/**
 	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
 	 * 
-	 * @param workerId
+	 * @param jservrt jserv
+	 * @param usrid
 	 * @param device
 	 * @param pswd
-	 * @return
+	 * @return this
 	 * @throws SemanticException
 	 * @throws AnsonException
 	 * @throws SsException
 	 * @throws IOException
 	 */
-	public Doclientier loginWithUri(String jservrt, String workerId, String device, String pswd)
+	public Doclientier loginWithUri(String jservrt, String usrid, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
 		// client = Clients.loginWithUri(uri, workerId, pswd, device);
-		client = SessionClient.loginWithUri(jservrt, uri, workerId, pswd, device);
+		client = SessionClient.loginWithUri(jservrt, uri, usrid, pswd, device);
 
 		return onLogin(client);
 	}
@@ -262,6 +263,7 @@ public class Doclientier extends Semantier {
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
 				throws TransException, IOException, AnsonException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
+		mustnonull(client);
 		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper2.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
