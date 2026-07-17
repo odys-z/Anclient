@@ -8,6 +8,7 @@ import java.io.IOException;
 import io.odysz.anson.AnsonException;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jserv.echo.EchoReq;
@@ -17,7 +18,6 @@ import io.odysz.semantics.x.SemanticException;
 import io.odysz.transact.x.TransException;
 import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IWSPoint;
-import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPort;
 import jakarta.websocket.RemoteEndpoint.Async;
 import jakarta.websocket.RemoteEndpoint.Basic;
@@ -27,7 +27,7 @@ public class WSEcho implements IWSPoint {
 
 	@Override
 	public IPort port() {
-		return WSPort.echo;
+		return Port.echo;
 	}
 
 	public WSEcho(WServPort wsSocket) {

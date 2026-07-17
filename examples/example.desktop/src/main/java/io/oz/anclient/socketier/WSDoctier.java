@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.jclient.AnclientSettings;
 import io.odysz.jclient.Clients.OnLogin;
+import io.odysz.jclient.syn.IFileProvider;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
 import io.odysz.semantic.jprotocol.AnsonMsg.MsgCode;
+import io.odysz.semantic.jprotocol.AnsonMsg.Port;
 import io.odysz.semantic.jprotocol.AnsonResp;
 import io.odysz.semantic.jprotocol.IPort;
 import io.odysz.semantic.jprotocol.JProtocol.OnDocsOk;
@@ -34,7 +34,6 @@ import io.oz.anclient.app.DesktopSettings;
 import io.oz.anclient.ipcagent.IPCException;
 import io.oz.anclient.ipcagent.IWSPoint;
 import io.oz.anclient.ipcagent.SingleAgent;
-import io.oz.anclient.ipcagent.WSPort;
 import io.oz.anclient.ipcagent.WServPort;
 import io.oz.syndoc.client.AsynClientier;
 
@@ -47,7 +46,7 @@ public class WSDoctier implements IWSPoint  {
 
 	@Override
 	public IPort port() {
-		return WSPort.docstier;
+		return Port.docstier;
 	}
 
 	public WSDoctier(WServPort wsSocket) throws SemanticException, IOException {
@@ -116,22 +115,34 @@ public class WSDoctier implements IWSPoint  {
 
     ExpSyncDoc templtDoc = new ExpSyncDoc();
 	
-	DocsResp onResuestSyn(Basic sr, Async ar, DocsReq req) throws SemanticException, IOException, AnsonException, SsException {
+	DocsResp onResuestSyn(Basic sr, Async ar, DocsReq req)
+			throws SemanticException, IOException, AnsonException, SsException {
+
 		mustnonull(req.device());
 
 		DocsResp resp = new DocsResp()
 							.doc(new ExpSyncDoc()
 							.device(req.device()));
 
-		placePushsTask(sr, templtDoc, req.docTabl, videos(req),
-			(rx, rows, bx, blocks, rep) -> {
-				rep.msg(String.format("%d,%d,%d,%d,rx rows bx blocks", rx, rows, bx, blocks));
-				sr.sendText(rep.toBlock());
+		List<String> problematics = new ArrayList<String>();
+		List<IFileDescriptor> uploadings = videos(req, problematics);
+		
+		if (problematics.size() > 0) {
+			getErr(sr).err(MsgCode.exIo, "On fiel verification failed:", (String[]) problematics.toArray());
+		}
+			
+		if (uploadings.size() > 0)
+		placePushsTask(sr, templtDoc, req.docTabl, uploadings,
+			(rx, rows, bx, blocks, repbd) -> {
+				repbd.msg(String.format("%d,%d,%d,%d,rx rows bx blocks", rx, rows, bx, blocks));
+				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>(Port.docstier, MsgCode.ok);
+				repmsg.body(repbd);
+				sr.sendText(repmsg.toBlock());
 				return false;
 			},
 			// pushsOk,
 			(synrep) -> {
-				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>();
+				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>(Port.docstier, MsgCode.ok);
 				repmsg.bodys(synrep);
 				sr.sendText(repmsg.toBlock());
 			},
@@ -139,7 +150,7 @@ public class WSDoctier implements IWSPoint  {
 				// TODO start hearbeat...
 
 				// relay the response
-				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>();
+				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>(Port.docstier, MsgCode.ok);
 				AnSessionResp rp = new AnSessionResp();
 				repmsg.body(rp);
 				try {
@@ -161,6 +172,7 @@ public class WSDoctier implements IWSPoint  {
 		if (docs.size() > 0) {
 			if (synodeclient == null) {
 				synodeclient = new AsynClientier(settings.sysuri, settings.synuri, getErr(sr));
+				synodeclient.fileProvider(new IFileProvider() {});
 	        	synodeclient.loginWithUri(settings.synode_jserv,
 	        						settings.admin, settings.device, settings.token);
 			}
@@ -168,14 +180,18 @@ public class WSDoctier implements IWSPoint  {
 		}
 	}
 
-	private List<IFileDescriptor> videos(DocsReq req) throws SemanticException {
+	private List<IFileDescriptor> videos(DocsReq req, List<String> problematics) throws SemanticException {
 		mustnonull(req.syncingPage());
 		mustnonull(req.syncingPage().paths());
 
 		List<IFileDescriptor> vids = new ArrayList<IFileDescriptor>();
 		for (String p : req.syncingPage().paths().keySet()) {
 			ExpSyncDoc d = new ExpSyncDoc();
-			d.clientpath = p;
+			try {
+				d.clientpath(p).figure_locally();
+			} catch (IOException e) {
+				problematics.add(p);
+			}
 			vids.add(d);
 		}
 		return vids;

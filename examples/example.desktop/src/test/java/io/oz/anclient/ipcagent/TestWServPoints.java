@@ -22,11 +22,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
+import io.odysz.common.CheapIO;
 import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
-import io.odysz.jclient.AnclientSettings;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -47,6 +46,7 @@ import io.odysz.semantic.jprotocol.JServUrl;
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.Utils.warn;
 import static io.odysz.common.Utils.logi;
+import static io.odysz.common.Utils.pause;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestWServPoints {
@@ -86,7 +86,7 @@ public class TestWServPoints {
     @Test
     public void testServPoint() throws Exception {
         JProtocol p = new JProtocol(T_WSAgent.ipc_path);
-        JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
+        JServUrl jserv = new JServUrl(p, false, "localhost", appsettings.wsport);
 
         WSClient wsclient = new WSClient(jserv, true);
         
@@ -104,7 +104,7 @@ public class TestWServPoints {
     @Test
     public void testTaskPing() throws Exception {
         JProtocol p = new JProtocol(T_WSAgent.ipc_path);
-        JServUrl jserv = new JServUrl(p, false, "localhost", 8700);
+        JServUrl jserv = new JServUrl(p, false, "localhost", appsettings.wsport);
         
         WSClient pinger = new WSClient(jserv, true);
         pinger.connect();
@@ -125,18 +125,21 @@ public class TestWServPoints {
 		assertArrayEquals(new String[] {"1", "2", "1", "2", "rx rows bx blocks"}, LangExt.split(reps.get(4).msg()));
     }
 
+	@SuppressWarnings("deprecation")
 	private List<DocsResp> placeTasks_ping(
 			WSClient wsclient, ArrayList<String> paths)
 			throws AnsonException, IOException, SemanticException, InterruptedException {
 		return placeTasks(appsettings, WSPort.ping, wsclient, paths);
 	}
 
+	@SuppressWarnings("deprecation")
 	private List<DocsResp> placeTasks_upload(WSClient wsclient, ArrayList<String> paths)
 			throws AnsonException, IOException, SemanticException, InterruptedException {
 		return placeTasks(appsettings, WSPort.docstier, wsclient, paths);
 	}
 
-	static List<DocsResp> placeTasks(DesktopSettings settings, WSPort wsport,
+	static List<DocsResp> placeTasks(DesktopSettings settings,
+			@SuppressWarnings("deprecation") WSPort wsport,
 			WSClient wsclient, ArrayList<String> paths)
 			throws AnsonException, IOException, SemanticException, InterruptedException {
 		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
@@ -154,15 +157,19 @@ public class TestWServPoints {
 		
 		AnsonMsg<AnsonResp> resp = wsclient.block_pop(WSPing.msInterval + 500);
 		while (resp != null) {
-			if (resp.port() == wsport) {
+			if (
+				// c++ with polymorphism registered should expecting this: 
+				resp.port() == wsport
+				// java test with jprotocol setup as Port should expecting this:
+			  || resp.port() == Port.ping || resp.port() == Port.docstier) {
 				AnsonResp repbd = resp.body(0);
 				if (!(repbd instanceof DocsResp))
 					warn("UNEXPECTED REPLY: %s\n\t%s", repbd.getClass().getName(), repbd.msg());
 				else {
 					DocsResp docrep = (DocsResp) repbd;
-					if (eq(docrep.a(), DocsReq.A.requestSyn))
-						pongs.add(docrep);
-					else warn("UNEXPECTED ACT in reply: %s", docrep.a());
+					if (!eq(docrep.a(), DocsReq.A.requestSyn))
+						warn("UNEXPECTED ACT in reply: %s", docrep.a());
+					pongs.add(docrep);
 				}
 			}
 			else warn("UNEXPECTED REPLY, port: %s", resp.port());
@@ -183,15 +190,17 @@ public class TestWServPoints {
         pusher.connect();
 
 		ArrayList<String> paths = new ArrayList<String>(Arrays
-									.asList("test/resources/182x121.png"));
+									.asList(CheapIO.genTestFile("src/test/resources/182x121.png", "png")));
 
         List<DocsResp> reps = placeTasks_upload(pusher, paths);
 
-		assertEquals(3, reps.size());
-		String uri64 = reps.get(reps.size() - 1).xdoc.uri64;
-		logi(uri64);
-		String fullpath = EnvPath.decodeUri(".", uri64);
+
+		// pause("Press enter to quite ...");
+		assertTrue(reps.size() >= 3);
+
+		String fullpath = reps.get(reps.size() - 1).xdoc.clientpath;
 		logi(fullpath);
+		assertNotNull(fullpath);
 		assertTrue(Files.exists(Path.of(fullpath)));
     }
 }

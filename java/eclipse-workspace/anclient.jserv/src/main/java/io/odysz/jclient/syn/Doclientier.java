@@ -303,7 +303,7 @@ public class Doclientier extends Semantier {
 
 		List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
 
-		for ( int px = 0; px < videos.size(); px++ ) {
+		for ( int rx = 0; rx < videos.size(); rx++ ) {
 
 			FileInputStream ifs = null;
 			int seq = 0;
@@ -314,11 +314,11 @@ public class Doclientier extends Semantier {
 			 * 2025-03-04 fix error of reading non-latin file name.
 			 */
 
-			IFileDescriptor f = videos.get(px);
+			IFileDescriptor f = videos.get(rx);
 			if (fileProvider == null) {
 				if (isblank(f.fullpath()) || isblank(f.clientname()) || isblank(f.cdate()))
 					throw new IOException(
-							f("File information is not enough: %s, %s, create time %s",
+							f("File information is not enough: name %s, %s, create time %s",
 							f.clientname(), f.fullpath(), f.cdate()));
 			}
 			else if (fileProvider.meta(f) < 0) {
@@ -359,7 +359,11 @@ public class Doclientier extends Semantier {
 				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
 				totalBlocks = (int) (Math.max(0, p.size - 1) / blocksize) + 1;
 
-				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
+				if (proc != null) {
+					if (resp0.xdoc != null && isblank(resp0.xdoc.shareflag()))
+						resp0.xdoc.shareflag(ShareFlag.pushing);
+					proc.proc(rx, videos.size(), 0, totalBlocks, resp0);
+				}
 
 				ifs = (FileInputStream) fileProvider.open(f);
 
@@ -372,7 +376,11 @@ public class Doclientier extends Semantier {
 								.header(header);
 
 					respi = client.commit(q, errHandler);
-					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+					if (proc != null) {
+						if (respi.xdoc != null && isblank(respi.xdoc.shareflag()))
+							respi.xdoc.shareflag(ShareFlag.pushing);
+						proc.proc(rx, videos.size(), seq, totalBlocks, respi);
+					}
 
 					b64 = AESHelper2.encode64(ifs, blocksize);
 				}
@@ -381,7 +389,11 @@ public class Doclientier extends Semantier {
 				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
 				respi = client.commit(q, errHandler);
-				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+				if (proc != null) {
+					if (respi.xdoc != null && isblank(respi.xdoc.shareflag()))
+						respi.xdoc.shareflag(ShareFlag.publish);
+					proc.proc(rx, videos.size(), seq, totalBlocks, respi);
+				}
 
 				reslts.add(respi);
 			}
@@ -405,12 +417,6 @@ public class Doclientier extends Semantier {
 					// Tag: MVP - This is not correct way of deserialize exception at client side
 					if (!isblank(exmsg)) {
 						try {
-							// Code: ext, mesage: {
-							//   \"type\": \"io.odysz.semantics.SemanticObject\",
-							//   \"props\": {\"code\": 99,
-							//   \"reasons\": [\"Found existing file for device & client path.\",
-							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
-
 							String reasons = exmsg;
 							SemanticObject exp = null; 
 							try {
@@ -441,11 +447,6 @@ public class Doclientier extends Semantier {
 							ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
 				}
 			}
-//			finally {
-//				if (ifs != null)
-//					ifs.close();
-//				// DocLocks.readed(p.fullpath());
-//			}
 		}
 		if (docsOk != null) docsOk.ok(reslts);
 

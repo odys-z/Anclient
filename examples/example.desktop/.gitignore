@@ -5,3 +5,4 @@ build
 **/*.beautify
 *.gitignore.json
 dependency-reduced-pom.xml
+182x121*.png
