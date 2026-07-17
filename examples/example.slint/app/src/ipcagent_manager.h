@@ -90,12 +90,12 @@ public:
      * Starts the background Java IPC Agent process.
      * Uses a completely hidden window context on Windows.
      */
-    bool start_agent(const std::string& setting_path = "") {
+    bool start_agent(const std::string& jarg_agentsetting_path = "") {
         anlog("[AgentUtil] Starting Java Agent background worker...");
 
     #ifdef _WIN32
         std::string cmd = std::format("{} -jar {} {}", 
-                                      resolveHomePath(m_java_exe), m_agent_jar, setting_path);
+                                      resolveHomePath(m_java_exe), m_agent_jar, jarg_agentsetting_path);
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         si.dwFlags = STARTF_USESHOWWINDOW;

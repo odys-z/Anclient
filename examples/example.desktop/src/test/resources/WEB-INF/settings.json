@@ -1,17 +1,23 @@
 { "type"     : "io.oz.anclient.app.DesktopSettings",
-  "wshost"   : "127.0.0.1",
-  "wsport"   : 8700,
-  "ipc_tiers": ["io.oz.anclient.socketier.WSEcho", "io.oz.anclient.ipcagent.T_Doclient"],
+  "device": "desktop.test",
   "sysuri": "/sys/desktop-test",
   "synuri": "/syn/desktop-test",
-  "jserv" : "http://localhost:0000/jserv-album",
-  "jprotocolpath": "jserv-album",
+  "synode_jserv" : "http://localhost:0000/jserv-album",
 
-  "domain": "******",
-  "admin": "ody",
-  "domain_token": "********",
+  "java_path"  : "~/github/semantic-jserv/jserv-album/infor-17.1/jre17/bin/java.exe",
+  "doctier_jar": "res/doctier-0.5.19.jar",
+  "wsagent_jar": "res/ws-agent-0.2.0.jar",
+  "synode_id"  : "infor-17.1",
+  "synode_vol" : "~/github/semantic-jserv/jserv-album/infor-17.1/vol",
 
-  "regiserv": "http://.../regist-alpha",
-  "regiprotopath": "jserv-alpha",
-  "centralPswd": "**************"
+  "domain": "********",
+  "admin" : "ody",
+  "token" : "********",
+
+  "wshost"   : "127.0.0.1",
+  "wsport"   : 12345,
+  "ipc_tiers": ["io.oz.anclient.socketier.WSEcho", "io.oz.anclient.ipcagent.T_Doclient"],
+
+  "regiserv"     : "http://------:8888/regist-alpha",
+  "centralPswd"  : "**************"
 }

@@ -54,7 +54,7 @@ public class DesktopSettings extends Anson {
 	public String[] ipc_tiers;
 
 	/** Path to settings the agent working as a synode client */
-	public String synclientjson;
+//	public String synclientjson;
 
 
 	public DesktopSettings() {

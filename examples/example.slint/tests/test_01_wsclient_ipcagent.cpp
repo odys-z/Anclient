@@ -45,7 +45,7 @@ OnMsg onmsg = []() { return false; };
 static JavaAgentController* agentController = nullptr;
 
 class Ipclient : public ::testing::Test {
-    static QMLAppSettings qmlsettings;
+    static QMLTestSettings qmlsettings;
 protected:
     static WSClient* wsclient;
  
@@ -54,7 +54,7 @@ protected:
     static void start_agent() {
         const string java = resolveHomePath(qmlsettings.java_path);
         agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
-        if (!agentController->start_agent(qmlsettings.wsagent_settings)) {
+        if (!agentController->start_agent(qmlsettings)) {
             FAIL() << "Failed to initialize IPC Java Agent process context.";
         }
 
@@ -67,7 +67,7 @@ protected:
         register_semantier(asts, "");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_qmlappsettingsAst(asts);
+        register_desktopsettingsAst(asts);
 
         Anson::from_file("settings/test-01-settings.json", qmlsettings);
         ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
@@ -96,7 +96,7 @@ protected:
         stop_agent();
         
         asts.clear();
-        qmlsettings = QMLAppSettings();
+        qmlsettings = DesktopSettings();
 
         std::cout << "Teardown[*]" << std::endl;
 
@@ -121,8 +121,8 @@ protected:
     void TearDown() override {}
 };
 
-QMLAppSettings Ipclient::qmlsettings;
-WSClient*      Ipclient::wsclient;
+DesktopSettings Ipclient::qmlsettings;
+WSClient*       Ipclient::wsclient;
 
 TEST_F(Ipclient, Echo) {
     EchoReq echo{EchoReq::A::echo};

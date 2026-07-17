@@ -39,4 +39,5 @@ build
 surrealism-0.5.3
 app-settings-*.json
 app-settings.json
+*.gitignore.json
 !app-settings-template.json

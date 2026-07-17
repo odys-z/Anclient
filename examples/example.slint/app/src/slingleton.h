@@ -30,7 +30,7 @@ namespace anson {
     WSClient* wsclient = nullptr;
 
   public:
-    static QMLAppSettings qmlsettings;
+    static DesktopSettings qmlsettings;
     AsynClienter* doclientier = nullptr;
     string volume_path;
 
@@ -43,13 +43,13 @@ namespace anson {
         register_semantier(asts, "");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_qmlappsettingsAst(asts);
+        register_desktopsettingsAst(asts);
 
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         Anson::from_file(settings_path, qmlsettings);
 
         instance->agentController = new JavaAgentController(qmlsettings.java_path, qmlsettings.wsagent_jar);
-        instance->agentController->start_agent(qmlsettings.wsagent_settings);
+        instance->agentController->start_agent(qmlsettings.synclientjson);
 
         ix::initNetSystem();
 

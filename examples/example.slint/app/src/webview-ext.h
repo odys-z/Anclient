@@ -80,7 +80,7 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
 
 std::atomic<bool> is_webview_open(false);
 
-void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const anson::QMLAppSettings & settings) {
+void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const anson::DesktopSettings & settings) {
     if (is_webview_open.exchange(true)) {
         slint::invoke_from_event_loop([weak_ui_handle]() {
             if (auto ui = weak_ui_handle.lock()) {

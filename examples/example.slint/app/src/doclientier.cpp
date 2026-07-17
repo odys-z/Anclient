@@ -28,7 +28,7 @@ bool AsynClienter::stop_ipcagent() {
 bool AsynClienter::start_ipcagent() {
     const string java = resolveHomePath(appsettings.java_path);
     agentController = JavaAgentController(java, appsettings.wsagent_jar);
-    if (!agentController.start_agent(appsettings.wsagent_settings)) {
+    if (!agentController.start_agent(appsettings.synclientjson)) {
         anerror("Failed to initialize IPC Java Agent process context.");
         throw AnsonException("Failed to initialize IPC Java Agent process context.");
     }

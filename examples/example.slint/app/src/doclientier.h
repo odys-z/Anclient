@@ -24,14 +24,14 @@ protected:
     inline static const string sysuri = "/sys/cpp";
     inline static const string synuri = "/syn/cpp";
 
-    QMLAppSettings appsettings;
+    DesktopSettings appsettings;
     JavaAgentController agentController;
 
     string _device;
 
     OnMsg onmsg;
 
-    QMLAppSettings qmlsettings;
+    DesktopSettings qmlsettings;
 
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 

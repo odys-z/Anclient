@@ -305,13 +305,13 @@
 		<version>3.3.1</version>
 		<executions>
 			<execution>
-				<id>copy-jar-to-example.qml</id>
+				<id>copy-jar-to-example.slint</id>
 				<phase>install</phase> 
 				<goals>
 					<goal>copy-resources</goal>
 				</goals>
 				<configuration>
-					<outputDirectory>${basedir}/../example.qml/tests/res</outputDirectory>
+					<outputDirectory>${basedir}/../example.slint/tests/res</outputDirectory>
 					<resources>
 						<resource>
 							<directory>${project.build.directory}</directory>

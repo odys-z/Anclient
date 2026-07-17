@@ -5,7 +5,6 @@
     "device": {"dataAnclass": "string"},
     "sysuri": {"dataAnclass": "string"},
     "synuri": {"dataAnclass": "string"},
-    "temp_dir"    : {"dataAnclass": "string"},
     "java_path"   : {"dataAnclass": "string"},
     "doctier_jar" : {"dataAnclass": "string"},
     "wsagent_jar" : {"dataAnclass": "string"},
@@ -18,7 +17,8 @@
     "wshost"      : {"dataAnclass": "string"},
     "wsport"      : {"dataAnclass": "int"},
     "wstimeout"   : {"dataAnclass": "int"},
-    "ipc_tiers"   : {"dataAnclass": "list<string"}
+    "ipc_tiers"   : {"dataAnclass": "list<string"},
+    "synclientjson":{"dataAnclass": "string"}
   },
   "ctorsemantics": [ ]
 }
