@@ -261,7 +261,9 @@ public class WSClient extends Endpoint implements MessageHandler.Whole<String> {
 		return (AnsonMsg<AnsonResp>) Anson.fromJson(msg);
 	}
 
-	<T extends AnsonBody> void asynRequest(WSPort port, T reqbd) throws AnsonException, IOException {
+	<T extends AnsonBody> void asynRequest(
+			@SuppressWarnings("deprecation") WSPort port,
+			T reqbd) throws AnsonException, IOException {
 
 		mustnonull(this.wsClient);
 

@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Test;
 
 import io.odysz.anson.AnsonException;
 import io.odysz.common.CheapIO;
-import io.odysz.common.EnvPath;
 import io.odysz.common.LangExt;
 import io.odysz.jclient.SessionClient;
 import io.odysz.semantic.jprotocol.AnsonBody;
@@ -49,6 +48,7 @@ import static io.odysz.common.Utils.logi;
 import static io.odysz.common.Utils.pause;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("unused")
 public class TestWServPoints {
     private Server server;
 
