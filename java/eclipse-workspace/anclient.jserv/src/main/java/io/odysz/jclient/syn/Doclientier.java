@@ -131,7 +131,7 @@ public class Doclientier extends Semantier {
 	public Doclientier loginWithUri(String jservrt, String usrid, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
-		// client = Clients.loginWithUri(uri, workerId, pswd, device);
+		mustnonull(jservrt, "Arg jservrt for login is null!");
 		client = SessionClient.loginWithUri(jservrt, uri, usrid, pswd, device);
 
 		return onLogin(client);
@@ -310,7 +310,7 @@ public class Doclientier extends Semantier {
 			int totalBlocks = 0;
 
 			/* 
-			 * 025-03-02 fix class casting error while pick files on Android.
+			 * 2025-03-02 fix class casting error while pick ingfiles on Android.
 			 * 2025-03-04 fix error of reading non-latin file name.
 			 */
 
