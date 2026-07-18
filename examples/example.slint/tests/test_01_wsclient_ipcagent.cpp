@@ -34,6 +34,7 @@
 #include <signal.h>
 #endif
 
+string settings_json = "settings/desktop-settings.gitignore.json";
 anson::AstMap asts;
 anson::JsonOpt opts{&asts};
 
@@ -45,21 +46,28 @@ OnMsg onmsg = []() { return false; };
 static JavaAgentController* agentController = nullptr;
 
 class Ipclient : public ::testing::Test {
-    static QMLTestSettings qmlsettings;
+    static DesktopSettings settings;
 protected:
     static WSClient* wsclient;
  
     void SetUp() override {}
 
     static void start_agent() {
-        const string java = resolveHomePath(qmlsettings.java_path);
-        agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
-        if (!agentController->start_agent(qmlsettings)) {
+        // const string java = resolveHomePath(qmlsettings.java_path);
+        // agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
+
+        // DesktopSettings settings;
+        Anson::from_file(settings_json, settings);
+        agentController = new JavaAgentController(settings);
+
+        // ASSERT_TRUE(std::regex_search(agentController.settings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
+
+        if (!agentController->start_agent(settings_json)) {
             FAIL() << "Failed to initialize IPC Java Agent process context.";
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        anlog(std::format("Synode Volume: {}", qmlsettings.synode_vol));
+        anlog(std::format("Synode Volume: {}", settings.synode_vol));
     }
 
     static void SetUpTestSuite() {
@@ -69,16 +77,15 @@ protected:
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
 
-        Anson::from_file("settings/test-01-settings.json", qmlsettings);
-        ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
-        ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
-        ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
-
-        anlog(std::format("Starting IPC Agent: {}", qmlsettings.wsagent_jar));
+        // Anson::from_file("settings/test-01-settings.json", qmlsettings);
+        // ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
+        // ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
+        // ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
+        // anlog(std::format("Starting IPC Agent: {}", qmlsettings.wsagent_jar));
         start_agent();
 
         ix::initNetSystem();
-        string wsjserv = std::format("ws://{}:{}/ipc", qmlsettings.wshost, qmlsettings.wsport);
+        string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
         wsclient = new WSClient({wsjserv, {"ipc"}}, onmsg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
@@ -96,7 +103,6 @@ protected:
         stop_agent();
         
         asts.clear();
-        qmlsettings = DesktopSettings();
 
         std::cout << "Teardown[*]" << std::endl;
 
@@ -121,7 +127,7 @@ protected:
     void TearDown() override {}
 };
 
-DesktopSettings Ipclient::qmlsettings;
+DesktopSettings Ipclient::settings;
 WSClient*       Ipclient::wsclient;
 
 TEST_F(Ipclient, Echo) {
@@ -177,6 +183,37 @@ TEST_F(Ipclient, PING_Place_Task) {
     ASSERT_EQ(pthpage.clientPaths.size() * 2 + 1, c);
 }
 
+TEST_F(Ipclient, DocTask_upload) {
+    DocsReq uploadreq{"h_photos", {}};
+    uploadreq.a = DocsReq::A::requestSyn;
+
+    std::map<std::string, std::vector<LangExt::VarType>> clientPaths {
+        {"path/a", {ShareFlag::pushing}}, {"path/b", {}}, {"path/c", {}},
+        {"path/d", {}}, {"path/e", {}}, {"path/f", {}} 
+    };
+
+    PathsPage pthpage;
+    pthpage.clientPaths = clientPaths;
+    uploadreq.syncingPage = {pthpage};
+    uploadreq.syncingPage.end = clientPaths.size();
+    uploadreq.syncingPage.start = 0;
+    AnsonMsg<DocsReq> msg(WSPort{WSPort::docstier}, uploadreq);
+
+    wsclient->asynSend(msg);
+
+    AnsonMsg<DocsResp> resp;
+    bool has_envl = wsclient->block_poll();
+    while (has_envl) {
+        try {
+            resp = wsclient->pop_envelope<DocsResp>();
+            ASSERT_EQ(resp.port.valof(), WSPort{WSPort::docstier}.valof());
+            has_envl = wsclient->block_poll(500);
+        } catch(SemanticException& e) {
+            FAIL() << "expecting upload task replies ...";
+        }
+    }
+}
+
 /**
  * Override the main function for ensure gtest outputs.
  */
@@ -194,5 +231,4 @@ int main(int argc, char** argv) {
     cout << "---------------- Tearing down TestSuite Ipclient Done. ----------------" << std::endl;
 
     return c;
-    // _exit(c);
 }

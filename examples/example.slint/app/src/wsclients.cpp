@@ -63,7 +63,6 @@ WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         this->onMessage(msg);
     });
-    // setup(jserv_.wservUri(), jserv_.jprotocol->protocolpath, onmsg);
 }
 
 void WSClient::setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {
@@ -71,7 +70,7 @@ void WSClient::setup(const string& jserv, const string& protocol_root, const OnM
     onMsg = onmsg;
 
     string ipcurl = jserv_.wservUri();
-    anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
+    aninfo(std::format("[****** WSClient ******] Constructing with jserv: {}", ipcurl));
     websocket.setUrl(ipcurl);
     websocket.setPingInterval(15);
     
@@ -81,7 +80,6 @@ void WSClient::setup(const string& jserv, const string& protocol_root, const OnM
         this->onMessage(msg);
     });
 }
-
 
 WSClient::~WSClient() {
     websocket.stop();
@@ -172,6 +170,7 @@ void WSClient::onMessage(const ix::WebSocketMessagePtr& msg) {
     else if (msg->type == ix::WebSocketMessageType::Error) {
         anwarn("WebSocket Error: "s + msg->errorInfo.reason);
         queueCv_.notify_all();
+        // ISSUE slint ui helper: can update ui with a static helper
     }
 }
 
@@ -202,8 +201,6 @@ bool WSClient::block_poll(int wait_ms) {
 
 void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
     DocsReq uploadreq{"h_photos", {}};
-    // uploadreq.syncingPage.end = pthpage.clientPaths.size();
-    // uploadreq.syncingPage.start = 0;
     uploadreq.syncingPage = pthpage;
     uploadreq.a = DocsReq::A::requestSyn;
     AnsonMsg<DocsReq> msg(port, std::move(uploadreq));

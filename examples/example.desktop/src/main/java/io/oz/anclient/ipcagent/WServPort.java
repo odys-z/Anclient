@@ -1,7 +1,7 @@
 package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt.f;
-import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.LangExt.shouldntnull;
 import static io.odysz.common.Utils.logi;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 
 
 	public static WServPort build(DesktopSettings settings) {
-		mustnonull(settings.ipc_tiers);
+		shouldntnull(new Object() {}, settings.ipc_tiers);
 		try {
 			instance = new WServPort(settings.ipc_tiers);
 		} catch (SemanticException | IOException e) {

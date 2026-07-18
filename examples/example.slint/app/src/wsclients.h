@@ -56,7 +56,7 @@ public:
     template <typename R> AnsonMsg<R> pop_envelope();
 
     WSClient* on_msg(OnMsg on) { onMsg = on; return this; }
-    void place_tasks(PathsPage& tasks, const WSPort port = WSPort{WSPort::doctier});
+    void place_tasks(PathsPage& tasks, const WSPort port = WSPort{WSPort::docstier});
 
 private:
     JServUrl jserv_;

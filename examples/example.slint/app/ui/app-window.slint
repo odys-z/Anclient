@@ -9,139 +9,147 @@ import { PathItemData, FileTable } from "file-table.slint";
 
 
 export component App inherits Window {
-    height: 800px;
-    width: 1280px;
 
-    // min-height: 600px;
-    // min-width: 800px;
+/* To enable slint preview, use this:
+ */
+height: 600px;
+width: 1024px;
 
-    in-out property <string> window-title: "Anclient.slint";
-    title: window-title;
+/* To enable maximize, use this:
+preferred-height: 600px;
+preferred-width:  1024px;
+min-height: 400px;
+min-width: 600px;
+ */
 
-    private property <string> menu_id;
+  in-out property <string> window-title: "Anclient.slint";
+  title: window-title;
 
-    out property <length> web_x;
-    out property <length> web_y;
-    out property <length> web_width;
-    out property <length> web_height;
+  private property <string> menu_id;
 
-    in-out property <string> webview-status: "Webview not started";
-    in-out property <string> syncing-status: "Ready";
+  out property <length> web_x;
+  out property <length> web_y;
+  out property <length> web_width;
+  out property <length> web_height;
 
-    in-out property <string> current_pth;
-    in-out property <[PathItemData]> filelist: [];
-    in-out property <bool> enable_vol;
+  in-out property <string> webview-status: "Webview not started";
+  in-out property <string> syncing-status: "Ready";
 
-    callback menu-changed(string);
-    callback item_clicked(string, bool);
-    callback echows(string);
-    callback pingws([string]);
-    callback load_folder(string);
-    callback select_file(PathItemData, bool);
-    callback upload_files();
-    callback open_link(string);
-    callback open_volume();
+  in-out property <string> current_pth;
+  in-out property <[PathItemData]> filelist: [];
+  in-out property <bool> enable_vol;
 
-    init => {
-      menu_id = "home";
-    }
+  callback menu-changed(string);
+  callback item_clicked(string, bool);
+  callback echows(string);
+  callback pingws([string]);
+  callback load_folder(string);
+  callback select_file(PathItemData, bool);
+  callback upload_files();
+  callback open_link(string);
+  callback open_volume();
 
-    HorizontalLayout {
-      left-wrapper:=Rectangle {
-        z: 111;
-        width: menu.width;
-        clip: false;
-        menu:=SMenu {
-          menu-data:[
-            { id: "home",  icon: @image-url("imgs/home.svg"),  name: "Home" },
-            { id: "album", icon: @image-url("imgs/album-icon.svg"), name: "Album"},
-            { id: "volume",icon: UseIcons.icons.Folder,   name: "Volume" },
-            { id: "upload",icon: UseIcons.icons.FileCode, name: "Upload" },
-          ];
+  init => {
+    menu_id = "home";
+  }
 
-          change(index, data) => {
-            debug(index, data);
-            menu_id = data.id;
-            menu-changed(data.id);
-          }
-        }
-      }
+  HorizontalLayout {
+    left-wrapper:=Rectangle {
+      z: 111;
+      width: menu.width;
+      clip: false;
+      menu:=SMenu {
+        menu-data:[
+          { id: "home",  icon: @image-url("imgs/home.svg"),  name: "Home" },
+          { id: "album", icon: @image-url("imgs/album-icon.svg"), name: "Album"},
+          { id: "volume",icon: UseIcons.icons.Folder,   name: "Volume" },
+          { id: "upload",icon: UseIcons.icons.FileCode, name: "Upload" },
+        ];
 
-      right-wrapper:=Rectangle {
-        z: 100;
-        width: parent.width - menu.width;
-        background: #2b2b32;
-        VerticalLayout {
-          width: parent.width;
-          height: parent.height;
-
-          if (menu_id == "home") : index-page := HomeForm { 
-            height: parent.height - 14pt;
-            visible: root.menu_id == "home";
-            navigate(menuid) => {
-              root.menu-id = menuid;
-              menu-changed(menuid);
-            }
-            open-link(link) => { root.open_link(link); }
-            enable-vol: root.enable_vol;
-          }
-
-          if (menu_id == "album") : webview_slot := Rectangle {
-            background: #e0e0e0;
-            // Text { text: "Page 2"; }
-          }
-
-          if (menu_id == "volume") : Rectangle {
-            background: #b0d0d0;
-            // Volume Information
-            // CustomTableViewPage { width: 100%; height: 100%; }
-          }
-
-          if (menu_id == "upload") : Rectangle {
-            background: #202020;
-            FileTable { width: 100%; height: 100%;
-              row_data: root.filelist;
-              init => { root.load_folder("."); }
-              current_path: root.current_pth;
-              row-double-click(row) => {
-                if (row.is-folder) {
-                  debug("[App Window] callback, loading: " + row.fname);
-                  root.load_folder(row.fullpath);
-                }
-              }
-              row-selected(row) => {
-                if (!row.is-folder) {
-                  debug("[App Window] callback, synching: " + row.fname);
-                  root.select_file(row, row.iselected);
-                }
-              }
-              upload => {
-                root.upload_files();
-              }
-            }
-          }
-
-          if (menu_id == "2-2") : Rectangle {
-            background: #b0d0d0;
-            GUIClientSettings {
-              width: 100%; height: 100%;
-              echows-clicked(msg) => { root.echows(msg); }
-              pingws-clicked => { root.pingws(self.file_paths)}
-            }
-          }
-
-          status-bar:= HorizontalLayout {
-            padding-top: 1pt;
-            padding-left: 12pt;
-            STag{ text: root.syncing_status;
-              clicked => { popup.open(); }
-            }
-          }
+        change(index, data) => {
+          debug(index, data);
+          menu_id = data.id;
+          menu-changed(data.id);
         }
       }
     }
 
-    popup:=SPopup {
+    right-wrapper:=Rectangle {
+      z: 100;
+      width: parent.width - menu.width;
+      background: #2b2b32;
+      VerticalLayout {
+        width: parent.width;
+        height: parent.height;
+
+        // if (menu_id == "home") : index-page := HomeForm { 
+        if (menu_id == "home" || menu_id == "album") : index-page := HomeForm { 
+          height: parent.height - 14pt;
+          visible: root.menu_id == "home";
+          navigate(menuid) => {
+            root.menu-id = menuid;
+            menu-changed(menuid);
+          }
+          open-link(link) => { root.open_link(link); }
+          enable-vol: root.enable_vol;
+        }
+
+        // if (menu_id == "album") : webview_slot := Rectangle {
+        //   background: #e0e0e0;
+        //   // Text { text: "Page 2"; }
+        // }
+
+        if (menu_id == "volume") : Rectangle {
+          background: #b0d0d0;
+          // Volume Information
+          // CustomTableViewPage { width: 100%; height: 100%; }
+        }
+
+        if (menu_id == "upload") : Rectangle {
+          background: #202020;
+          FileTable { width: 100%; height: 100%;
+            row_data: root.filelist;
+            init => { root.load_folder("."); }
+            current_path: root.current_pth;
+            row-double-click(row) => {
+              if (row.is-folder) {
+                debug("[App Window] callback, loading: " + row.fname);
+                root.load_folder(row.fullpath);
+              }
+            }
+            row-selected(row) => {
+              if (!row.is-folder) {
+                debug("[App Window] callback, synching: " + row.fname);
+                root.select_file(row, row.iselected);
+              }
+            }
+            upload => {
+              root.upload_files();
+            }
+          }
+        }
+
+        if (menu_id == "2-2") : Rectangle {
+          background: #b0d0d0;
+          GUIClientSettings {
+            width: 100%; height: 100%;
+            echows-clicked(msg) => { root.echows(msg); }
+            pingws-clicked => { root.pingws(self.file_paths)}
+          }
+        }
+
+        status-bar:= HorizontalLayout {
+          padding-top: 1pt;
+          padding-left: 12pt;
+          STag{ text: root.syncing_status;
+            clicked => { popup.open(); }
+          }
+        }
+      }
+    }
+  }
+
+  popup:=SPopup {
     Rectangle {
       background: #222;
       VerticalLayout {

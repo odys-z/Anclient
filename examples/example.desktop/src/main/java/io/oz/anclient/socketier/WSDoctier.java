@@ -52,6 +52,7 @@ public class WSDoctier implements IWSPoint  {
 	public WSDoctier(WServPort wsSocket) throws SemanticException, IOException {
 		this.socket = wsSocket;
 		settings = SingleAgent.getInstance().settings();
+		mustnonull(settings);
 	}
 	
 	@Override
@@ -78,6 +79,9 @@ public class WSDoctier implements IWSPoint  {
 			rp.msg(err);
 			AnsonMsg<DocsResp> rep = new AnsonMsg<DocsResp>(port(), c);
 			rep.body(rp);
+
+			try { logi(rep.toBlock()); }
+			catch (Exception e) { }
 
 			try { sr.sendText(rep.toBlock());
 			} catch (AnsonException | IOException e) {
@@ -143,7 +147,10 @@ public class WSDoctier implements IWSPoint  {
 			// pushsOk,
 			(synrep) -> {
 				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>(Port.docstier, MsgCode.ok);
-				repmsg.bodys(synrep);
+				if (synrep.size() == 0)
+					repmsg.body(new DocsResp().msg("No files has been pushed."));
+				else
+					repmsg.bodys(synrep);
 				sr.sendText(repmsg.toBlock());
 			},
 			(client) -> {
@@ -168,11 +175,15 @@ public class WSDoctier implements IWSPoint  {
 	AsynClientier synodeclient;
 
 	private void placePushsTask(Basic sr, ExpSyncDoc doc0, String doctbl, List<IFileDescriptor> docs,
-			OnProcess proc, OnDocsOk ok, OnLogin onlogin, OnError err) throws SemanticException, IOException, AnsonException, SsException {
+				OnProcess proc, OnDocsOk ok, OnLogin onlogin, OnError err)
+				throws SemanticException, IOException, AnsonException, SsException {
 		if (docs.size() > 0) {
 			if (synodeclient == null) {
 				synodeclient = new AsynClientier(settings.sysuri, settings.synuri, getErr(sr));
 				synodeclient.fileProvider(new IFileProvider() {});
+			}
+			if (synodeclient.client == null) {
+				mustnonull(settings.synode_jserv, "settings.synode_jserv is null!"); // check here, not at initiating
 	        	synodeclient.loginWithUri(settings.synode_jserv,
 	        						settings.admin, settings.device, settings.token);
 			}
@@ -183,12 +194,14 @@ public class WSDoctier implements IWSPoint  {
 	private List<IFileDescriptor> videos(DocsReq req, List<String> problematics) throws SemanticException {
 		mustnonull(req.syncingPage());
 		mustnonull(req.syncingPage().paths());
+		mustnonull(req.device());
+		mustnonull(req.device().id, "device id is null");
 
 		List<IFileDescriptor> vids = new ArrayList<IFileDescriptor>();
 		for (String p : req.syncingPage().paths().keySet()) {
 			ExpSyncDoc d = new ExpSyncDoc();
 			try {
-				d.clientpath(p).figure_locally();
+				d.clientpath(p).device(req.device()).figure_locally();
 			} catch (IOException e) {
 				problematics.add(p);
 			}

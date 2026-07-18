@@ -1,4 +1,5 @@
-{ "type"    : "io.odysz.anclient.slint.QMLAppSettings",
+{ "type"    : "io.oz.anclient.app.DesktopSettings",
+  "device"  : "slint.test",
   "synuri"  : "/syn/qmltest",
   "sysuri"  : "/sys/qmltest",
   "temp_dir": "temp",
@@ -7,10 +8,11 @@
   "wsagent_jar": "res/ws-agent-0.1.0.jar",
   "synode_id": "29-X",
   "synode_vol" : "~/github/semantic-jserv/jserv-album/qqhome/",
+  "synode_jserv":"http://127.0.0.1:0000/jserv-album",
   "admin" : "ody",
   "token" : "*********",
   "domain": "*********",
   "wsagent_settings": "settings/ipc-agent-settings.json",
-  "wshost": "localhost",
+  "wshost": "127.0.0.1",
   "wsport": 8700
 }

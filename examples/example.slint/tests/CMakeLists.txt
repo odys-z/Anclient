@@ -53,6 +53,8 @@ add_custom_command(TARGET album_tests POST_BUILD
     COMMENT "Copying resources to build directory"
 )
 
+add_compile_definitions(ANSON_VERBOSE=4)
+
 # Windows DLLs
 if(WIN32)
     add_custom_command(TARGET album_tests POST_BUILD

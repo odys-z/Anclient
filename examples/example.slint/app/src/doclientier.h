@@ -24,18 +24,18 @@ protected:
     inline static const string sysuri = "/sys/cpp";
     inline static const string synuri = "/syn/cpp";
 
+    string settings_json;
     DesktopSettings appsettings;
-    JavaAgentController agentController;
 
     string _device;
 
     OnMsg onmsg;
 
-    DesktopSettings qmlsettings;
-
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
+    bool load_settings(const string& settings_json);
+
     // Getter
     string getDevice() const { return _device; }
 
@@ -57,20 +57,17 @@ public:
     };
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin)
-        : Doclientier("h_photos", sysuri, synuri, onErr),
-        agentController("java", "agent.jar"), window_weak(appwin) {}
+        : Doclientier("h_photos", sysuri, synuri, onErr), window_weak(appwin) {}
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, err),
-        agentController("java", "agent.jar"), window_weak(appwin) {}
+        : Doclientier("h_photos", sysuri, synuri, err), window_weak(appwin) {}
 
-    bool load_settings();
-    bool start_ipcagent();
-    bool stop_ipcagent();
+    // bool start_ipcagent(const string& settings_json);
+    // bool stop_ipcagent();
 
     void reconnect_ipc();
 
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::doctier});
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::docstier});
 
     void query_synode(vector<std::string> paths) {
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
@@ -104,14 +101,13 @@ public:
     // void asy_echows(OnOk ok, OnError err);
     void asy_echows(const string& echo = "Echo by Asynclientier from C++");
 private:
-    // string format_proc_report(const string& proc_msg) {
     string format_proc_report(const DocsResp& resp) {
         std::vector<std::string_view> report = LangExt::split(resp.m, ',');
         if (report.size() >= 4) {
             int current_row   = std::stoi(std::string(report[0]));
-            int total_rows     = std::stoi(std::string(report[1]));
-            int current_block  = std::stoi(std::string(report[2]));
-            int total_blocks   = std::stoi(std::string(report[3]));
+            int total_rows    = std::stoi(std::string(report[1]));
+            int current_block = std::stoi(std::string(report[2]));
+            int total_blocks  = std::stoi(std::string(report[3]));
 
             if (total_blocks > 0) {
                 float percentage = (static_cast<float>(current_block + 1) / total_blocks) * 100.0f;

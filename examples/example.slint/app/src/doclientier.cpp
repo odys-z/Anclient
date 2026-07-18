@@ -2,13 +2,15 @@
 #include <ixwebsocket/IXWebSocket.h>
 
 #include <io/odysz/utils.h>
+#include "slingleton.h"
 #include "doclientier.h"
 #include "gen/app_settings.hpp"
 
 
-bool AsynClienter::load_settings() {
+bool AsynClienter::load_settings(const string& settings_json) {
     try {
-        Anson::from_file("settings/app-settings.json", qmlsettings);
+        this->settings_json = settings_json;
+        Anson::from_file(settings_json, appsettings);
     } catch (AnsonException e) {
         anerror(e.what());
         return false;
@@ -16,30 +18,8 @@ bool AsynClienter::load_settings() {
     return true;
 }
 
-bool AsynClienter::stop_ipcagent() {
-    aninfo("Stopping IPC Agent...");
-    agentController.stop_agent();
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    aninfo("IPC Agent stopped.");
-    return true;
-}
-
-bool AsynClienter::start_ipcagent() {
-    const string java = resolveHomePath(appsettings.java_path);
-    agentController = JavaAgentController(java, appsettings.wsagent_jar);
-    if (!agentController.start_agent(appsettings.synclientjson)) {
-        anerror("Failed to initialize IPC Java Agent process context.");
-        throw AnsonException("Failed to initialize IPC Java Agent process context.");
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    anlog(std::format("Synode Volume: {}", qmlsettings.synode_vol));
-    return true;
-}
-
 void AsynClienter::reconnect_ipc() {
-    if (!load_settings()) {
+    if (!load_settings(settings_json)) {
         anerror("Failed to load settings.");
         return;
     }
@@ -68,9 +48,11 @@ void AsynClienter::reconnect_ipc() {
                 }
                 else if (!rep.body.empty()) {
                     string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
-                    anlog(std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state));
+                    string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
+                    anlog(status_txt);
 
-                    slint::SharedString slint_text(clientpath_state);
+                    // ISSUE slint ui helper: can update ui with a static helper
+                    slint::SharedString slint_text(status_txt);
                     slint::invoke_from_event_loop([this, slint_text]() {
                         if (auto handle = window_weak.lock()) {
                             anlog("[onmsg] Updating statues report: "s + string{slint_text});
@@ -79,11 +61,11 @@ void AsynClienter::reconnect_ipc() {
                     });
                 }
                 else
-                    anlog("on DocsResp: emptyp response body.");
+                    anlog("on DocsResp: empty response body.");
             }
         };
 
-        WSClient* _wsclient = new WSClient{JServUrl{qmlsettings.wshost, qmlsettings.wsport, {"ipc"}}, onmsg};
+        WSClient* _wsclient = new WSClient{JServUrl{appsettings.wshost, appsettings.wsport, {"ipc"}}, onmsg};
         try {
             _wsclient->connect();
             this->wsclient.reset(_wsclient);

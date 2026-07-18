@@ -25,18 +25,18 @@ namespace anson {
     static AstMap  asts;
     static Slingleton* instance;
 
-    JavaAgentController* agentController = nullptr;
-
-    WSClient* wsclient = nullptr;
-
   public:
     static DesktopSettings qmlsettings;
+
+    JavaAgentController* agentController = nullptr;
+
     AsynClienter* doclientier = nullptr;
     string volume_path;
 
     Slingleton() {}
 
-    static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin, const string & settings_path = "settings/app-settings.json") {
+    static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin,
+                      const string & settings_path = "settings/app-settings.json") {
       if (instance == nullptr) {
         instance = new Slingleton();
         register_jserv(asts, opts);
@@ -48,12 +48,18 @@ namespace anson {
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         Anson::from_file(settings_path, qmlsettings);
 
-        instance->agentController = new JavaAgentController(qmlsettings.java_path, qmlsettings.wsagent_jar);
-        instance->agentController->start_agent(qmlsettings.synclientjson);
+        // instance->appwin = appwin;
+        instance->agentController = new JavaAgentController(qmlsettings);
+        instance->agentController->start_agent(settings_path);
 
-        ix::initNetSystem();
+        // ix::initNetSystem();
+        slint::invoke_from_event_loop([appwin]() {
+          anlog("[***** ix::initNetSystem *****] Initializing network subsystems after Slint event loop is spinning ...");
+          ix::initNetSystem();
+        });
 
         instance->doclientier = new AsynClienter(appwin);
+        instance->doclientier->load_settings(settings_path);
 
         anlog(std::format("Has volume: {}, {}: {}",
           instance->has_synode_vol(), qmlsettings.synode_id, qmlsettings.synode_vol));

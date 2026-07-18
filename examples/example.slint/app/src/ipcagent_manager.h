@@ -21,6 +21,7 @@
 #include "gen/app_settings.hpp"
 #include "wsclients.h"
 
+namespace anson {
 /**
  * @brief Resolves the tilde (~) prefix in file paths across different platforms.
  * On Windows, it expands '~' to the USERPROFILE directory.
@@ -76,8 +77,13 @@ private:
 public:
     JavaAgentController() {}
 
-    JavaAgentController(const std::string& java_exe, const std::string& agent_jar)
-        : m_java_exe(java_exe), m_agent_jar(agent_jar) {}
+    // JavaAgentController(const std::string& java_exe, const std::string& agent_jar)
+        // : m_java_exe(resolveHomePath(java_exe)), m_agent_jar(resolveHomePath(agent_jar)) {}
+    JavaAgentController(const DesktopSettings& settings) {
+        // Anson::from_file(settings_json, settings);
+        m_java_exe = resolveHomePath(settings.java_path);
+        m_agent_jar = resolveHomePath(settings.wsagent_jar);
+    }
 
     ~JavaAgentController() {
         // Fallback protection
@@ -90,8 +96,11 @@ public:
      * Starts the background Java IPC Agent process.
      * Uses a completely hidden window context on Windows.
      */
-    bool start_agent(const std::string& jarg_agentsetting_path = "") {
+    bool start_agent(const std::string& jarg_agentsetting_path) {
         anlog("[AgentUtil] Starting Java Agent background worker...");
+
+        std::filesystem::create_directories("log");
+        string log_file = "log/ipc_agent_java.log";
 
     #ifdef _WIN32
         std::string cmd = std::format("{} -jar {} {}", 
@@ -102,8 +111,8 @@ public:
         si.wShowWindow = SW_HIDE; // Completely invisible window context
         PROCESS_INFORMATION pi = { 0, 0, 0, 0 };
 
-        std::string full_cmd = std::format("cmd.exe /c \"{}\" > java_agent_start.log 2>&1", cmd);
-        anlog("[AgentUtil]: "s + full_cmd);
+        std::string full_cmd = std::format("cmd.exe /c \"{} > {} 2>&1\"", cmd, log_file);
+        aninfo("[***** Agent Controller *****]: "s + full_cmd);
 
         if (CreateProcessA(NULL, const_cast<char*>(full_cmd.c_str()), NULL, NULL, TRUE, 
                            CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
@@ -112,28 +121,51 @@ public:
             CloseHandle(pi.hThread); // Release thread handle resource mapping safely
             m_is_running = true;
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            anlog("[AgentUtil] Background Agent started. PID (Windows): "s + std::to_string(m_agent_pid));
+            aninfo("[***** Agent Controller *****] Background Agent started. PID (Windows): "s + std::to_string(m_agent_pid));
             return true;
         } else {
-            anwarn("[AgentUtil] Failed to start Agent! Error: "s + std::to_string(GetLastError()));
+            anwarn("[***** Agent Controller *****] Failed to start Agent! Error: "s + std::to_string(GetLastError()));
             return false;
         }
     #else
+        /* TODO redirect to log file
+        // 1. Open the log file (Creates it if missing, appends if it exists)
+        int log_fd = open(log_file, O_WRONLY | O_CREAT | O_APPEND, 0644);
+
+        if (log_fd < 0) {
+            std::perror("Failed to open log file");
+            // Handle error or exit
+        } else {
+            // 2. Redirect stdout (1) and stderr (2) to the log file
+            dup2(log_fd, STDOUT_FILENO);
+            dup2(log_fd, STDERR_FILENO);
+
+            // 3. Close the original file descriptor as it's no longer needed
+            close(log_fd);
+        }
+
+        // 4. Now execute the jar safely. Its output goes straight to the log file.
+        execl(m_java_exe.c_str(), m_java_exe.c_str(), "-jar", m_agent_jar.c_str(), 
+            jarg_agentsetting_path.c_str(), (char*)NULL);
+
+        // If execl returns, it failed
+        std::perror("execl failed");
+        */
         m_agent_pid = fork();
         if (m_agent_pid == 0) {
             // Child process: close standard streams or redirect if necessary
-            execl(m_java_exe.c_str(), m_java_exe.c_str(), "-cp", m_agent_jar.c_str(), 
-                  "io.oz.anclient.ipcagent.AnsiIpcAgent", extra_args.c_str(), (char*)NULL);
+            execl(m_java_exe.c_str(), m_java_exe.c_str(), "-jar", m_agent_jar.c_str(), 
+                  jarg_agentsetting_path.c_str(), (char*)NULL);
             
-            anwarn("[AgentUtil] Failed to execute background process via execl!");
+            anwarn("[***** Agent Controller *****] Failed to execute background process via execl!");
             exit(1);
         } else if (m_agent_pid < 0) {
-            anwarn("[AgentUtil] Failed to fork background Agent process!");
+            anwarn("[***** Agent Controller *****] Failed to fork background Agent process!");
             return false;
         } else {
             m_is_running = true;
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            anlog("[AgentUtil] Background Agent started. PID (POSIX): "s + m_agent_pid);
+            aninfo("[***** Agent Controller *****] Background Agent started. PID (POSIX): "s + m_agent_pid);
             return true;
         }
     #endif
@@ -144,7 +176,7 @@ public:
      * Falls back to a forced process termination if it hangs.
      */
     void stop_agent() {
-        anlog("[AgentUtil] Stopping Java Agent gracefully...");
+        aninfo("[***** Agent Controller *****] Stopping Java Agent gracefully...");
 
     #ifdef _WIN32
         // Clean UTF-8 console context string chaining with proper output logging redirection
@@ -157,7 +189,7 @@ public:
         si.wShowWindow = SW_HIDE;
         PROCESS_INFORMATION pi = { 0, 0, 0, 0 };
             
-        anlog("[AgentUtil] Executing Stop Hook Command Line Process...");
+        anlog("[***** Agent Controller *****] Executing Stop Hook Command Line Process...");
         
         if (CreateProcessA(NULL, const_cast<char*>(stop_cmd.c_str()), NULL, NULL, TRUE, 
                            CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
@@ -168,13 +200,13 @@ public:
             CloseHandle(pi.hProcess);
 
             if (wait_result == WAIT_TIMEOUT) {
-                anwarn("[AgentUtil] Stop hook command timed out! Forcing termination...");
+                anwarn("[***** Agent Controller *****] Stop hook command timed out! Forcing termination...");
                 if (m_agent_process_handle) {
                     TerminateProcess(m_agent_process_handle, 0);
                 }
             }
         } else {
-            anwarn(std::format("[AgentUtil] Failed to run Stop Hook executable! Error: {}", GetLastError() ));
+            anwarn(std::format("[***** Agent Controller *****] Failed to run Stop Hook executable! Error: {}", GetLastError() ));
             // Immediate fallback to hard process kill if stop command hook itself fails to launch
             if (m_agent_process_handle) {
                 TerminateProcess(m_agent_process_handle, 0);
@@ -213,6 +245,7 @@ public:
     #endif
 
         m_is_running = false;
-        anlog("[AgentUtil] Java Agent stopped successfully.");
+        aninfo("[***** Agent Controller *****] Java Agent stopped successfully.");
     }
 };
+}

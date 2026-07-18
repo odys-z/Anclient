@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
             launch_webview_window(ui, slingle.qmlsettings);
         }
         else if (menu_id == "volume") {
-            anlog("TDD: Launch volume explorer");
+            anlog("Launching volume explorer");
             slingle.open_volume();
         }
     });
