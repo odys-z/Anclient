@@ -85,7 +85,7 @@ min-width: 600px;
         // if (menu_id == "home") : index-page := HomeForm { 
         if (menu_id == "home" || menu_id == "album") : index-page := HomeForm { 
           height: parent.height - 14pt;
-          visible: root.menu_id == "home";
+          visible: root.menu_id == "home" || menu_id == "album";
           navigate(menuid) => {
             root.menu-id = menuid;
             menu-changed(menuid);
@@ -107,25 +107,29 @@ min-width: 600px;
 
         if (menu_id == "upload") : Rectangle {
           background: #202020;
-          FileTable { width: 100%; height: 100%;
-            row_data: root.filelist;
-            init => { root.load_folder("."); }
+          FileTable {
+            width: 100%; height: 100%;
+
+            row_data    : root.filelist;
             current_path: root.current_pth;
+
+            init => { root.load_folder("."); }
+
             row-double-click(row) => {
               if (row.is-folder) {
                 debug("[App Window] callback, loading: " + row.fname);
                 root.load_folder(row.fullpath);
               }
             }
+
             row-selected(row) => {
               if (!row.is-folder) {
                 debug("[App Window] callback, synching: " + row.fname);
                 root.select_file(row, row.iselected);
               }
             }
-            upload => {
-              root.upload_files();
-            }
+
+            upload => { root.upload_files(); }
           }
         }
 

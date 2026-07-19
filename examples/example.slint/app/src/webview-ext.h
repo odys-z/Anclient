@@ -94,12 +94,6 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     w.set_title("Popup Webview");
     w.set_size(800, 600, WEBVIEW_HINT_NONE);
 
-    /* Android snipet
-    f("loadAlbum('%s', '%s', {legacyPDF: true, platform: 'android', serv: '%s'});",
-                                    client.ssInfo().uid(), pswd,
-                                    AlbumApp.prfConfig.jservlist.entry()
-    */
-
     string script = std::format(R"(
         window.addEventListener('DOMContentLoaded', () => {{
                 loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
@@ -107,13 +101,6 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
 
     anlog(script);
     w.init(script);
-
-    // w.init(R"(
-    //         window.addEventListener('DOMContentLoaded', () => {
-    //             loadAlbum('ody', '****************', {legacyPDF: true, platform: 'android', serv: '***********'});
-    //             alert('Injected JS from Slint Action!');
-    //         });
-    //     )"),
 
     w.navigate("http://127.0.0.1:8960/webview.html");
 

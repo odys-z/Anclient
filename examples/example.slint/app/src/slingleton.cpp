@@ -3,5 +3,5 @@
 AstMap  Slingleton::asts;
 JsonOpt Slingleton::opts{&asts};
 Slingleton* Slingleton::instance = nullptr;
-DesktopSettings Slingleton::qmlsettings;
+DesktopSettings Slingleton::appsettings;
 

@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
         anlog(std::format("Menu changed! ID: {}", menu_id));
 
         if (menu_id == "album") {
-            launch_webview_window(ui, slingle.qmlsettings);
+            launch_webview_window(ui, slingle.appsettings);
         }
         else if (menu_id == "volume") {
             anlog("Launching volume explorer");
@@ -76,7 +76,9 @@ int main(int argc, char **argv) {
                 PathItemData p { true, {}, "..", "", "", slint::SharedString(root.parent_path().string()) };
                 table_model->push_back(p);
             }
-            for (const auto& entry : fs::directory_iterator(root)) {
+
+            fs::directory_iterator syncpage = fs::directory_iterator(root);
+            for (const auto& entry : syncpage) {
                 std::string type = entry.is_directory() ? "Folder" : (entry.is_regular_file() ? "File" : "Other");
                 PathItemData row {.is_folder{entry.is_directory()},
                             .indent = {},
@@ -84,13 +86,14 @@ int main(int argc, char **argv) {
                             .size{entry.is_regular_file() ? std::to_string(entry.file_size()) : "-"},
                             .type{type},
                             .fullpath{entry.path().string()},
-                            .iselected{fileselection.find(string{row.fullpath}) != fileselection.end()} };
+                            .iselected{fileselection.find(string{row.fullpath}) != fileselection.end()}};
 
                 table_model->push_back(row);
             }
 
             ui->set_filelist(table_model);
             ui->set_current_pth(pth);
+            // query_syncgpage(syncpage);
         } catch (const fs::filesystem_error& e) {
             anerror("Filesystem error: "s + e.what());
         }

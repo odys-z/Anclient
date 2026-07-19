@@ -123,6 +123,7 @@ public class WSDoctier implements IWSPoint  {
 			throws SemanticException, IOException, AnsonException, SsException {
 
 		mustnonull(req.device());
+		mustnonull(req.device().id);
 
 		DocsResp resp = new DocsResp()
 							.doc(new ExpSyncDoc()

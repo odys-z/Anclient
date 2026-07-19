@@ -53,14 +53,8 @@ protected:
     void SetUp() override {}
 
     static void start_agent() {
-        // const string java = resolveHomePath(qmlsettings.java_path);
-        // agentController = new JavaAgentController(java, qmlsettings.wsagent_jar);
-
-        // DesktopSettings settings;
         Anson::from_file(settings_json, settings);
         agentController = new JavaAgentController(settings);
-
-        // ASSERT_TRUE(std::regex_search(agentController.settings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
 
         if (!agentController->start_agent(settings_json)) {
             FAIL() << "Failed to initialize IPC Java Agent process context.";
@@ -77,11 +71,6 @@ protected:
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
 
-        // Anson::from_file("settings/test-01-settings.json", qmlsettings);
-        // ASSERT_EQ("/sys/qmltest", qmlsettings.sysuri);
-        // ASSERT_EQ("/syn/qmltest", qmlsettings.synuri);
-        // ASSERT_TRUE(std::regex_search(qmlsettings.wsagent_jar, std::regex{"ws-agent-[0-9.]+.jar"}));
-        // anlog(std::format("Starting IPC Agent: {}", qmlsettings.wsagent_jar));
         start_agent();
 
         ix::initNetSystem();

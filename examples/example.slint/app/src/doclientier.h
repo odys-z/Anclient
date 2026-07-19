@@ -29,7 +29,49 @@ protected:
 
     string _device;
 
-    OnMsg onmsg;
+    OnMsg onmsg = [this]() -> void {
+        if (!wsclient->block_poll(200)) return;
+
+        AnsonMsg<DocsResp> rep = wsclient->pop_envelope<DocsResp>();
+        if (rep.body.empty()) {
+            anlog("on DocsResp: empty response body.");
+            return;
+        }
+
+        if (rep.code == MsgCode::Code::ok) {
+            anlog(rep.Body().m);
+            string proc_report = format_proc_report(rep.Body());
+            anlog(proc_report);
+
+            slint::SharedString slint_text(proc_report);
+            slint::invoke_from_event_loop([this, slint_text]() {
+                if (auto handle = window_weak.lock()) {
+                    anlog("[onmsg] Updating statues report: "s + string{slint_text});
+                    (*handle)->set_syncing_status(slint_text);
+                }
+            });
+        }
+        else if (rep.code == MsgCode::Code::_sentinel_) {
+            // show be the ws connection reports
+            // anlog("Show be the ws connection report ...");
+        }
+        else { //if (!rep.body.empty()) {
+            string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
+            string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
+            anlog(status_txt);
+
+            // ISSUE slint ui helper: can update ui with a static helper
+            slint::SharedString slint_text(status_txt);
+            slint::invoke_from_event_loop([this, slint_text]() {
+                if (auto handle = window_weak.lock()) {
+                    anlog("[onmsg] Updating statues report: "s + string{slint_text});
+                    (*handle)->set_syncing_status(slint_text);
+                }
+            });
+        }
+
+        // query_currentfolder();
+    };
 
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
@@ -61,9 +103,6 @@ public:
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
         : Doclientier("h_photos", sysuri, synuri, err), window_weak(appwin) {}
-
-    // bool start_ipcagent(const string& settings_json);
-    // bool stop_ipcagent();
 
     void reconnect_ipc();
 

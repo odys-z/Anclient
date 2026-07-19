@@ -26,7 +26,7 @@ namespace anson {
     static Slingleton* instance;
 
   public:
-    static DesktopSettings qmlsettings;
+    static DesktopSettings appsettings;
 
     JavaAgentController* agentController = nullptr;
 
@@ -46,10 +46,13 @@ namespace anson {
         register_desktopsettingsAst(asts);
 
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
-        Anson::from_file(settings_path, qmlsettings);
+        Anson::from_file(settings_path, appsettings);
+        if (LangExt::isblank(appsettings.device))
+          throw AnsonException("appsetings.device is empty. file: "s + settings_path);
+        else aninfo("[***** DEVICE *****] "s + appsettings.device);
 
         // instance->appwin = appwin;
-        instance->agentController = new JavaAgentController(qmlsettings);
+        instance->agentController = new JavaAgentController(appsettings);
         instance->agentController->start_agent(settings_path);
 
         // ix::initNetSystem();
@@ -62,19 +65,19 @@ namespace anson {
         instance->doclientier->load_settings(settings_path);
 
         anlog(std::format("Has volume: {}, {}: {}",
-          instance->has_synode_vol(), qmlsettings.synode_id, qmlsettings.synode_vol));
+          instance->has_synode_vol(), appsettings.synode_id, appsettings.synode_vol));
       }
       return *instance;
     }
 
     bool has_synode_vol() {
-      return !LangExt::isblank(qmlsettings.synode_id)
-           && std::filesystem::exists(resolveHomePath(qmlsettings.synode_vol));
+      return !LangExt::isblank(appsettings.synode_id)
+           && std::filesystem::exists(resolveHomePath(appsettings.synode_vol));
     }
 
     bool open_volume() {
       if (has_synode_vol()) {
-        open_file_explorer(qmlsettings.synode_vol);
+        open_file_explorer(appsettings.synode_vol);
         return true;
       }
       return false;
