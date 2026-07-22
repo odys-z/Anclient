@@ -2,6 +2,8 @@ import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, L
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
 
+export enum SyncingIcon { invisible, pushing, publish, localonly }
+
 export struct PathItemData {
     is_folder: bool,
     indent   : [string], // [+, |, T, L, -]
@@ -9,7 +11,8 @@ export struct PathItemData {
     size     : string,
     type     : string,
     fullpath : string,
-    iselected: bool
+    iselected: bool,
+    syncicon : SyncingIcon
 }
 
 export component FileTable {
@@ -22,7 +25,7 @@ export component FileTable {
     in-out property <string> current_path;
 
     in-out property <[PathItemData]> row_data: [
-        {is_folder: false, indent: [], fname: "test",   type: "test-type", size: "0", fullpath: "~/x/y.z", iselected: false},
+        {is_folder: false, indent: [], fname: "test",   type: "test-type", size: "0", fullpath: "~/x/y.z", iselected: false, syncicon: SyncingIcon.pushing},
         {is_folder: true,  indent: [], fname: "folder", type: "folder",    size: "",  fullpath: "~/x/dir", iselected: false}
     ];
 
@@ -52,7 +55,13 @@ export component FileTable {
       vertical-stretch: 1;
 
       VerticalLayout {
-        Text { text: root.current_path; }
+        HorizontalLayout {
+            Text { text: root.current_path; }
+            SButton {
+                text: @tr("Upload");
+                clicked => { root.upload(); }
+            }
+        }
 
         // Table Header
         HorizontalLayout {
@@ -65,10 +74,11 @@ export component FileTable {
         // Table Body Rows
         ScrollView {
           VerticalLayout {
-            for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
-                init => {
-                    debug(row.iselected ? "ON" : "OFF", row.fullpath);
-                }
+            // for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
+            for row in root.row_data : Rectangle {
+                // init => {
+                //     debug(row.iselected ? "ON" : "OFF", row.fullpath);
+                // }
 
                 background: row.iselected ? rgba(0, 120, 215, 0.2) : rgba(0, 0, 0, 0.02);
                 height: 24pt;
@@ -102,20 +112,33 @@ export component FileTable {
                         chkbox := SCheckbox {
                             text: "";
                             actived: row.iselected;
-                            disabled: row.is_folder;
+                            disabled: row.is_folder || row.syncicon != SyncingIcon.invisible;
                             height: 22pt; width: 22pt;
                             clicked(text, value, actived) => {
                                 touchbox.clicked();
                             }
                         }
 
+                        if (row.syncicon == SyncingIcon.pushing) : Image {
+                            source: root.icons("rotat");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.syncicon == SyncingIcon.publish) : Image {
+                            source: root.icons("album");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.syncicon == SyncingIcon.localonly) : Image {
+                            source: root.icons("locked");
+                            width: 14pt; height: 14pt;
+                        }
+
                         if (row.is-folder) : Image {
-                            // horizontal-alignment: ImageHorizontalAlignment.left;
                             source: root.icons("d");
                             width: 14pt; height: 14pt;
                         }
                         if (!row.is-folder): Image {
-                            // horizontal-alignment: ImageHorizontalAlignment.left;
                             source: root.icons("e");
                             width: 14pt; height: 14pt;
                         }
@@ -135,17 +158,16 @@ export component FileTable {
           }
         }
 
-        HorizontalLayout {
-            // Text { text: @tr("Filter by Name:"); }
-            filter-edit := LineEdit {
-                placeholder-text: @tr("Enter filter text");
-            }
+        // HorizontalLayout {
+        //     filter-edit := LineEdit {
+        //         placeholder-text: @tr("Enter filter text");
+        //     }
 
-            SButton {
-                text: @tr("Upload");
-                clicked => { root.upload(); }
-            }
+        //     // SButton {
+        //     //     text: @tr("Upload");
+        //     //     clicked => { root.upload(); }
+        //     // }
+        // }
         }
-      }
     }
 }

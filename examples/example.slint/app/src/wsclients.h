@@ -12,8 +12,6 @@
 
 namespace anson {
 
-// string resolveHomePath(const std::string& inputPath);
-
 /**
  * @return true if the message needs to be dropped
  */
@@ -35,14 +33,14 @@ public:
     inline static const string Closed = "Closed";
 
     WSClient(const JServUrl& jserv, const OnMsg& onmsg);
-    WSClient() : jserv_({"", {}}) {}
+    WSClient() : jserv_({"", JProtocol{}}) {}
 
     ~WSClient();
 
     void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg);
 
     string ipconn_state();
-    string syncon_state();
+    // string syncon_state();
     void connect();
     void disconnect();
     bool shouldReconnect(int code) const;

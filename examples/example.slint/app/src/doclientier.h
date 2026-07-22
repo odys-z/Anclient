@@ -8,6 +8,7 @@
 
 #include <thread>
 #include <chrono>
+#include <io/odysz/jprotocol.h>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
@@ -26,8 +27,6 @@ protected:
 
     string settings_json;
     DesktopSettings appsettings;
-
-    string _device;
 
     OnMsg onmsg = [this]() -> void {
         if (!wsclient->block_poll(200)) return;
@@ -70,7 +69,13 @@ protected:
             });
         }
 
-        // query_currentfolder();
+        // ui_query_synchings();
+        slint::invoke_from_event_loop([this]() {
+            if (auto handle = window_weak.lock()) {
+                anlog("querying page ...");
+                (*handle)->invoke_query_syncflags();
+            }
+        });
     };
 
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
@@ -78,17 +83,8 @@ protected:
 public:
     bool load_settings(const string& settings_json);
 
-    // Getter
-    string getDevice() const { return _device; }
-
-    // Setter
-    void setDevice(const string &device) {
-        if (_device == device) return;
-        _device = device;
-    }
-
     std::unique_ptr<WSClient> wsclient;
-    std::unique_ptr<AsynClienter> jservclient;
+    // SessionClient synodeclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
         anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
@@ -99,7 +95,7 @@ public:
     };
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin)
-        : Doclientier("h_photos", sysuri, synuri, onErr), window_weak(appwin) {}
+        : Doclientier("h_photos", sysuri, synuri, onErr), window_weak(appwin)  {}
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
         : Doclientier("h_photos", sysuri, synuri, err), window_weak(appwin) {}
@@ -112,13 +108,11 @@ public:
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
     }
 
-    void login_synode(const JServUrl & jserv, const string &uid, const string &pswd) noexcept {
+    void login_synode(const JServUrl & jserv, const string &uid, const string &pswd, const string& device) noexcept {
         try {
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
-            SessionClient ssclient = SessionClient::loginWithUri(jserv,
-                                    sysuri, uid, pswd, _device, onErr);
-            jservclient = make_unique<AsynClienter>(window_weak, onErr);
-            jservclient.get()->client = ssclient;
+            SessionClient ssclient = SessionClient::loginWithUri(jserv, sysuri, uid, pswd, device, onErr);
+            client = ssclient;
         } catch (const std::logic_error e) {
             anwarn(e.what());
             onErr(MsgCode::Code::exSession, e.what(), {});
@@ -128,17 +122,10 @@ public:
         }
     }
 
-    /**
-     * @brief connections
-     * @return [is ws conn ok, is synode conn ok]
-     */
-    vector<bool> connections() {
-        return {wsclient != nullptr && !LangExt::isblank(jservclient.get()->client.ssInf.ssid),
-             jservclient != nullptr && !LangExt::isblank(jservclient.get()->client.ssInf.ssid)};
-    }
-
-    // void asy_echows(OnOk ok, OnError err);
     void asy_echows(const string& echo = "Echo by Asynclientier from C++");
+
+    void query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok);
+
 private:
     string format_proc_report(const DocsResp& resp) {
         std::vector<std::string_view> report = LangExt::split(resp.m, ',');

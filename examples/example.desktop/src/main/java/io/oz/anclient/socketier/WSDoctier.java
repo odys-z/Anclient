@@ -2,6 +2,7 @@ package io.oz.anclient.socketier;
 
 import static io.odysz.common.LangExt.eq;
 import static io.odysz.common.LangExt.mustnonull;
+import static io.odysz.common.LangExt.musteqs;
 import static io.odysz.common.Utils.warn;
 import static io.odysz.common.Utils.logi;
 
@@ -123,7 +124,7 @@ public class WSDoctier implements IWSPoint  {
 			throws SemanticException, IOException, AnsonException, SsException {
 
 		mustnonull(req.device());
-		mustnonull(req.device().id);
+		musteqs(req.device().id, settings.device);
 
 		DocsResp resp = new DocsResp()
 							.doc(new ExpSyncDoc()
@@ -195,8 +196,6 @@ public class WSDoctier implements IWSPoint  {
 	private List<IFileDescriptor> videos(DocsReq req, List<String> problematics) throws SemanticException {
 		mustnonull(req.syncingPage());
 		mustnonull(req.syncingPage().paths());
-		mustnonull(req.device());
-		mustnonull(req.device().id, "device id is null");
 
 		List<IFileDescriptor> vids = new ArrayList<IFileDescriptor>();
 		for (String p : req.syncingPage().paths().keySet()) {

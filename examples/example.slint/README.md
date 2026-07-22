@@ -37,3 +37,18 @@ FYI, the .vscode/c_cpp_properties.json example
     "version": 4
   }
 ```
+
+Tip:
+
+1. Start Eclipse ipc-agent for bind first at 8700
+
+   File build/app/log/ipc_agent_java.log should report:
+
+   ```
+     [main] INFO org.eclipse.jetty.server.Server - jetty-12.0.21; built: 2025-05-09T00:32:00.688Z; 
+     Exception in thread "main" java.io.IOException: Failed to bind to 0.0.0.0/0.0.0.0:8700
+	 at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:349)
+	 at org.eclipse.jetty.server.ServerConnector.open(ServerConnector.java:313)
+	 at org.eclipse.jetty.server.Server.lambda$doStart$0(Server.java:571)
+     ...
+   ```

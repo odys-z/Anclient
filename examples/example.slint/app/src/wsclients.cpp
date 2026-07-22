@@ -61,11 +61,6 @@ string WSClient::ipconn_state() {
     else return Closed;
 }
 
-string WSClient::syncon_state() {
-    string stats[] = {Connecting, Open, Closing, Closed};
-    return stats[(int)websocket.getReadyState()];
-}
-
 void WSClient::disconnect() {
     andebug("WSClient disconnecting...");
 
@@ -162,9 +157,12 @@ bool WSClient::block_poll(int wait_ms) {
 
 void WSClient::place_tasks(PathsPage& pthpage, const WSPort port) {
     DocsReq uploadreq{"h_photos", {}};
+    uploadreq.device = Device{pthpage.device, pthpage.device, pthpage.device};
     uploadreq.syncingPage = pthpage;
     uploadreq.a = DocsReq::A::requestSyn;
     AnsonMsg<DocsReq> msg(port, std::move(uploadreq));
+
+    anlog("-----------------------------------------------\n" + msg.toBlock());
     asynSend(msg);
 }
 

@@ -25,7 +25,7 @@ min-width: 600px;
   in-out property <string> window-title: "Anclient.slint";
   title: window-title;
 
-  private property <string> menu_id;
+  in-out property <string> menu_id;
 
   out property <length> web_x;
   out property <length> web_y;
@@ -39,18 +39,25 @@ min-width: 600px;
   in-out property <[PathItemData]> filelist: [];
   in-out property <bool> enable_vol;
 
+  // Design Notes:
+  // Gemini says the callback cannot be reached because the callback hasn't been set by ui->on_initapp() yet.
+  // callback initapp();
+
   callback menu-changed(string);
   callback item_clicked(string, bool);
   callback echows(string);
   callback pingws([string]);
   callback load_folder(string);
+  callback query_syncflags();
+  callback update_syncflags();
   callback select_file(PathItemData, bool);
   callback upload_files();
   callback open_link(string);
   callback open_volume();
 
   init => {
-    menu_id = "home";
+    // menu_id = "home";
+    // Design Notes: initapp(); not working
   }
 
   HorizontalLayout {

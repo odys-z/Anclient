@@ -2,6 +2,7 @@
 #include <ixwebsocket/IXWebSocket.h>
 
 #include <io/odysz/utils.h>
+#include <io/odysz/jprotocol.h>
 #include "slingleton.h"
 #include "doclientier.h"
 #include "gen/app_settings.hpp"
@@ -54,12 +55,18 @@ void AsynClienter::reconnect_ipc() {
 }
 
 void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths, const WSPort& port) {
+    reconnect_ipc();
+
     PathsPage syncingpage;
-    syncingpage.clientPaths = syncing_paths;
+    syncingpage.device = appsettings.device;
+
+    // syncingpage.clientPaths = syncing_paths;
+    for (auto&[p, flgs] : syncing_paths) {
+        syncingpage.clientPaths.emplace(Anson::posix_path(p), flgs);
+    }
     syncingpage.start = 0;
     syncingpage.end = syncing_paths.size();
 
-    reconnect_ipc();
     wsclient->place_tasks(syncingpage, port);
 }
 
@@ -76,4 +83,55 @@ void AsynClienter::asy_echows(const string & echo_msg) {
     });
 
     bg_thread.detach();
+}
+
+void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok) {
+    if (syncing_paths.size() == 0)
+        return;
+    
+    std::thread query_thread([this, syncing_paths, ok]() {
+        if (LangExt::isblank(client.ssInf.ssid)) {
+            anlog("Login to "s + appsettings.synode_jserv);
+            login_synode(JServUrl{appsettings.synode_jserv},
+                    this->appsettings.admin, this->appsettings.token, this->appsettings.device);
+            // client.openLink(sysuri);
+        }
+        if (LangExt::isblank(client.ssInf.ssid))
+            return;
+        
+		client.header.Act("desktop.slint", "query", "r/states", "query sync");
+
+		DocsReq req;
+        req.syncingPage = PathsPage{Slingleton::appsettings.device, 0, static_cast<int>(syncing_paths.size())};
+        req.syncingPage.clientPaths = syncing_paths;
+        req.docTabl = Doclientier::doctbl;
+        req.device = Device{Slingleton::appsettings.device, Slingleton::appsettings.device, Slingleton::appsettings.device};
+        req.a = DocsReq::A::selectSyncs;
+        req.limit = -1;
+        req.pageInf.size = -1;
+
+        anlog("=========================\n"s + client.header.toBlock());
+
+		AnsonMsg<DocsReq> q = client.userReq(synuri, Port{Port::docstier}, req)
+				                    .Header(client.header);
+        anlog("=========================\n"s + q.toBlock());
+
+        try {
+            DocsResp resp = client.commit<DocsResp>(q, err);
+            ok(resp);
+        } 
+        catch (const SemanticException& e) {
+            anerror(e.what());
+        } 
+        catch (const AnsonException& e) {
+            anerror(e.what());
+        } 
+        catch (const std::exception& e) {
+            anerror(e.what());
+        } 
+        catch (...) {
+            anerror("Caught unknown exception.");
+        }
+    });
+    query_thread.detach();
 }

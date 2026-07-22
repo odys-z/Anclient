@@ -309,15 +309,6 @@ public class SessionClient {
 	 */
 	public <T extends AnsonBody> AnsonMsg<T> userReq(String uri, IPort port, T bodyItem, LogAct... act)
 			throws AnsonException {
-//		if (port == null)
-//			throw new AnsonException(0, "AnsonMsg<UserReq> needs port explicitly specified.");
-//
-//		// let header = Protocol.formatHeader(this.ssInf);
-//		bodyItem.uri(uri);
-//		if (act != null && act.length > 0)
-//			header().act(act[0]); 
-//
-//		return new AnsonMsg<T>(port).header(header()).body(bodyItem);
 		return userReq(header, uri, port, bodyItem, act);
 	}
 	

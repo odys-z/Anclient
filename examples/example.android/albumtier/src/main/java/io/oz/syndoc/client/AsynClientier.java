@@ -82,12 +82,14 @@ public class AsynClientier extends Doclientier {
 	public AsynClientier asyGetSettings(OnOk onOk, OnError... onErr) {
 	  new Thread(() -> {
 		try {
-			AnsonHeader header = client.header()
+			AnsonHeader header = client
+					.header()
 					.act("album.java", "profile", "r/settings", "load profile");
 
 			AlbumReq req = new AlbumReq(uri);
 			req.a(A.getPrefs);
-			AnsonMsg<AlbumReq> q = client.userReq(uri, SynDocollPort.docoll, req)
+			AnsonMsg<AlbumReq> q = client
+					.userReq(uri, SynDocollPort.docoll, req)
 					.header(header);
 			AnsonResp resp = client.commit(q, errCtx);
 			onOk.ok(resp);
