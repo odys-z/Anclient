@@ -174,9 +174,9 @@ public class SessionClient {
 		stoplink = false;
 
 		HeartBeat beat = new HeartBeat(null, clientUri, ssInf.ssid(), ssInf.uid());
-		AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
+		// AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
-				.header(header)
+				.header(ssInf)
 				.body(beat);
 		
 		msInterval = msInterv == null || msInterv.length < 1 ? 60000 : msInterv[0];

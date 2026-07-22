@@ -48,7 +48,7 @@ namespace anson {
       if (instance == nullptr) {
         instance = new Slingleton();
         register_jserv(asts, opts);
-        register_semantier(asts, "");
+        register_semantier(asts, "ast");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
