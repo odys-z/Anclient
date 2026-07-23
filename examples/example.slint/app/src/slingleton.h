@@ -38,7 +38,7 @@ namespace anson {
     AsynClienter* doclientier = nullptr;
     string volume_path;
 
-    queue<DocsResp> synode_msgs;
+    queue<AnsonResp> synode_msgs;
     mutable std::mutex synode_mutex;
 
     Slingleton() {}
@@ -91,17 +91,17 @@ namespace anson {
       return false;
     }
 
-    shared_ptr<DocsResp> dequeue_synode() {
+    shared_ptr<AnsonResp> dequeue_synode() {
       std::lock_guard<std::mutex> lock(synode_mutex);
       if (synode_msgs.size() > 0) {
-        auto ret = std::make_shared<DocsResp>(std::move(synode_msgs.front()));
+        auto ret = std::make_shared<AnsonResp>(std::move(synode_msgs.front()));
         synode_msgs.pop();
         return ret;
       }
       else return nullptr;
     }
 
-    void enqueue_synode(const anson::DocsResp& msg) {
+    void enqueue_synode(const anson::AnsonResp& msg) {
       std::lock_guard<std::mutex> lock(synode_mutex);
       synode_msgs.push(msg);
     }
