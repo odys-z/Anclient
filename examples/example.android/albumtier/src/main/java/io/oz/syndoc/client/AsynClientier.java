@@ -33,7 +33,7 @@ import io.oz.album.peer.AlbumReq.A;
 import io.oz.album.peer.SynDocollPort;
 
 /**
- * A wrapper for the runtime requires backgound thread networking, such as Android Activities.
+ * A wrapper for the runtime requires background threads for networking, such as Android Activities.
  */
 public class AsynClientier extends Doclientier {
 
@@ -90,7 +90,7 @@ public class AsynClientier extends Doclientier {
 			req.a(A.getPrefs);
 			AnsonMsg<AlbumReq> q = client
 					.userReq(uri, SynDocollPort.docoll, req)
-					.header(header);
+					.header(header); // ISSUE must be a bug, try .header(client.ssInfo())
 			AnsonResp resp = client.commit(q, errCtx);
 			onOk.ok(resp);
 		} catch (IOException e) {
@@ -165,7 +165,7 @@ public class AsynClientier extends Doclientier {
 				DocsReq req = new DocsReq(uri);
 				req.a(DocsReq.A.devices);
 				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
-						.header(header);
+						.header(header); // ISSUE must be a bug .header(client.ssInfo())
 				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
@@ -192,7 +192,7 @@ public class AsynClientier extends Doclientier {
 						.device(new Device(device, null, devname));
 				req.a(DocsReq.A.registDev);
 				AnsonMsg<DocsReq> q = client.userReq(uri, SynDocollPort.docoll, req)
-						.header(header);
+						.header(header); // ISSUE must be a bug .header(client.ssInfo())
 				q.body(0).synuri = synuri;
 				AnsonResp resp = client.commit(q, errCtx);
 				ok.ok(resp);
@@ -251,7 +251,7 @@ public class AsynClientier extends Doclientier {
 			String[] act = AnsonHeader.usrAct("synclient.java", "del", "d/photo", "");
 			AnsonHeader header = client.header().act(act);
 			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, SynDocollPort.docoll, req)
-										.header(header);
+										.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 			resp = client.commit(q, errCtx);
 		} catch (AnsonException | SemanticException e) {
