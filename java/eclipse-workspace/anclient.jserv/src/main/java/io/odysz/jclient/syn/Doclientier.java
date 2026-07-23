@@ -345,7 +345,7 @@ public class Doclientier extends Semantier {
 					.blockStart(p, ssinf);
 			
 			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
-									.header(header);
+									.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 			try {
 				resp0 = client.commit(q, errHandler);
@@ -613,7 +613,7 @@ public class Doclientier extends Semantier {
 
 		AnsonMsg<DocsReq> q = client
 				.<DocsReq>userReq(synuri, port, req)
-				.header(header);
+				.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 		DocsResp resp = client.commit(q, errCtx);
 
