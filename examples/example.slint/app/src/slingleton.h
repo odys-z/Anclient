@@ -38,7 +38,7 @@ namespace anson {
     AsynClienter* doclientier = nullptr;
     string volume_path;
 
-    queue<AnsonResp> synode_msgs;
+    queue<shared_ptr<AnsonResp>> synode_msgs;
     mutable std::mutex synode_mutex;
 
     Slingleton() {}
@@ -91,18 +91,35 @@ namespace anson {
       return false;
     }
 
+    /**
+     * To conert returns to DocsResp:
+     * 
+     * std::dynamic_pointer_cast<DocsResp>(returns);
+     * 
+     */
     shared_ptr<AnsonResp> dequeue_synode() {
       std::lock_guard<std::mutex> lock(synode_mutex);
       if (synode_msgs.size() > 0) {
-        auto ret = std::make_shared<AnsonResp>(std::move(synode_msgs.front()));
+        auto ret = synode_msgs.front();
         synode_msgs.pop();
         return ret;
       }
       else return nullptr;
     }
 
-    void enqueue_synode(const anson::AnsonResp& msg) {
+    /**
+     * It's the caller's responsibility to correctly cast and retrieve the object type. Say:
+     * 
+     * slingle.enqueue_synode(std::make_shared<DocsResp>(msg.Body())); // allocate and copy
+     * slingle.enqueue_synode(std::dynamic_cast<DocsResp>(msg.Body())); // cast to actual type at runtime, using vtable
+     * 
+     * shared_ptr<AnsonResp> qryptr = slingle.dequeue_synode();
+     * if (!qryptr) return;
+     * shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
+     */
+    void enqueue_synode(shared_ptr<AnsonResp> msg) {
       std::lock_guard<std::mutex> lock(synode_mutex);
+      anlog("Enqueuing: "s + msg->toBlock());
       synode_msgs.push(msg);
     }
 

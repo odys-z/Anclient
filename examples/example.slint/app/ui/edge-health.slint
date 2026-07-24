@@ -2,7 +2,7 @@ import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surr
 import { UseIcons } from "@surrealism/use/index.slint";
 import { LineEdit } from "std-widgets.slint";
 
-export component GUIClientSettings {
+export component EdgeHealth {
 
     in-out property <[string]> file_paths;
 
@@ -13,24 +13,34 @@ export component GUIClientSettings {
         height: 100%;
         width: 100%;
         vertical-stretch: 1;
+        background: #e3e4bf;
+
+        Image {
+            width: 100%;
+            height: 100%;
+            source: @image-url("imgs/album.svg");
+            image-fit: cover; // fills as much area as possible while preserving aspect ratio
+            opacity: 0.16;
+        }
+
         VerticalLayout {
-          HorizontalLayout {
-            alignment: center;
-            SCard {
-                card-width: 48px;
-                card-height: 48px;
-                SIcon {
-                    height: parent.height;
-                    width: parent.width;
-                    source: @image-url("imgs/album.svg");
-                }
+          padding: 8pt;
+          spacing: 8pt;
+          SButton {
+            text: "Edge Network Health";
+            font-color: #fbffab;
+            font-size: 18pt;
+            width: 100%;
+            background: #261b03;
+            opacity: 0.8;
+            clicked => {
             }
           }
-
+         
           SButton {
+            theme: Primary;
             text: "Ping Task Placing";
             width: 100%;
-            padding: 8pt;
             clicked => {
               file_paths = ["~/github/anclient/examples/ EXAMPLE.SLINT/RST/DOCSREQ.AST.JSON",
                             "~/GITHUB/ANCLIENT/EXAMPLES/ example.slint/rst/docsresp.ast.json"];
@@ -39,13 +49,15 @@ export component GUIClientSettings {
           }
 
           HorizontalLayout {
-            padding: 24px;
+            width: 100%;
             alignment: space-around;
             vertical-stretch: 1;
+            spacing: 8pt;
 
             msg-edit:=LineEdit {
                 width: 80%;
                 placeholder-text: @tr("Echo by Album Client");
+                text: "Echo message...";
             }
             SButton {
                 show-icon: true;
@@ -56,10 +68,6 @@ export component GUIClientSettings {
                     echows-clicked(msg-edit.text);
                 }
             }
-          }
-
-          HorizontalLayout {
-            vertical-stretch: 50%;
           }
         }
     }

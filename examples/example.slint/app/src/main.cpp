@@ -26,13 +26,6 @@ int main(int argc, char **argv) {
 
     std::unique_ptr<webview::webview> wv = nullptr;
 
-    // ui->on_initapp([&]() {
-    //     if (slingle.validsettings())
-    //         ui->set_menu_id("home");
-    //     else
-    //         ui->set_menu_id("2-2");
-    // });
-
     ui->on_menu_changed([&](slint::SharedString page_ix) {
         std::string menu_id = string{page_ix}; //page_ix.data();
         anlog(std::format("Menu changed! ID: {}", menu_id));
@@ -135,7 +128,14 @@ int main(int argc, char **argv) {
                 pthpage.emplace(Anson::posix_path(entry.path().string()), vector<LangExt::VarType>{ShareFlag::pushing});
             }
 
-            slingle.doclientier->query_syncflags(pthpage, [&ui_weak](auto resp) {
+            slingle.doclientier->query_syncflags(pthpage, [&ui_weak, &slingle](AnsonResp& resp) {
+                // slingle.enqueue_synode(std::make_shared<DocsResp>(resp));
+                if (auto* docs = dynamic_cast<DocsResp*>(&resp)) {
+                    slingle.enqueue_synode(std::make_shared<DocsResp>(std::move(*docs)));
+                } else {
+                    anwarn("query_syncflags: unexpected response type, dropping");
+                    return;
+                }
                 slint::invoke_from_event_loop([&ui_weak, &resp]() {
                     if (auto handle = ui_weak.lock()) {
                         anlog("querying page ...");
@@ -150,9 +150,14 @@ int main(int argc, char **argv) {
 
     ui->on_update_syncflags([&, ui]() {
         // TODO: drop the query results silently if current folder changed while querying. 
-        shared_ptr<DocsResp> qryptr = slingle.dequeue_synode();
+        shared_ptr<AnsonResp> qryptr = slingle.dequeue_synode();
         if (!qryptr) return;
-        DocsResp qry = *qryptr;
+        shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
+        if (!qry) {
+            anwarn("Dropping expected DocsResp ===========");
+            anwarn(qryptr->toBlock());
+            return;
+        }
 
         auto filelist_model = ui->get_filelist();
         auto filelist = std::dynamic_pointer_cast<slint::VectorModel<PathItemData>>(filelist_model);
@@ -163,26 +168,32 @@ int main(int argc, char **argv) {
             for (std::size_t i = 0; i < count; ++i) {
                 if (auto row_opt = filelist->row_data(i)) {
                     PathItemData row = *row_opt;
-                    string fullpath{row.fullpath};
+
                     #ifdef _WIN32
-                    fullpath = Anson::win_path(fullpath);
+                    const string posixpath{Anson::posix_path(string{row.fullpath})};
+                    #else
+                    const string posixpath{row.fullpath};
                     #endif
-                    if (!qry.syncingPage.clientPaths.contains(fullpath)) continue;
-                    string icon = LangExt::var_str(qry.syncingPage.clientPaths[fullpath][0]).value_or("");
-                    anlog(std::format("updating sync-flag {} : {}", fullpath, icon));
+                    // anlog(posixpath);
+                    if (!qry->syncingPage.clientPaths.contains(posixpath)) continue;
+
+                    string icon = LangExt::var_str(qry->syncingPage.clientPaths[posixpath][1]).value_or("");
+                    anlog(std::format("updating sync-flag {} : {}", posixpath, icon));
 
                     // map string icon to SyncingIcon enum/value
-                    if (icon == ShareFlag::pushing)
+                    if (icon == ShareFlag::pushing || icon == "pushing")
                         row.syncicon = SyncingIcon::Pushing;
-                    else if (icon == ShareFlag::publish)
+                    else if (icon == ShareFlag::publish || icon == "publish")
                         row.syncicon = SyncingIcon::Publish;
+                    else if (icon == ShareFlag::prv || icon == "prv")
+                        row.syncicon = SyncingIcon::Private;
                     else
                         row.syncicon = SyncingIcon::Invisible;
 
                     filelist->set_row_data(i, row);
                 }
             }
-            // ui->set_filelist(filelist);
+            ui->set_filelist(filelist);
         }
     });
 

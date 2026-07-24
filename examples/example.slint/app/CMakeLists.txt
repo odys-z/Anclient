@@ -27,11 +27,18 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${webview_SOURCE_DIR}
 )
 
-# Slint UI
-slint_target_sources(${PROJECT_NAME}
+# share slint uis for tests
+add_library(album_slint_obj OBJECT)
+
+slint_target_sources(album_slint_obj
     ui/app-window.slint
     LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
 )
+# slint_target_sources(${PROJECT_NAME}
+#     ui/app-window.slint
+#     LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
+# )
+target_link_libraries(album_slint_obj PUBLIC Slint::Slint)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -40,10 +47,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     EnTT::EnTT
     nlohmann_json::nlohmann_json
     ixwebsocket::ixwebsocket
+    webview::core
     anson
     anclient
     Slint::Slint
-    webview::core
+    album_slint_obj
 )
 
 add_compile_definitions(ANSON_VERBOSE=4)

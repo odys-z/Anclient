@@ -111,8 +111,8 @@ public:
     void login_synode(const JServUrl & jserv, const string &uid, const string &pswd, const string& device) noexcept {
         try {
             andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
-            SessionClient ssclient = SessionClient::loginWithUri(jserv, sysuri, uid, pswd, device, onErr);
-            client = ssclient;
+            client.jserv = jserv;
+            SessionClient::loginWithUri(client, sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
             anwarn(e.what());
             onErr(MsgCode::Code::exSession, e.what(), {});

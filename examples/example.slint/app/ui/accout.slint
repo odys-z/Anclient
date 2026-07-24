@@ -1,0 +1,244 @@
+import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
+import { UseIcons } from "@surrealism/use/index.slint";
+import { LineEdit, ComboBox } from "std-widgets.slint";
+
+export component UserProfile {
+
+    in-out property <string> market_name : "MY 0.1.0";
+    in-out property <string> readonly_url_text;
+
+    in-out property <[string]> orgs_model : ["Test-1", "Test-2"];
+    in-out property <[string]> domains_model : ["Test-1:domain 0", "Test-1: domain 1"];
+    in-out property <[string]> synodes_model : ["domain 0-hub", "domain 1-1"];
+    in-out property <string> selected_org;
+    in-out property <string> selected_domain;
+    in-out property <string> selected_node;
+
+    in-out property <string> url_text;
+    in-out property <string> user_id_text;
+    in-out property <string> password_text;
+    in-out property <string> confirm_password_text;
+
+    // Set by the host code after a successful login test, e.g.
+    // ui.set_qr_code_image(Image::load_from_path(...)) and
+    // ui.set_show_qr_code(true);
+    in-out property <image> qr_code_image;
+    in-out property <bool> show_qr_code: false;
+
+    callback refresh-clicked();
+    callback org-domain-node-changed(string, string, string);
+    callback ping-clicked(string);
+    callback login-test-clicked(string, string);
+    callback save-clicked(string, string, string, string);
+
+    Rectangle {
+        height: 100%;
+        width: 100%;
+        vertical-stretch: 1;
+        background: #eaeab9;
+
+        Image {
+            width: 100%;
+            height: 100%;
+            source: @image-url("imgs/album.svg");
+            image-fit: cover; // fills as much area as possible while preserving aspect ratio
+            opacity: 0.16;
+        }
+
+        VerticalLayout {
+            alignment: center;
+            padding: 32px;
+
+            GridLayout {
+                spacing: 8pt;
+
+                // market name
+                Row {
+                  HorizontalLayout {
+                    spacing: 8pt;
+                    Text { text: "Market"; font-size: 14pt; }
+                    Rectangle {
+                        background: #8a8a8a;
+                        border-radius: 4px;
+                        LineEdit {
+                            width: 100%;
+                            horizontal-stretch: 1;
+                            read-only: true;
+                            text: market_name;
+                            font-size: 16pt;
+                            horizontal-alignment: center;
+                        }
+                    }
+                  }
+                }
+
+                // Registry Jserv
+                Row {
+                    LineEdit {
+                        col: 0;
+                        horizontal-stretch: 1;
+                        read-only: true;
+                        text: readonly_url_text;
+                    }
+
+                    SButton {
+                        col: 1;
+                        horizontal-stretch: 0;
+                        width: 96px;
+                        show-icon: true;
+                        icon: @image-url("imgs/refresh.svg");
+                        text: @tr("Refresh");
+                        clicked => {
+                            refresh-clicked();
+                        }
+                    }
+                }
+
+                // orgs | domain | synode
+                Row {
+                    HorizontalLayout {
+                        col: 0;
+                        spacing: 8px;
+
+                        orgs-combo := ComboBox {
+                            horizontal-stretch: 1;
+                            model: orgs_model;
+                            current-value <=> selected_org;
+                            selected => {
+                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            }
+                        }
+
+                        domain-combo := ComboBox {
+                            horizontal-stretch: 1;
+                            model: domains_model;
+                            current-value <=> selected_domain;
+                            selected => {
+                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            }
+                        }
+
+                        node-combo := ComboBox {
+                            horizontal-stretch: 1;
+                            model: synodes_model;
+                            current-value <=> selected_node;
+                            selected => {
+                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            }
+                        }
+                    }
+                }
+
+                // jserv-url | Ping
+                Row {
+                    url-edit := LineEdit {
+                        col: 0;
+                        horizontal-stretch: 1;
+                        placeholder-text: @tr("Server URL");
+                        text <=> url_text;
+                    }
+
+                    SButton {
+                        col: 1;
+                        horizontal-stretch: 0;
+                        width: 96px;
+                        show-icon: true;
+                        icon: UseIcons.icons.Info;
+                        text: @tr("    Ping");
+                        clicked => {
+                            ping-clicked(url-edit.text);
+                        }
+                    }
+                }
+
+                // [ uid ]   [ pswd | pswd-2 ] | Login  (single flat row, flows horizontally)
+                Row {
+                    HorizontalLayout {
+                        col: 0;
+                        spacing: 8px;
+
+                        user-id-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("User ID");
+                            text <=> user_id_text;
+                        }
+
+                        // spacer to visually separate uid from the pswd/pswd-2 pair
+                        Rectangle {
+                            width: 16px;
+                        }
+
+                        password-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("Password");
+                            input-type: password;
+                            text <=> password_text;
+                        }
+
+                        confirm-password-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("Confirm");
+                            input-type: password;
+                            text <=> confirm_password_text;
+                        }
+                    }
+
+                    SButton {
+                        col: 1;
+                        horizontal-stretch: 0;
+                        width: 96px;
+                        text: "Login";
+                        clicked => {
+                            login-test-clicked(user-id-edit.text, password-edit.text);
+                        }
+                    }
+                }
+
+                // QR code (centered) | Save
+                Row {
+                    Rectangle {
+                        col: 0;
+                        height: 160px;
+
+                        HorizontalLayout {
+                            alignment: center;
+
+                            if show_qr_code: Image {
+                                width: 160px;
+                                height: 160px;
+                                source: qr_code_image;
+                            }
+                            if !show_qr_code: Rectangle {
+                                width: 160px;
+                                height: 160px;
+                                background: #00000022;
+                                border-width: 1px;
+                                border-color: #ffffff55;
+
+                                Text {
+                                    text: @tr("QR");
+                                    color: #ffffff88;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                    }
+
+                    SButton {
+                        col: 1;
+                        horizontal-stretch: 0;
+                        width: 96px;
+                        show-icon: true;
+                        icon: @image-url("imgs/save.svg");
+                        theme: Primary;
+                        text: "Save";
+                        clicked => {
+                            save-clicked(url-edit.text, user-id-edit.text, password-edit.text, confirm-password-edit.text);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

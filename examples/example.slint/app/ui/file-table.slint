@@ -2,7 +2,7 @@ import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, L
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
 
-export enum SyncingIcon { invisible, pushing, publish, localonly }
+export enum SyncingIcon { invisible, pushing, publish, private, localonly }
 
 export struct PathItemData {
     is_folder: bool,
@@ -47,6 +47,13 @@ export component FileTable {
         }
         if ("e" == idx) {
             return @image-url("@surrealism/icons/link-left.svg");
+        }
+
+        if ("prv" == idx) {
+            return @image-url("imgs/lock.svg");
+        }
+        if ("publish" == idx) {
+            return @image-url("imgs/web.svg");
         }
         return @image-url("@surrealism/icons/more.svg");
     }
@@ -129,6 +136,11 @@ export component FileTable {
                             width: 14pt; height: 14pt;
                         }
 
+                        if (row.syncicon == SyncingIcon.private) : Image {
+                            source: root.icons("prv");
+                            width: 14pt; height: 14pt;
+                        }
+
                         if (row.syncicon == SyncingIcon.localonly) : Image {
                             source: root.icons("locked");
                             width: 14pt; height: 14pt;
@@ -138,7 +150,7 @@ export component FileTable {
                             source: root.icons("d");
                             width: 14pt; height: 14pt;
                         }
-                        if (!row.is-folder): Image {
+                        if (!row.is-folder && row.syncicon == SyncingIcon.invisible ): Image {
                             source: root.icons("e");
                             width: 14pt; height: 14pt;
                         }
@@ -157,17 +169,6 @@ export component FileTable {
             }
           }
         }
-
-        // HorizontalLayout {
-        //     filter-edit := LineEdit {
-        //         placeholder-text: @tr("Enter filter text");
-        //     }
-
-        //     // SButton {
-        //     //     text: @tr("Upload");
-        //     //     clicked => { root.upload(); }
-        //     // }
-        // }
-        }
+      }
     }
 }

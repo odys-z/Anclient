@@ -90,16 +90,20 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         return;
     
     std::thread query_thread([this, syncing_paths, ok]() {
-        if (LangExt::isblank(client.ssInf.ssid)) {
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             anlog("Login to "s + appsettings.synode_jserv);
             login_synode(JServUrl{appsettings.synode_jserv},
                     this->appsettings.admin, this->appsettings.token, this->appsettings.device);
-            // client.openLink(sysuri);
+            client.openLink(sysuri, [this](MsgCode c, const string& e, const vector<string> &a) {
+                // this->client.ssInf = SessionInf{};
+                anwarn("Cannot open link on "s + this->appsettings.synode_jserv);
+                anwarn(e);
+            });
         }
-        if (LangExt::isblank(client.ssInf.ssid))
-            return;
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating)
+            return; // next reaching of here should work (go the other branch) if beating
         
-		client.header.Act("desktop.slint", "query", "r/states", "query sync");
+		client.header.Act(synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 
 		DocsReq req;
         req.syncingPage = PathsPage{Slingleton::appsettings.device, 0, static_cast<int>(syncing_paths.size())};
@@ -110,10 +114,10 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         req.limit = -1;
         req.pageInf.size = -1;
 
-        anlog("=========================\n"s + client.header.toBlock());
+        anlog("=========================\n"s + client.ssInf.toBlock());
 
 		AnsonMsg<DocsReq> q = client.userReq(synuri, Port{Port::docstier}, req)
-				                    .Header(client.header);
+				                    .Header(client.ssInf);
         anlog("=========================\n"s + q.toBlock());
 
         try {

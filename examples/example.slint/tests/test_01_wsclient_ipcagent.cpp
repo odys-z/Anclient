@@ -66,7 +66,7 @@ protected:
 
     static void SetUpTestSuite() {
         register_jserv(asts, opts);
-        register_semantier(asts, "");
+        register_semantier(asts, "ast");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
@@ -130,6 +130,8 @@ TEST_F(Ipclient, Echo) {
     AnsonMsg<AnsonResp> resp = wsclient->pop_envelope<AnsonResp>();
     ASSERT_EQ(MsgCode::Code::_sentinel_, resp.code) << "expecting session open ...";
     anlog("✅ Echo Opening message verified");
+
+    echomsg.code = MsgCode::Code::ok;
     wsclient->asynSend(echomsg);
     if (!wsclient->block_poll(3000))
         FAIL() << "expecting echos ...";
@@ -154,6 +156,7 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
     AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
+    msg.code = MsgCode::Code::ext; // Should it be a good idea to change name of sentinel to null?
 
     wsclient->asynSend(msg);
 
@@ -187,6 +190,7 @@ TEST_F(Ipclient, DocTask_upload) {
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
     AnsonMsg<DocsReq> msg(WSPort{WSPort::docstier}, uploadreq);
+    msg.code = MsgCode::Code::ok;
 
     wsclient->asynSend(msg);
 

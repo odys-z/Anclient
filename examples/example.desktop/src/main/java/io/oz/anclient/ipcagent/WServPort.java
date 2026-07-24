@@ -42,7 +42,6 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 	/** {"host:port": session} */
 	protected final HashMap<String, Session> wsessions;
 
-
 	public static WServPort build(DesktopSettings settings) {
 		shouldntnull(new Object() {}, settings.ipc_tiers);
 		try {

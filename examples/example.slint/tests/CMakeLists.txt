@@ -13,7 +13,10 @@ add_executable(album_tests
     ../app/src/wsclients.h
     ../app/src/wsclients.cpp
     ../app/src/doctier.cpp
+    ../app/src/doclientier.cpp
+    ../app/src/slingleton.cpp
     test_01_wsclient_ipcagent.cpp
+    test_02_dequeue.cpp
     test_common.h
     test_settings.h
 )
@@ -27,6 +30,7 @@ target_link_libraries(album_tests PRIVATE
     anson
     anclient
     Slint::Slint
+    album_slint_obj
     webview::core
     gtest_main
 )
