@@ -100,8 +100,10 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
                 anwarn(e);
             });
         }
-        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating)
+
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             return; // next reaching of here should work (go the other branch) if beating
+        }
         
 		client.header.Act(synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 

@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug album_gui",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "copy-dlls",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": ["settings/app-settings-reddish.json"],
+            "cwd": "${command:cmake.launchTargetDirectory}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${command:cmake.launchTargetDirectory};${env:PATH}"
+                }
+            ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/Qt-6.10/mingw64-gcc16.1.0/bin/gdb.exe",
+            "setupCommands": [
+                { "text": "-exec echo LAUNCH_JSON_SETUP_COMMANDS_RAN\n", "ignoreFailures": true },
+                { "text": "set auto-solib-add off", "description": "Don't eagerly parse symbols for every loaded DLL — huge speedup while stepping", "ignoreFailures": true },
+                { "text": "-enable-pretty-printing", "ignoreFailures": true }
+            ]
+        }
+    ]
+}

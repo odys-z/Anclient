@@ -19,7 +19,7 @@ find_package(boost_url CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-# vcpkage install ixwebsocket[core,openssl]:x64-mingw-dynamic
+# vcpkg install ixwebsocket[core,openssl]:x64-mingw-dynamic
 find_package(ixwebsocket REQUIRED)
 
 include(FetchContent)
@@ -50,7 +50,6 @@ if(WIN32)
     add_compile_definitions(WIN32_LEAN_AND_MEAN _AMD64_)
 endif()
 
-include(FetchContent)
 FetchContent_Declare(
     Slint
     GIT_REPOSITORY https://github.com/slint-ui/slint.git
@@ -59,8 +58,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Slint)
 
-get_filename_component(SURREALISM_UI_DIR 
-    "${CMAKE_CURRENT_SOURCE_DIR}/../surrealism-0.5.3" 
+get_filename_component(SURREALISM_UI_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/../surrealism-0.5.3"
     ABSOLUTE
 )
 

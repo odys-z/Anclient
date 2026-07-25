@@ -1,6 +1,7 @@
 # Debug from Source
 
-This is a cmake project.
+This is a cmake project, using gcc 16.1.0, in path ".../mingw64-gcc16.1.0/bin/gdb.exe".
+See CMakeLists.txts and .vscode/launch.json
 
 With VS Code, CMake & Slint Plugins, setup .vscode/settings.json as
 
@@ -52,3 +53,19 @@ Tip:
 	 at org.eclipse.jetty.server.Server.lambda$doStart$0(Server.java:571)
      ...
    ```
+
+# Build
+
+```
+    rm -rf build
+    cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug
+    cmake --build build --config Debug
+```
+
+Or skip tests, cmake --build build --target album_gui --config Debug
+
+For release
+
+    cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+    cmake --build build --config Release`
+

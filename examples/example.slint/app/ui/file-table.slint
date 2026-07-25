@@ -2,7 +2,7 @@ import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, L
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
 
-export enum SyncingIcon { invisible, pushing, publish, private, localonly }
+export enum SyncingIcon { invisible, ready4sync, pushing, publish, private, /** TODO Synchronized to local synode? */localonly }
 
 export struct PathItemData {
     is_folder: bool,
@@ -21,6 +21,8 @@ export component FileTable {
     
     property <int> sort-index: -1;
     property <bool> sort-ascending;
+
+    in property <bool> synode-linked : false;
 
     in-out property <string> current_path;
 
@@ -65,6 +67,8 @@ export component FileTable {
         HorizontalLayout {
             Text { text: root.current_path; }
             SButton {
+                icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
+                disabled: { !root.synode-linked; }
                 text: @tr("Upload");
                 clicked => { root.upload(); }
             }
@@ -126,6 +130,22 @@ export component FileTable {
                             }
                         }
 
+                        /**
+                            Claude can only optimize like this:
+                            for icon-name in [
+                                row.syncicon == SyncingIcon.pushing ? "rotat" : "",
+                                row.syncicon == SyncingIcon.publish ? "album" : "",
+                                row.syncicon == SyncingIcon.private ? "prv" : "",
+                                row.syncicon == SyncingIcon.localonly ? "locked" : "",
+                                row.is-folder ? "d" : "",
+                                (!row.is-folder && row.syncicon == SyncingIcon.invisible) ? "e" : "",
+                            ] : Image {
+                                visible: icon-name != "";
+                                source: root.icons(icon-name);
+                                width: 14pt;
+                                height: 14pt;
+                            }
+                         */
                         if (row.syncicon == SyncingIcon.pushing) : Image {
                             source: root.icons("rotat");
                             width: 14pt; height: 14pt;
@@ -150,10 +170,12 @@ export component FileTable {
                             source: root.icons("d");
                             width: 14pt; height: 14pt;
                         }
-                        if (!row.is-folder && row.syncicon == SyncingIcon.invisible ): Image {
+
+                        if (!row.is-folder && row.syncicon == SyncingIcon.ready4sync ): Image {
                             source: root.icons("e");
                             width: 14pt; height: 14pt;
                         }
+
                         Text {
                             color: #e5ffff;
                             text: row.fname;

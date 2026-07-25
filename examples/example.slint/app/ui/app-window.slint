@@ -39,6 +39,7 @@ min-width: 600px;
   in-out property <string> current_pth;
   in-out property <[PathItemData]> filelist: [];
   in-out property <bool> enable_vol;
+  in-out property <bool> synode-linked;
 
   // Design Notes:
   // Gemini says the callback cannot be reached because the callback hasn't been set by ui->on_initapp() yet.
@@ -56,10 +57,7 @@ min-width: 600px;
   callback open_link(string);
   callback open_volume();
 
-  init => {
-    // menu_id = "home";
-    // Design Notes: initapp(); not working
-  }
+  init => { }
 
   HorizontalLayout {
     left-wrapper:=Rectangle {
@@ -115,6 +113,8 @@ min-width: 600px;
 
             row_data    : root.filelist;
             current_path: root.current_pth;
+
+            synode-linked: root.synode-linked;
 
             init => { root.load_folder("."); }
 

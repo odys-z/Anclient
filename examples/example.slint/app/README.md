@@ -42,3 +42,60 @@
       cd ../tests
       py -m semantier_gen settings/gen-settings.json ../ast
     ```
+
+# Tips
+
+1. Speedup GDB session by exclude Windows Definder Scanning:
+
+   In powershell
+
+   ```
+    Add-MpPreference -ExclusionPath "$env:USERPROFILE\github\anclient\examples\example.slint\build"
+    # or
+    # Add-MpPreference -ExclusionPath "$env:USERPROFILE\github\**\build"
+   ```
+
+   To verify the path is exists:
+
+   ```
+    Write-Host "$env:USERPROFILE\github\anclient\examples\example.slint\build"
+    .\github\anclient\examples\example.slint\build
+   ```
+
+1. Turn off automatic shared-library symbol loading
+
+   Add set auto-solib-add off to your launch.json's setupCommands
+
+   ```
+    {
+      "text": "set auto-solib-add off",
+      "description": "Don't eagerly parse symbols for every loaded system/driver DLL — huge speedup",
+      "ignoreFailures": true
+    }
+   ```
+
+   and settings.json
+
+   ```
+    "cmake.debugConfig": {
+      "cwd": "${command:cmake.launchTargetDirectory}",
+      "args": ["settings/app-settings-reddish.json"],
+      "environment": [
+        {
+            "name": "PATH",
+            "value": "${command:cmake.launchTargetDirectory};${env:PATH}"
+        }
+      ],
+      "setupCommands": [
+        {
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        },
+        {
+            "text": "set auto-solib-add off",
+            "ignoreFailures": false
+        }
+      ]
+    }
+   ```
+
