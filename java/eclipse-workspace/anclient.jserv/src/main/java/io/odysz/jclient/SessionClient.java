@@ -162,6 +162,10 @@ public class SessionClient {
 
 	/**
 	 * Start a heart beat thread which is waken every msInterv = 60000. Break if {@link #stoplink} = false;
+	 * 
+	 * TODO Keep consistency with Anclient.cmake, where {@code onLink} is the type of OnLink,
+	 * the type of linking update callback.
+	 * 
 	 * @param clientUri
 	 * @param onLink can be null
 	 * @param onBroken can be null
