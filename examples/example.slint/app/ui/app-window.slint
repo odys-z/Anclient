@@ -54,8 +54,9 @@ min-width: 600px;
   callback update_syncflags();
   callback select_file(PathItemData, bool);
   callback upload_files();
-  callback open_link(string);
+  callback open_web(string);
   callback open_volume();
+  // callback update_synlink(bool);
 
   init => { }
 
@@ -96,7 +97,7 @@ min-width: 600px;
             root.menu-id = menuid;
             menu-changed(menuid);
           }
-          open-link(link) => { root.open_link(link); }
+          open-web(link) => { root.open_web(link); }
           enable-vol: root.enable_vol;
         }
 

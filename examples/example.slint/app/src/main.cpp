@@ -187,8 +187,8 @@ int main(int argc, char **argv) {
                         row.syncicon = SyncingIcon::Publish;
                     else if (icon == ShareFlag::prv || icon == "prv")
                         row.syncicon = SyncingIcon::Private;
-                    else if (slingle.constates.synlink == connect_state::online)
-                        row.syncicon = SyncingIcon::Ready4sync;
+                    // else if (slingle.constates.synlink == connect_state::online)
+                    //     row.syncicon = SyncingIcon::Ready4sync;
                     else
                         row.syncicon = SyncingIcon::Invisible;
 
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
         }
     });
 
-    ui->on_open_link([](slint::SharedString url) {
+    ui->on_open_web([](slint::SharedString url) {
         open_browser(std::string(url));
     });
 
