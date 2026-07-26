@@ -1,71 +1,118 @@
-# Debug from Source
+# Quick Start
 
-This is a cmake project, using gcc 16.1.0, in path ".../mingw64-gcc16.1.0/bin/gdb.exe".
-See CMakeLists.txts and .vscode/launch.json
+*Currently only for Windows 10 and above.*
 
-With VS Code, CMake & Slint Plugins, setup .vscode/settings.json as
+1. Start from Sources
 
-```
-    "cmake.debugConfig": {
-        "args": ["settings/app-settings.json"]
-    }
-```
+    See SurrealismUI/tests for latest version.
 
-The *settings/app-settings.json* is the configuration where the user ID and token is saved. 
+    Download code zip, extract to, say, surrealism-0.5.3.
 
-Create the configuration file, see *settings/app-settings-template.json*, then debug with GDB.
+    Config .vscode/settings.json & CMakeLists.txt.
 
-FYI, the .vscode/c_cpp_properties.json example
-
-```
-  {
-    "configurations": [
-        {
-            "name": "MinGW",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "app/src/**",
-                "path-to/mingw64-gcc16.1.0/include/**",
-                "~/github/vcpkg/installed/x64-mingw-dynamic/include/**"
-            ],
-            "defines": [],
-            "compilerPath": "path-to/mingw64-gcc16.1.0/bin/g++.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++20",
-            "intelliSenseMode": "windows-gcc-x64"
+    ```
+      {
+        "slint.libraryPaths": {
+            "surrealism": "../surrealism-0.5.3"
         }
-    ],
-    "version": 4
-  }
-```
+      }
+    ```
+    ```
+      get_filename_component(SURREALISM_UI_DIR 
+        "${CMAKE_CURRENT_SOURCE_DIR}/../surrealism-0.5.3" 
+        ABSOLUTE
+      )
+    ```
 
-Tip:
+1. Compile with MinGW + GCC 16.1.0 (Win32 Only)
 
-1. Start Eclipse ipc-agent for bind first at 8700
+    ```
+      export PATH="/c/Qt-6.10/Tools/CMake_64/bin:$PATH"
+      export PATH="/c/Qt-6.10/mingw64-gcc16.1.0/bin:$PATH"
+      rustup target add --toolchain stable-x86_64-pc-windows-msvc x86_64-pc-windows-gnu
+      # WIN32 for the first time or any fetch contents updata
+      cmake -G "MinGW Makefiles" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=FALSE
+      # to avoid github downloading
+      cmake -G "MinGW Makefiles" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      cmake --build build
+      build/album_slint.exe
+    ```
 
-   File build/app/log/ipc_agent_java.log should report:
+1. Generate Semantier (C++ Reflection with ASTs)
+
+    ```
+      cd ../tests
+      py -m semantier_gen settings/gen-settings.json ../ast
+    ```
+
+1. Copy the lib of MinGW GCC 16.1.0.
+
+   Install Python Invoke.
+
+   Then optionally, 
 
    ```
-     [main] INFO org.eclipse.jetty.server.Server - jetty-12.0.21; built: 2025-05-09T00:32:00.688Z; 
-     Exception in thread "main" java.io.IOException: Failed to bind to 0.0.0.0/0.0.0.0:8700
-	 at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:349)
-	 at org.eclipse.jetty.server.ServerConnector.open(ServerConnector.java:313)
-	 at org.eclipse.jetty.server.Server.lambda$doStart$0(Server.java:571)
-     ...
+     Invoke copy-dlls.
    ```
 
-# Build
+   This process is configured in *.vscode/launch.json*. The file is used by vs code in the debug & run pannel.
+   
+   Deprecated: Also tried in *.vscode/settings.json*, the GDB debugger should running faster
+   as system dlls' symbols loading is disabled. 
 
-```
-    rm -rf build
-    cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug
-    cmake --build build --config Debug
-```
+# Tips
 
-Or skip tests, cmake --build build --target album_gui --config Debug
+1. Speedup GDB session by exclude Windows Definder Scanning:
 
-For release
+   In powershell
 
-    cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
-    cmake --build build --config Release`
+   ```
+    Add-MpPreference -ExclusionPath "$env:USERPROFILE\github\anclient\examples\example.slint\build"
+    # or
+    # Add-MpPreference -ExclusionPath "$env:USERPROFILE\github\**\build"
+   ```
+
+   To verify the path is exists:
+
+   ```
+    Write-Host "$env:USERPROFILE\github\anclient\examples\example.slint\build"
+    .\github\anclient\examples\example.slint\build
+   ```
+
+1. Turn off automatic shared-library symbol loading
+
+   Add set auto-solib-add off to your launch.json's setupCommands
+
+   ```
+    {
+      "text": "set auto-solib-add off",
+      "description": "Don't eagerly parse symbols for every loaded system/driver DLL — huge speedup",
+      "ignoreFailures": true
+    }
+   ```
+
+   and settings.json
+
+   ```
+    "cmake.debugConfig": {
+      "cwd": "${command:cmake.launchTargetDirectory}",
+      "args": ["settings/app-settings-reddish.json"],
+      "environment": [
+        {
+            "name": "PATH",
+            "value": "${command:cmake.launchTargetDirectory};${env:PATH}"
+        }
+      ],
+      "setupCommands": [
+        {
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        },
+        {
+            "text": "set auto-solib-add off",
+            "ignoreFailures": false
+        }
+      ]
+    }
+   ```
 
