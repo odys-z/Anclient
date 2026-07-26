@@ -94,15 +94,21 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
             anlog("Login to "s + appsettings.synode_jserv);
             login_synode(JServUrl{appsettings.synode_jserv},
                     this->appsettings.admin, this->appsettings.token, this->appsettings.device);
-            client.openLink(sysuri, [this](MsgCode c, const string& e, const vector<string> &a) {
-                // this->client.ssInf = SessionInf{};
+            client.openLink(sysuri, updatelink, [this](MsgCode c, const string& e, const vector<string> &a) {
                 anwarn("Cannot open link on "s + this->appsettings.synode_jserv);
                 anwarn(e);
             });
         }
 
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
-            return; // next reaching of here should work (go the other branch) if beating
+            return;
+        }
+        if (!client.heartbeating) {
+            client.openLink(sysuri, updatelink, [this](MsgCode c, const string& e, const vector<string> &a) {
+                anwarn("Cannot open link on "s + this->appsettings.synode_jserv);
+                anwarn(e);
+            });
+            return;
         }
         
 		client.header.Act(synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");

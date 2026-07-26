@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug album_gui",
+            "name": "Debug AlbumGUI",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "copy-dlls",

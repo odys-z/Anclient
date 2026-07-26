@@ -37,6 +37,7 @@ namespace anson {
 
     AsynClienter* doclientier = nullptr;
     string volume_path;
+    connect_state constates;
 
     queue<shared_ptr<AnsonResp>> synode_msgs;
     mutable std::mutex synode_mutex;
@@ -64,12 +65,20 @@ namespace anson {
         instance->agentController->start_agent(settings_path);
 
         // ix::initNetSystem();
-        slint::invoke_from_event_loop([appwin]() {
+        slint::invoke_from_event_loop([&appwin]() {
           anlog("[***** ix::initNetSystem *****] Initializing network subsystems after Slint event loop is spinning ...");
           ix::initNetSystem();
         });
 
-        instance->doclientier = new AsynClienter(appwin);
+        instance->doclientier = new AsynClienter(appwin, [&appwin](connect_state connstates) {
+          instance->constates = connstates;
+          slint::invoke_from_event_loop([&appwin, &connstates]() {
+            if (auto app = appwin.lock()) {
+              (*app)->set_synode_linked(connstates.synlink == connect_state::online);
+              (*app)->invoke_update_syncflags();
+            }});
+        });
+
         instance->doclientier->load_settings(settings_path);
 
         anlog(std::format("Has volume: {}, {}: {}",

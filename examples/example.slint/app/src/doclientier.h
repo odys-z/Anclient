@@ -78,13 +78,14 @@ protected:
         });
     };
 
+    OnLink updatelink;
+
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
     bool load_settings(const string& settings_json);
 
     std::unique_ptr<WSClient> wsclient;
-    // SessionClient synodeclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
         anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
@@ -94,8 +95,8 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin)
-        : Doclientier("h_photos", sysuri, synuri, onErr), window_weak(appwin)  {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnLink onlink)
+        : Doclientier("h_photos", sysuri, synuri, onErr), updatelink(onlink), window_weak(appwin)  {}
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
         : Doclientier("h_photos", sysuri, synuri, err), window_weak(appwin) {}

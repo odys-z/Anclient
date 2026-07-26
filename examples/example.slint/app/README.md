@@ -1,5 +1,7 @@
 # Quick Start
 
+*Currently only for Windows 10 and above.*
+
 1. Start from Sources
 
     See SurrealismUI/tests for latest version.
@@ -36,12 +38,25 @@
       build/album_slint.exe
     ```
 
-1. Generate anclient.cmake
+1. Generate Semantier (C++ Reflection with ASTs)
 
     ```
       cd ../tests
       py -m semantier_gen settings/gen-settings.json ../ast
     ```
+
+1. Copy the other version lib of MinGW GCC 16.1.0.
+
+   Install Python Invoke.
+
+   Then optionally, 
+
+   ```
+     Invoke copy-dlls.
+   ```
+
+   This process is configured in *.vscode/launch.json*. In *.vscode/settings.json*, the GDB debugger should running faster
+   as system dlls' symbols loading is disabled.
 
 # Tips
 
