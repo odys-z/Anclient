@@ -37,6 +37,12 @@
       cmake --build build
       build/album_slint.exe
     ```
+    
+    or simply
+
+    ```
+      invoke build
+    ```
 
 1. Generate Semantier (C++ Reflection with ASTs)
 

@@ -7,6 +7,9 @@ Usage:
     inv copy-dlls                 # locate + copy runtime DLLs into dist/
     inv dist                      # build + copy-dlls in one shot
     inv clean                     # remove the build directory
+    inv keepgit-clean             # remove build/, but keep _deps/ and cargo/
+                                  # (avoids re-cloning from GitHub / re-compiling
+                                  # every Rust crate on a slow connection)
 
     inv build --config=Release
     inv dist --config=Release
@@ -60,6 +63,15 @@ MINGW_RUNTIME_DLL_NAMES = [
     "libstdc++-6.dll",
     "libwinpthread-1.dll",
 ]
+
+# Top-level entries directly under build/ to preserve when doing a
+# "clean but keep what's expensive to re-fetch/re-build" reset:
+#   _deps  — FetchContent-downloaded sources + their subbuild stamp files
+#            (deleting these forces re-cloning from GitHub on reconfigure)
+#   cargo  — Corrosion/cargo target dir for Slint's Rust crates (deleting
+#            this forces a full recompile of every crate, not a re-download,
+#            but it's just as slow to rebuild)
+KEEP_DIRS_ON_CLEAN = {"_deps", "cargo"}
 
 
 def _gxx_bin_dir():
@@ -199,3 +211,38 @@ def clean(ctx):
         print(f"Removed {BUILD_DIR}")
     else:
         print("Nothing to clean.")
+
+
+@task(name="keepgit-clean")
+def keepgit_clean(ctx):
+    """
+    Remove everything under build/ EXCEPT _deps/ and cargo/, then leave build/
+    itself in place. Use this instead of `clean` when reconfiguring is needed
+    (e.g. after a CMakeLists.txt change) but re-downloading FetchContent
+    sources from GitHub, or recompiling every Rust crate under cargo/, would
+    be too slow to redo.
+
+    Note: FetchContent tracks whether a dependency is already populated via
+    stamp files inside _deps/<name>-subbuild/, not via CMakeCache.txt, so
+    wiping the rest of build/ and keeping _deps/ still gets you a genuinely
+    clean reconfigure without re-triggering clones for content that hasn't
+    changed.
+    """
+    if not BUILD_DIR.exists():
+        print("Nothing to clean.")
+        return
+
+    removed = []
+    kept = []
+    for item in BUILD_DIR.iterdir():
+        if item.name in KEEP_DIRS_ON_CLEAN:
+            kept.append(item.name)
+            continue
+        if item.is_dir():
+            shutil.rmtree(item, onerror=_rmtree_onerror)
+        else:
+            item.unlink()
+        removed.append(item.name)
+
+    print(f"Removed: {removed}")
+    print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")

@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     Slingleton& slingle = argc > 1 ? Slingleton::get_instance(ui_weak, string{argv[1]})
                                    : Slingleton::get_instance(ui_weak);
 
-    ui->set_window_title("SurrealTree Explorer v1.0");
+    ui->set_window_title("Portfolio Desktop");
     ui->set_enable_vol(slingle.has_synode_vol());
     ui->window().set_maximized(false);
 
@@ -211,8 +211,10 @@ int main(int argc, char **argv) {
     slint::invoke_from_event_loop([ui, &slingle]() {
         if (slingle.validsettings())
             ui->set_menu_id("home");
-        else
-            ui->set_menu_id("2-2");
+        else {
+            ui->set_menu_id("2-1");
+            ui->set_ui_labels(vector<string>{"Please check settings!"_ans}]);
+        }
     });
 
     ui->run();

@@ -10,6 +10,7 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/gen/semantier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
+#include <io/odysz/module/langstring.h>
 
 #include "gen/app_settings.hpp"
 #include "wsclients.h"
@@ -53,6 +54,7 @@ namespace anson {
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
+        register_langstringAst(asts);
 
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         Anson::from_file(settings_path, appsettings);
