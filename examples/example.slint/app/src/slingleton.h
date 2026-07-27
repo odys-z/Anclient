@@ -10,6 +10,7 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/gen/semantier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
+#include <io/odysz/module/langstring.h>
 
 #include "gen/app_settings.hpp"
 #include "wsclients.h"
@@ -53,6 +54,7 @@ namespace anson {
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
         register_desktopsettingsAst(asts);
+        register_langstringAst(asts);
 
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         Anson::from_file(settings_path, appsettings);
@@ -72,10 +74,12 @@ namespace anson {
 
         instance->doclientier = new AsynClienter(appwin, [&appwin](connect_state connstates) {
           instance->constates = connstates;
-          slint::invoke_from_event_loop([&appwin, &connstates]() {
+
+          // debug notes: cannot capture outer lamda's connstates as it quit immediatly, before this one is running.
+          slint::invoke_from_event_loop([&appwin]() {
             if (auto app = appwin.lock()) {
-              (*app)->set_synode_linked(connstates.synlink == connect_state::online);
-              (*app)->invoke_update_syncflags();
+              (*app)->set_synode_linked(instance->constates.synlink == connect_state::online);
+              // (*app)->invoke_update_synlink(instance->constates.synlink == connect_state::online);
             }});
         });
 

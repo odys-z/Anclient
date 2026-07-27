@@ -46,10 +46,19 @@ slint_target_sources(album_slint_obj
     ui/app-window.slint
     LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
 )
-# slint_target_sources(${PROJECT_NAME}
-#     ui/app-window.slint
-#     LIBRARY_PATHS "surrealism=${SURREALISM_UI_DIR}"
-# )
+
+
+# ---------------------------------------------------------------------------
+# Embed every image/icon referenced via @image-url(...) in the .slint files
+# (both app/src/ui/imgs and anything pulled in from the surrealism= library)
+# directly into the compiled binary, instead of baking in absolute paths
+# that only resolve on this machine. See SLINT_EMBED_RESOURCES docs:
+# https://docs.slint.dev/latest/docs/cpp/cmake_reference
+# ---------------------------------------------------------------------------
+set_target_properties(album_slint_obj PROPERTIES
+    SLINT_EMBED_RESOURCES "embed-files"
+)
+
 target_link_libraries(album_slint_obj PUBLIC Slint::Slint)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC

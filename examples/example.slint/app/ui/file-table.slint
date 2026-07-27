@@ -1,8 +1,8 @@
-import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit } from "std-widgets.slint";
+import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit, Button } from "std-widgets.slint";
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
 
-export enum SyncingIcon { invisible, ready4sync, pushing, publish, private, /** TODO Synchronized to local synode? */localonly }
+export enum SyncingIcon { invisible, pushing, publish, private, /** TODO Synchronized to local synode? */localonly }
 
 export struct PathItemData {
     is_folder: bool,
@@ -66,10 +66,15 @@ export component FileTable {
       VerticalLayout {
         HorizontalLayout {
             Text { text: root.current_path; }
-            SButton {
+            Button {
+                // icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
+                // show-icon: true;
+                max-width: 30pt;
                 icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
-                disabled: { !root.synode-linked; }
+                icon-size: 12pt;
+                enabled: root.synode-linked;
                 text: @tr("Upload");
+                primary: true;
                 clicked => { root.upload(); }
             }
         }
@@ -171,7 +176,7 @@ export component FileTable {
                             width: 14pt; height: 14pt;
                         }
 
-                        if (!row.is-folder && row.syncicon == SyncingIcon.ready4sync ): Image {
+                        if (!row.is-folder && root.synode-linked ): Image {
                             source: root.icons("e");
                             width: 14pt; height: 14pt;
                         }

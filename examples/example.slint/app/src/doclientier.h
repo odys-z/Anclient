@@ -78,7 +78,7 @@ protected:
         });
     };
 
-    OnLink updatelink;
+    // OnLink updatelink;
 
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
@@ -96,10 +96,10 @@ public:
     };
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnLink onlink)
-        : Doclientier("h_photos", sysuri, synuri, onErr), updatelink(onlink), window_weak(appwin)  {}
+        : Doclientier("h_photos", sysuri, synuri, onlink, onErr), window_weak(appwin)  {}
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, err), window_weak(appwin) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnLink onlink, OnError err)
+        : Doclientier("h_photos", sysuri, synuri, onlink, err), window_weak(appwin) {}
 
     void reconnect_ipc();
 

@@ -13,62 +13,66 @@ export component EdgeHealth {
         height: 100%;
         width: 100%;
         vertical-stretch: 1;
-        background: #e3e4bf;
+        background: #fadbad;
 
         Image {
             width: 100%;
             height: 100%;
-            source: @image-url("imgs/album.svg");
+            source: @image-url("imgs/album-icon.svg");
             image-fit: cover; // fills as much area as possible while preserving aspect ratio
-            opacity: 0.16;
+            opacity: 0.86;
         }
 
         VerticalLayout {
           padding: 8pt;
           spacing: 8pt;
-          SButton {
-            text: "Edge Network Health";
-            font-color: #fbffab;
-            font-size: 18pt;
-            width: 100%;
-            background: #261b03;
-            opacity: 0.8;
-            clicked => {
-            }
-          }
+
+          Text { text: "Edge Health Monintor, COMING SOON ..."; font-size: 25pt; color: red; }
+        //   Text { text: "THIS PAGE IS A DEMO!"; font-size: 25pt; color: red; }
+
+        //   SButton {
+        //     text: "Edge Network Health";
+        //     font-color: #fbffab;
+        //     font-size: 18pt;
+        //     width: 100%;
+        //     background: #261b03;
+        //     opacity: 0.8;
+        //     clicked => {
+        //     }
+        //   }
          
-          SButton {
-            theme: Primary;
-            text: "Ping Task Placing";
-            width: 100%;
-            clicked => {
-              file_paths = ["~/github/anclient/examples/ EXAMPLE.SLINT/RST/DOCSREQ.AST.JSON",
-                            "~/GITHUB/ANCLIENT/EXAMPLES/ example.slint/rst/docsresp.ast.json"];
-              pingws-clicked();
-            }
-          }
+        //   SButton {
+        //     theme: Primary;
+        //     text: "Ping Task Placing";
+        //     width: 100%;
+        //     clicked => {
+        //       file_paths = ["~/github/anclient/examples/ EXAMPLE.SLINT/RST/DOCSREQ.AST.JSON",
+        //                     "~/GITHUB/ANCLIENT/EXAMPLES/ example.slint/rst/docsresp.ast.json"];
+        //       pingws-clicked();
+        //     }
+        //   }
 
-          HorizontalLayout {
-            width: 100%;
-            alignment: space-around;
-            vertical-stretch: 1;
-            spacing: 8pt;
+        //   HorizontalLayout {
+        //     width: 100%;
+        //     alignment: space-around;
+        //     vertical-stretch: 1;
+        //     spacing: 8pt;
 
-            msg-edit:=LineEdit {
-                width: 80%;
-                placeholder-text: @tr("Echo by Album Client");
-                text: "Echo message...";
-            }
-            SButton {
-                show-icon: true;
-                icon: UseIcons.icons.More;
-                theme: Primary;
-                text: "Echo to IPC Agent";
-                clicked => {
-                    echows-clicked(msg-edit.text);
-                }
-            }
-          }
+        //     msg-edit:=LineEdit {
+        //         width: 80%;
+        //         placeholder-text: @tr("Echo by Album Client");
+        //         text: "Echo message...";
+        //     }
+        //     SButton {
+        //         show-icon: true;
+        //         icon: UseIcons.icons.More;
+        //         theme: Primary;
+        //         text: "Echo to IPC Agent";
+        //         clicked => {
+        //             echows-clicked(msg-edit.text);
+        //         }
+        //     }
+        //   }
         }
     }
 }

@@ -6,7 +6,7 @@ import { CustomTableViewPage } from "./custom-table.slint";
 import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
 import { PathItemData, FileTable } from "file-table.slint";
-import { UserProfile } from "accout.slint";
+import { UserProfile, UserProfile } from "user.slint";
 
 
 export component App inherits Window {
@@ -54,8 +54,9 @@ min-width: 600px;
   callback update_syncflags();
   callback select_file(PathItemData, bool);
   callback upload_files();
-  callback open_link(string);
+  callback open_web(string);
   callback open_volume();
+  // callback update_synlink(bool);
 
   init => { }
 
@@ -96,7 +97,7 @@ min-width: 600px;
             root.menu-id = menuid;
             menu-changed(menuid);
           }
-          open-link(link) => { root.open_link(link); }
+          open-web(link) => { root.open_web(link); }
           enable-vol: root.enable_vol;
         }
 
@@ -138,17 +139,33 @@ min-width: 600px;
 
         if (menu_id == "2-1") : Rectangle {
           UserProfile {
-            width: 100%; height: 100%;
+            model: {
+                info_label: "Portfolio Desktop 0.1.0",
+                detail_label: "",
+                market_name: "MY 0.1.0",
+                orgs_model: ["Acme Corp", "Globex"],
+                domains_model: ["prod", "staging"],
+                synodes_model: ["node-a", "node-b"],
+                show_qr_code: false,
+            };
+
+            model-changed(m) => {
+                debug("model changed:", m.url_text, m.selected_org);
+            }
+
+            refresh-clicked => { debug("User: refresh clicked"); }
+            ping-clicked(url) => { debug("User: ping clicked"); }
+            login-test-clicked(uid, pw) => { debug("User: login test clicked"); }
+            save-clicked(url, uid, pw, confirm) => { debug("User: save-cliecked"); } 
           }
-        }
 
-
-        if (menu_id == "2-2") : Rectangle {
-          background: #b0d0d0;
-          EdgeHealth {
-            width: 100%; height: 100%;
-            echows-clicked(msg) => { root.echows(msg); }
-            pingws-clicked => { root.pingws(self.file_paths)}
+          if (menu_id == "2-2") : Rectangle {
+            background: #b0d0d0;
+            EdgeHealth {
+              width: 100%; height: 100%;
+              echows-clicked(msg) => { root.echows(msg); }
+              pingws-clicked => { root.pingws(self.file_paths)}
+            }
           }
         }
 

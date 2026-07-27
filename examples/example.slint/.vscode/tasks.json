@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            "label": "copy-dlls",
+            "type": "shell",
+            "command": "invoke",
+            "args": ["copy-dlls"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        }
+	]
+}

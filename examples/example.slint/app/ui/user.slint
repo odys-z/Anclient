@@ -1,29 +1,51 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
-import { LineEdit, ComboBox } from "std-widgets.slint";
+import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
 
-export component UserProfile {
 
-    in-out property <string> market_name : "MY 0.1.0";
-    in-out property <string> readonly_url_text;
+export struct UserProfileModel {
+    info_label: string,
+    detail_label: string,
 
-    in-out property <[string]> orgs_model : ["Test-1", "Test-2"];
-    in-out property <[string]> domains_model : ["Test-1:domain 0", "Test-1: domain 1"];
-    in-out property <[string]> synodes_model : ["domain 0-hub", "domain 1-1"];
-    in-out property <string> selected_org;
-    in-out property <string> selected_domain;
-    in-out property <string> selected_node;
+    market_name: string,
+    readonly_url_text: string,
 
-    in-out property <string> url_text;
-    in-out property <string> user_id_text;
-    in-out property <string> password_text;
-    in-out property <string> confirm_password_text;
+    orgs_model: [string],
+    domains_model: [string],
+    synodes_model: [string],
+    selected_org: string,
+    selected_domain: string,
+    selected_node: string,
+
+    url_text: string,
+    user_id_text: string,
+    password_text: string,
+    confirm_password_text: string,
 
     // Set by the host code after a successful login test, e.g.
-    // ui.set_qr_code_image(Image::load_from_path(...)) and
-    // ui.set_show_qr_code(true);
-    in-out property <image> qr_code_image;
-    in-out property <bool> show_qr_code: false;
+    // let mut m = ui.get_model();
+    // m.qr_code_image = Image::load_from_path(...);
+    // m.show_qr_code = true;
+    // ui.set_model(m);
+    qr_code_image: image,
+    show_qr_code: bool,
+}
+
+export component UserProfile {
+    in-out property <UserProfileModel> model: {
+        info_label: "Portfolio Desktop 0.1.0",
+        detail_label: "Product page: ...",
+        market_name: "MY 0.1.0",
+        orgs_model: ["Test-1", "Test-2"],
+        domains_model: ["Test-1:domain 0", "Test-1: domain 1"],
+        synodes_model: ["domain 0-hub", "domain 1-1"],
+        show_qr_code: false,
+    };
+
+    // Fired once, with the full model, any time the UI mutates a field
+    // below. Host code only needs to subscribe here instead of tracking
+    // each field individually.
+    callback model-changed(UserProfileModel);
 
     callback refresh-clicked();
     callback org-domain-node-changed(string, string, string);
@@ -31,11 +53,15 @@ export component UserProfile {
     callback login-test-clicked(string, string);
     callback save-clicked(string, string, string, string);
 
+    function notify-changed() {
+        root.model-changed(root.model);
+    }
+
     Rectangle {
         height: 100%;
         width: 100%;
         vertical-stretch: 1;
-        background: #eaeab9;
+        background: #1f1f14;
 
         Image {
             width: 100%;
@@ -47,7 +73,14 @@ export component UserProfile {
 
         VerticalLayout {
             alignment: center;
-            padding: 32px;
+            padding: 8pt;
+            VerticalLayout {
+                padding-bottom: 26pt; 
+                horizontal-stretch: 1;
+                alignment: center;
+                Text { text: root.model.info_label; font-size: 18pt; color: #ccc; }
+                Text { text: root.model.detail_label; font-size: 14pt; color: #ccc; }
+            }
 
             GridLayout {
                 spacing: 8pt;
@@ -56,7 +89,7 @@ export component UserProfile {
                 Row {
                   HorizontalLayout {
                     spacing: 8pt;
-                    Text { text: "Market"; font-size: 14pt; }
+                    Text { text: "Market ID  : "; font-size: 14pt; color: #bbb; }
                     Rectangle {
                         background: #8a8a8a;
                         border-radius: 4px;
@@ -64,7 +97,7 @@ export component UserProfile {
                             width: 100%;
                             horizontal-stretch: 1;
                             read-only: true;
-                            text: market_name;
+                            text: root.model.market_name;
                             font-size: 16pt;
                             horizontal-alignment: center;
                         }
@@ -78,7 +111,7 @@ export component UserProfile {
                         col: 0;
                         horizontal-stretch: 1;
                         read-only: true;
-                        text: readonly_url_text;
+                        text: root.model.readonly_url_text;
                     }
 
                     SButton {
@@ -102,28 +135,34 @@ export component UserProfile {
 
                         orgs-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: orgs_model;
-                            current-value <=> selected_org;
-                            selected => {
-                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            model: root.model.orgs_model;
+                            current-value: root.model.selected_org;
+                            selected(value) => {
+                                root.model.selected_org = value;
+                                root.notify-changed();
+                                org-domain-node-changed(root.model.selected_org, root.model.selected_domain, root.model.selected_node);
                             }
                         }
 
                         domain-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: domains_model;
-                            current-value <=> selected_domain;
-                            selected => {
-                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            model: root.model.domains_model;
+                            current-value: root.model.selected_domain;
+                            selected(value) => {
+                                root.model.selected_domain = value;
+                                root.notify-changed();
+                                org-domain-node-changed(root.model.selected_org, root.model.selected_domain, root.model.selected_node);
                             }
                         }
 
                         node-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: synodes_model;
-                            current-value <=> selected_node;
-                            selected => {
-                                org-domain-node-changed(selected_org, selected_domain, selected_node);
+                            model: root.model.synodes_model;
+                            current-value: root.model.selected_node;
+                            selected(value) => {
+                                root.model.selected_node = value;
+                                root.notify-changed();
+                                org-domain-node-changed(root.model.selected_org, root.model.selected_domain, root.model.selected_node);
                             }
                         }
                     }
@@ -135,7 +174,11 @@ export component UserProfile {
                         col: 0;
                         horizontal-stretch: 1;
                         placeholder-text: @tr("Server URL");
-                        text <=> url_text;
+                        text: root.model.url_text;
+                        edited(text) => {
+                            root.model.url_text = text;
+                            root.notify-changed();
+                        }
                     }
 
                     SButton {
@@ -160,7 +203,11 @@ export component UserProfile {
                         user-id-edit := LineEdit {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("User ID");
-                            text <=> user_id_text;
+                            text: root.model.user_id_text;
+                            edited(text) => {
+                                root.model.user_id_text = text;
+                                root.notify-changed();
+                            }
                         }
 
                         // spacer to visually separate uid from the pswd/pswd-2 pair
@@ -172,14 +219,22 @@ export component UserProfile {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("Password");
                             input-type: password;
-                            text <=> password_text;
+                            text: root.model.password_text;
+                            edited(text) => {
+                                root.model.password_text = text;
+                                root.notify-changed();
+                            }
                         }
 
                         confirm-password-edit := LineEdit {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("Confirm");
                             input-type: password;
-                            text <=> confirm_password_text;
+                            text: root.model.confirm_password_text;
+                            edited(text) => {
+                                root.model.confirm_password_text = text;
+                                root.notify-changed();
+                            }
                         }
                     }
 
@@ -203,12 +258,12 @@ export component UserProfile {
                         HorizontalLayout {
                             alignment: center;
 
-                            if show_qr_code: Image {
+                            if root.model.show_qr_code: Image {
                                 width: 160px;
                                 height: 160px;
-                                source: qr_code_image;
+                                source: root.model.qr_code_image;
                             }
-                            if !show_qr_code: Rectangle {
+                            if !root.model.show_qr_code: Rectangle {
                                 width: 160px;
                                 height: 160px;
                                 background: #00000022;
