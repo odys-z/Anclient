@@ -6,8 +6,10 @@ import { CustomTableViewPage } from "./custom-table.slint";
 import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
 import { PathItemData, FileTable } from "file-table.slint";
-import { UserProfile, UserProfile } from "user.slint";
+import { UserProfile } from "user.slint";
+import { AppState } from "app-state.slint";
 
+export { AppState } from "app-state.slint";
 
 export component App inherits Window {
 
@@ -23,23 +25,14 @@ min-height: 400px;
 min-width: 600px;
  */
 
-  in-out property <string> window-title: "Anclient.slint";
-  title: window-title;
+  title: AppState.data.window_title;
 
-  in-out property <string> menu_id;
-
+  // Pure UI-computed outputs (window geometry read by the host) —
+  // not part of AppState since the host only ever reads these, never sets them.
   out property <length> web_x;
   out property <length> web_y;
   out property <length> web_width;
   out property <length> web_height;
-
-  in-out property <string> webview-status: "Webview not started";
-  in-out property <string> syncing-status: "Ready";
-
-  in-out property <string> current_pth;
-  in-out property <[PathItemData]> filelist: [];
-  in-out property <bool> enable_vol;
-  in-out property <bool> synode-linked;
 
   // Design Notes:
   // Gemini says the callback cannot be reached because the callback hasn't been set by ui->on_initapp() yet.
@@ -58,6 +51,10 @@ min-width: 600px;
   callback open_volume();
   // callback update_synlink(bool);
 
+  function notify-changed() {
+      AppState.data-changed(AppState.data);
+  }
+
   init => { }
 
   HorizontalLayout {
@@ -75,7 +72,8 @@ min-width: 600px;
 
         change(index, data) => {
           debug(index, data);
-          menu_id = data.id;
+          AppState.data.menu_id = data.id;
+          root.notify-changed();
           menu-changed(data.id);
         }
       }
@@ -89,33 +87,34 @@ min-width: 600px;
         width: parent.width;
         height: parent.height;
 
-        // if (menu_id == "home") : index-page := HomeForm { 
-        if (menu_id == "home" || menu_id == "album") : index-page := HomeForm { 
+        // if (AppState.data.menu_id == "home") : index-page := HomeForm {
+        if (AppState.data.menu_id == "home" || AppState.data.menu_id == "album") : index-page := HomeForm { 
           height: parent.height - 14pt;
-          visible: root.menu_id == "home" || menu_id == "album";
+          visible: AppState.data.menu_id == "home" || AppState.data.menu_id == "album";
           navigate(menuid) => {
-            root.menu-id = menuid;
+            AppState.data.menu_id = menuid;
+            root.notify-changed();
             menu-changed(menuid);
           }
           open-web(link) => { root.open_web(link); }
-          enable-vol: root.enable_vol;
+          enable-vol: AppState.data.enable_vol;
         }
 
-        if (menu_id == "volume") : Rectangle {
+        if (AppState.data.menu_id == "volume") : Rectangle {
           background: #b0d0d0;
           // Volume Information
           // CustomTableViewPage { width: 100%; height: 100%; }
         }
 
-        if (menu_id == "upload") : Rectangle {
+        if (AppState.data.menu_id == "upload") : Rectangle {
           background: #202020;
           FileTable {
             width: 100%; height: 100%;
 
-            row_data    : root.filelist;
-            current_path: root.current_pth;
+            row_data    : AppState.data.filelist;
+            current_path: AppState.data.current_pth;
 
-            synode-linked: root.synode-linked;
+            synode-linked: AppState.data.synode_linked;
 
             init => { root.load_folder("."); }
 
@@ -137,42 +136,23 @@ min-width: 600px;
           }
         }
 
-        if (menu_id == "2-1") : Rectangle {
-          UserProfile {
-            model: {
-                info_label: "Portfolio Desktop 0.1.0",
-                detail_label: "",
-                market_name: "MY 0.1.0",
-                orgs_model: ["Acme Corp", "Globex"],
-                domains_model: ["prod", "staging"],
-                synodes_model: ["node-a", "node-b"],
-                show_qr_code: false,
-            };
+        if (AppState.data.menu_id == "2-1") : Rectangle {
+          UserProfile { }
+        }
 
-            model-changed(m) => {
-                debug("model changed:", m.url_text, m.selected_org);
-            }
-
-            refresh-clicked => { debug("User: refresh clicked"); }
-            ping-clicked(url) => { debug("User: ping clicked"); }
-            login-test-clicked(uid, pw) => { debug("User: login test clicked"); }
-            save-clicked(url, uid, pw, confirm) => { debug("User: save-cliecked"); } 
-          }
-
-          if (menu_id == "2-2") : Rectangle {
-            background: #b0d0d0;
-            EdgeHealth {
-              width: 100%; height: 100%;
-              echows-clicked(msg) => { root.echows(msg); }
-              pingws-clicked => { root.pingws(self.file_paths)}
-            }
+        if (AppState.data.menu_id == "2-2") : Rectangle {
+          background: #b0d0d0;
+          EdgeHealth {
+            width: 100%; height: 100%;
+            echows-clicked(msg) => { root.echows(msg); }
+            pingws-clicked => { root.pingws(self.file_paths)}
           }
         }
 
         status-bar:= HorizontalLayout {
           padding-top: 1pt;
           padding-left: 12pt;
-          STag{ text: root.syncing_status;
+          STag{ text: AppState.data.syncing_status;
             clicked => { popup.open(); }
           }
         }
@@ -189,7 +169,7 @@ min-width: 600px;
         Text{ horizontal-alignment: left;
             color: #ddd;
             font-size: 12pt;
-            text: root.syncing-status; }
+            text: AppState.data.syncing_status; }
       }
     }
   }

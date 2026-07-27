@@ -78,8 +78,10 @@ namespace anson {
           // debug notes: cannot capture outer lamda's connstates as it quit immediatly, before this one is running.
           slint::invoke_from_event_loop([&appwin]() {
             if (auto app = appwin.lock()) {
-              (*app)->set_synode_linked(instance->constates.synlink == connect_state::online);
-              // (*app)->invoke_update_synlink(instance->constates.synlink == connect_state::online);
+              // (*app)->set_synode_linked(instance->constates.synlink == connect_state::online);
+              auto data = (*app)->global<AppState>().get_data();
+              data.synode_linked = instance->constates.synlink == connect_state::online;
+              (*app)->global<AppState>().set_data(data);
             }});
         });
 

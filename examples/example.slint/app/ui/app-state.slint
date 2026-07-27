@@ -1,0 +1,24 @@
+import { AppModel } from "models.slint";
+
+export global AppState {
+    in-out property <AppModel> data: {
+        window_title: "Anclient.slint",
+        webview_status: "Webview not started",
+        syncing_status: "Ready",
+        filelist: [],
+        profile: {
+            info_label: "Portfolio Desktop 0.1.0",
+            detail_label: "Product page: ...",
+            market_name: "MY 0.1.0",
+            orgs_model: ["Test-1", "Test-2"],
+            domains_model: ["Test-1:domain 0", "Test-1: domain 1"],
+            synodes_model: ["domain 0-hub", "domain 1-1"],
+            show_qr_code: false,
+        },
+    };
+
+    // Fired whenever anything in `data` is mutated from within the UI
+    // (App or UserProfile). Host code subscribes here once instead of
+    // tracking individual properties/callbacks across components.
+    callback data-changed(AppModel);
+}

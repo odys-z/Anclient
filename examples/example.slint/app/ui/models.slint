@@ -1,0 +1,44 @@
+import { PathItemData } from "file-table.slint";
+
+export struct UserProfileModel {
+    info_label: string,
+    detail_label: string,
+
+    market_name: string,
+    readonly_url_text: string,
+
+    orgs_model: [string],
+    domains_model: [string],
+    synodes_model: [string],
+    selected_org: string,
+    selected_domain: string,
+    selected_node: string,
+
+    url_text: string,
+    user_id_text: string,
+    password_text: string,
+    confirm_password_text: string,
+
+    // Set by the host code after a successful login test, e.g.
+    // let mut d = ui.global::<AppState>().get_data();
+    // d.profile.qr_code_image = Image::load_from_path(...);
+    // d.profile.show_qr_code = true;
+    // ui.global::<AppState>().set_data(d);
+    qr_code_image: image,
+    show_qr_code: bool,
+}
+
+export struct AppModel {
+    window_title: string,
+    menu_id: string,
+
+    webview_status: string,
+    syncing_status: string,
+
+    current_pth: string,
+    filelist: [PathItemData],
+    enable_vol: bool,
+    synode_linked: bool,
+
+    profile: UserProfileModel,
+}

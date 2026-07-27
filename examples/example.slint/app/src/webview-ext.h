@@ -84,7 +84,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     if (is_webview_open.exchange(true)) {
         slint::invoke_from_event_loop([weak_ui_handle]() {
             if (auto ui = weak_ui_handle.lock()) {
-                (*ui)->set_webview_status("A webview window is already open!");
+                // (*ui)->set_webview_status("A webview window is already open!");
+                auto data = (*ui)->global<AppState>().get_data();
+                data.webview_status = "A webview window is already open!";
+                (*ui)->global<AppState>().set_data(data);
             }
         });
         return;
@@ -107,7 +110,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     // 3. Notify Slint UI that the window is now active
     slint::invoke_from_event_loop([weak_ui_handle]() {
         if (auto ui = weak_ui_handle.lock()) {
-            (*ui)->set_webview_status("Webview window is active.");
+            // (*ui)->set_webview_status("Webview window is active.");
+            auto data = (*ui)->global<AppState>().get_data();
+            data.webview_status = "webview window is active.";
+            (*ui)->global<AppState>().set_data(data);
         }
     });
 
@@ -117,7 +123,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
 
     slint::invoke_from_event_loop([weak_ui_handle]() {
         if (auto ui = weak_ui_handle.lock()) {
-            (*ui)->set_webview_status("Webview closed. Click button to reopen.");
+            // (*ui)->set_webview_status("Webview closed. Click button to reopen.");
+            auto data = (*ui)->global<AppState>().get_data();
+            data.webview_status = "Webview closed. Click button to reopen.";
+            (*ui)->global<AppState>().set_data(data);
         }
     });
 }

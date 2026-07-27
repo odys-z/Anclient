@@ -20,8 +20,12 @@ int main(int argc, char **argv) {
     Slingleton& slingle = argc > 1 ? Slingleton::get_instance(ui_weak, string{argv[1]})
                                    : Slingleton::get_instance(ui_weak);
 
-    ui->set_window_title("Portfolio Desktop");
-    ui->set_enable_vol(slingle.has_synode_vol());
+    {
+        auto data = ui->global<AppState>().get_data();
+        data.window_title = "Portfolio Desktop";
+        data.enable_vol = slingle.has_synode_vol();
+        ui->global<AppState>().set_data(data);
+    }
     ui->window().set_maximized(false);
 
     std::unique_ptr<webview::webview> wv = nullptr;
@@ -60,7 +64,11 @@ int main(int argc, char **argv) {
             status = slint::SharedString(" "s + updated_status);
             anlog("Pinging: "s + file_str);
         }
-        ui->set_syncing_status(status);
+
+        auto data = ui->global<AppState>().get_data();
+        data.syncing_status = status;
+        ui->global<AppState>().set_data(data);
+
         slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
     });
 
@@ -94,8 +102,12 @@ int main(int argc, char **argv) {
                 table_model->push_back(row);
             }
 
-            ui->set_filelist(table_model);
-            ui->set_current_pth(pth);
+            {
+                auto data = ui->global<AppState>().get_data();
+                data.filelist = table_model;
+                data.current_pth = pth;
+                ui->global<AppState>().set_data(data);
+            }
 
             ui->invoke_query_syncflags();
         } catch (const fs::filesystem_error& e) {
@@ -111,7 +123,10 @@ int main(int argc, char **argv) {
         
         string status = std::format("Total selected files: \n{}.", map2str(fileselection));
         anlog(status);
-        ui->set_syncing_status(slint::SharedString{status});
+
+        auto data = ui->global<AppState>().get_data();
+        data.syncing_status = slint::SharedString{status};
+        ui->global<AppState>().set_data(data);
     });
 
     ui->on_upload_files([&]() {
@@ -119,7 +134,7 @@ int main(int argc, char **argv) {
     });
 
     ui->on_query_syncflags([&]() {
-        fs::path root = fs::absolute(fs::path{string{ui->get_current_pth()}});
+        fs::path root = fs::absolute(fs::path{string{ui->global<AppState>().get_data().current_pth}});
 
         map<string, vector<LangExt::VarType>> pthpage{};
         try {
@@ -159,8 +174,8 @@ int main(int argc, char **argv) {
             return;
         }
 
-        auto filelist_model = ui->get_filelist();
-        auto filelist = std::dynamic_pointer_cast<slint::VectorModel<PathItemData>>(filelist_model);
+        auto data = ui->global<AppState>().get_data();
+        auto filelist = std::dynamic_pointer_cast<slint::VectorModel<PathItemData>>(data.filelist);
 
         if (filelist) {
             std::size_t count = filelist->row_count();
@@ -195,7 +210,13 @@ int main(int argc, char **argv) {
                     filelist->set_row_data(i, row);
                 }
             }
-            ui->set_filelist(filelist);
+
+            // filelist rows were mutated in place on the same model instance
+            // referenced by data.filelist, but we still round-trip through
+            // set_data() (matching the original set_filelist(filelist) call)
+            // in case something downstream relies on AppState.data-changed firing.
+            data.filelist = filelist;
+            ui->global<AppState>().set_data(data);
         }
     });
 
@@ -209,12 +230,16 @@ int main(int argc, char **argv) {
 
     // Design Notes: We need a post load event callback API.
     slint::invoke_from_event_loop([ui, &slingle]() {
-        if (slingle.validsettings())
-            ui->set_menu_id("home");
-        else {
-            ui->set_menu_id("2-1");
-            ui->set_ui_labels(vector<string>{"Please check settings!"_ans}]);
+        auto data = ui->global<AppState>().get_data();
+
+        if (slingle.validsettings()) {
+            data.menu_id = "home";
+        } else {
+            data.menu_id = "2-1";
+            data.profile.detail_label = "Please check settings!";
         }
+
+        ui->global<AppState>().set_data(data);
     });
 
     ui->run();

@@ -44,9 +44,12 @@ protected:
 
             slint::SharedString slint_text(proc_report);
             slint::invoke_from_event_loop([this, slint_text]() {
-                if (auto handle = window_weak.lock()) {
+                if (auto app = window_weak.lock()) {
                     anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                    (*handle)->set_syncing_status(slint_text);
+                    // (*handle)->set_syncing_status(slint_text);
+                    auto data = (*app)->global<AppState>().get_data();
+                    data.syncing_status = slint_text;
+                    (*app)->global<AppState>().set_data(data);
                 }
             });
         }
@@ -62,9 +65,13 @@ protected:
             // ISSUE slint ui helper: can update ui with a static helper
             slint::SharedString slint_text(status_txt);
             slint::invoke_from_event_loop([this, slint_text]() {
-                if (auto handle = window_weak.lock()) {
+                if (auto app = window_weak.lock()) {
                     anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                    (*handle)->set_syncing_status(slint_text);
+                    // (*handle)->set_syncing_status(slint_text);
+                    auto data = (*app)->global<AppState>().get_data();
+                    data.syncing_status = slint_text;
+                    (*app)->global<AppState>().set_data(data);
+
                 }
             });
         }
