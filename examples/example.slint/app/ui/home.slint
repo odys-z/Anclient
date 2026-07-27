@@ -10,7 +10,7 @@ export component HomeForm {
     in-out property <bool> enable-vol: false;
 
     callback navigate(string);
-    callback open-link(string);
+    callback open-web(string);
 
     Rectangle {
         height: 100%; width: 100%;
@@ -141,7 +141,7 @@ export component HomeForm {
                 icon: UseIcons.icons.Smiling-face;
                 font-size: 9pt;
                 text: "Data Privacy";
-                clicked => { root.open_link("https://odys-z.github.io/products/portfolio/privacy-policy.html"); }
+                clicked => { root.open_web("https://odys-z.github.io/products/portfolio/privacy-policy.html"); }
             }
 
             SButton {
@@ -149,7 +149,7 @@ export component HomeForm {
                 text: "Credits";
                 font-size: 9pt;
                 clicked => {
-                    root.open-link("https://odys-z.github.io/products/portfolio/credits.html");
+                    root.open-web("https://odys-z.github.io/products/portfolio/credits.html");
                 }
             }
           }
