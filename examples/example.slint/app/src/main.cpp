@@ -17,8 +17,9 @@ int main(int argc, char **argv) {
 
     auto ui = App::create();
     slint::ComponentWeakHandle<App> ui_weak = ui;
-    Slingleton& slingle = argc > 1 ? Slingleton::get_instance(ui_weak, string{argv[1]})
-                                   : Slingleton::get_instance(ui_weak);
+
+    string settings_path = argc > 1 ? string{argv[1]} : "settings/app-settings.json";
+    Slingleton& slingle = Slingleton::get_instance(ui_weak, settings_path);
 
     {
         auto data = ui->global<AppState>().get_data();
@@ -62,12 +63,18 @@ int main(int argc, char **argv) {
 
             std::string updated_status = std::string(std::string_view(status)) + std::string(std::string_view(*f));
             status = slint::SharedString(" "s + updated_status);
-            anlog("Pinging: "s + file_str);
+            // anlog("Pinging: "s + file_str);
+
         }
 
-        auto data = ui->global<AppState>().get_data();
-        data.syncing_status = status;
-        ui->global<AppState>().set_data(data);
+        insert_status(ui, "Ping: placing tasks ...");
+        // auto data = ui->global<AppState>().get_data();
+        // auto status_model = data.syncing_status;
+        // auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+
+        // if (vec_model) {
+        //     vec_model->insert(0, "New status message");
+        // ui->global<AppState>().set_data(data);
 
         slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
     });
@@ -124,9 +131,10 @@ int main(int argc, char **argv) {
         string status = std::format("Total selected files: \n{}.", map2str(fileselection));
         anlog(status);
 
-        auto data = ui->global<AppState>().get_data();
-        data.syncing_status = slint::SharedString{status};
-        ui->global<AppState>().set_data(data);
+        // auto data = ui->global<AppState>().get_data();
+        // data.syncing_status = slint::SharedString{status};
+        // ui->global<AppState>().set_data(data);
+        // inv_insert_status(ui, status);
     });
 
     ui->on_upload_files([&]() {
@@ -229,8 +237,10 @@ int main(int argc, char **argv) {
     });
 
     // Design Notes: We need a post load event callback API.
-    slint::invoke_from_event_loop([ui, &slingle]() {
+    slint::invoke_from_event_loop([&ui, &slingle]() {
         auto data = ui->global<AppState>().get_data();
+
+        bind_profile(data.profile, slingle.appsettings);
 
         if (slingle.validsettings()) {
             data.menu_id = "home";
@@ -241,6 +251,34 @@ int main(int argc, char **argv) {
 
         ui->global<AppState>().set_data(data);
     });
+
+    // user
+    ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
+        auto data = ui->global<AppState>().get_data();
+        UserProfileModel p = data.profile;
+
+        anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
+
+        // We need a better validation pattern. See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
+        if (string{p.password_text} != string{p.confirm_password_text})
+            insert_status(ui, "Confirm password / token doesn't march.");
+
+        DesktopSettings s {slingle.appsettings};
+        s.admin = string{p.user_id_text};
+        s.token = p.password_text;
+        s.synode_jserv = p.synode_jserv;
+
+        optional<string> err = Slingleton::validate_settings(s);
+        if (!err) {
+            slingle.settings(s);
+            s.to_file(settings_path);
+            anlog("saved: "s + settings_path);
+        }
+        else {
+            anwarn(*err);
+            insert_status(ui, *err);
+        }
+    } );
 
     ui->run();
     return 0;

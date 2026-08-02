@@ -87,15 +87,9 @@ export component FileTable {
             Text { text: @tr("Size"); width: 35%; color: #bbb; font-weight: 700; }
         }
 
-        // Table Body Rows
         ScrollView {
           VerticalLayout {
-            // for row in root.filter_sort_model(root.row_data, filter-edit.text, root.sort-index, root.sort-ascending) : Rectangle {
             for row in root.row_data : Rectangle {
-                // init => {
-                //     debug(row.iselected ? "ON" : "OFF", row.fullpath);
-                // }
-
                 background: row.iselected ? rgba(0, 120, 215, 0.2) : rgba(0, 0, 0, 0.02);
                 height: 24pt;
                 touchbox := TouchArea {

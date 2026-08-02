@@ -50,6 +50,7 @@ min-width: 600px;
   callback open_web(string);
   callback open_volume();
   // callback update_synlink(bool);
+  callback save_userinfo();
 
   function notify-changed() {
       AppState.data-changed(AppState.data);
@@ -137,7 +138,13 @@ min-width: 600px;
         }
 
         if (AppState.data.menu_id == "2-1") : Rectangle {
-          UserProfile { }
+          UserProfile {
+            save-profile(jserv, u, p) => {
+              root.save_userinfo();
+              // debug("save-profile:", jserv, u, p, "=> save_userinfo()");
+              debug("save-profile: => save_userinfo()");
+            }
+          }
         }
 
         if (AppState.data.menu_id == "2-2") : Rectangle {
@@ -152,7 +159,7 @@ min-width: 600px;
         status-bar:= HorizontalLayout {
           padding-top: 1pt;
           padding-left: 12pt;
-          STag{ text: AppState.data.syncing_status;
+          STag{ text: AppState.data.syncing_status[0];
             clicked => { popup.open(); }
           }
         }
@@ -166,10 +173,16 @@ min-width: 600px;
       VerticalLayout {
         padding: 12px;
         alignment: center;
-        Text{ horizontal-alignment: left;
-            color: #ddd;
-            font-size: 12pt;
-            text: AppState.data.syncing_status; }
+        // Text{ horizontal-alignment: left;
+        //     color: #ddd;
+        //     font-size: 12pt;
+        //     text: AppState.data.syncing_status[0]; }
+        
+        for i in Math.min(15, AppState.data.syncing-status.length): Text {
+            text: AppState.data.syncing-status[i];
+            font-size: 14px;
+            color: #333333;
+        }
       }
     }
   }

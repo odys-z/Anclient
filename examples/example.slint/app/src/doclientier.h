@@ -41,17 +41,7 @@ protected:
             anlog(rep.Body().m);
             string proc_report = format_proc_report(rep.Body());
             anlog(proc_report);
-
-            slint::SharedString slint_text(proc_report);
-            slint::invoke_from_event_loop([this, slint_text]() {
-                if (auto app = window_weak.lock()) {
-                    anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                    // (*handle)->set_syncing_status(slint_text);
-                    auto data = (*app)->global<AppState>().get_data();
-                    data.syncing_status = slint_text;
-                    (*app)->global<AppState>().set_data(data);
-                }
-            });
+            inv_insert_status(window_weak, proc_report);
         }
         else if (rep.code == MsgCode::Code::_sentinel_) {
             // show be the ws connection reports
@@ -61,19 +51,7 @@ protected:
             string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
             string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
             anlog(status_txt);
-
-            // ISSUE slint ui helper: can update ui with a static helper
-            slint::SharedString slint_text(status_txt);
-            slint::invoke_from_event_loop([this, slint_text]() {
-                if (auto app = window_weak.lock()) {
-                    anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                    // (*handle)->set_syncing_status(slint_text);
-                    auto data = (*app)->global<AppState>().get_data();
-                    data.syncing_status = slint_text;
-                    (*app)->global<AppState>().set_data(data);
-
-                }
-            });
+            inv_insert_status(window_weak, status_txt);
         }
 
         // ui_query_synchings();
@@ -84,8 +62,6 @@ protected:
             }
         });
     };
-
-    // OnLink updatelink;
 
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
@@ -118,7 +94,7 @@ public:
 
     void login_synode(const JServUrl & jserv, const string &uid, const string &pswd, const string& device) noexcept {
         try {
-            andebug("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
+            anlog("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             client.jserv = jserv;
             SessionClient::loginWithUri(client, sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
@@ -133,6 +109,24 @@ public:
     void asy_echows(const string& echo = "Echo by Asynclientier from C++");
 
     void query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok);
+
+    /// helper
+    static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
+        slint::SharedString slint_text(txt);
+        slint::invoke_from_event_loop([&appwin, &slint_text]() {
+            if (auto app = appwin.lock()) {
+                anlog("[onmsg] Updating statues report: "s + string{slint_text});
+                auto data = (*app)->global<AppState>().get_data();
+                // data.syncing_status = slint_text;
+                auto status_model = data.syncing_status;
+                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+                if (vec_model) {
+                    vec_model->insert(0, slint_text);
+                }
+                (*app)->global<AppState>().set_data(data);
+            }
+        });
+    }
 
 private:
     string format_proc_report(const DocsResp& resp) {

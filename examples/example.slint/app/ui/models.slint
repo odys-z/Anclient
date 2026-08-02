@@ -4,8 +4,9 @@ export struct UserProfileModel {
     info_label: string,
     detail_label: string,
 
+    org_name: string,
     market_name: string,
-    readonly_url_text: string,
+    regiserv: string,
 
     orgs_model: [string],
     domains_model: [string],
@@ -14,7 +15,7 @@ export struct UserProfileModel {
     selected_domain: string,
     selected_node: string,
 
-    url_text: string,
+    synode_jserv: string,
     user_id_text: string,
     password_text: string,
     confirm_password_text: string,
@@ -33,7 +34,7 @@ export struct AppModel {
     menu_id: string,
 
     webview_status: string,
-    syncing_status: string,
+    syncing_status: [string],
 
     current_pth: string,
     filelist: [PathItemData],

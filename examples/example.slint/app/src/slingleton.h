@@ -46,7 +46,7 @@ namespace anson {
     Slingleton() {}
 
     static Slingleton& get_instance(slint::ComponentWeakHandle<App>& appwin,
-                      const string & settings_path = "settings/app-settings.json") {
+                      const string & settings_path) {
       if (instance == nullptr) {
         instance = new Slingleton();
         register_jserv(asts, opts);
@@ -71,6 +71,26 @@ namespace anson {
           anlog("[***** ix::initNetSystem *****] Initializing network subsystems after Slint event loop is spinning ...");
           ix::initNetSystem();
         });
+
+        AsynClienter::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
+          if (!instance->validsettings()) {
+            anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
+            slint::invoke_from_event_loop([&appwin, c, &e, &args]() {
+              if (auto app = appwin.lock()) {
+                auto data = (*app)->global<AppState>().get_data();
+
+                auto status_model = data.syncing_status;
+                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+
+                if (vec_model) {
+                    vec_model->insert(0, "New status message");
+                }
+
+                (*app)->global<AppState>().set_data(data);
+
+              }});
+          }
+        };
 
         instance->doclientier = new AsynClienter(appwin, [&appwin](connect_state connstates) {
           instance->constates = connstates;
@@ -148,6 +168,35 @@ namespace anson {
           && !appsettings.admin.empty()
           && !appsettings.token.empty() && appsettings.token.size() >= 4
           ;
+    }
+
+    void settings(const DesktopSettings& s) { this->appsettings = move(s); }
+
+    /**
+     * There is a validation pattern issue in slint.
+     * See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
+     */
+    static std::optional<std::string> validate_settings(DesktopSettings s) {
+      return [&]() -> std::optional<std::string> {
+              if (s.java_path.empty())                       return "Java path cannot be empty";
+              if (s.synode_jserv.empty())                    return "Synode Jserv cannot be empty";
+              if (auto err = validate_jserv(s.synode_jserv)) return err;
+              if (s.admin.empty())                           return "Admin field cannot be empty";
+              if (auto err = validate_token(s.token))        return err;
+              return std::nullopt;
+          }();
+    }
+
+    static std::optional<std::string> validate_jserv(const std::string& jservstr) {
+      return Regex::asJserv(jservstr).empty() 
+           ? std::optional<std::string>{"Invalid Jserv"} 
+           : std::nullopt;
+    }
+
+    static std::optional<std::string> validate_token(const std::string& t) {
+      return t.empty() || t.length() > 32 || t.length() < 4 
+           ? std::optional<std::string>{"Invalid Token Length"} 
+           : std::nullopt;
     }
   };
 }

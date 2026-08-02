@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <string>
 #include <algorithm>
+#include "app-window.h"
 
 inline static void open_browser(const std::string& url) {
 #if defined(_WIN32) || defined(_WIN64)
@@ -37,4 +38,23 @@ inline static void open_file_explorer(std::string path) {
     std::string command = "xdg-open \"" + path + "\"";
     std::system(command.c_str());
 #endif
+}
+
+inline static void bind_profile(UserProfileModel& p, const DesktopSettings& s) {
+    p.market_name = s.market_name;
+    p.synode_jserv = s.synode_jserv;
+    p.selected_domain = s.domain;
+    p.selected_org = s.org;
+    p.selected_node = s.synode_id;
+}
+
+inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {
+    auto data = ui->global<AppState>().get_data();
+    auto status_model = data.syncing_status;
+    auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+    if (vec_model) {
+        slint::SharedString slintxt(s);
+        vec_model->insert(0, slintxt);
+        ui->global<AppState>().set_data(data);
+    }
 }

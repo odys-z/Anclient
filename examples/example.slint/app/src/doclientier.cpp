@@ -60,7 +60,6 @@ void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& synci
     PathsPage syncingpage;
     syncingpage.device = appsettings.device;
 
-    // syncingpage.clientPaths = syncing_paths;
     for (auto&[p, flgs] : syncing_paths) {
         syncingpage.clientPaths.emplace(Anson::posix_path(p), flgs);
     }
@@ -94,10 +93,6 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
             anlog("Login to "s + appsettings.synode_jserv);
             login_synode(JServUrl{appsettings.synode_jserv},
                     this->appsettings.admin, this->appsettings.token, this->appsettings.device);
-            // client.openLink(sysuri, updatelink, [this](MsgCode c, const string& e, const vector<string> &a) {
-            //     anwarn("Cannot open link on "s + this->appsettings.synode_jserv);
-            //     anwarn(e);
-            // });
             client.openLink(sysuri);
         }
 
@@ -105,10 +100,6 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
             return;
         }
         if (!client.heartbeating) {
-            // client.openLink(sysuri, updatelink, [this](MsgCode c, const string& e, const vector<string> &a) {
-            //     anwarn("Cannot open link on "s + this->appsettings.synode_jserv);
-            //     anwarn(e);
-            // });
             client.openLink(sysuri);
             return;
         }

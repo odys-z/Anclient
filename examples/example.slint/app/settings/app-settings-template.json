@@ -1,4 +1,7 @@
 { "type"    : "io.oz.anclient.app.DesktopSettings",
+  "market"  : "MY",
+  "market_name"   : "MY 0.1.0",
+  "regiserv": "https://.../regist-alpha",
   "device"  : "slint.test",
   "synuri"  : "/syn/qmltest",
   "sysuri"  : "/sys/qmltest",

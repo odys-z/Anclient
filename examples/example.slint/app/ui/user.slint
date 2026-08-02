@@ -11,7 +11,8 @@ export component UserProfile {
     callback org-domain-node-changed(string, string, string);
     callback ping-clicked(string);
     callback login-test-clicked(string, string);
-    callback save-clicked(string, string, string, string);
+    /** jserv, uid, pswd */
+    callback save-profile(string, string, string);
 
     function notify-changed() {
         AppState.data-changed(AppState.data);
@@ -47,10 +48,12 @@ export component UserProfile {
 
                 // market name
                 Row {
-                  HorizontalLayout {
-                    spacing: 8pt;
-                    Text { text: "Market ID  : "; font-size: 14pt; color: #bbb; }
+                    Text { 
+                        col: 0;
+                        width: 72pt;
+                        text: "Market ID"; font-size: 14pt; color: #bbb; }
                     Rectangle {
+                        col: 1;
                         background: #8a8a8a;
                         border-radius: 4px;
                         LineEdit {
@@ -62,25 +65,27 @@ export component UserProfile {
                             horizontal-alignment: center;
                         }
                     }
-                  }
                 }
 
                 // Registry Jserv
                 Row {
-                    LineEdit {
+                    Text {
                         col: 0;
+                        text: "Registry"; font-size: 14pt; color: #bbb; }
+                    LineEdit {
+                        col: 1;
                         horizontal-stretch: 1;
                         read-only: true;
-                        text: AppState.data.profile.readonly_url_text;
+                        text: AppState.data.profile.regiserv;
                     }
 
                     SButton {
-                        col: 1;
+                        col: 2;
                         horizontal-stretch: 0;
-                        width: 96px;
+                        width: 90pt;
                         show-icon: true;
                         icon: @image-url("imgs/refresh.svg");
-                        text: @tr("Refresh");
+                        text: @tr("Find Nodes");
                         clicked => {
                             refresh-clicked();
                         }
@@ -89,19 +94,26 @@ export component UserProfile {
 
                 // orgs | domain | synode
                 Row {
-                    HorizontalLayout {
+                    Text {
                         col: 0;
+                        text: "Storage Node"; font-size: 14pt; color: #bbb; }
+                    HorizontalLayout {
+                        col: 1;
                         spacing: 8px;
 
-                        orgs-combo := ComboBox {
-                            horizontal-stretch: 1;
-                            model: AppState.data.profile.orgs_model;
-                            current-value: AppState.data.profile.selected_org;
-                            selected(value) => {
-                                AppState.data.profile.selected_org = value;
-                                root.notify-changed();
-                                org-domain-node-changed(AppState.data.profile.selected_org, AppState.data.profile.selected_domain, AppState.data.profile.selected_node);
-                            }
+                        // orgs-combo := ComboBox {
+                        //     horizontal-stretch: 1;
+                        //     model: AppState.data.profile.orgs_model;
+                        //     current-value: AppState.data.profile.selected_org;
+                        //     selected(value) => {
+                        //         AppState.data.profile.selected_org = value;
+                        //         root.notify-changed();
+                        //         org-domain-node-changed(AppState.data.profile.selected_org, AppState.data.profile.selected_domain, AppState.data.profile.selected_node);
+                        //     }
+                        // }
+                        LineEdit {
+                            text: AppState.data.profile.org-name;
+                            enabled: false;
                         }
 
                         domain-combo := ComboBox {
@@ -130,21 +142,24 @@ export component UserProfile {
 
                 // jserv-url | Ping
                 Row {
-                    url-edit := LineEdit {
+                    Text {
                         col: 0;
+                        text: "Synode URL"; font-size: 14pt; color: #bbb; }
+                    url-edit := LineEdit {
+                        col: 1;
                         horizontal-stretch: 1;
                         placeholder-text: @tr("Server URL");
-                        text: AppState.data.profile.url_text;
+                        text: AppState.data.profile.synode_jserv;
                         edited(text) => {
-                            AppState.data.profile.url_text = text;
+                            AppState.data.profile.synode_jserv = text;
                             root.notify-changed();
                         }
                     }
 
                     SButton {
-                        col: 1;
+                        col: 2;
                         horizontal-stretch: 0;
-                        width: 96px;
+                        width: 90pt;
                         show-icon: true;
                         icon: UseIcons.icons.Info;
                         text: @tr("    Ping");
@@ -156,8 +171,14 @@ export component UserProfile {
 
                 // [ uid ]   [ pswd | pswd-2 ] | Login  (single flat row, flows horizontally)
                 Row {
-                    HorizontalLayout {
+                    VerticalLayout {
                         col: 0;
+                        padding-top: 2pt;
+                        Text {
+                            text: "Admin"; font-size: 14pt; color: #bbb; }
+                    }
+                    HorizontalLayout {
+                        col: 1;
                         spacing: 8px;
 
                         user-id-edit := LineEdit {
@@ -199,10 +220,11 @@ export component UserProfile {
                     }
 
                     SButton {
-                        col: 1;
-                        horizontal-stretch: 0;
-                        width: 96px;
-                        text: "Login";
+                        col: 2;
+                        show-icon: true;
+                        icon: UseIcons.icons.Avatar;
+                        width: 90pt;
+                        text: "   Login";
                         clicked => {
                             login-test-clicked(user-id-edit.text, password-edit.text);
                         }
@@ -211,8 +233,9 @@ export component UserProfile {
 
                 // QR code (centered) | Save
                 Row {
+                    // Text { text: "x"; }
                     Rectangle {
-                        col: 0;
+                        col: 1;
                         height: 160px;
 
                         HorizontalLayout {
@@ -241,7 +264,7 @@ export component UserProfile {
                     }
 
                     SButton {
-                        col: 1;
+                        col: 2;
                         horizontal-stretch: 0;
                         width: 96px;
                         show-icon: true;
@@ -249,7 +272,9 @@ export component UserProfile {
                         theme: Primary;
                         text: "Save";
                         clicked => {
-                            save-clicked(url-edit.text, user-id-edit.text, password-edit.text, confirm-password-edit.text);
+                            // we need a better validation patter. see https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
+                            debug("url-edit.text, user-id-edit.text, password-edit.text");
+                            save-profile(url-edit.text, user-id-edit.text, password-edit.text);
                         }
                     }
                 }
