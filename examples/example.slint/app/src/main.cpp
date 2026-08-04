@@ -12,7 +12,7 @@
 int main(int argc, char **argv) {
     using namespace anson;
 
-    // TODO move to slingle
+    // TODO move to synching list
     map<string, vector<LangExt::VarType>> fileselection;
 
     auto ui = App::create();
@@ -22,10 +22,10 @@ int main(int argc, char **argv) {
     Slingleton& slingle = Slingleton::get_instance(ui_weak, settings_path);
 
     {
-        auto data = ui->global<AppState>().get_data();
+        auto data = ui->global<AppState>().get_model();
         data.window_title = "Portfolio Desktop";
         data.enable_vol = slingle.has_synode_vol();
-        ui->global<AppState>().set_data(data);
+        ui->global<AppState>().set_model(data);
     }
     ui->window().set_maximized(false);
 
@@ -68,14 +68,6 @@ int main(int argc, char **argv) {
         }
 
         insert_status(ui, "Ping: placing tasks ...");
-        // auto data = ui->global<AppState>().get_data();
-        // auto status_model = data.syncing_status;
-        // auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-
-        // if (vec_model) {
-        //     vec_model->insert(0, "New status message");
-        // ui->global<AppState>().set_data(data);
-
         slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
     });
 
@@ -110,10 +102,10 @@ int main(int argc, char **argv) {
             }
 
             {
-                auto data = ui->global<AppState>().get_data();
+                auto data = ui->global<AppState>().get_model();
                 data.filelist = table_model;
                 data.current_pth = pth;
-                ui->global<AppState>().set_data(data);
+                ui->global<AppState>().set_model(data);
             }
 
             ui->invoke_query_syncflags();
@@ -142,7 +134,7 @@ int main(int argc, char **argv) {
     });
 
     ui->on_query_syncflags([&]() {
-        fs::path root = fs::absolute(fs::path{string{ui->global<AppState>().get_data().current_pth}});
+        fs::path root = fs::absolute(fs::path{string{ui->global<AppState>().get_model().current_pth}});
 
         map<string, vector<LangExt::VarType>> pthpage{};
         try {
@@ -182,7 +174,7 @@ int main(int argc, char **argv) {
             return;
         }
 
-        auto data = ui->global<AppState>().get_data();
+        auto data = ui->global<AppState>().get_model();
         auto filelist = std::dynamic_pointer_cast<slint::VectorModel<PathItemData>>(data.filelist);
 
         if (filelist) {
@@ -221,10 +213,10 @@ int main(int argc, char **argv) {
 
             // filelist rows were mutated in place on the same model instance
             // referenced by data.filelist, but we still round-trip through
-            // set_data() (matching the original set_filelist(filelist) call)
-            // in case something downstream relies on AppState.data-changed firing.
+            // set_model() (matching the original set_filelist(filelist) call)
+            // in case something downstream relies on AppState.model-changed firing.
             data.filelist = filelist;
-            ui->global<AppState>().set_data(data);
+            ui->global<AppState>().set_model(data);
         }
     });
 
@@ -238,7 +230,7 @@ int main(int argc, char **argv) {
 
     // Design Notes: We need a post load event callback API.
     slint::invoke_from_event_loop([&ui, &slingle]() {
-        auto data = ui->global<AppState>().get_data();
+        auto data = ui->global<AppState>().get_model();
 
         bind_profile(data.profile, slingle.appsettings);
 
@@ -249,12 +241,12 @@ int main(int argc, char **argv) {
             data.profile.detail_label = "Please check settings!";
         }
 
-        ui->global<AppState>().set_data(data);
+        ui->global<AppState>().set_model(data);
     });
 
     // user
     ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
-        auto data = ui->global<AppState>().get_data();
+        auto data = ui->global<AppState>().get_model();
         UserProfileModel p = data.profile;
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});

@@ -116,14 +116,14 @@ public:
         slint::invoke_from_event_loop([&appwin, &slint_text]() {
             if (auto app = appwin.lock()) {
                 anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                auto data = (*app)->global<AppState>().get_data();
+                auto data = (*app)->global<AppState>().get_model();
                 // data.syncing_status = slint_text;
                 auto status_model = data.syncing_status;
                 auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
                 if (vec_model) {
                     vec_model->insert(0, slint_text);
                 }
-                (*app)->global<AppState>().set_data(data);
+                (*app)->global<AppState>().set_model(data);
             }
         });
     }

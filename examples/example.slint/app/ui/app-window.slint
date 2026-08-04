@@ -6,7 +6,7 @@ import { CustomTableViewPage } from "./custom-table.slint";
 import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
 import { PathItemData, FileTable } from "file-table.slint";
-import { UserProfile } from "user.slint";
+import { User } from "user.slint";
 import { AppState } from "app-state.slint";
 
 export { AppState } from "app-state.slint";
@@ -25,7 +25,7 @@ min-height: 400px;
 min-width: 600px;
  */
 
-  title: AppState.data.window_title;
+  title: AppState.model.window_title;
 
   // Pure UI-computed outputs (window geometry read by the host) —
   // not part of AppState since the host only ever reads these, never sets them.
@@ -53,7 +53,7 @@ min-width: 600px;
   callback save_userinfo();
 
   function notify-changed() {
-      AppState.data-changed(AppState.data);
+      AppState.model-changed(AppState.model);
   }
 
   init => { }
@@ -73,7 +73,7 @@ min-width: 600px;
 
         change(index, data) => {
           debug(index, data);
-          AppState.data.menu_id = data.id;
+          AppState.model.menu_id = data.id;
           root.notify-changed();
           menu-changed(data.id);
         }
@@ -89,33 +89,33 @@ min-width: 600px;
         height: parent.height;
 
         // if (AppState.data.menu_id == "home") : index-page := HomeForm {
-        if (AppState.data.menu_id == "home" || AppState.data.menu_id == "album") : index-page := HomeForm { 
+        if (AppState.model.menu_id == "home" || AppState.model.menu_id == "album") : index-page := HomeForm { 
           height: parent.height - 14pt;
-          visible: AppState.data.menu_id == "home" || AppState.data.menu_id == "album";
+          visible: AppState.model.menu_id == "home" || AppState.model.menu_id == "album";
           navigate(menuid) => {
-            AppState.data.menu_id = menuid;
+            AppState.model.menu_id = menuid;
             root.notify-changed();
             menu-changed(menuid);
           }
           open-web(link) => { root.open_web(link); }
-          enable-vol: AppState.data.enable_vol;
+          enable-vol: AppState.model.enable_vol;
         }
 
-        if (AppState.data.menu_id == "volume") : Rectangle {
+        if (AppState.model.menu_id == "volume") : Rectangle {
           background: #b0d0d0;
           // Volume Information
           // CustomTableViewPage { width: 100%; height: 100%; }
         }
 
-        if (AppState.data.menu_id == "upload") : Rectangle {
+        if (AppState.model.menu_id == "upload") : Rectangle {
           background: #202020;
           FileTable {
             width: 100%; height: 100%;
 
-            row_data    : AppState.data.filelist;
-            current_path: AppState.data.current_pth;
+            row_data    : AppState.model.filelist;
+            current_path: AppState.model.current_pth;
 
-            synode-linked: AppState.data.synode_linked;
+            synode-linked: AppState.model.synode_linked;
 
             init => { root.load_folder("."); }
 
@@ -137,8 +137,8 @@ min-width: 600px;
           }
         }
 
-        if (AppState.data.menu_id == "2-1") : Rectangle {
-          UserProfile {
+        if (AppState.model.menu_id == "2-1") : Rectangle {
+          User {
             save-profile(jserv, u, p) => {
               root.save_userinfo();
               // debug("save-profile:", jserv, u, p, "=> save_userinfo()");
@@ -147,19 +147,19 @@ min-width: 600px;
           }
         }
 
-        if (AppState.data.menu_id == "2-2") : Rectangle {
+        if (AppState.model.menu_id == "2-2") : Rectangle {
           background: #b0d0d0;
           EdgeHealth {
             width: 100%; height: 100%;
             echows-clicked(msg) => { root.echows(msg); }
-            pingws-clicked => { root.pingws(self.file_paths)}
+            pingws-clicked => { root.pingws(self.file_paths); }
           }
         }
 
         status-bar:= HorizontalLayout {
           padding-top: 1pt;
           padding-left: 12pt;
-          STag{ text: AppState.data.syncing_status[0];
+          STag{ text: AppState.model.syncing_status[0];
             clicked => { popup.open(); }
           }
         }
@@ -176,10 +176,10 @@ min-width: 600px;
         // Text{ horizontal-alignment: left;
         //     color: #ddd;
         //     font-size: 12pt;
-        //     text: AppState.data.syncing_status[0]; }
+        //     text: AppState.model.syncing_status[0]; }
         
-        for i in Math.min(15, AppState.data.syncing-status.length): Text {
-            text: AppState.data.syncing-status[i];
+        for i in Math.min(15, AppState.model.syncing-status.length): Text {
+            text: AppState.model.syncing-status[i];
             font-size: 14px;
             color: #333333;
         }

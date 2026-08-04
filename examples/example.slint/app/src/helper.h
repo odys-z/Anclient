@@ -49,12 +49,12 @@ inline static void bind_profile(UserProfileModel& p, const DesktopSettings& s) {
 }
 
 inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {
-    auto data = ui->global<AppState>().get_data();
+    auto data = ui->global<AppState>().get_model();
     auto status_model = data.syncing_status;
     auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
     if (vec_model) {
         slint::SharedString slintxt(s);
         vec_model->insert(0, slintxt);
-        ui->global<AppState>().set_data(data);
+        ui->global<AppState>().set_model(data);
     }
 }

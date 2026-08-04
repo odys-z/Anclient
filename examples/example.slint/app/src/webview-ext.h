@@ -1,6 +1,7 @@
 #pragma once
 
-#include "app-window.h"
+// #include "app-window.h"
+#include "helper.h"
 #include "webview.h"
 #include "gen/app_settings.hpp"
 
@@ -85,9 +86,9 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         slint::invoke_from_event_loop([weak_ui_handle]() {
             if (auto ui = weak_ui_handle.lock()) {
                 // (*ui)->set_webview_status("A webview window is already open!");
-                auto data = (*ui)->global<AppState>().get_data();
+                auto data = (*ui)->global<AppState>().get_model();
                 data.webview_status = "A webview window is already open!";
-                (*ui)->global<AppState>().set_data(data);
+                (*ui)->global<AppState>().set_model(data);
             }
         });
         return;
@@ -111,9 +112,9 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     slint::invoke_from_event_loop([weak_ui_handle]() {
         if (auto ui = weak_ui_handle.lock()) {
             // (*ui)->set_webview_status("Webview window is active.");
-            auto data = (*ui)->global<AppState>().get_data();
+            auto data = (*ui)->global<AppState>().get_model();
             data.webview_status = "webview window is active.";
-            (*ui)->global<AppState>().set_data(data);
+            (*ui)->global<AppState>().set_model(data);
         }
     });
 
@@ -124,9 +125,9 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     slint::invoke_from_event_loop([weak_ui_handle]() {
         if (auto ui = weak_ui_handle.lock()) {
             // (*ui)->set_webview_status("Webview closed. Click button to reopen.");
-            auto data = (*ui)->global<AppState>().get_data();
+            auto data = (*ui)->global<AppState>().get_model();
             data.webview_status = "Webview closed. Click button to reopen.";
-            (*ui)->global<AppState>().set_data(data);
+            (*ui)->global<AppState>().set_model(data);
         }
     });
 }

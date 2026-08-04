@@ -77,7 +77,7 @@ namespace anson {
             anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
             slint::invoke_from_event_loop([&appwin, c, &e, &args]() {
               if (auto app = appwin.lock()) {
-                auto data = (*app)->global<AppState>().get_data();
+                auto data = (*app)->global<AppState>().get_model();
 
                 auto status_model = data.syncing_status;
                 auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
@@ -86,7 +86,7 @@ namespace anson {
                     vec_model->insert(0, "New status message");
                 }
 
-                (*app)->global<AppState>().set_data(data);
+                (*app)->global<AppState>().set_model(data);
 
               }});
           }
@@ -99,9 +99,9 @@ namespace anson {
           slint::invoke_from_event_loop([&appwin]() {
             if (auto app = appwin.lock()) {
               // (*app)->set_synode_linked(instance->constates.synlink == connect_state::online);
-              auto data = (*app)->global<AppState>().get_data();
+              auto data = (*app)->global<AppState>().get_model();
               data.synode_linked = instance->constates.synlink == connect_state::online;
-              (*app)->global<AppState>().set_data(data);
+              (*app)->global<AppState>().set_model(data);
             }});
         });
 

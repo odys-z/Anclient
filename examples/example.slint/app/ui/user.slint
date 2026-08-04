@@ -1,12 +1,12 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
 import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
-import { AppState } from "app-state.slint";
+import { UserProfile } from "app-state.slint";
 
 // Re-exported for anything that used to `import { UserProfileModel } from "user.slint"`.
 // export { UserProfileModel } from "models.slint";
 
-export component UserProfile {
+export component User {
     callback refresh-clicked();
     callback org-domain-node-changed(string, string, string);
     callback ping-clicked(string);
@@ -15,7 +15,7 @@ export component UserProfile {
     callback save-profile(string, string, string);
 
     function notify-changed() {
-        AppState.data-changed(AppState.data);
+        UserProfile.model-changed(UserProfile.model);
     }
 
     Rectangle {
@@ -39,8 +39,8 @@ export component UserProfile {
                 padding-bottom: 26pt; 
                 horizontal-stretch: 1;
                 alignment: center;
-                Text { text: AppState.data.profile.info_label; font-size: 18pt; color: #ccc; }
-                Text { text: AppState.data.profile.detail_label; font-size: 14pt; color: #ccc; }
+                Text { text: UserProfile.model.info_label; font-size: 18pt; color: #ccc; }
+                Text { text: UserProfile.model.detail_label; font-size: 14pt; color: #ccc; }
             }
 
             GridLayout {
@@ -60,7 +60,7 @@ export component UserProfile {
                             width: 100%;
                             horizontal-stretch: 1;
                             read-only: true;
-                            text: AppState.data.profile.market_name;
+                            text: UserProfile.model.market_name;
                             font-size: 16pt;
                             horizontal-alignment: center;
                         }
@@ -76,7 +76,7 @@ export component UserProfile {
                         col: 1;
                         horizontal-stretch: 1;
                         read-only: true;
-                        text: AppState.data.profile.regiserv;
+                        text: UserProfile.model.regiserv;
                     }
 
                     SButton {
@@ -112,29 +112,29 @@ export component UserProfile {
                         //     }
                         // }
                         LineEdit {
-                            text: AppState.data.profile.org-name;
+                            text: UserProfile.model.org-name;
                             enabled: false;
                         }
 
                         domain-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: AppState.data.profile.domains_model;
-                            current-value: AppState.data.profile.selected_domain;
+                            model: UserProfile.model.domains_model;
+                            current-value: UserProfile.model.selected_domain;
                             selected(value) => {
-                                AppState.data.profile.selected_domain = value;
+                                UserProfile.model.selected_domain = value;
                                 root.notify-changed();
-                                org-domain-node-changed(AppState.data.profile.selected_org, AppState.data.profile.selected_domain, AppState.data.profile.selected_node);
+                                org-domain-node-changed(UserProfile.model.selected_org, UserProfile.model.selected_domain, UserProfile.model.selected_node);
                             }
                         }
 
                         node-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: AppState.data.profile.synodes_model;
-                            current-value: AppState.data.profile.selected_node;
+                            model: UserProfile.model.synodes_model;
+                            current-value: UserProfile.model.selected_node;
                             selected(value) => {
-                                AppState.data.profile.selected_node = value;
+                                UserProfile.model.selected_node = value;
                                 root.notify-changed();
-                                org-domain-node-changed(AppState.data.profile.selected_org, AppState.data.profile.selected_domain, AppState.data.profile.selected_node);
+                                org-domain-node-changed(UserProfile.model.selected_org, UserProfile.model.selected_domain, UserProfile.model.selected_node);
                             }
                         }
                     }
@@ -149,9 +149,9 @@ export component UserProfile {
                         col: 1;
                         horizontal-stretch: 1;
                         placeholder-text: @tr("Server URL");
-                        text: AppState.data.profile.synode_jserv;
+                        text: UserProfile.model.synode_jserv;
                         edited(text) => {
-                            AppState.data.profile.synode_jserv = text;
+                            UserProfile.model.synode_jserv = text;
                             root.notify-changed();
                         }
                     }
@@ -184,9 +184,9 @@ export component UserProfile {
                         user-id-edit := LineEdit {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("User ID");
-                            text: AppState.data.profile.user_id_text;
+                            text: UserProfile.model.user_id_text;
                             edited(text) => {
-                                AppState.data.profile.user_id_text = text;
+                                UserProfile.model.user_id_text = text;
                                 root.notify-changed();
                             }
                         }
@@ -200,9 +200,9 @@ export component UserProfile {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("Password");
                             input-type: password;
-                            text: AppState.data.profile.password_text;
+                            text: UserProfile.model.password_text;
                             edited(text) => {
-                                AppState.data.profile.password_text = text;
+                                UserProfile.model.password_text = text;
                                 root.notify-changed();
                             }
                         }
@@ -211,9 +211,9 @@ export component UserProfile {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("Confirm");
                             input-type: password;
-                            text: AppState.data.profile.confirm_password_text;
+                            text: UserProfile.model.confirm_password_text;
                             edited(text) => {
-                                AppState.data.profile.confirm_password_text = text;
+                                UserProfile.model.confirm_password_text = text;
                                 root.notify-changed();
                             }
                         }
@@ -241,12 +241,12 @@ export component UserProfile {
                         HorizontalLayout {
                             alignment: center;
 
-                            if AppState.data.profile.show_qr_code: Image {
+                            if UserProfile.model.show_qr_code: Image {
                                 width: 160px;
                                 height: 160px;
-                                source: AppState.data.profile.qr_code_image;
+                                source: UserProfile.model.qr_code_image;
                             }
-                            if !AppState.data.profile.show_qr_code: Rectangle {
+                            if !UserProfile.model.show_qr_code: Rectangle {
                                 width: 160px;
                                 height: 160px;
                                 background: #00000022;
