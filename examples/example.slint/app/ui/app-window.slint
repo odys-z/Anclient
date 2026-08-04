@@ -7,9 +7,9 @@ import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
 import { PathItemData, FileTable } from "file-table.slint";
 import { User } from "user.slint";
-import { AppState } from "app-state.slint";
+import { IDs, AppState } from "app-state.slint";
 
-export { AppState } from "app-state.slint";
+export { IDs, AppState, UserProfile } from "app-state.slint";
 
 export component App inherits Window {
 
@@ -64,12 +64,19 @@ min-width: 600px;
       width: menu.width;
       clip: false;
       menu:=SMenu {
-        menu-data:[
-          { id: "home",  icon: @image-url("imgs/home.svg"),  name: "Home" },
-          { id: "album", icon: @image-url("imgs/album-icon.svg"), name: "Album"},
-          { id: "volume",icon: UseIcons.icons.Folder,   name: "Volume" },
-          { id: "upload",icon: UseIcons.icons.FileCode, name: "Upload" },
+        menu-data: [
+          { id: IDs.m_home, icon: @image-url("imgs/home.svg"),  name: "Home" },
+          { id: IDs.m_album,  icon: @image-url("imgs/album-icon.svg"), name: "Album"},
+          { id: IDs.m_volume, icon: UseIcons.icons.Folder,   name: "Volume" },
+          { id: IDs.m_upload, icon: UseIcons.icons.FileCode, name: "Upload" }
         ];
+
+        
+        sub-menu-data: [
+          {id: IDs.m_user, icon:UseIcons.icons.Avatar,name:"User"},
+          {id: IDs.m_edge, icon:UseIcons.icons.Setting-two,name:"Settings"}
+        ];
+
 
         change(index, data) => {
           debug(index, data);

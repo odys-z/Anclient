@@ -60,7 +60,10 @@ namespace anson {
         Anson::from_file(settings_path, appsettings);
         if (LangExt::isblank(appsettings.device))
           anwarn("appsetings.device is empty. file: "s + settings_path);
-        else aninfo("[***** DEVICE *****] "s + appsettings.device);
+        else {
+          aninfo("[***** DEVICE *****] "s + appsettings.device);
+          anlog(appsettings.toBlock());
+        }
 
         // instance->appwin = appwin;
         instance->agentController = new JavaAgentController(appsettings);

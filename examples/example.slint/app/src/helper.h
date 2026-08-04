@@ -4,6 +4,8 @@
 #include <string>
 #include <algorithm>
 #include "app-window.h"
+#include "gen/app_settings.hpp"
+#include "ipcagent_manager.h"
 
 inline static void open_browser(const std::string& url) {
 #if defined(_WIN32) || defined(_WIN64)
@@ -22,7 +24,7 @@ inline static void open_browser(const std::string& url) {
 }
 
 inline static void open_file_explorer(std::string path) {
-    path = resolveHomePath(path);
+    path = anson::resolveHomePath(path);
 #if defined(_WIN32) || defined(_WIN64)
     // Windows: Open explorer at the specific path
     std::replace(path.begin(), path.end(), '/', '\\');
@@ -40,12 +42,12 @@ inline static void open_file_explorer(std::string path) {
 #endif
 }
 
-inline static void bind_profile(UserProfileModel& p, const DesktopSettings& s) {
+inline static void bind_profile(UserProfileModel& p, const anson::DesktopSettings& s) {
     p.market_name = s.market_name;
     p.synode_jserv = s.synode_jserv;
-    p.selected_domain = s.domain;
-    p.selected_org = s.org;
-    p.selected_node = s.synode_id;
+    p.domain_selected = s.domain;
+    p.org_selected = s.org;
+    p.synode_selected = s.synode_id;
 }
 
 inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {

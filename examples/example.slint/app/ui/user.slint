@@ -3,9 +3,6 @@ import { UseIcons } from "@surrealism/use/index.slint";
 import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
 import { UserProfile } from "app-state.slint";
 
-// Re-exported for anything that used to `import { UserProfileModel } from "user.slint"`.
-// export { UserProfileModel } from "models.slint";
-
 export component User {
     callback refresh-clicked();
     callback org-domain-node-changed(string, string, string);
@@ -87,6 +84,7 @@ export component User {
                         icon: @image-url("imgs/refresh.svg");
                         text: @tr("Find Nodes");
                         clicked => {
+                            debug(UserProfile.model.regiserv);
                             refresh-clicked();
                         }
                     }
@@ -118,23 +116,23 @@ export component User {
 
                         domain-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: UserProfile.model.domains_model;
-                            current-value: UserProfile.model.selected_domain;
+                            model: UserProfile.model.domains_list;
+                            current-value: UserProfile.model.domain_selected;
                             selected(value) => {
-                                UserProfile.model.selected_domain = value;
+                                UserProfile.model.domain_selected = value;
                                 root.notify-changed();
-                                org-domain-node-changed(UserProfile.model.selected_org, UserProfile.model.selected_domain, UserProfile.model.selected_node);
+                                org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
                             }
                         }
 
                         node-combo := ComboBox {
                             horizontal-stretch: 1;
-                            model: UserProfile.model.synodes_model;
-                            current-value: UserProfile.model.selected_node;
+                            model: UserProfile.model.synodes_list;
+                            current-value: UserProfile.model.synode_selected;
                             selected(value) => {
-                                UserProfile.model.selected_node = value;
+                                UserProfile.model.synode_selected = value;
                                 root.notify-changed();
-                                org-domain-node-changed(UserProfile.model.selected_org, UserProfile.model.selected_domain, UserProfile.model.selected_node);
+                                org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
                             }
                         }
                     }
@@ -144,14 +142,16 @@ export component User {
                 Row {
                     Text {
                         col: 0;
-                        text: "Synode URL"; font-size: 14pt; color: #bbb; }
+                        text: UserProfile.model.synode-jserv; font-size: 14pt; color: #bbb; }
                     url-edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;
                         placeholder-text: @tr("Server URL");
                         text: UserProfile.model.synode_jserv;
                         edited(text) => {
+                            debug(UserProfile.model.synode_jserv);
                             UserProfile.model.synode_jserv = text;
+                            debug(UserProfile.model.synode_jserv);
                             root.notify-changed();
                         }
                     }

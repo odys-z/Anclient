@@ -1,28 +1,29 @@
 import { AppModel, UserProfileModel } from "models.slint";
 
+export global IDs {
+    out property <string> m_home   : "home";
+    out property <string> m_album  : "album";
+    out property <string> m_volume : "volume";
+    out property <string> m_upload : "upload";
+    out property <string> m_user   : "user";
+    out property <string> m_edge   : "edge";
+
+    out property <int> id_int: 0;
+}
+
 export global AppState {
     in-out property <AppModel> model: {
         window_title: "Anclient.slint",
         webview_status: "Webview not started",
         syncing_status: ["Ready"],
-        filelist: [],
-        // profile: {
-        //     info_label: "Portfolio Desktop 0.1.0",
-        //     detail_label: "Product page: ...",
-        //     market_name: "MY 0.1.0",
-        //     regiserv: "http://",
-        //     org_name: "",
-        //     orgs_model: ["Test-1", "Test-2"],
-        //     domains_model: ["Test-1:domain 0", "Test-1: domain 1"],
-        //     synodes_model: ["domain 0-hub", "domain 1-1"],
-        //     show_qr_code: false,
-        // },
+        filelist: []
     };
 
     // Fired whenever anything in `data` is mutated from within the UI
     // (App or UserProfile). Host code subscribes here once instead of
     // tracking individual properties/callbacks across components.
     callback model-changed(AppModel);
+    callback closing() -> bool;
 }
 
 export global UserProfile {
@@ -30,13 +31,18 @@ export global UserProfile {
             info_label: "Portfolio Desktop 0.1.0",
             detail_label: "Product page: ...",
             market_name: "MY 0.1.0",
-            regiserv: "http://",
             org_name: "",
-            orgs_model: ["Test-1", "Test-2"],
-            domains_model: ["Test-1:domain 0", "Test-1: domain 1"],
-            synodes_model: ["domain 0-hub", "domain 1-1"],
+            regiserv: "http://.../jserv-central",
+
+            orgs_list: ["Test-1", "Test-2"],
+            org_selected: "",
+            domains_list: ["Test-1:domain 0", "Test-1: domain 1"],
+            domain_selected: "Test-1:domain 0",
+            synodes_list: ["domain 0-hub", "domain 1-1"],
+            synode_selected: "domain 0-hub",
             show_qr_code: false
     };
 
     callback model-changed(UserProfileModel);
+    callback closing() -> bool;
 }

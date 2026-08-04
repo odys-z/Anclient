@@ -2,7 +2,17 @@
 
 // #include "app-window.h"
 #include "helper.h"
+
+#if defined(_WIN32)
+#define byte win_byte_override   // prevent clash between std::byte and rpcndr.h's byte typedef
+#endif
+
 #include "webview.h"
+
+#if defined(_WIN32)
+#undef byte
+#endif
+
 #include "gen/app_settings.hpp"
 
 #if defined(_WIN32)

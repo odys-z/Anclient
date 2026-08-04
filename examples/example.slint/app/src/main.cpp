@@ -1,12 +1,13 @@
 #include <memory>
 #include <string>
+#include <io/odysz/anserializer.h>
 #include "app-window.h"
 #include "webview-ext.h"
 #include "slingleton.h"
 
 // This order is to avoid compile error
-#include <io/odysz/anserializer.h>
 #include "helper.h"
+#include "router.h"
 #include "gen/wsport.hpp"
 
 int main(int argc, char **argv) {
@@ -35,10 +36,14 @@ int main(int argc, char **argv) {
         std::string menu_id = string{page_ix};
         anlog(std::format("Menu changed! ID: {}", menu_id));
 
-        if (menu_id == "album") {
+        if (menu_id == menu_home && !ui->global<UserProfile>().invoke_closing()) {
+            return;
+        }
+
+        if (menu_id == menu_album) {
             launch_webview_window(ui, slingle.appsettings);
         }
-        else if (menu_id == "volume") {
+        else if (menu_id == menu_volume) {
             anlog("Launching volume explorer");
             slingle.open_volume();
         }
@@ -230,24 +235,26 @@ int main(int argc, char **argv) {
 
     // Design Notes: We need a post load event callback API.
     slint::invoke_from_event_loop([&ui, &slingle]() {
-        auto data = ui->global<AppState>().get_model();
+        auto appstat = ui->global<AppState>().get_model();
+        auto profile = ui->global<UserProfile>().get_model();
 
-        bind_profile(data.profile, slingle.appsettings);
+        bind_profile(profile, slingle.appsettings);
 
         if (slingle.validsettings()) {
-            data.menu_id = "home";
+            appstat.menu_id = menu_home;
         } else {
-            data.menu_id = "2-1";
-            data.profile.detail_label = "Please check settings!";
+            appstat.menu_id = menu_user;
+            profile.detail_label = "Please check settings!";
         }
 
-        ui->global<AppState>().set_model(data);
+        ui->global<AppState>().set_model(appstat);
+        ui->global<UserProfile>().set_model(profile);
     });
 
     // user
     ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
-        auto data = ui->global<AppState>().get_model();
-        UserProfileModel p = data.profile;
+        UserProfileModel p = ui->global<UserProfile>().get_model();
+        // UserProfileModel p = data.profile;
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 

@@ -21,6 +21,8 @@
 #include "gen/app_settings.hpp"
 #include "wsclients.h"
 
+namespace fs = std::filesystem; 
+
 namespace anson {
 /**
  * @brief Resolves the tilde (~) prefix in file paths across different platforms.

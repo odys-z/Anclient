@@ -8,12 +8,12 @@ export struct UserProfileModel {
     market_name: string,
     regiserv: string,
 
-    orgs_model: [string],
-    domains_model: [string],
-    synodes_model: [string],
-    selected_org: string,
-    selected_domain: string,
-    selected_node: string,
+    orgs_list: [string],
+    org_selected: string,
+    domains_list: [string],
+    domain_selected: string,
+    synodes_list: [string],
+    synode_selected: string,
 
     synode_jserv: string,
     user_id_text: string,
@@ -41,5 +41,5 @@ export struct AppModel {
     enable_vol: bool,
     synode_linked: bool,
 
-    profile: UserProfileModel,
+    // profile: UserProfileModel,
 }
