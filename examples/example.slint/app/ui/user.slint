@@ -142,11 +142,11 @@ export component User {
                 Row {
                     Text {
                         col: 0;
-                        text: UserProfile.model.synode-jserv; font-size: 14pt; color: #bbb; }
+                        text: "Synode Url"; font-size: 14pt; color: #bbb; }
                     url-edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;
-                        placeholder-text: @tr("Server URL");
+                        placeholder-text: @tr("http://ip:port(ask admin)/jserv-album");
                         text: UserProfile.model.synode_jserv;
                         edited(text) => {
                             debug(UserProfile.model.synode_jserv);
