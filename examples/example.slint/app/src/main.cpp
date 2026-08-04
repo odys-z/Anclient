@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     std::unique_ptr<webview::webview> wv = nullptr;
 
     ui->on_menu_changed([&](slint::SharedString page_ix) {
-        std::string menu_id = string{page_ix}; //page_ix.data();
+        std::string menu_id = string{page_ix};
         anlog(std::format("Menu changed! ID: {}", menu_id));
 
         if (menu_id == "album") {

@@ -24,7 +24,7 @@ class AsynClienter : public Doclientier {
 protected:
     inline static const string sysuri = "/sys/cpp";
     inline static const string synuri = "/syn/cpp";
-
+    /** Settings is loaded and mananged by AsynClienter, validated by singletong's validator. */
     string settings_json;
     DesktopSettings appsettings;
 
