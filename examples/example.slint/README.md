@@ -31,9 +31,9 @@
       export PATH="/c/Qt-6.10/mingw64-gcc16.1.0/bin:$PATH"
       rustup target add --toolchain stable-x86_64-pc-windows-msvc x86_64-pc-windows-gnu
       # WIN32 for the first time or any fetch contents updata
-      cmake -G "MinGW Makefiles" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=FALSE
+      cmake -G "Ninja" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=FALSE
       # to avoid github downloading
-      cmake -G "MinGW Makefiles" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      cmake -G "Ninja" -B build -DFETCHCONTENT_BASE_DIR="~/CMakeCache" -DFETCHCONTENT_FULLY_DISCONNECTED=ON
       cmake --build build
       build/album_slint.exe
     ```

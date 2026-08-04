@@ -4,7 +4,7 @@
         "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
     },
     "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.generator": "MinGW Makefiles",
+    "cmake.generator": "Ninja",
     "cmake.buildArgs": ["-j", "12"],
     "cmake.configureArgs": [
         "-DCMAKE_CXX_STANDARD=20"
