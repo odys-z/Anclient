@@ -82,9 +82,9 @@ add_compile_definitions(ANSON_VERBOSE=4)
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${ALBUM_DIST_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E copy
-            -t "${ALBUM_DIST_DIR}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+            "${ALBUM_DIST_DIR}"
         COMMAND_EXPAND_LISTS
     )
 endif()
@@ -133,16 +133,18 @@ endif()
 # ---------------------------------------------------------------------------
 # App assets -> dist/
 # ---------------------------------------------------------------------------
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+# Ensure assets copying only when building the main target
+add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/ast"
         "${ALBUM_DIST_DIR}/ast"
-
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/app/settings"   # or move settings to root
+        "${CMAKE_SOURCE_DIR}/app/settings"
         "${ALBUM_DIST_DIR}/settings"
-
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/tests/res"
         "${ALBUM_DIST_DIR}/res"
+    COMMENT "Syncing assets to dist folder..."
 )
+
+add_dependencies(${PROJECT_NAME} copy_album_assets)
