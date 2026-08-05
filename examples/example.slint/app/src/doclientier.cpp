@@ -140,3 +140,53 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     });
     query_thread.detach();
 }
+
+void RegistryClient::asyquery_domconfig(const string & org, OnOk ok) {
+    
+    std::thread query_thread([this, org, ok]() {
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
+            loginWithUri(JServUrl{appsettings.registry_jserv},
+                    this->appsettings.admin, this->appsettings.token, this->appsettings.device);
+            openLink(sysuri);
+        }
+
+        if (LangExt::isblank(ssInf.ssid) || !heartbeating) {
+            return;
+        }
+        if (!heartbeating) {
+            client.openLink(sysuri);
+            return;
+        }
+        
+		header.Act(synuri, Port::docstier, RegistReq::A::queryDomConfig, "query sync");
+
+		RegistReq req;
+        req.docTabl = Doclientier::doctbl;
+        // req.device = Device{Slingleton::appsettings.device, Slingleton::appsettings.device, Slingleton::appsettings.device};
+        req.a = DocsReq::A::selectSyncs;
+
+        anlog("=========================\n"s + client.ssInf.toBlock());
+
+		AnsonMsg<RegistReq> q = userReq(synuri, Port{Port::docstier}, req)
+				                    .Header(client.ssInf);
+        anlog("=========================\n"s + q.toBlock());
+
+        try {
+            RegistResp resp = client.commit<DocsResp>(q, err);
+            ok(resp);
+        } 
+        catch (const SemanticException& e) {
+            anerror(e.what());
+        } 
+        catch (const AnsonException& e) {
+            anerror(e.what());
+        } 
+        catch (const std::exception& e) {
+            anerror(e.what());
+        } 
+        catch (...) {
+            anerror("Caught unknown exception.");
+        }
+    });
+    query_thread.detach();
+}

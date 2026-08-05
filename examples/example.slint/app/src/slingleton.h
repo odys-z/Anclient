@@ -112,6 +112,12 @@ namespace anson {
 
         anlog(std::format("Has volume: {}, {}: {}",
           instance->has_synode_vol(), appsettings.synode_id, appsettings.synode_vol));
+        
+        // registry client
+        RegistryClient::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
+          if (!instance->validsettings());
+        };
+
       }
       return *instance;
     }

@@ -18,7 +18,7 @@
 #include "wsclients.h"
 #include "ipcagent_manager.h"
 
-using namespace anson;
+namespace anson {
 
 class AsynClienter : public Doclientier {
 protected:
@@ -145,3 +145,27 @@ private:
         return resp.m;
     }
 };
+
+class RegistryClient : public SessionClient {
+
+    inline static const string sysuri = "/sys/cpp";
+    inline static const string synuri = "/syn/cpp";
+
+public:
+    string settings_json;
+    DesktopSettings appsettings;
+
+    inline static OnError onErr;
+
+    inline Doclientier* loginWithUri(const JServUrl &jserv,
+           const string& uid, const string& pswd, const string& device, const OnError& err) {
+        this->client.jserv = jserv;
+        SessionClient::loginWithUri(this->client, sysuri, uid, pswd, device, err);
+        return this;
+    }
+
+    /** A::queryDomConfig */
+    void asyquery_domconfig(const string & org, OnOk ok);
+};
+
+}
