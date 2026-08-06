@@ -33,7 +33,7 @@ public:
     inline static const string Closed = "Closed";
 
     WSClient(const JServUrl& jserv, const OnMsg& onmsg);
-    WSClient() : jserv_({"", JProtocol{}}) {}
+    WSClient() : jserv_("", nullptr) {}
 
     ~WSClient();
 

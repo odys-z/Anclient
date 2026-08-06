@@ -94,11 +94,15 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     if (syncing_paths.size() == 0)
         return;
     
+    if (!client.jserv.valid()) {
+        anerror("Invalid jserv URL: " + client.jserv.jserv());
+        return;
+    }
+    
     std::thread query_thread([this, syncing_paths, ok]() {
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             anlog("Login to "s + appsettings.synode_jserv);
-            login_synode(client.jserv,
-                    this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
+            login_synode(this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
             client.openLink(sysuri);
         }
 
