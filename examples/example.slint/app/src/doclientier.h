@@ -11,6 +11,7 @@
 #include <io/odysz/jprotocol.h>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
+#include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 #include <gen/app_settings.hpp>
 
@@ -96,7 +97,7 @@ public:
         try {
             anlog("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
             client.jserv = jserv;
-            SessionClient::loginWithUri(client, sysuri, uid, pswd, device, onErr);
+            client.loginWithUri(sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
             anwarn(e.what());
             onErr(MsgCode::Code::exSession, e.what(), {});
@@ -144,28 +145,6 @@ private:
         }
         return resp.m;
     }
-};
-
-class RegistryClient : public SessionClient {
-
-    inline static const string sysuri = "/sys/cpp";
-    inline static const string synuri = "/syn/cpp";
-
-public:
-    string settings_json;
-    DesktopSettings appsettings;
-
-    inline static OnError onErr;
-
-    inline Doclientier* loginWithUri(const JServUrl &jserv,
-           const string& uid, const string& pswd, const string& device, const OnError& err) {
-        this->client.jserv = jserv;
-        SessionClient::loginWithUri(this->client, sysuri, uid, pswd, device, err);
-        return this;
-    }
-
-    /** A::queryDomConfig */
-    void asyquery_domconfig(const string & org, OnOk ok);
 };
 
 }

@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
 
         DesktopSettings s {slingle.appsettings};
         s.admin = string{p.user_id_text};
-        s.token = p.password_text;
+        s.domain_token = p.password_text;
         s.synode_jserv = p.synode_jserv;
 
         optional<string> err = Slingleton::validate_settings(s);

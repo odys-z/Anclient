@@ -6,6 +6,6 @@
   "javaEnums"  : [],
   "ansonBody"  : "io.odysz.semantic.jprotocol.AnsonBody",
   "anRequests" : [],
-  "cpp_include": [],
+  "cpp_include": ["io/odysz/gen/anclient_settings.hpp"],
   "cpp_gen"    : "../app/src/gen/app_settings.hpp"
 }

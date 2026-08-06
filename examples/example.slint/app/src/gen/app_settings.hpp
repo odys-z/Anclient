@@ -8,21 +8,17 @@
 #include <io/odysz/entt_jserv.h>
 #include <io/odysz/module/rs.h>
 
-
+#include <io/odysz/gen/anclient_settings.hpp>
 
 namespace anson {
 
-class DesktopSettings : public anson::Anson {
+class DesktopSettings : public anson::AnclientSettings {
 public:
     inline static const std::string _type_ = "io.oz.anclient.app.DesktopSettings";
-    string device;
-    string sysuri;
-    string synuri;
     string market;
     string org;
     string market_name;
     string org_name;
-    string regiserv;
     string java_path;
     string doctier_jar;
     string wsagent_jar;
@@ -30,14 +26,11 @@ public:
     string synode_vol;
     string synode_jserv;
     string album_web;
-    string domain;
-    string admin;
-    string token;
     string wshost;
     int wsport;
     int wstimeout;
 
-    DesktopSettings() : Anson() {
+    DesktopSettings() : AnclientSettings() {
         Type(_type_);
     }
 };
@@ -45,15 +38,11 @@ public:
 inline static void register_desktopsettingsAst(AstMap & asts) {
 
     AnsonAst * ast = createAST <DesktopSettings, AnsonAst> (
-        asts, Anson::_type_, map <string, AnsonField> {
-        {"device", {.dataAnclass="string"} },
-        {"sysuri", {.dataAnclass="string"} },
-        {"synuri", {.dataAnclass="string"} },
+        asts, AnclientSettings::_type_, map <string, AnsonField> {
         {"market", {.dataAnclass="string"} },
         {"org", {.dataAnclass="string"} },
         {"market_name", {.dataAnclass="string"} },
         {"org_name", {.dataAnclass="string"} },
-        {"regiserv", {.dataAnclass="string"} },
         {"java_path", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
         {"wsagent_jar", {.dataAnclass="string"} },
@@ -61,9 +50,6 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
         {"synode_vol", {.dataAnclass="string"} },
         {"synode_jserv", {.dataAnclass="string"} },
         {"album_web", {.dataAnclass="string"} },
-        {"domain", {.dataAnclass="string"} },
-        {"admin", {.dataAnclass="string"} },
-        {"token", {.dataAnclass="string"} },
         {"wshost", {.dataAnclass="string"} },
         {"wsport", {.dataAnclass="int"} },
         {"wstimeout", {.dataAnclass="int"} },
@@ -71,16 +57,12 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
 
     entt::meta_factory <anson::DesktopSettings> ()
         .type(ast->enttypeid)
-        .base<Anson>()
+        .base<AnclientSettings>()
 
-        .data<&anson::DesktopSettings::device>("device")
-        .data<&anson::DesktopSettings::sysuri>("sysuri")
-        .data<&anson::DesktopSettings::synuri>("synuri")
         .data<&anson::DesktopSettings::market>("market")
         .data<&anson::DesktopSettings::org>("org")
         .data<&anson::DesktopSettings::market_name>("market_name")
         .data<&anson::DesktopSettings::org_name>("org_name")
-        .data<&anson::DesktopSettings::regiserv>("regiserv")
         .data<&anson::DesktopSettings::java_path>("java_path")
         .data<&anson::DesktopSettings::doctier_jar>("doctier_jar")
         .data<&anson::DesktopSettings::wsagent_jar>("wsagent_jar")
@@ -88,9 +70,6 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
         .data<&anson::DesktopSettings::synode_vol>("synode_vol")
         .data<&anson::DesktopSettings::synode_jserv>("synode_jserv")
         .data<&anson::DesktopSettings::album_web>("album_web")
-        .data<&anson::DesktopSettings::domain>("domain")
-        .data<&anson::DesktopSettings::admin>("admin")
-        .data<&anson::DesktopSettings::token>("token")
         .data<&anson::DesktopSettings::wshost>("wshost")
         .data<&anson::DesktopSettings::wsport>("wsport")
         .data<&anson::DesktopSettings::wstimeout>("wstimeout")
@@ -100,12 +79,6 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
         ast->get_field_instance = [ast](const IJsonable& ans, const string& fieldname) -> meta_any {
             if (ast->fields.contains(fieldname)) {
                 auto& concrete = static_cast<const DesktopSettings&>(ans);
-                if ("device" == fieldname)
-                    return entt::forward_as_meta(concrete.device);
-                if ("sysuri" == fieldname)
-                    return entt::forward_as_meta(concrete.sysuri);
-                if ("synuri" == fieldname)
-                    return entt::forward_as_meta(concrete.synuri);
                 if ("market" == fieldname)
                     return entt::forward_as_meta(concrete.market);
                 if ("org" == fieldname)
@@ -114,8 +87,6 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.market_name);
                 if ("org_name" == fieldname)
                     return entt::forward_as_meta(concrete.org_name);
-                if ("regiserv" == fieldname)
-                    return entt::forward_as_meta(concrete.regiserv);
                 if ("java_path" == fieldname)
                     return entt::forward_as_meta(concrete.java_path);
                 if ("doctier_jar" == fieldname)
@@ -130,12 +101,6 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.synode_jserv);
                 if ("album_web" == fieldname)
                     return entt::forward_as_meta(concrete.album_web);
-                if ("domain" == fieldname)
-                    return entt::forward_as_meta(concrete.domain);
-                if ("admin" == fieldname)
-                    return entt::forward_as_meta(concrete.admin);
-                if ("token" == fieldname)
-                    return entt::forward_as_meta(concrete.token);
                 if ("wshost" == fieldname)
                     return entt::forward_as_meta(concrete.wshost);
                 if ("wsport" == fieldname)

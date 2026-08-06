@@ -1,16 +1,11 @@
 { "type": "io.odysz.reflect.AnsonAst",
   "dataAnclass": "io.oz.anclient.app.DesktopSettings",
-  "baseAnclass": "io.odysz.anson.Anson",
+  "baseAnclass": "io.odysz.jclient.AnclientSettings",
   "fields" : {
-    "device": {"dataAnclass": "string"},
-    "sysuri": {"dataAnclass": "string"},
-    "synuri": {"dataAnclass": "string"},
     "market": {"dataAnclass": "string"},
     "org"   : {"dataAnclass": "string"},
     "market_name"   : {"dataAnclass": "string"},
     "org_name"      : {"dataAnclass": "string"},
-
-    "regiserv"      : {"dataAnclass": "string"},
     "java_path"     : {"dataAnclass": "string"},
     "doctier_jar"   : {"dataAnclass": "string"},
     "wsagent_jar"   : {"dataAnclass": "string"},
@@ -18,9 +13,6 @@
     "synode_vol"    : {"dataAnclass": "string"},
     "synode_jserv"  : {"dataAnclass": "string"},
     "album_web"     : {"dataAnclass": "string"},
-    "domain"        : {"dataAnclass": "string"},
-    "admin"         : {"dataAnclass": "string"},
-    "token"         : {"dataAnclass": "string"},
     "wshost"        : {"dataAnclass": "string"},
     "wsport"        : {"dataAnclass": "int"},
     "wstimeout"     : {"dataAnclass": "int"}

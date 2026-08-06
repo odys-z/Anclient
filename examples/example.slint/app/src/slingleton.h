@@ -9,6 +9,8 @@
 #include <io/odysz/reflect.h>
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/gen/semantier.hpp>
+#include <io/odysz/gen/registry.hpp>
+#include <io/odysz/gen/anclient_settings.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 #include <io/odysz/module/langstring.h>
 
@@ -57,12 +59,12 @@ namespace anson {
         register_langstringAst(asts);
 
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
-        Anson::from_file(settings_path, appsettings);
+        Anson::from_file(settings_path, appsettings, &opts);
         if (LangExt::isblank(appsettings.device))
           anwarn("appsetings.device is empty. file: "s + settings_path);
         else {
           aninfo("[***** DEVICE *****] "s + appsettings.device);
-          anlog(appsettings.toBlock());
+          anlog(appsettings.toBlock(opts));
         }
 
         // instance->appwin = appwin;
@@ -114,9 +116,9 @@ namespace anson {
           instance->has_synode_vol(), appsettings.synode_id, appsettings.synode_vol));
         
         // registry client
-        RegistryClient::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
-          if (!instance->validsettings());
-        };
+        // RegistryClient::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
+        //   if (!instance->validsettings());
+        // };
 
       }
       return *instance;
@@ -175,7 +177,7 @@ namespace anson {
           && !appsettings.synode_jserv.empty()
           && !Regex::asJserv(appsettings.synode_jserv).empty()
           && !appsettings.admin.empty()
-          && !appsettings.token.empty() && appsettings.token.size() >= 4
+          && !appsettings.domain_token.empty() && appsettings.domain_token.size() >= 4
           ;
     }
 
@@ -191,7 +193,7 @@ namespace anson {
               if (s.synode_jserv.empty())                    return "Synode Jserv cannot be empty";
               if (auto err = validate_jserv(s.synode_jserv)) return err;
               if (s.admin.empty())                           return "Admin field cannot be empty";
-              if (auto err = validate_token(s.token))        return err;
+              if (auto err = validate_token(s.domain_token)) return err;
               return std::nullopt;
           }();
     }

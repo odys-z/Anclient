@@ -111,7 +111,7 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     string script = std::format(R"(
         window.addEventListener('DOMContentLoaded', () => {{
                 loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
-        }}); )", settings.admin, settings.token, settings.synode_id);
+        }}); )", settings.admin, settings.domain_token, settings.synode_id);
 
     anlog(script);
     w.init(script);

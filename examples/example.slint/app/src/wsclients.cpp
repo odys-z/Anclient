@@ -26,8 +26,8 @@ WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
     });
 }
 
-void WSClient::setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg) {
-    jserv_ = JServUrl(jserv, {protocol_root});
+void WSClient::setup(const string& jserv, const string& protocol_root, const JsonOpt* ctx, const OnMsg& onmsg) {
+    jserv_ = JServUrl(jserv, JProtocol{protocol_root, ctx});
     onMsg = onmsg;
 
     string ipcurl = jserv_.wservUri();

@@ -37,7 +37,8 @@ public:
 
     ~WSClient();
 
-    void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg);
+    // void setup(const string& jserv, const string& protocol_root, const OnMsg& onmsg);
+    void setup(const string& jserv, const string& protocol_root, const JsonOpt* ctx, const OnMsg& onmsg);
 
     string ipconn_state();
     // string syncon_state();

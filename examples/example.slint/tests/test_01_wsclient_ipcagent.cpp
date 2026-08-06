@@ -75,7 +75,7 @@ protected:
 
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
-        wsclient = new WSClient({wsjserv, {"ipc"}}, onmsg);
+        wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, onmsg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
     }
