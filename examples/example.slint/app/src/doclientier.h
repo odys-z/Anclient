@@ -93,10 +93,10 @@ public:
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
     }
 
-    void login_synode(const JServUrl & jserv, const string &uid, const string &pswd, const string& device) noexcept {
+    void login_synode(const string &uid, const string &pswd, const string& device) noexcept {
         try {
-            anlog("''''''''''''''''''  login  '''''''''''''''''''''''''''''");
-            client.jserv = jserv;
+            anlog("''''''''''''''''''' login: "s + client.jserv.jserv() + " ''''''''''''''''''''''");
+            // client.jserv = jserv;
             client.loginWithUri(sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
             anwarn(e.what());

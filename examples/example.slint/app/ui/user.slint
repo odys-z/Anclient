@@ -15,6 +15,12 @@ export component User {
         UserProfile.model-changed(UserProfile.model);
     }
 
+    init => {
+        debug("User.init => UserProfile.model:", UserProfile.model);
+        debug("loading", UserProfile.model.regiserv);
+        root.refresh-clicked();
+    }
+
     Rectangle {
         height: 100%;
         width: 100%;
