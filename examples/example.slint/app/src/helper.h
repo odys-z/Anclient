@@ -42,12 +42,24 @@ inline static void open_file_explorer(std::string path) {
 #endif
 }
 
-inline static void bind_profile(UserProfileModel& p, const anson::DesktopSettings& s) {
+/**
+ * p's domain list & synode list is not bind here.
+ * @brief bind_profile
+ * @param p
+ * @param s
+ * @return true if the regiserv is different
+ */
+inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSettings& s) {
+    bool refresh =  string{p.regiserv} != s.regiserv;
+
     p.market_name = s.market_name;
+    p.market_name = s.market_name;
+    p.regiserv = s.regiserv;
     p.synode_jserv = s.synode_jserv;
     p.domain_selected = s.domain;
     p.org_selected = s.org;
     p.synode_selected = s.synode_id;
+    return refresh;
 }
 
 inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {

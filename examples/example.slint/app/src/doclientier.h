@@ -25,9 +25,8 @@ class AsynClienter : public Doclientier {
 protected:
     inline static const string sysuri = "/sys/cpp";
     inline static const string synuri = "/syn/cpp";
-    /** Settings is loaded and mananged by AsynClienter, validated by singletong's validator. */
-    string settings_json;
-    DesktopSettings appsettings;
+
+    DesktopSettings& appsettings;
 
     OnMsg onmsg = [this]() -> void {
         if (!wsclient->block_poll(200)) return;
@@ -67,7 +66,6 @@ protected:
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
-    bool load_settings(const string& settings_json);
 
     std::unique_ptr<WSClient> wsclient;
 
@@ -79,11 +77,11 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnLink onlink)
-        : Doclientier("h_photos", sysuri, synuri, onlink, onErr), window_weak(appwin)  {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink)
+        : Doclientier("h_photos", sysuri, synuri, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, OnLink onlink, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, onlink, err), window_weak(appwin) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink, OnError err)
+        : Doclientier("h_photos", sysuri, synuri, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 

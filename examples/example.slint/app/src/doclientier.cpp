@@ -11,22 +11,11 @@
 
 namespace anson {
 
-bool AsynClienter::load_settings(const string& settings_json) {
-    try {
-        this->settings_json = settings_json;
-        Anson::from_file(settings_json, appsettings);
-    } catch (AnsonException e) {
-        anerror(e.what());
-        return false;
-    }
-    return true;
-}
-
 void AsynClienter::reconnect_ipc() {
-    if (!load_settings(settings_json)) {
-        anerror("Failed to load settings.");
-        return;
-    }
+    // if (!load_settings(settings_json)) {
+    //     anerror("Failed to load settings.");
+    //     return;
+    // }
     if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
         // WSClient* _wsclient = new WSClient{JServUrl{appsettings.wshost, appsettings.wsport, {"ipc"}}, onmsg};

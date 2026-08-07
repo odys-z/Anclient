@@ -94,14 +94,14 @@ int main(int argc, char **argv) {
             for (const auto& entry : syncpage) {
                 std::string type = entry.is_directory() ? "Folder" : (entry.is_regular_file() ? "File" : "Other");
                 PathItemData row {
-                    .is_folder{entry.is_directory()},
+                    .is_folder = entry.is_directory(),
                     .indent = {},
                     .fname{entry.path().filename().string()},
                     .size{entry.is_regular_file() ? std::to_string(entry.file_size()) : "-"},
                     .type{type},
                     .fullpath{entry.path().string()},
-                    .iselected{fileselection.find(string{row.fullpath}) != fileselection.end()},
-                    .syncicon{SyncingIcon::Invisible}};
+                    .iselected = fileselection.find(string{row.fullpath}) != fileselection.end(),
+                    .syncicon = SyncingIcon::Invisible};
 
                 table_model->push_back(row);
             }
@@ -233,28 +233,17 @@ int main(int argc, char **argv) {
         slingle.open_volume();
     });
 
-    // Design Notes: We need a post load event callback API.
-    slint::invoke_from_event_loop([&ui, &slingle]() {
-        auto appstat = ui->global<AppState>().get_model();
-        auto profile = ui->global<UserProfile>().get_model();
-
-        bind_profile(profile, slingle.appsettings);
-
-        if (slingle.validsettings()) {
-            appstat.menu_id = menu_home;
-        } else {
-            appstat.menu_id = menu_user;
-            profile.detail_label = "Please check settings!";
-        }
-
-        ui->global<AppState>().set_model(appstat);
-        ui->global<UserProfile>().set_model(profile);
+    // user
+    ui->on_query_orgdoms([&slingle](const slint::SharedString& org) {
+        slingle.query_orgdoms(string{org});
     });
 
-    // user
+    ui->on_query_domnodes([&slingle](const slint::SharedString& org, const slint::SharedString& domain) {
+        slingle.query_domnodes(string{org}, string{domain});
+    });
+
     ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
         UserProfileModel p = ui->global<UserProfile>().get_model();
-        // UserProfileModel p = data.profile;
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 
@@ -277,7 +266,25 @@ int main(int argc, char **argv) {
             anwarn(*err);
             insert_status(ui, *err);
         }
-    } );
+    });
+
+    // Design Notes: We need a post load event callback API.
+    slint::invoke_from_event_loop([&ui, &slingle]() {
+        auto appstat = ui->global<AppState>().get_model();
+        auto profile = ui->global<UserProfile>().get_model();
+
+        bool reload = bind_profile(profile, slingle.appsettings);
+
+        if (slingle.validsettings()) {
+            appstat.menu_id = menu_home;
+        } else {
+            appstat.menu_id = menu_user;
+            profile.detail_label = "Please check settings!";
+        }
+
+        ui->global<AppState>().set_model(appstat);
+        ui->global<UserProfile>().set_model(profile);
+    });
 
     ui->run();
     return 0;

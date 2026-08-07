@@ -13,9 +13,8 @@
   "synode_vol" : "~/github/semantic-jserv/jserv-album/qqhome/",
   "synode_jserv":"http://127.0.0.1:0000/jserv-album",
   "admin" : "ody",
-  "token" : "*********",
+  "domain_token" : "*********",
   "domain": "*********",
-  "wsagent_settings": "settings/ipc-agent-settings.json",
   "wshost": "127.0.0.1",
   "wsport": 8700
 }

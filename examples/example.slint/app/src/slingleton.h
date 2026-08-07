@@ -10,12 +10,10 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/gen/semantier.hpp>
 #include <io/odysz/gen/registry.hpp>
-#include <io/odysz/gen/anclient_settings.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 #include <io/odysz/module/langstring.h>
 
 #include "gen/app_settings.hpp"
-#include "wsclients.h"
 #include "gen/wsport.hpp"
 #include "doclientier.h"
 #include "ipcagent_manager.h"
@@ -26,6 +24,10 @@ namespace anson {
   class Slingleton {
     static JsonOpt opts;
     static AstMap  asts;
+
+    static JsonOpt registry_opts;
+    static AstMap  registry_asts;
+
     static Slingleton* instance;
 
   public:
@@ -34,13 +36,20 @@ namespace anson {
     Slingleton(Slingleton&&) = delete;
     Slingleton& operator=(Slingleton&&) = delete;
 
+    static string settings_json;
+
+    /** Desktop settings is shared accross multiple clients. */
     static DesktopSettings appsettings;
 
     JavaAgentController* agentController = nullptr;
+    RegistryClient* registryClient = nullptr;
 
     AsynClienter* doclientier = nullptr;
+
     string volume_path;
     connect_state constates;
+
+    slint::ComponentWeakHandle<App> window_weak; // so registry callbacks can reach the UI thread
 
     queue<shared_ptr<AnsonResp>> synode_msgs;
     mutable std::mutex synode_mutex;
@@ -51,15 +60,18 @@ namespace anson {
                       const string & settings_path) {
       if (instance == nullptr) {
         instance = new Slingleton();
+        instance->window_weak = appwin;
         register_jserv(asts, opts);
         register_semantier(asts, "ast");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
+        register_anclientsettingsAst(asts);
         register_desktopsettingsAst(asts);
         register_langstringAst(asts);
 
+        // settings
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
-        Anson::from_file(settings_path, appsettings, &opts);
+        instance->load_settings(settings_path, opts);
         if (LangExt::isblank(appsettings.device))
           anwarn("appsetings.device is empty. file: "s + settings_path);
         else {
@@ -67,7 +79,7 @@ namespace anson {
           anlog(appsettings.toBlock(opts));
         }
 
-        // instance->appwin = appwin;
+        // ipc
         instance->agentController = new JavaAgentController(appsettings);
         instance->agentController->start_agent(settings_path);
 
@@ -77,49 +89,17 @@ namespace anson {
           ix::initNetSystem();
         });
 
-        AsynClienter::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
-          if (!instance->validsettings()) {
-            anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
-            slint::invoke_from_event_loop([&appwin, c, &e, &args]() {
-              if (auto app = appwin.lock()) {
-                auto data = (*app)->global<AppState>().get_model();
+        // doclientier
+        instance->setup_doclientier(appwin);
 
-                auto status_model = data.syncing_status;
-                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-
-                if (vec_model) {
-                    vec_model->insert(0, "New status message");
-                }
-
-                (*app)->global<AppState>().set_model(data);
-
-              }});
-          }
-        };
-
-        instance->doclientier = new AsynClienter(appwin, [&appwin](connect_state connstates) {
-          instance->constates = connstates;
-
-          // debug notes: cannot capture outer lamda's connstates as it quit immediatly, before this one is running.
-          slint::invoke_from_event_loop([&appwin]() {
-            if (auto app = appwin.lock()) {
-              // (*app)->set_synode_linked(instance->constates.synlink == connect_state::online);
-              auto data = (*app)->global<AppState>().get_model();
-              data.synode_linked = instance->constates.synlink == connect_state::online;
-              (*app)->global<AppState>().set_model(data);
-            }});
-        });
-
-        instance->doclientier->load_settings(settings_path);
+        // registry client 
+        register_jserv(registry_asts, registry_opts);
+        register_semantier(registry_asts, "ast");
+        register_centralclientier(registry_asts, "ast/");
+        instance->setup_regclient();
 
         anlog(std::format("Has volume: {}, {}: {}",
           instance->has_synode_vol(), appsettings.synode_id, appsettings.synode_vol));
-        
-        // registry client
-        // RegistryClient::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
-        //   if (!instance->validsettings());
-        // };
-
       }
       return *instance;
     }
@@ -135,6 +115,86 @@ namespace anson {
         return true;
       }
       return false;
+    }
+
+    bool load_settings(const string& settings_json, const JsonOpt& opts);
+
+    RegistryClient* setup_regclient();
+
+    AsynClienter* setup_doclientier(slint::ComponentWeakHandle<App>& appwin) ;
+
+    void query_orgdoms(const string & domid) {
+      slint::invoke_from_event_loop([this]() {
+        if (auto app = window_weak.lock()) {
+          auto profile = (*app)->global<UserProfile>().get_model();
+          profile.detail_label = "Loading organization domains ...";
+          profile.org_name = appsettings.org_name;
+          (*app)->global<UserProfile>().set_model(profile);
+        }
+      });
+
+      registryClient->asyquery_orgdoms(appsettings.org,
+        [this](AnsonResp& resp) { on_org_domains(static_cast<RegistResp&>(resp)); },
+        AsynClienter::onErr);
+    }
+
+    void on_org_domains(RegistResp& res) {
+      vector<string> domains(res.orgDomains.begin(), res.orgDomains.end());
+
+      string configured = appsettings.domain;
+      string selected = domains.empty() ? "" : domains.front();
+      for (auto& d : domains) if (d == configured) { selected = d; break; }
+
+      slint::invoke_from_event_loop([this, domains, selected]() {
+        if (auto app = window_weak.lock()) {
+          auto profile = (*app)->global<UserProfile>().get_model();
+          vector<slint::SharedString> sl;
+          for (auto& d : domains) sl.push_back(slint::SharedString(d));
+
+          profile.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
+          profile.domain_selected = slint::SharedString(selected);
+          profile.detail_label = domains.empty() ? "No domains found." : "Loading synodes ...";
+          (*app)->global<UserProfile>().set_model(profile);
+
+          if (!selected.empty())
+            query_domnodes(string{profile.domain_selected}, selected);
+        }
+      });
+
+    }
+
+    void query_domnodes(const string & org, const string& domain) {
+      registryClient->asyquery_domconfig(org, domain,
+        [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
+        AsynClienter::onErr);
+    }
+
+    void on_domnodes(RegistResp& res) {
+      vector<string> synodes;
+      for (auto& peer : res.diction.peers) synodes.push_back(peer.synid);
+
+      string configured = appsettings.synode_id;
+      string selected = synodes.empty() ? "" : synodes.front();
+
+      for (auto& s : synodes) if (s == configured) { selected = s; break; }
+
+      string jserv;
+      for (auto& peer : res.diction.peers) if (peer.synid == selected) {
+        jserv = peer.jserv;
+      }
+
+      slint::invoke_from_event_loop([this, synodes, selected, jserv]() {
+        if (auto app = window_weak.lock()) {
+          auto profile = (*app)->global<UserProfile>().get_model();
+          vector<slint::SharedString> sl;
+          for (auto& s : synodes) sl.push_back(slint::SharedString(s));
+          profile.synodes_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
+          profile.synode_selected = slint::SharedString(selected);
+          profile.detail_label = synodes.empty() ? "No synodes found in domain." : "Ready.";
+
+          (*app)->global<UserProfile>().set_model(profile);
+        }
+      });
     }
 
     /**

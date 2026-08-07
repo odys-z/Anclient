@@ -51,6 +51,8 @@ min-width: 600px;
   callback open_volume();
   // callback update_synlink(bool);
   callback save_userinfo();
+  callback query_orgdoms(string);
+  callback query_domnodes(string, string);
 
   function notify-changed() {
       AppState.model-changed(AppState.model);
@@ -146,6 +148,8 @@ min-width: 600px;
 
         if (AppState.model.menu_id == IDs.m_user) : Rectangle {
           User {
+            query-orgdoms(org) => { root.query_orgdoms(org); }
+            query-domnodes(org, domain) => { root.query_domnodes(org, domain); }
             save-profile(jserv, u, p) => {
               root.save_userinfo();
               // debug("save-profile:", jserv, u, p, "=> save_userinfo()");

@@ -4,12 +4,14 @@ import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
 import { UserProfile } from "app-state.slint";
 
 export component User {
-    callback refresh-clicked();
-    callback org-domain-node-changed(string, string, string);
+    // callback refresh-clicked();
+    // callback org-domain-node-changed(string, string, string);
     callback ping-clicked(string);
     callback login-test-clicked(string, string);
     /** jserv, uid, pswd */
     callback save-profile(string, string, string);
+    callback query-orgdoms(string);
+    callback query-domnodes(string, string);
 
     function notify-changed() {
         UserProfile.model-changed(UserProfile.model);
@@ -18,7 +20,8 @@ export component User {
     init => {
         debug("User.init => UserProfile.model:", UserProfile.model);
         debug("loading", UserProfile.model.regiserv);
-        root.refresh-clicked();
+        // root.refresh-clicked();
+        root.query-orgdoms(UserProfile.model.org_selected); // TODO make sure org_selected is set when loading settings
     }
 
     Rectangle {
@@ -91,7 +94,7 @@ export component User {
                         text: @tr("Find Nodes");
                         clicked => {
                             debug(UserProfile.model.regiserv);
-                            refresh-clicked();
+                            root.query-orgdoms(UserProfile.model.org_selected);
                         }
                     }
                 }
@@ -127,7 +130,7 @@ export component User {
                             selected(value) => {
                                 UserProfile.model.domain_selected = value;
                                 root.notify-changed();
-                                org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
+                                query-orgdoms(UserProfile.model.org_selected);
                             }
                         }
 
@@ -138,7 +141,8 @@ export component User {
                             selected(value) => {
                                 UserProfile.model.synode_selected = value;
                                 root.notify-changed();
-                                org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
+                                // org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
+                                query-domnodes(UserProfile.model.org_selected, UserProfile.model.domain_selected);
                             }
                         }
                     }
@@ -152,7 +156,7 @@ export component User {
                     url-edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;
-                        placeholder-text: @tr("http://ip:port(ask admin)/jserv-album");
+                        placeholder-text: "http://ip:port(ask admin)/jserv-album";
                         text: UserProfile.model.synode_jserv;
                         edited(text) => {
                             debug(UserProfile.model.synode_jserv);

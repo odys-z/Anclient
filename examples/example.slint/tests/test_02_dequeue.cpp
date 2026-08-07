@@ -37,11 +37,8 @@
 
 
 using namespace anson;
-static AstMap asts;
-static JsonOpt contxt{&asts};
 
 TEST(DOCSTIER, DE_ReserializeDocsResp) {
-
     AstMap asts;
     JsonOpt opts{&asts};
     register_jserv(asts, opts);
