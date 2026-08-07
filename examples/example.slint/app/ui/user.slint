@@ -78,11 +78,15 @@ export component User {
                     Text {
                         col: 0;
                         text: "Registry"; font-size: 14pt; color: #bbb; }
-                    LineEdit {
+                    registjserv_edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;
-                        read-only: true;
+                        font-size: 14pt; 
                         text: UserProfile.model.regiserv;
+                        edited(text) => {
+                            // debug(UserProfile.model.synode_jserv);
+                            // UserProfile.model.regiserv = text;
+                        }
                     }
 
                     SButton {
@@ -93,6 +97,7 @@ export component User {
                         icon: @image-url("imgs/refresh.svg");
                         text: @tr("Find Nodes");
                         clicked => {
+                            UserProfile.model.regiserv = registjserv_edit.text;
                             debug(UserProfile.model.regiserv);
                             root.query-orgdoms(UserProfile.model.org_selected);
                         }
@@ -119,8 +124,9 @@ export component User {
                         //     }
                         // }
                         LineEdit {
-                            text: UserProfile.model.org-name;
+                            text: UserProfile.model.org_selected;
                             enabled: false;
+                            font-size: 12pt;
                         }
 
                         domain-combo := ComboBox {
@@ -156,13 +162,14 @@ export component User {
                     url-edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;
+                        font-size: 14pt;
                         placeholder-text: "http://ip:port(ask admin)/jserv-album";
                         text: UserProfile.model.synode_jserv;
                         edited(text) => {
                             debug(UserProfile.model.synode_jserv);
-                            UserProfile.model.synode_jserv = text;
+                            // UserProfile.model.synode_jserv = text;
                             debug(UserProfile.model.synode_jserv);
-                            root.notify-changed();
+                            // root.notify-changed();
                         }
                     }
 

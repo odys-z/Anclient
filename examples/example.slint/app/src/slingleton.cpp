@@ -34,7 +34,7 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
                 auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
 
                 if (vec_model) {
-                    vec_model->insert(0, "New status message");
+                    vec_model->insert(0, "Status not able to read.");
                 }
 
                 (*app)->global<AppState>().set_model(data);
@@ -55,7 +55,6 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
         }});
     });
     }
-    // return doclientier;
 }
 
 void Slingleton::setup_regclient()  {
@@ -67,11 +66,9 @@ void Slingleton::setup_regclient()  {
     };
 
     registryClient = new RegistryClient(appsettings, regjserv,
-                                            onbeat, AsynClienter::onErr);
+                                        onbeat, AsynClienter::onErr);
 
     registryClient->market  = appsettings.market;
     registryClient->orgid   = appsettings.org;
     registryClient->orgname = appsettings.org_name;
-
-    // return registryClient;
 }
