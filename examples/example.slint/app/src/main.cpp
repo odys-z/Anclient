@@ -261,6 +261,7 @@ int main(int argc, char **argv) {
             slingle.settings(s);
             s.to_file(settings_path);
             anlog("saved: "s + settings_path);
+            slingle.appsettings = s;
         }
         else {
             anwarn(*err);

@@ -22,7 +22,7 @@ bool Slingleton::load_settings(const string& settings_json, const JsonOpt& opts)
     return true;
 }
 
-AsynClienter* Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
+void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
     AsynClienter::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
         if (!instance->validsettings()) {
             anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
@@ -55,10 +55,10 @@ AsynClienter* Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& app
         }});
     });
     }
-    return doclientier;
+    // return doclientier;
 }
 
-RegistryClient* Slingleton::setup_regclient()  {
+void Slingleton::setup_regclient()  {
 
     JServUrl regjserv{appsettings.regiserv, &registry_opts};
 
@@ -66,12 +66,12 @@ RegistryClient* Slingleton::setup_regclient()  {
         anlog("registry connect_state: "s + conn.registlink);
     };
 
-    RegistryClient *registryClient = new RegistryClient(appsettings, regjserv,
+    registryClient = new RegistryClient(appsettings, regjserv,
                                             onbeat, AsynClienter::onErr);
 
     registryClient->market  = appsettings.market;
     registryClient->orgid   = appsettings.org;
     registryClient->orgname = appsettings.org_name;
 
-    return registryClient;
+    // return registryClient;
 }

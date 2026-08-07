@@ -72,11 +72,12 @@ namespace anson {
         // settings
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         instance->load_settings(settings_path, opts);
-        if (LangExt::isblank(appsettings.device))
-          anwarn("appsetings.device is empty. file: "s + settings_path);
+        if (auto err = validate_settings(appsettings))
+          anwarn(std::format("App setings is invalid, file: {}, error: {}", settings_path, *err));
         else {
           aninfo("[***** DEVICE *****] "s + appsettings.device);
-          anlog(appsettings.toBlock(opts));
+          anlog(std::format("org   : {}\ndomain: {}\ndevice: {}\nsynode: {}\njserv : {}\nregistry: {}",
+              appsettings.org, appsettings.domain, appsettings.device, appsettings.synode_id, appsettings.synode_jserv, appsettings.regiserv));
         }
 
         // ipc
@@ -119,11 +120,11 @@ namespace anson {
 
     bool load_settings(const string& settings_json, const JsonOpt& opts);
 
-    RegistryClient* setup_regclient();
+    void setup_regclient();
 
-    AsynClienter* setup_doclientier(slint::ComponentWeakHandle<App>& appwin) ;
+    void setup_doclientier(slint::ComponentWeakHandle<App>& appwin) ;
 
-    void query_orgdoms(const string & domid) {
+    void query_orgdoms(const string & orgid) {
       slint::invoke_from_event_loop([this]() {
         if (auto app = window_weak.lock()) {
           auto profile = (*app)->global<UserProfile>().get_model();
@@ -133,7 +134,7 @@ namespace anson {
         }
       });
 
-      registryClient->asyquery_orgdoms(appsettings.org,
+      registryClient->asyquery_orgdoms(orgid,
         [this](AnsonResp& resp) { on_org_domains(static_cast<RegistResp&>(resp)); },
         AsynClienter::onErr);
     }
@@ -249,12 +250,17 @@ namespace anson {
      */
     static std::optional<std::string> validate_settings(DesktopSettings s) {
       return [&]() -> std::optional<std::string> {
-              if (s.java_path.empty())                       return "Java path cannot be empty";
-              if (s.synode_jserv.empty())                    return "Synode Jserv cannot be empty";
-              if (auto err = validate_jserv(s.synode_jserv)) return err;
-              if (s.admin.empty())                           return "Admin field cannot be empty";
-              if (auto err = validate_token(s.domain_token)) return err;
-              return std::nullopt;
+            if (appsettings.device.empty())		return "device id is empty";
+            if (appsettings.market.empty())		return "market id is empty";
+            if (appsettings.domain.empty()) 	return "domain id is mepty";
+            if (appsettings.org.empty())		return "org id is empty";
+            if (appsettings.synode_id.empty())	return "synode id is empty";
+            if (s.java_path.empty())            return "Java path cannot be empty";
+            if (s.synode_jserv.empty())         return "Synode Jserv cannot be empty";
+            if (s.admin.empty())                return "Admin field cannot be empty";
+            if (auto err = validate_jserv(s.synode_jserv)) return err;
+            if (auto err = validate_token(s.domain_token)) return err;
+            return std::nullopt;
           }();
     }
 
