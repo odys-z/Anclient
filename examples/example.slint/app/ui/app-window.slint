@@ -39,20 +39,27 @@ min-width: 600px;
   // callback initapp();
 
   callback menu-changed(string);
-  callback item_clicked(string, bool);
-  callback echows(string);
-  callback pingws([string]);
+  callback open_web(string);
+  callback open_volume();
+
+  // fiel-table
   callback load_folder(string);
+  callback item_clicked(string, bool);
   callback query_syncflags();
   callback update_syncflags();
   callback select_file(PathItemData, bool);
   callback upload_files();
-  callback open_web(string);
-  callback open_volume();
-  // callback update_synlink(bool);
-  callback save_userinfo();
+
+  // edge-health
+  callback echows(string);
+  callback pingws([string]);
+
+  // user
+  /** Query with profile.model.regiserv. */
   callback query_orgdoms(string);
   callback query_domnodes(string, string);
+  callback ping_synode(string, string, string, string);
+  callback save_userinfo();
 
   function notify-changed() {
       AppState.model-changed(AppState.model);
@@ -97,7 +104,6 @@ min-width: 600px;
         width: parent.width;
         height: parent.height;
 
-        // if (AppState.data.menu_id == "home") : index-page := HomeForm {
         if (AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album) : index-page := HomeForm { 
           height: parent.height - 14pt;
           visible: AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album;
@@ -148,11 +154,11 @@ min-width: 600px;
 
         if (AppState.model.menu_id == IDs.m_user) : Rectangle {
           User {
+            ping-synode(org, dom, synid, synjserv) => { root.ping_synode(org, dom, synid, synjserv); }
             query-orgdoms(org) => { root.query_orgdoms(org); }
             query-domnodes(org, domain) => { root.query_domnodes(org, domain); }
             save-profile(jserv, u, p) => {
               root.save_userinfo();
-              // debug("save-profile:", jserv, u, p, "=> save_userinfo()");
               debug("save-profile: => save_userinfo()");
             }
           }
@@ -184,10 +190,6 @@ min-width: 600px;
       VerticalLayout {
         padding: 12px;
         alignment: center;
-        // Text{ horizontal-alignment: left;
-        //     color: #ddd;
-        //     font-size: 12pt;
-        //     text: AppState.model.syncing_status[0]; }
         
         for i in Math.min(15, AppState.model.syncing-status.length): Text {
             text: AppState.model.syncing-status[i];

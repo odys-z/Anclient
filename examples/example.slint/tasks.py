@@ -22,13 +22,14 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from anson.io.odysz.utils import copy_anyway
 from invoke import task
 
 # ---------------------------------------------------------------------------
 # Project layout — adjust these two if your repo is laid out differently.
 # ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
-BUILD_DIR = ROOT_DIR / "build"
+BUILD_DIR = ROOT_DIR / "qt-build"
 DIST_DIR = BUILD_DIR / "dist"
 
 # Matches VCPKG_INSTALLED_DIR in the root CMakeLists.txt
@@ -186,7 +187,7 @@ def copy_dlls(ctx, config="Debug"):
 
 
 @task
-def dist(ctx, config="Debug", target=TARGET_NAME, generator="MinGW Makefiles", reconfigure=False):
+def dist(ctx, config="Debug", target=TARGET_NAME, generator="Ninja", reconfigure=False):
     """Build the exe, then assemble dist/ with all required DLLs and assets."""
     build(ctx, config=config, target=target, generator=generator, reconfigure=reconfigure)
     copy_dlls(ctx, config=config)
@@ -246,3 +247,33 @@ def keepgit_clean(ctx):
 
     print(f"Removed: {removed}")
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
+
+
+@task(name="config-appsets")
+def config_appsetss(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
+    if deploy != "deploy-settings.json":
+        copy_anyway(deploy, Path(dist_dir) / "app-settings.json")
+
+@task(name="shallow-pack")
+def shallow_pack(ctx,
+                 deploy: str = 'tasks.json',
+                 config="Debug", target=TARGET_NAME, generator="Ninja"
+                 ):
+    """
+    Assemble dist/ for distribution while avoiding the expensive build step
+    when possible: builds only if the target exe isn't already present,
+    then always (re)copies the runtime DLLs.
+    """
+
+    config_appsets(ctx, deploy)
+
+    exe_path = DIST_DIR / (target + ".exe")
+
+    if exe_path.exists():
+        print(f"{exe_path} already exists — skipping build.")
+    else:
+        print(f"{exe_path} not found — building first.")
+        build(ctx, config=config, target=target, generator=generator)
+
+    copy_dlls(ctx, config=config)
+    print(f"\nDone. Run: {exe_path}")

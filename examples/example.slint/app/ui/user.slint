@@ -4,10 +4,8 @@ import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
 import { UserProfile } from "app-state.slint";
 
 export component User {
-    // callback refresh-clicked();
-    // callback org-domain-node-changed(string, string, string);
-    callback ping-clicked(string);
-    callback login-test-clicked(string, string);
+    callback ping-synode(string, string, string, string);
+    callback test-login(string, string, string);
     /** jserv, uid, pswd */
     callback save-profile(string, string, string);
     callback query-orgdoms(string);
@@ -45,7 +43,9 @@ export component User {
                 padding-bottom: 26pt; 
                 horizontal-stretch: 1;
                 alignment: center;
-                Text { text: UserProfile.model.info_label; font-size: 18pt; color: #ccc; }
+                Text { horizontal-alignment: center; padding-bottom: 8pt;
+                    text: UserProfile.model.info_label; font-size: 20pt; color: #b6d0f6;
+                 }
                 Text { text: UserProfile.model.detail_label; font-size: 14pt; color: #ccc; }
             }
 
@@ -181,7 +181,9 @@ export component User {
                         icon: UseIcons.icons.Info;
                         text: @tr("    Ping");
                         clicked => {
-                            ping-clicked(url-edit.text);
+                            debug("ping-synode:",
+                                        UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected, url-edit.text);
+                            ping-synode(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected, url-edit.text);
                         }
                     }
                 }
@@ -192,7 +194,7 @@ export component User {
                         col: 0;
                         padding-top: 2pt;
                         Text {
-                            text: "Admin"; font-size: 14pt; color: #bbb; }
+                            text: "Domain User"; font-size: 14pt; color: #bbb; }
                     }
                     HorizontalLayout {
                         col: 1;
@@ -243,7 +245,7 @@ export component User {
                         width: 90pt;
                         text: "   Login";
                         clicked => {
-                            login-test-clicked(user-id-edit.text, password-edit.text);
+                            test-login(user-id-edit.text, password-edit.text, confirm-password-edit.text);
                         }
                     }
                 }

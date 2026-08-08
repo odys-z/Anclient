@@ -20,7 +20,7 @@ export global AppState {
     };
 
     // Fired whenever anything in `data` is mutated from within the UI
-    // (App or UserProfile). Host code subscribes here once instead of
+    // (App or %serProfile). Host code subscribes here once instead of
     // tracking individual properties/callbacks across components.
     callback model-changed(AppModel);
     callback closing() -> bool;
@@ -29,7 +29,7 @@ export global AppState {
 export global UserProfile {
     in-out property <UserProfileModel> model: {
             info_label: "Portfolio Desktop 0.1.0",
-            detail_label: "Product page: ...",
+            detail_label: "Ready",
             market_name: "MY 0.1.0",
             org_name: "",
             regiserv: "http://.../jserv-central",

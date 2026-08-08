@@ -12,6 +12,7 @@
 
 int main(int argc, char **argv) {
     using namespace anson;
+    using ss = slint::SharedString;
 
     // TODO move to synching list
     map<string, vector<LangExt::VarType>> fileselection;
@@ -127,11 +128,6 @@ int main(int argc, char **argv) {
         
         string status = std::format("Total selected files: \n{}.", map2str(fileselection));
         anlog(status);
-
-        // auto data = ui->global<AppState>().get_data();
-        // data.syncing_status = slint::SharedString{status};
-        // ui->global<AppState>().set_data(data);
-        // inv_insert_status(ui, status);
     });
 
     ui->on_upload_files([&]() {
@@ -234,12 +230,21 @@ int main(int argc, char **argv) {
     });
 
     // user
-    ui->on_query_orgdoms([&slingle](const slint::SharedString& org) {
+    ui->on_query_orgdoms([&ui, &slingle](const slint::SharedString& org) {
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.update_regjserv(string{profile.regiserv});
         slingle.query_orgdoms(string{org});
     });
 
-    ui->on_query_domnodes([&slingle](const slint::SharedString& org, const slint::SharedString& domain) {
+    ui->on_query_domnodes([&ui, &slingle](const ss& org, const ss& domain) {
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.appsettings.regiserv = profile.regiserv;
         slingle.query_domnodes(string{org}, string{domain});
+    });
+
+    ui->on_ping_synode([&ui, &slingle](const ss& org, const ss& domain, const ss& synid, const ss& jserv) {
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.ping_synode(ui, string{org}, string{domain}, string{synid}, string{jserv});
     });
 
     ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
