@@ -247,14 +247,25 @@ int main(int argc, char **argv) {
         slingle.ping_synode(ui, string{org}, string{domain}, string{synid}, string{jserv});
     });
 
-    ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
+    ui->on_select_synode([&ui, &slingle](const ss& synid) {
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.on_select_synode(synid);
+    });
+
+    ui->on_test_synlogin([&ui, &slingle](const ss& uid, const ss& pswd, const ss& pswd2){
+        // create a temp ssclient & a temp jserv for test login
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.on_test_synlogin(ui, string{uid}, string{pswd}, string{pswd2}, string{profile.synode_jserv});
+    });
+
+    ui->on_save_userinfo([&ui, &ui_weak, &settings_path, &slingle]() {
         UserProfileModel p = ui->global<UserProfile>().get_model();
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 
         // We need a better validation pattern. See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
         if (string{p.password_text} != string{p.confirm_password_text})
-            insert_status(ui, "Confirm password / token doesn't march.");
+            insert_status(ui, "Domain Token doesn't march with confirming text.");
 
         DesktopSettings s {slingle.appsettings};
         s.admin = string{p.user_id_text};
@@ -264,9 +275,11 @@ int main(int argc, char **argv) {
         optional<string> err = Slingleton::validate_settings(s);
         if (!err) {
             slingle.settings(s);
-            s.to_file(settings_path);
+            // s.to_file(settings_path, &slingle.opts);
+            slingle.save_settings(settings_path);
             anlog("saved: "s + settings_path);
             slingle.appsettings = s;
+            slingle.setup_doclientier(ui_weak);
         }
         else {
             anwarn(*err);

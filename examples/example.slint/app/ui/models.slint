@@ -13,12 +13,16 @@ export struct UserProfileModel {
     domains_list: [string],
     domain_selected: string,
     synodes_list: [string],
+    jserv_list  : [string],
     synode_selected: string,
 
     synode_jserv: string,
     user_id_text: string,
     password_text: string,
     confirm_password_text: string,
+
+    device: string,
+    is_device_locked: bool,
 
     // Set by the host code after a successful login test, e.g.
     // let mut d = ui.global::<AppState>().get_data();

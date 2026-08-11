@@ -28,19 +28,22 @@ export global AppState {
 
 export global UserProfile {
     in-out property <UserProfileModel> model: {
-            info_label: "Portfolio Desktop 0.1.0",
-            detail_label: "Ready",
-            market_name: "MY 0.1.0",
-            org_name: "",
-            regiserv: "http://.../jserv-central",
+        info_label: "Portfolio Desktop 0.1.0",
+        detail_label: "Ready",
+        market_name: "MY 0.1.0",
+        org_name: "",
+        regiserv: "http://.../jserv-central",
 
-            orgs_list: ["Test-1", "Test-2"],
-            org_selected: "",
-            domains_list: [],
-            domain_selected: "",
-            synodes_list: [],
-            synode_selected: "",
-            show_qr_code: false
+        orgs_list: ["Test-1", "Test-2"],
+        org_selected: "",
+        domains_list: [],
+        domain_selected: "",
+        synodes_list: [],
+        jserv_list  : [],
+        synode_selected: "",
+        device: "",
+        is_device_locked: true,
+        show_qr_code: false
     };
 
     callback model-changed(UserProfileModel);

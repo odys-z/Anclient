@@ -35,7 +35,7 @@ public:
     }
 };
 
-inline static void register_desktopsettingsAst(AstMap & asts) {
+inline static void register_desktopsettingsAst(AstMap & asts, const JsonOpt* contxt) {
 
     AnsonAst * ast = createAST <DesktopSettings, AnsonAst> (
         asts, AnclientSettings::_type_, map <string, AnsonField> {
@@ -76,7 +76,7 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
         ;
 
         //
-        ast->get_field_instance = [ast](const IJsonable& ans, const string& fieldname) -> meta_any {
+        ast->get_field_instance = [ast, contxt](const IJsonable& ans, const string& fieldname) -> meta_any {
             if (ast->fields.contains(fieldname)) {
                 auto& concrete = static_cast<const DesktopSettings&>(ans);
                 if ("market" == fieldname)
@@ -109,8 +109,8 @@ inline static void register_desktopsettingsAst(AstMap & asts) {
                     return entt::forward_as_meta(concrete.wstimeout);
             }
 
-            if (IJsonable::contxt_ptr->has_ast(ast->baseAnclass)) {
-                AnsonAst *bast = IJsonable::contxt_ptr->ast<AnsonAst>(ast->baseAnclass);
+            if (contxt->has_ast(ast->baseAnclass)) {
+                AnsonAst *bast = contxt->ast<AnsonAst>(ast->baseAnclass);
                 return bast->get_field_instance(ans, fieldname);
             }
 

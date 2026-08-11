@@ -58,7 +58,9 @@ min-width: 600px;
   /** Query with profile.model.regiserv. */
   callback query_orgdoms(string);
   callback query_domnodes(string, string);
+  callback select_synode(string);
   callback ping_synode(string, string, string, string);
+  callback test_synlogin(string, string, string);
   callback save_userinfo();
 
   function notify-changed() {
@@ -157,6 +159,8 @@ min-width: 600px;
             ping-synode(org, dom, synid, synjserv) => { root.ping_synode(org, dom, synid, synjserv); }
             query-orgdoms(org) => { root.query_orgdoms(org); }
             query-domnodes(org, domain) => { root.query_domnodes(org, domain); }
+            change-synode(synode) => { root.select_synode(synode); }
+            login_synode(uid, pswd, re_paswd) => { root.test_synlogin(uid, pswd, re_paswd); }
             save-profile(jserv, u, p) => {
               root.save_userinfo();
               debug("save-profile: => save_userinfo()");

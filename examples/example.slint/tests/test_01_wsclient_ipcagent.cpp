@@ -2,11 +2,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <regex>
-#include <filesystem>
 #include <thread>
 #include <chrono>
-#include <cstdlib>
 
 #include <io/odysz/utils.h>
 #include <io/odysz/anson.h>
@@ -22,7 +19,6 @@
 
 #include "../app/src/wsclients.h"
 #include "../app/src/gen/wsport.hpp"
-#include "../app/src/doclientier.h"
 #include "../app/src/gen/app_settings.hpp"
 #include "../app/src/ipcagent_manager.h"
 
@@ -69,7 +65,7 @@ protected:
         register_semantier(asts, "ast");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_desktopsettingsAst(asts);
+        register_desktopsettingsAst(asts, &opts);
 
         start_agent();
 

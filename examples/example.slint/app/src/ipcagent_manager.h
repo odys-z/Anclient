@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <filesystem>
 #include <thread>
@@ -19,7 +18,6 @@
 
 #include <io/odysz/utils.h>
 #include "gen/app_settings.hpp"
-#include "wsclients.h"
 
 namespace fs = std::filesystem; 
 
@@ -65,7 +63,7 @@ inline static string resolveHomePath(const std::string& inputPath) {
  
 class JavaAgentController {
 private:
-    std::string m_java_exe;
+    std::string m_java_cmd;
     std::string m_agent_jar;
 
 #ifdef _WIN32
@@ -79,11 +77,19 @@ private:
 public:
     JavaAgentController() {}
 
-    // JavaAgentController(const std::string& java_exe, const std::string& agent_jar)
-        // : m_java_exe(resolveHomePath(java_exe)), m_agent_jar(resolveHomePath(agent_jar)) {}
     JavaAgentController(const DesktopSettings& settings) {
-        // Anson::from_file(settings_json, settings);
-        m_java_exe = resolveHomePath(settings.java_path);
+        m_java_cmd = resolveHomePath(settings.java_path);
+        #ifdef _WIN32
+        if (m_java_cmd.size() < 4 ||
+            m_java_cmd.compare(m_java_cmd.size() - 4, 4, ".exe") != 0) {
+            m_java_cmd += ".exe";
+        }
+        #else
+            if (m_java_cmd.size() >= 4 &&
+                m_java_cmd.compare(m_java_cmd.size() - 4, 4, ".exe") == 0) {
+            m_java_cmd.erase(m_java_cmd.size() - 4, 4);
+        }
+        #endif
         m_agent_jar = resolveHomePath(settings.wsagent_jar);
     }
 
@@ -106,7 +112,7 @@ public:
 
     #ifdef _WIN32
         std::string cmd = std::format("{} -jar {} {}", 
-                                      resolveHomePath(m_java_exe), m_agent_jar, jarg_agentsetting_path);
+                                      resolveHomePath(m_java_cmd), m_agent_jar, jarg_agentsetting_path);
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         si.dwFlags = STARTF_USESHOWWINDOW;
@@ -184,7 +190,7 @@ public:
         // Clean UTF-8 console context string chaining with proper output logging redirection
         std::string stop_cmd = std::format(
             "cmd.exe /c \"chcp 65001 > NUL && {} -cp {} io.oz.anclient.ipcagent.StopAgent > java_agent_stop.log 2>&1\"",
-            m_java_exe, m_agent_jar);
+            m_java_cmd, m_agent_jar);
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         si.dwFlags = STARTF_USESHOWWINDOW;

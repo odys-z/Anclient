@@ -53,22 +53,36 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     bool refresh =  string{p.regiserv} != s.regiserv;
 
     p.market_name = s.market_name;
-    p.market_name = s.market_name;
     p.regiserv = s.regiserv;
     p.synode_jserv = s.synode_jserv;
     p.domain_selected = s.domain;
     p.org_selected = s.org;
     p.synode_selected = s.synode_id;
+    p.user_id_text = s.admin;
+    p.password_text = s.domain_token;
+    p.confirm_password_text = s.domain_token;
     return refresh;
 }
 
+
+inline static void insert_status(slint::ComponentWeakHandle<App> weak_ui, std::string s) {
+    slint::invoke_from_event_loop([weak_ui, s = std::move(s)]() {
+        if (auto ui = weak_ui.lock()) {
+            auto data = (*ui)->global<AppState>().get_model();
+            auto status_model = data.syncing_status;
+            auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+            if (vec_model) {
+                vec_model->insert(0, slint::SharedString(s));
+                while (vec_model->row_count() > 1024) {
+                    vec_model->erase(vec_model->row_count() - 1);
+                }
+                (*ui)->global<AppState>().set_model(data);
+            }
+        }
+    });
+}
+
 inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {
-    auto data = ui->global<AppState>().get_model();
-    auto status_model = data.syncing_status;
-    auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-    if (vec_model) {
-        slint::SharedString slintxt(s);
-        vec_model->insert(0, slintxt);
-        ui->global<AppState>().set_model(data);
-    }
+    slint::ComponentWeakHandle<App> ui_weak = ui;
+    insert_status(ui_weak, s);
 }

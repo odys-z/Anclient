@@ -5,20 +5,19 @@ import { UserProfile } from "app-state.slint";
 
 export component User {
     callback ping-synode(string, string, string, string);
-    callback test-login(string, string, string);
+    callback login_synode(string, string, string);
     /** jserv, uid, pswd */
     callback save-profile(string, string, string);
     callback query-orgdoms(string);
     callback query-domnodes(string, string);
-
-    function notify-changed() {
-        UserProfile.model-changed(UserProfile.model);
-    }
+    callback change-synode(string);
+    // function notify-changed() {
+    //     UserProfile.model-changed(UserProfile.model);
+    // }
 
     init => {
         debug("User.init => UserProfile.model:", UserProfile.model);
         debug("loading", UserProfile.model.regiserv);
-        // root.refresh-clicked();
         root.query-orgdoms(UserProfile.model.org_selected); // TODO make sure org_selected is set when loading settings
     }
 
@@ -84,8 +83,6 @@ export component User {
                         font-size: 14pt; 
                         text: UserProfile.model.regiserv;
                         edited(text) => {
-                            // debug(UserProfile.model.synode_jserv);
-                            // UserProfile.model.regiserv = text;
                         }
                     }
 
@@ -126,7 +123,7 @@ export component User {
                         LineEdit {
                             text: UserProfile.model.org_selected;
                             enabled: false;
-                            font-size: 12pt;
+                            font-size: 14pt;
                         }
 
                         domain-combo := ComboBox {
@@ -135,7 +132,7 @@ export component User {
                             current-value: UserProfile.model.domain_selected;
                             selected(value) => {
                                 UserProfile.model.domain_selected = value;
-                                root.notify-changed();
+                                // root.notify-changed();
                                 query-orgdoms(UserProfile.model.org_selected);
                             }
                         }
@@ -146,9 +143,9 @@ export component User {
                             current-value: UserProfile.model.synode_selected;
                             selected(value) => {
                                 UserProfile.model.synode_selected = value;
-                                root.notify-changed();
-                                // org-domain-node-changed(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected);
-                                query-domnodes(UserProfile.model.org_selected, UserProfile.model.domain_selected);
+                                // root.notify-changed();
+                                // query-domnodes(UserProfile.model.org_selected, UserProfile.model.domain_selected);
+                                change-synode(value);
                             }
                         }
                     }
@@ -164,12 +161,9 @@ export component User {
                         horizontal-stretch: 1;
                         font-size: 14pt;
                         placeholder-text: "http://ip:port(ask admin)/jserv-album";
-                        text: UserProfile.model.synode_jserv;
+                        text <=> UserProfile.model.synode_jserv;
                         edited(text) => {
-                            debug(UserProfile.model.synode_jserv);
-                            // UserProfile.model.synode_jserv = text;
-                            debug(UserProfile.model.synode_jserv);
-                            // root.notify-changed();
+                            debug("ping synode:", UserProfile.model.synode_jserv);
                         }
                     }
 
@@ -204,10 +198,9 @@ export component User {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("User ID");
                             text: UserProfile.model.user_id_text;
-                            edited(text) => {
-                                UserProfile.model.user_id_text = text;
-                                root.notify-changed();
-                            }
+                            // edited(text) => {
+                            //     UserProfile.model.user_id_text = text;
+                            // }
                         }
 
                         // spacer to visually separate uid from the pswd/pswd-2 pair
@@ -220,10 +213,10 @@ export component User {
                             placeholder-text: @tr("Password");
                             input-type: password;
                             text: UserProfile.model.password_text;
-                            edited(text) => {
-                                UserProfile.model.password_text = text;
-                                root.notify-changed();
-                            }
+                            // edited(text) => {
+                            //     UserProfile.model.password_text = text;
+                            //     root.notify-changed();
+                            // }
                         }
 
                         confirm-password-edit := LineEdit {
@@ -231,10 +224,10 @@ export component User {
                             placeholder-text: @tr("Confirm");
                             input-type: password;
                             text: UserProfile.model.confirm_password_text;
-                            edited(text) => {
-                                UserProfile.model.confirm_password_text = text;
-                                root.notify-changed();
-                            }
+                            // edited(text) => {
+                            //     UserProfile.model.confirm_password_text = text;
+                            //     root.notify-changed();
+                            // }
                         }
                     }
 
@@ -245,8 +238,29 @@ export component User {
                         width: 90pt;
                         text: "   Login";
                         clicked => {
-                            test-login(user-id-edit.text, password-edit.text, confirm-password-edit.text);
+                            root.login_synode(user-id-edit.text, password-edit.text, confirm-password-edit.text);
                         }
+                    }
+                }
+
+                // Device
+                Row {
+                    Text { col: 0; text: "Device"; font-size: 14pt; color: #bbb; }
+
+                    if (!UserProfile.model.is_device_locked) : device-edit := LineEdit {
+                        col: 1;
+                        horizontal-stretch: 1;
+                        font-size: 14pt;
+                        text: UserProfile.model.device;
+                        placeholder-text: "Name this device uniquely in the domain";
+                    }
+                    if (UserProfile.model.is_device_locked) : device-label := TextInput {
+                            col: 1;
+                            horizontal-stretch: 1;
+                            font-size: 14pt;
+                            color: #ffffffbb;
+                            text: UserProfile.model.device;
+                            enabled: !UserProfile.model.is_device_locked;
                     }
                 }
 

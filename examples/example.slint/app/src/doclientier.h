@@ -77,11 +77,11 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink)
-        : Doclientier("h_photos", sysuri, synuri, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
+        : Doclientier("h_photos", sysuri, synuri, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, onlink, err), window_weak(appwin), appsettings(desksets) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
+        : Doclientier("h_photos", sysuri, synuri, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 

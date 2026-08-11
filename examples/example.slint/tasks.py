@@ -250,22 +250,22 @@ def keepgit_clean(ctx):
 
 
 @task(name="config-appsets")
-def config_appsetss(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
+def copy_settings(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
     if deploy != "deploy-settings.json":
         copy_anyway(deploy, Path(dist_dir) / "app-settings.json")
 
 @task(name="shallow-pack")
 def shallow_pack(ctx,
-                 deploy: str = 'tasks.json',
+                 appsettings: str = 'settings/app-settings.json',
                  config="Debug", target=TARGET_NAME, generator="Ninja"
                  ):
     """
     Assemble dist/ for distribution while avoiding the expensive build step
     when possible: builds only if the target exe isn't already present,
     then always (re)copies the runtime DLLs.
-    """
 
-    config_appsets(ctx, deploy)
+    app-settings for packaging must be generated and is ready for distribution.
+    """
 
     exe_path = DIST_DIR / (target + ".exe")
 
@@ -276,4 +276,5 @@ def shallow_pack(ctx,
         build(ctx, config=config, target=target, generator=generator)
 
     copy_dlls(ctx, config=config)
+    copy_settings(appsettings)
     print(f"\nDone. Run: {exe_path}")

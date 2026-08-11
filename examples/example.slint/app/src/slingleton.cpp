@@ -22,7 +22,7 @@ bool Slingleton::load_settings(const string& settings_json, const JsonOpt& opts)
     return true;
 }
 
-void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
+void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx) {
     AsynClienter::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
         if (!instance->validsettings()) {
             anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
@@ -43,7 +43,9 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin) {
     };
 
     if (!doclientier) {
-        doclientier = new AsynClienter(appwin, appsettings, [&appwin](connect_state connstates) {
+        if (ctx == nullptr)
+            ctx = &opts;
+        doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [&appwin](connect_state connstates) {
         instance->constates = connstates;
 
         // debug notes: cannot capture outer lamda's 'connstates' as it quit immediatly, before this one is running.

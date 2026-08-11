@@ -65,8 +65,8 @@ namespace anson {
         register_semantier(asts, "ast");
         register_doctier(asts, "ast");
         register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_anclientsettingsAst(asts);
-        register_desktopsettingsAst(asts);
+        register_anclient_cmake(asts, "ast");
+        register_desktopsettingsAst(asts, &opts);
         register_langstringAst(asts);
 
         // settings
@@ -91,7 +91,7 @@ namespace anson {
         });
 
         // doclientier
-        instance->setup_doclientier(appwin);
+        instance->setup_doclientier(appwin, &opts);
 
         // registry client 
         register_jserv(registry_asts, registry_opts);
@@ -122,7 +122,7 @@ namespace anson {
 
     void setup_regclient();
 
-    void setup_doclientier(slint::ComponentWeakHandle<App>& appwin) ;
+    void setup_doclientier(slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx = &opts) ;
 
     void query_orgdoms(const string & orgid) {
       slint::invoke_from_event_loop([this]() {
@@ -172,12 +172,12 @@ namespace anson {
 
     void query_domnodes(const string & org, const string& domain) {
       registryClient->asyquery_domconfig(org, domain,
-        [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
-        AsynClienter::onErr);
+                        [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
+                        AsynClienter::onErr);
     }
 
     void on_domnodes(RegistResp& res) {
-      anlog("on_domnodes(): "s + res.toBlock(registry_opts));
+      anlog("on_domnodes(), handling: "s + res.toBlock(registry_opts));
       vector<string> synodes;
       for (auto& peer : res.diction.peers) synodes.push_back(peer.synid);
 
@@ -191,27 +191,93 @@ namespace anson {
         jserv = peer.jserv;
       }
 
-      slint::invoke_from_event_loop([this, synodes, selected, jserv]() {
+      vector<Synode> peers = res.diction.peers;
+
+      slint::invoke_from_event_loop([this, synodes, peers, selected, jserv]() {
         if (auto app = window_weak.lock()) {
           auto profile = (*app)->global<UserProfile>().get_model();
           vector<slint::SharedString> sl;
-          for (auto& s : synodes) sl.push_back(slint::SharedString(s));
+          vector<slint::SharedString> jservlst;
+          for (auto& p : peers) {
+              sl.push_back(slint::SharedString(p.synid));
+              jservlst.push_back(slint::SharedString(p.jserv));
+          }
+          profile.jserv_list = std::make_shared<slint::VectorModel<slint::SharedString>>(jservlst);
           profile.synodes_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
           profile.synode_selected = slint::SharedString(selected);
           profile.detail_label = synodes.empty() ? "No synodes found in domain." : "Ready.";
+
+          if (!jserv.empty())
+              profile.synode_jserv = jserv;
 
           (*app)->global<UserProfile>().set_model(profile);
         }
       });
     }
 
+    void on_select_synode(const slint::SharedString synid) {
+        slint::invoke_from_event_loop([this, synid]() {
+            if (auto app = window_weak.lock()) {
+
+                auto profile = (*app)->global<UserProfile>().get_model();
+                slint::SharedString jserv_select;
+                for (int i = 0; i < profile.synodes_list->row_count(); i++)
+                    if (synid == profile.synodes_list->row_data(i).value()) {
+                        jserv_select = profile.jserv_list->row_data(i).value();
+                        anlog(std::format("profile.synodes_list[{:d}] = {}, jserv_list[{}] : {}; ",
+                                          i, std::string_view(synid), i, std::string_view(jserv_select)));
+                        break;
+                    }
+                profile.synode_jserv = jserv_select;
+                (*app)->global<UserProfile>().set_model(profile);
+            }
+        });
+    }
+
+    void on_test_synlogin(const slint::ComponentHandle<App>& ui,
+                          const string& uid, const string& pswd, const string& pswd2, const string& synjserv) {
+
+        if (auto err = validate_jserv(synjserv))
+            insert_status(ui, err.value());
+        if (auto err = validate_token(pswd))
+            insert_status(ui, err.value());
+        if (pswd != pswd)
+            insert_status(ui, "Passwords are not same.");
+
+        std::string msg{std::format("login {} -> {}", uid, synjserv)};
+        insert_status(ui, msg);
+
+        SessionClient ssclient{JServUrl{synjserv, &opts}, {}, {}};
+
+        ssclient.loginWithUri(appsettings.sysuri, uid, pswd, "test-device",
+                              [ui, this](MsgCode::Code c, const string& e, const vector<string>& args) {
+            insert_status(ui, e);
+        });
+
+        if (!ssclient.ssInf.ssid.empty())
+            insert_status(ui, "Ok!");
+    }
+
     void ping_synode(const slint::ComponentHandle<App>& ui,
-                     const string& org, const string& domain, const string& synid, const string& jserv) {
-      std::string msg{std::format("Pinging {}/{}/{} : {}", org, domain, synid, jserv)};
-      insert_status(ui, msg);
-      AnsonResp resp = Clients::pingLess(JServUrl{jserv, doclientier->client.jserv.jprotocol},
-                        doclientier->sysuri, "ping by slingleton", AsynClienter::onErr);
-      insert_status(ui, {"Pinging OK: "s + jserv});
+                     const string& org, const string& domain, const string& synid, const string& ui_jserv) {
+        std::string msg{std::format("Pinging {}/{}/{} : {}", org, domain, synid, ui_jserv)};
+        insert_status(ui, msg);
+        // Desgin / Debug Notes
+        // use temp jserv, not doclientier's
+        // Error popped here because there is no wrapper like asyquery_domconfig() etc.
+        try {
+            AnsonResp resp = Clients::pingLess(JServUrl{ui_jserv, &opts},
+                                      doclientier->sysuri, "ping by slingleton", AsynClienter::onErr);
+            insert_status(ui, resp.m);
+        }
+        catch (const std::exception& e) {
+            anerror(e.what());
+            AsynClienter::onErr(MsgCode::Code::exIo, e.what(), {});
+        }
+        catch (...) {
+            anerror("Caught unknown exception.");
+        }
+        insert_status(ui, {"Pinging OK: "s + ui_jserv});
     }
 
     /**
@@ -265,6 +331,16 @@ namespace anson {
     }
 
     void settings(const DesktopSettings& s) { this->appsettings = std::move(s); }
+
+    void save_settings(const string& pth) {
+        anlog(std::format(R"("saving settings:
+        market: {}, market_name: {}
+        sysuri: {}, synuri: {}")",
+        appsettings.market, appsettings.market_name,
+        appsettings.sysuri, appsettings.synuri
+        ));
+        appsettings.to_file(pth, opts);
+    }
 
     /**
      * There is a validation pattern issue in slint.
