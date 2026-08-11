@@ -6,8 +6,6 @@
 #include <io/odysz/common.h>
 #include <io/odysz/jprotocol.h>
 
-#include <thread>
-#include <chrono>
 #include <io/odysz/jprotocol.h>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
@@ -17,12 +15,13 @@
 
 #include "app-window.h"
 #include "wsclients.h"
-#include "ipcagent_manager.h"
 
 namespace anson {
 
 class AsynClienter : public Doclientier {
 protected:
+    static AstMap wsAsts;
+    static JsonOpt wsctx; //{&wsAsts};
 
     DesktopSettings& appsettings;
 
@@ -46,7 +45,7 @@ protected:
             // anlog("Show be the ws connection report ...");
         }
         else { //if (!rep.body.empty()) {
-            string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
+            string clientpath_state = map2str(rep.Body().syncingPage.clientPaths, *client.jserv.jprotocol.ctx);
             string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
             anlog(status_txt);
             inv_insert_status(window_weak, status_txt);
@@ -64,13 +63,20 @@ protected:
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
-    inline static const string sysuri = "/sys/cpp";
-    inline static const string synuri = "/syn/cpp";
+    static void registerCtx(const string& protocol_id = "ipc") {
+        register_jserv(&wsctx);
+        register_semantier(&wsctx, "ast");
+        register_doctier(&wsctx, "ast");
+        register_iport<WSPort>(&wsctx, "ast/wsport.ast.json");
+        register_anclient_cmake(&wsctx, "ast");
+        register_desktopsettingsAst(&wsctx);
+        register_langstringAst(&wsctx);
+    };
 
     std::unique_ptr<WSClient> wsclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
-        anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
+        anerror(std::format("[ERROR code {}], error: {}", c.to_string(c.valeur), e));
     };
 
     inline static OnProgress onprogress = [](const string& m, const string &a) {
@@ -78,14 +84,18 @@ public:
     };
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
-        : Doclientier("h_photos", sysuri, synuri, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
+        : Doclientier("h_photos", WSClient::sysuri, WSClient::synuri, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
+        : Doclientier("h_photos", WSClient::sysuri, WSClient::synuri, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::docstier});
+    // void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::docstier});
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port);
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = WSPort::docstier) {
+        push_files(paths, WSPort{client.jserv.jprotocol.ctx, port_code});
+    }
 
     void query_synode(vector<std::string> paths) {
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";

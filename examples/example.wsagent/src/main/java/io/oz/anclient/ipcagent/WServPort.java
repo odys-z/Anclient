@@ -1,7 +1,6 @@
 package io.oz.anclient.ipcagent;
 
 import static io.odysz.common.LangExt.f;
-import static io.odysz.common.LangExt.shouldntnull;
 import static io.odysz.common.Utils.logi;
 
 import java.io.IOException;
@@ -43,9 +42,9 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 	protected final HashMap<String, Session> wsessions;
 
 	public static WServPort build(DesktopSettings settings) {
-		shouldntnull(new Object() {}, settings.ipc_tiers);
+//		shouldntnull(new Object() {}, settings.ipc_tiers);
 		try {
-			instance = new WServPort(settings.ipc_tiers);
+			instance = new WServPort();
 		} catch (SemanticException | IOException e) {
 			e.printStackTrace();
 		}
@@ -55,14 +54,15 @@ public class WServPort extends Endpoint implements MessageHandler.Whole<String> 
 	private RemoteEndpoint.Async asyremote;
 	private RemoteEndpoint.Basic synremote;
 
-	public WServPort() {
-		ipcPorts = new HashMap<IPort, IWSPoint>();
-		wsessions= new HashMap<String, Session>();
-		instance = this;
-	}
+//	public WServPort() {
+//		ipcPorts = new HashMap<IPort, IWSPoint>();
+//		wsessions= new HashMap<String, Session>();
+//		instance = this;
+//	}
 
-	public WServPort(String[] tiernames) throws SemanticException, IOException {
-		ipcPorts = new HashMap<IPort, IWSPoint>(tiernames.length);
+	public WServPort() throws SemanticException, IOException {
+		instance = this;
+		ipcPorts = new HashMap<IPort, IWSPoint>();
 
 		IWSPoint wsp = new WSEcho(this);
 		ipcPorts.put(wsp.port(), wsp);

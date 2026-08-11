@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
         }
 
         insert_status(ui, "Ping: placing tasks ...");
-        slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
+        slingle.doclientier->push_files(filemap, WSPort::ping);
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
         else
             fileselection.emplace(string{fileitem.fullpath}, std::vector<LangExt::VarType>{"syncing"});
         
-        string status = std::format("Total selected files: \n{}.", map2str(fileselection));
+        string status = std::format("Total selected files: \n{}.", map2str(fileselection, Slingleton::opts));
         anlog(status);
     });
 
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
         shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
         if (!qry) {
             anwarn("Dropping expected DocsResp ===========");
-            anwarn(qryptr->toBlock());
+            anwarn(qryptr->toBlock(Slingleton::opts));
             return;
         }
 
@@ -305,6 +305,10 @@ int main(int argc, char **argv) {
         ui->global<UserProfile>().set_model(profile);
     });
 
-    ui->run();
+    try { ui->run();
+    } catch(runtime_error e) {
+        anerror(e.what());
+    }
+    slingle.agentController->stop_agent();
     return 0;
 }

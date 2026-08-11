@@ -1,6 +1,12 @@
-{ "type": "io.odysz.anson.AnsonJavaEnumAst",
+{ "type": "io.odysz.reflect.AnsonJavaEnumAst",
   "baseAnclass": "io.odysz.semantic.jprotocol.AnsonMsg.Port",
   "dataAnclass": "io.oz.anclient.ipcagent.WSPort",
   "encode": { "doclient": "doclient.ws", "configIPC": "config.ws", "echo": "echo.ws", "ping": "ping.ws", "docstier": "docs.ws"},
-  "decode": { "doclient.ws": "doclient", "config.ws": "configIPC", "echo.ws": "echo", "ping.ws": "ping", "docs.ws": "docstier"}
+  "decode": { "doclient.ws": "doclient", "config.ws": "configIPC", "echo.ws": "echo", "ping.ws": "ping", "docs.ws": "docstier"},
+  "ctorsemantics": [
+    { "base": {"stype": "()", "args": ["base", "\"_sentinel_\""]}},
+    { "base": {"stype": "()", "args": ["base", "enumval"]},
+      "args": [{"stype": "",  "args": ["const string&", "enumval"]}]
+    }
+  ]
 }

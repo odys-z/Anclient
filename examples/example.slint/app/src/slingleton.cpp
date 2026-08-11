@@ -25,7 +25,7 @@ bool Slingleton::load_settings(const string& settings_json, const JsonOpt& opts)
 void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx) {
     AsynClienter::onErr = [&appwin](MsgCode::Code c, const string& e, vector<string>args) {
         if (!instance->validsettings()) {
-            anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
+            anerror(std::format("[ERROR code {}], error: {}", MsgCode::to_string(c), e));
             slint::invoke_from_event_loop([&appwin]() {
             if (auto app = appwin.lock()) {
                 auto data = (*app)->global<AppState>().get_model();

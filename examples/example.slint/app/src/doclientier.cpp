@@ -11,16 +11,14 @@
 
 namespace anson {
 
+AstMap AsynClienter::wsAsts;
+JsonOpt AsynClienter::wsctx{&AsynClienter::wsAsts};
+
 void AsynClienter::reconnect_ipc() {
-    // if (!load_settings(settings_json)) {
-    //     anerror("Failed to load settings.");
-    //     return;
-    // }
     if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
-        // WSClient* _wsclient = new WSClient{JServUrl{appsettings.wshost, appsettings.wsport, {"ipc"}}, onmsg};
-        JServUrl synjserv{appsettings.synode_jserv, JProtocol{"ipc", {}}};
-        WSClient* _wsclient = new WSClient(synjserv, onmsg);
+        JServUrl wsjserv{std::format("http://{}:{}", appsettings.wshost, appsettings.wsport), JProtocol{"ipc", &wsctx}};
+        WSClient* _wsclient = new WSClient(wsjserv, onmsg);
         try {
             _wsclient->connect();
             this->wsclient.reset(_wsclient);
@@ -71,7 +69,7 @@ void AsynClienter::asy_echows(const string & echo_msg) {
 
         EchoReq echo{EchoReq::A::echo};
         echo.echo = echo_msg;
-        AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
+        AnsonMsg<EchoReq> echomsg(Port(client.jserv.jprotocol.ctx, Port::echo), echo);
 
         wsclient->asynSend(echomsg);
     });
@@ -111,14 +109,15 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         req.docTabl = Doclientier::doctbl;
         req.device = Device{Slingleton::appsettings.device, Slingleton::appsettings.device, Slingleton::appsettings.device};
         req.a = DocsReq::A::selectSyncs;
+        req.synuri = synuri;
         req.limit = -1;
         req.pageInf.size = -1;
 
-        anlog("=========================\n"s + client.ssInf.toBlock());
+        anlog("=========================\n"s + client.ssInf.toBlock(*client.jserv.jprotocol.ctx));
 
-		AnsonMsg<DocsReq> q = client.userReq(synuri, Port{Port::docstier}, req)
+        AnsonMsg<DocsReq> q = client.userReq(synuri, Port{client.jserv.jprotocol.ctx, Port::docstier}, req)
 				                    .Header(client.ssInf);
-        anlog("=========================\n"s + q.toBlock());
+        anlog("=========================\n"s + q.toBlock(*client.jserv.jprotocol.ctx));
 
         try {
             DocsResp resp = client.commit<DocsResp>(q, err);

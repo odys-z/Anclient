@@ -22,15 +22,16 @@
 namespace anson {
 
   class Slingleton {
-    static JsonOpt opts;
-    static AstMap  asts;
 
     static JsonOpt registry_opts;
     static AstMap  registry_asts;
 
     static Slingleton* instance;
 
+    static AstMap  asts;
   public:
+    static JsonOpt opts;
+
     Slingleton(const Slingleton&) = delete;
     Slingleton& operator=(const Slingleton&) = delete;
     Slingleton(Slingleton&&) = delete;
@@ -61,13 +62,15 @@ namespace anson {
       if (instance == nullptr) {
         instance = new Slingleton();
         instance->window_weak = appwin;
-        register_jserv(asts, opts);
-        register_semantier(asts, "ast");
-        register_doctier(asts, "ast");
-        register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_anclient_cmake(asts, "ast");
-        register_desktopsettingsAst(asts, &opts);
-        register_langstringAst(asts);
+        register_jserv(&opts);
+        register_semantier(&opts, "ast");
+        register_doctier(&opts, "ast");
+        // register_iport<Port>(&opts, "ast/port.ast.json");
+        register_anclient_cmake(&opts, "ast");
+        register_desktopsettingsAst(&opts);
+        register_langstringAst(&opts);
+
+        AsynClienter::registerCtx("ipc");
 
         // settings
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
@@ -94,9 +97,9 @@ namespace anson {
         instance->setup_doclientier(appwin, &opts);
 
         // registry client 
-        register_jserv(registry_asts, registry_opts);
-        register_semantier(registry_asts, "ast");
-        register_centralclientier(registry_asts, "ast/");
+        register_jserv(&registry_opts);
+        register_semantier(&registry_opts, "ast");
+        register_centralclientier(&registry_opts, "ast/");
         instance->setup_regclient();
 
         anlog(std::format("Has volume: {}, {}: {}",
@@ -308,7 +311,7 @@ namespace anson {
      */
     void enqueue_synode(shared_ptr<AnsonResp> msg) {
       std::lock_guard<std::mutex> lock(synode_mutex);
-      anlog("Enqueuing: "s + msg->toBlock());
+      anlog("Enqueuing: "s + msg->toBlock(opts));
       synode_msgs.push(msg);
     }
 
@@ -339,7 +342,7 @@ namespace anson {
         appsettings.market, appsettings.market_name,
         appsettings.sysuri, appsettings.synuri
         ));
-        appsettings.to_file(pth, opts);
+        appsettings.to_file(pth, &opts);
     }
 
     /**

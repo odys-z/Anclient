@@ -1,28 +1,35 @@
 #pragma once
 
+#include <entt/meta/factory.hpp>
+#include <entt/meta/meta.hpp>
+
 #include <io/odysz/anson.h>
 #include <io/odysz/jprotocol.h>
+#include <io/odysz/entt_jserv.h>
+#include <io/odysz/module/rs.h>
+
+
 
 namespace anson {
-/**
- * @brief The WSPort class
- * TODO generate
- */
-class WSPort : public JavaEnum {
+
+class WSPort : public anson::Port {
 public:
     inline static const std::string _type_ = "io.oz.anclient.ipcagent.WSPort";
-    inline static const std::string doclient = "doclient.ws";
-    inline static const std::string configIPC = "config.ws";
-    inline static const std::string echo = "echo.ws";
-    inline static const std::string ping = "ping.ws";
-    inline static const std::string docstier = "docs.ws";
 
-    WSPort(): JavaEnum(_type_, "na") {
-        andebug("WSPort Default Cosntructor");
+    inline static const string doclient = "doclient.ws";
+    inline static const string configIPC = "config.ws";
+    inline static const string echo = "echo.ws";
+    inline static const string ping = "ping.ws";
+    inline static const string docstier = "docs.ws";
+
+    WSPort(const JsonOpt* ctx) : Port(ctx, "_sentinel_") {
+        Anclass(_type_);
     }
 
-    WSPort(string enum_val) : JavaEnum(_type_, enum_val) {
-        andebug("WSPort Cosntructor<string>("s + enum_val + ").enm = " + enm);
+    WSPort(const JsonOpt* ctx, const string& enumval) : Port(ctx, enumval) {
+        Anclass(_type_);
     }
 };
+
+
 }

@@ -1,7 +1,7 @@
 package io.oz.anclient.app;
 
-import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonField;
+import io.odysz.jclient.AnclientSettings;
 
 /**
  * desktop-settings.ast.json
@@ -29,7 +29,7 @@ import io.odysz.anson.AnsonField;
  *   "ctorsemantics": [ ]
  * }</pre>
  */
-public class DesktopSettings extends Anson {
+public class DesktopSettings extends AnclientSettings {
 	/** For reload each time re-login to a synode */
 	@AnsonField(ignoreFrom=true)
 	public String json_path;
