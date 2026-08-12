@@ -11,8 +11,9 @@
 
 
 namespace anson {
-
-class WSPort : public anson::Port {
+/*
+*/
+class WSPort_test : public anson::Port {
 public:
     inline static const std::string _type_ = "io.oz.anclient.ipcagent.WSPort";
 
@@ -22,11 +23,11 @@ public:
     inline static const string ping = "ping.ws";
     inline static const string docstier = "docs.ws";
 
-    WSPort(const JsonOpt* ctx) : Port(ctx, "_sentinel_") {
+    WSPort_test(const JsonOpt* ctx) : Port(ctx, "_sentinel_") {
         Anclass(_type_);
     }
 
-    WSPort(const JsonOpt* ctx, const string& enumval) : Port(ctx, enumval) {
+    WSPort_test(const JsonOpt* ctx, const string& enumval) : Port(ctx, enumval) {
         Anclass(_type_);
     }
 };

@@ -187,7 +187,7 @@ public class WSDoctier implements IWSPoint  {
 			if (synodeclient.client == null) {
 				mustnonull(settings.synode_jserv, "settings.synode_jserv is null!"); // check here, not at initiating
 	        	synodeclient.loginWithUri(settings.synode_jserv,
-	        						settings.admin, settings.device, settings.token);
+	        						settings.admin, settings.device, settings.domain_token);
 			}
 			synodeclient.asyVideos(doc0, docs, proc, ok, err);
 		}

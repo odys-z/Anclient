@@ -11,14 +11,14 @@
 
 namespace anson {
 
-AstMap AsynClienter::wsAsts;
-JsonOpt AsynClienter::wsctx{&AsynClienter::wsAsts};
+// AstMap AsynClienter::wsAsts;
+// JsonOpt AsynClienter::wsctx{&AsynClienter::wsAsts};
 
 void AsynClienter::reconnect_ipc() {
     if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
-        JServUrl wsjserv{std::format("http://{}:{}", appsettings.wshost, appsettings.wsport), JProtocol{"ipc", &wsctx}};
-        WSClient* _wsclient = new WSClient(wsjserv, onmsg);
+        JServUrl wsjserv{std::format("ws://{}:{}", appsettings.wshost, appsettings.wsport), JProtocol{"ipc", &Slingleton::opts}};
+        WSClient* _wsclient = new WSClient(wsjserv, appsettings, onmsg);
         try {
             _wsclient->connect();
             this->wsclient.reset(_wsclient);
@@ -47,7 +47,7 @@ void AsynClienter::reconnect_ipc() {
     }
 }
 
-void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths, const WSPort& port) {
+void AsynClienter::push_files(const map<string, vector<LangExt::VarType>>& syncing_paths, const Port& port) {
     reconnect_ipc();
 
     PathsPage syncingpage;
@@ -90,32 +90,33 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             anlog("Login to "s + appsettings.synode_jserv);
             login_synode(this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
-            client.openLink(sysuri);
+            client.openLink(appsettings.sysuri);
         }
 
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             return;
         }
         if (!client.heartbeating) {
-            client.openLink(sysuri);
+            client.openLink(appsettings.sysuri);
             return;
         }
         
-		client.header.Act(synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
+        client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 
 		DocsReq req;
-        req.syncingPage = PathsPage{Slingleton::appsettings.device, 0, static_cast<int>(syncing_paths.size())};
+        DesktopSettings& s = Slingleton::appsettings;
+        req.syncingPage = PathsPage{s.device, 0, static_cast<int>(syncing_paths.size())};
         req.syncingPage.clientPaths = syncing_paths;
         req.docTabl = Doclientier::doctbl;
-        req.device = Device{Slingleton::appsettings.device, Slingleton::appsettings.device, Slingleton::appsettings.device};
+        req.device = Device{s.device, s.device, s.device};
         req.a = DocsReq::A::selectSyncs;
-        req.synuri = synuri;
+        req.synuri = s.synuri;
         req.limit = -1;
         req.pageInf.size = -1;
 
         anlog("=========================\n"s + client.ssInf.toBlock(*client.jserv.jprotocol.ctx));
 
-        AnsonMsg<DocsReq> q = client.userReq(synuri, Port{client.jserv.jprotocol.ctx, Port::docstier}, req)
+        AnsonMsg<DocsReq> q = client.userReq(s.synuri, Port{client.jserv.jprotocol.ctx, Port::docstier}, req)
 				                    .Header(client.ssInf);
         anlog("=========================\n"s + q.toBlock(*client.jserv.jprotocol.ctx));
 

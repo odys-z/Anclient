@@ -1,469 +1,280 @@
 """
-invoke make
+Invoke tasks for building album_gui and assembling a runnable dist/ folder.
+
+Usage:
+    inv configure                 # cmake configure (Debug by default)
+    inv build                     # cmake build (runs configure if needed)
+    inv copy-dlls                 # locate + copy runtime DLLs into dist/
+    inv dist                      # build + copy-dlls in one shot
+    inv clean                     # remove the build directory
+    inv keepgit-clean             # remove build/, but keep _deps/ and cargo/
+                                  # (avoids re-cloning from GitHub / re-compiling
+                                  # every Rust crate on a slow connection)
+
+    inv build --config=Release
+    inv dist --config=Release
+
+Install once:
+    pip install invoke
 """
+
 import shutil
-import sys
-from types import LambdaType
-from typing import cast
+import subprocess
 from pathlib import Path
-from anson.io.odysz.common import Utils, LangExt
-from anson.io.odysz.utils import zip2
-from semanticshare.io.odysz.semantic.jprotocol import JServUrl
-from docutils.utils import relative_path
-from invoke import task, call
-import os
 
-from semanticshare.io.oz.anclient.app import DesktopSettings
-from semanticshare.io.oz.invoke import requir_pkg, SynodeTask, CentralTask
+from anson.io.odysz.utils import copy_anyway
+from invoke import task
 
-requir_pkg("anson.py3", "0.4.3")
-requir_pkg("semantics.py3", "0.5.2")
+# ---------------------------------------------------------------------------
+# Project layout — adjust these two if your repo is laid out differently.
+# ---------------------------------------------------------------------------
+ROOT_DIR = Path(__file__).resolve().parent
+BUILD_DIR = ROOT_DIR / "qt-build"
+DIST_DIR = BUILD_DIR / "dist"
 
-from anson.io.odysz.anson import Anson
-from semanticshare.io.oz.syntier.serv import ExternalHosts
+# Matches VCPKG_INSTALLED_DIR in the root CMakeLists.txt
+# (${CMAKE_SOURCE_DIR}/../../../vcpkg/installed)
+VCPKG_INSTALLED_DIR = ROOT_DIR / "../../../vcpkg/installed"
+VCPKG_TRIPLET = "x64-mingw-dynamic"
 
-version_pattern = '[0-9\\.]+'
+TARGET_NAME = "album_gui"
 
-# dictionary.json
-synuser_pswd_pattern = '\"pswd\"\\s*:\\s*\"[^"]*\"'
-org_orgid_pattern    = '\"orgId\"\\s*:\\s*\"[^"]*\"'
+# DLLs pulled from vcpkg's install tree (names may drift with library
+# version bumps — adjust if a `where`/`find` shows a different filename).
+VCPKG_DLL_NAMES = [
+    "libboost_url-*.dll",
+    "libcrypto-3-x64.dll",
+    "libssl-3-x64.dll",
+    "libz*.dll",
+]
 
-# synode.json
-re_market_id     = '\"market_id\"\\s*:\\s*\"[^"]*\"'
-re_central_iport = '\"central_iport\"\\s*:\\s*\"[^"]*\"'
-re_central_path  = '\"central_path\"\\s*:\\s*\"[^\"]*\"'
+# DLLs that come from CMake FetchContent-built subprojects (searched for
+# under build/_deps rather than a fixed path, since the exact subbuild
+# folder name can change).
+FETCHCONTENT_DLL_NAMES = [
+    "slint_cpp.dll",
+    "libcpr.dll",
+]
 
-re_mirror_path_deprecated = lambda lang_id: '\"{lang}\"\\s*:\\s*{{\\s*\"jre_mirror\"\\s*:\\s*\"[^\"]*\"'.format(lang=lang_id) 
-'''
-"en": { "jre_mirror": "value to be replaced"}
-ISSUE: regex is to be replaced with Anson's deserialize and serialize.
-'''
-re_mirror_path = lambda lang_id: '\"jre_mirror.{lang}.re\"\\s*:\\s*\"[^\"]*\"'.format(lang=lang_id) 
+# MinGW compiler runtime DLLs — must come from the SAME g++ that built the
+# exe. See tasks below: located next to whatever `where g++` resolves to.
+MINGW_RUNTIME_DLL_NAMES = [
+    "libgcc_s_seh-1.dll",
+    "libgcc_s_dw2-1.dll",  # alternate exception model name, one of the two will exist
+    "libstdc++-6.dll",
+    "libwinpthread-1.dll",
+]
 
-# settings.json
-re_central_pswd  = '\"centralPswd\"\\s*:\\s*\"[^\"]*\"'
-re_install_key   = '\"installkey\"\\s*:\\s*\"[^\"]*\"'
-re_webport       = '\"webport\"\\s*:\\s*[0-9]+'
-re_jserv_port    = '\"port\"\\s*:\\s*\\d+'
+# Top-level entries directly under build/ to preserve when doing a
+# "clean but keep what's expensive to re-fetch/re-build" reset:
+#   _deps  — FetchContent-downloaded sources + their subbuild stamp files
+#            (deleting these forces re-cloning from GitHub on reconfigure)
+#   cargo  — Corrosion/cargo target dir for Slint's Rust crates (deleting
+#            this forces a full recompile of every crate, not a re-download,
+#            but it's just as slow to rebuild)
+KEEP_DIRS_ON_CLEAN = {"_deps", "cargo"}
 
-taskcfg = cast(SynodeTask, None)
+
+def _gxx_bin_dir():
+    """Directory containing the g++ that's actually on PATH (mirrors `where g++`)."""
+    gxx = shutil.which("g++") or shutil.which("g++.exe")
+    if not gxx:
+        raise RuntimeError("g++ not found on PATH — cannot locate matching MinGW runtime DLLs")
+    return Path(gxx).resolve().parent
+
+
+def _vcpkg_bin_dir(config):
+    """vcpkg's DLL output dir for the active triplet + build type."""
+    base = (VCPKG_INSTALLED_DIR / VCPKG_TRIPLET).resolve()
+    return (base / "debug" / "bin") if config.lower() == "debug" else (base / "bin")
+
+
+def _copy_if_found(src_dir, name_patterns, dest, label):
+    """Glob src_dir for each pattern and copy first match to dest. Warns if none found."""
+    dest.mkdir(parents=True, exist_ok=True)
+    copied = []
+    for pattern in name_patterns:
+        matches = list(src_dir.glob(pattern)) if src_dir.exists() else []
+        if not matches:
+            print(f"  [WARN] {label}: no match for '{pattern}' in {src_dir}")
+            continue
+        for m in matches:
+            shutil.copy2(m, dest / m.name)
+            copied.append(m.name)
+    return copied
+
+
+def _copy_from_tree(search_root, filenames, dest):
+    """Recursively search search_root for exact filenames (used for FetchContent
+    build outputs, whose folder names vary), copy first match of each."""
+    dest.mkdir(parents=True, exist_ok=True)
+    copied = []
+    for name in filenames:
+        matches = list(search_root.rglob(name)) if search_root.exists() else []
+        if not matches:
+            print(f"  [WARN] fetchcontent dll: '{name}' not found under {search_root}")
+            continue
+        shutil.copy2(matches[0], dest / name)
+        copied.append(name)
+    return copied
+
+
+def _generator_output_exists(generator):
+    """The actual file cmake --build depends on for this generator — a partial/
+    failed configure can leave CMakeCache.txt behind without this file."""
+    if generator.lower() == "ninja":
+        return (BUILD_DIR / "build.ninja").exists()
+    if "makefiles" in generator.lower():
+        return (BUILD_DIR / "Makefile").exists()
+    # Visual Studio / other generators: fall back to cache-only check
+    return (BUILD_DIR / "CMakeCache.txt").exists()
+
 
 @task
-def check_env(c):
-    # The active Python binary executing Invoke
-    print(f"Python Executable : {sys.executable}")
-    
-    # Python version details
-    print(f"Python Version    : {sys.version.split()[0]}")
-    
-    # Virtualenv / Environment base path
-    print(f"Prefix / Venv Path: {sys.prefix}")
-
-    print(f"SynodeTask Since Tag: {SynodeTask.since}")
-
-    print("To have invoke run in the curent venv, use")
-    print("python -m invoke build --deploy=tasks.pm-king.json")
-
-@task
-def validate(c, deploy: str = 'tasks.json'):
-    print(f'--------------    validate   ------------------')
-    global taskcfg
-    if taskcfg is None:
-        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
-
-    print('taskcfg:', taskcfg.deploy.orgid, taskcfg.version)
-
-    task_cent = cast(CentralTask, Anson.from_file(os.path.join(taskcfg.central_dir, 'tasks.json')))
-
-    if taskcfg.deploy.central_pswd != task_cent.users['admin']['pswd']: # Issue: should be ['admin'].pswd:
-        Utils.warn('Warning: central_pswd is not set to default value.')
-        sys.exit(1)
+def configure(ctx, config="Debug", generator="MinGW Makefiles"):
+    """cmake configure step."""
+    BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    ctx.run(
+        f'cmake -S "{ROOT_DIR}" -B "{BUILD_DIR}" -G "{generator}" '
+        f'-DCMAKE_BUILD_TYPE={config}'
+    )
 
 
 @task
-def create_volume(c):
-    for vol, fs in taskcfg.vol_files.items():
-        if not os.path.isdir(vol):
-            os.mkdir(vol)
-        for fn in fs: 
-            with open(os.path.join(vol, fn), 'a', encoding='utf-8') as vf:
-                print(f'Volume file created: {os.path.join(vol, fn)}')
-                vf.close()
+def build(ctx, config="Debug", target=TARGET_NAME, generator="MinGW Makefiles", reconfigure=False):
+    """cmake build step (configures first if missing, incomplete, or --reconfigure)."""
+    if reconfigure or not _generator_output_exists(generator):
+        configure(ctx, config=config, generator=generator)
+    ctx.run(f'cmake --build "{BUILD_DIR}" --target {target} --config {config}')
 
 
-def updateApkRes():
+@task
+def copy_dlls(ctx, config="Debug"):
     """
-    Update the APK resource record (ref-link) in the host.json file.
-    
-    Args:
-        host_json (str): Path to the host.json file.
-        res (dict): Dictionary containing the APK resource information.
+    Locate and copy every runtime DLL album_gui.exe needs into dist/:
+      - MinGW compiler runtime, from the same g++ currently on PATH
+      - vcpkg-built dependencies (boost_url, openssl, zlib, ...)
+      - FetchContent-built libraries (slint_cpp, cpr)
     """
-    print('Updating host.json with APK resource...', taskcfg.host_json)
+    DIST_DIR.mkdir(parents=True, exist_ok=True)
 
-    hosts = cast(ExternalHosts, Anson.from_file(taskcfg.host_json))
-    hosts.marketid = taskcfg.deploy.market_id
-    print(os.getcwd(), taskcfg.host_json)
+    print(f"dist dir: {DIST_DIR}")
 
-    print('host.json market:', hosts.marketid)
-    print('host.json:', hosts)
+    gxx_dir = _gxx_bin_dir()
+    print(f"g++ bin dir: {gxx_dir}")
+    mingw_copied = _copy_from_tree(gxx_dir, MINGW_RUNTIME_DLL_NAMES, DIST_DIR)
+    print(f"  copied MinGW runtime: {mingw_copied}")
 
-    res = {'apk': f'res-vol/portfolio-{taskcfg.apk_ver}.apk'}
-    hosts.resources.update(res)
-    print('Updated host.json/reources:', hosts.resources)
+    vcpkg_bin = _vcpkg_bin_dir(config)
+    print(f"vcpkg bin dir: {vcpkg_bin}")
+    vcpkg_copied = _copy_if_found(vcpkg_bin, VCPKG_DLL_NAMES, DIST_DIR, "vcpkg")
+    print(f"  copied vcpkg dlls: {vcpkg_copied}")
 
-    downloads = {f'{taskcfg.deploy.orgid}': [f'{taskcfg.download_root}/{taskcfg.zip_name()}']}
-    hosts.synodesetups.update(downloads)
-    print('Updated host.json/synodesetups:', hosts.synodesetups)
+    deps_dir = BUILD_DIR / "_deps"
+    print(f"FetchContent deps dir: {deps_dir}")
+    fc_copied = _copy_from_tree(deps_dir, FETCHCONTENT_DLL_NAMES, DIST_DIR)
+    print(f"  copied FetchContent dlls: {fc_copied}")
 
-    hosts.toFile(taskcfg.host_json)
-    print('host.json updated successfully.', hosts)
-
-    return None
-
-
-# @task(pre=[call(validate, deploy='tasks.json')])
-def config(c, deploy: str = 'tasks.json'):
-    validate(c, deploy)
-
-    print(f'--------------    configuration   ------------------')
-
-    # this_directory = os.getcwd()
-    # version_file = os.path.join(this_directory, 'pom.xml')
-    print(f'-- synode version: {taskcfg.version} --'),
-
-    # synode-srv-{ver}.jar
-    version_file = 'pom.xml'
-    Utils.update_patterns(version_file, {
-        f'<!-- auto update token TASKS.PY/CONFIG --><version>{version_pattern}</version>':
-        f'<!-- auto update token TASKS.PY/CONFIG --><version>{taskcfg.version}</version>',
-    })
-
-    # apk
-    version_file = os.path.join(taskcfg.android_dir, 'build.gradle')
-    Utils.update_patterns(version_file, {
-        f"app_ver = '{version_pattern}'": f"app_ver = '{taskcfg.apk_ver}'"
-    })
-
-    # FIXME This is not correct. To be moved to synode.py tasks.py
-    # global synode_json_bak, synode_json
-    # synode_json = os.path.join(this_directory, '../synode.py/src/synodepy3/synode.json')
-    # shutil.copy2(synode_json, synode_json_bak)
-    # installer
-    synode_json = taskcfg.backup('../synode.py/src/synodepy3/synode.json')
-    Utils.update_patterns(synode_json, {
-        re_market_id: f'"market_id": "{taskcfg.deploy.market_id}"',
-        re_mirror_path('en'): f'"jre_mirror": "{taskcfg.deploy.mirror_path}"',
-        re_central_iport: f'"central_iport": "{taskcfg.deploy.central_iport}"',
-        re_central_path:  f'"central_path" : "{taskcfg.deploy.central_path}"'
-    })
-
-    # vol/dictionary.json
-    diction_file = taskcfg.backup(os.path.join(taskcfg.registry_dir, 'dictionary.json'))
-    Utils.update_patterns(diction_file, {
-        org_orgid_pattern   : f'"orgId": "{taskcfg.deploy.orgid}"',
-        synuser_pswd_pattern: f'"pswd": "{taskcfg.deploy.syn_admin_pswd}"'
-    })
-
-    # album-web
-    settings_json = taskcfg.backup(os.path.join(taskcfg.web_inf_dir, 'settings.json'))
-    Utils.update_patterns(settings_json, {
-        re_central_pswd: f'"centralPswd" : "{taskcfg.deploy.central_pswd}"',
-        re_webport     : f'"webport"     : {taskcfg.deploy.web_port}',
-        re_jserv_port  : f'"port"        : {taskcfg.deploy.jserv_port}',
-        re_install_key : f'"installkey"  : "{taskcfg.deploy.root_key}"'
-    })
-
-    ''' And save tasks-central.json
-    central_settings = cast(SynodeTask, Anson.from_file('central/settings.json'))
-    taskcfg.config_central(central_settings)
-    central_settings.toFile('central/settings.json')
-    '''
-
-    # ipc-agent.jar
-    version_file = 'pom.xml'
-    Utils.update_patterns(version_file, {
-        f'<!-- auto update token TASKS.PY/CONFIG --><version>{version_pattern}</version>':
-            f'<!-- auto update token TASKS.PY/CONFIG --><version>{taskcfg.version}</version>',
-    })
-
-    # Desktop 0.1.0
-    desk_sets_json = taskcfg.backup(os.path.join(taskcfg.desktop_dir, 'app/settings/app-settings.json'))
-
-    Utils.update_patterns(desk_sets_json, {
-        re_market_id: f'"market_id": "{taskcfg.deploy.market_id}"',
-        re_central_pswd: f'"centralPswd" : "{taskcfg.deploy.central_pswd}"',
-    })
+    missing = (
+        [n for n in MINGW_RUNTIME_DLL_NAMES if n not in mingw_copied
+         and n != "libgcc_s_dw2-1.dll"]  # one of the two exception-model DLLs is expected to miss
+        + [n for n in FETCHCONTENT_DLL_NAMES if n not in fc_copied]
+    )
+    if missing:
+        print(f"\n[WARN] still missing, copy manually if the exe fails to start: {missing}")
+    else:
+        print("\nAll expected DLLs copied.")
 
 
 @task
-def clean(c):
-    if not os.path.exists(taskcfg.dist_dir):
-        os.makedirs(taskcfg.dist_dir, exist_ok=True)
-
-    for item in os.listdir(taskcfg.dist_dir):
-        item_path = os.path.join(taskcfg.dist_dir, item)
-        print('cleaning', item_path, taskcfg.zip_name())
-        if item_path == taskcfg.zip_name():
-            if os.path.isfile(item_path):
-                os.unlink(item_path)
-            elif os.path.isdir(item_path):
-                shutil.rmtree(item_path)
+def dist(ctx, config="Debug", target=TARGET_NAME, generator="Ninja", reconfigure=False):
+    """Build the exe, then assemble dist/ with all required DLLs and assets."""
+    build(ctx, config=config, target=target, generator=generator, reconfigure=reconfigure)
+    copy_dlls(ctx, config=config)
+    print(f"\nDone. Run: {DIST_DIR / (target + '.exe')}")
 
 
-# @task(config)
+def _rmtree_onerror(func, path, exc_info):
+    """shutil.rmtree error handler: git marks pack files read-only on Windows,
+    which blocks os.unlink. Clear the attribute and retry once."""
+    import os
+    import stat
+
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
 @task
-def build(c, deploy: str = 'tasks.json'):
-    '''
-    Build with build commands.
+def clean(ctx):
+    """Remove the build directory entirely."""
+    if BUILD_DIR.exists():
+        shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
+        print(f"Removed {BUILD_DIR}")
+    else:
+        print("Nothing to clean.")
 
-    - desktop app
 
-    invoke shallo-pack, replace att-setings.json with invoke pack-settings, wsport = ...
+@task(name="keepgit-clean")
+def keepgit_clean(ctx):
+    """
+    Remove everything under build/ EXCEPT _deps/ and cargo/, then leave build/
+    itself in place. Use this instead of `clean` when reconfiguring is needed
+    (e.g. after a CMakeLists.txt change) but re-downloading FetchContent
+    sources from GitHub, or recompiling every Rust crate under cargo/, would
+    be too slow to redo.
 
-    :param c: context
-    '''
+    Note: FetchContent tracks whether a dependency is already populated via
+    stamp files inside _deps/<name>-subbuild/, not via CMakeCache.txt, so
+    wiping the rest of build/ and keeping _deps/ still gets you a genuinely
+    clean reconfigure without re-triggering clones for content that hasn't
+    changed.
+    """
+    if not BUILD_DIR.exists():
+        print("Nothing to clean.")
+        return
 
-    config(c, deploy)
-
-    def cmd_build_synodepy3() -> str:
-        """
-        Get the command to build the synode.py3 package.
-
-        Returns:
-            str: The command to build the package.
-        """
-        print(f'Building synode.py3 {taskcfg.version} with web-dist {taskcfg.web_ver}, html-service.jar {taskcfg.html_jar_v}...')
-
-        if os.name == 'nt':
-            return f'set SYNODE_VERSION={taskcfg.version} & set JSERV_JAR_VERSION={taskcfg.version} & set WEB_VERSION={taskcfg.web_ver} & set HTML_JAR_VERSION={taskcfg.html_jar_v} & invoke build'
+    removed = []
+    kept = []
+    for item in BUILD_DIR.iterdir():
+        if item.name in KEEP_DIRS_ON_CLEAN:
+            kept.append(item.name)
+            continue
+        if item.is_dir():
+            shutil.rmtree(item, onerror=_rmtree_onerror)
         else:
-            return f'export SYNODE_VERSION="{taskcfg.version}" JSERV_JAR_VERSION="{taskcfg.version}" WEB_VERSION="{taskcfg.web_ver}" HTML_JAR_VERSION="{taskcfg.html_jar_v}" && invoke build'
+            item.unlink()
+        removed.append(item.name)
 
-    def desktop_settings_pth(taskcfg: SynodeTask) -> str:
-        """
-        Create an app-settings.json for desktop, return the relative file path, for slint/tasks.py --appsettings arg.
-
-        Initial package only setup market, market-id, java_path, regiserv, centralPswd, wshost, wsport, wsagent_jar.
-
-        Installer needs to setup synode-id and vol, jserv, etc.
-        :return:
-        """
-        relative_pth = "dist-settings-temp.json"
-        desksets = cast(DesktopSettings, Anson.from_file(Path(taskcfg.desktop_dir) / 'app/settings/app-settings.json'))
-        desksets.market = taskcfg.deploy.market_id
-        desksets.market_name = taskcfg.deploy.market
-        desksets.java_path = 'jre17/bin/java'
-        desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport, protocolroot = taskcfg.deploy.central_path).jserv()
-        desksets.wshost = '127.0.0.1'
-        desksets.wsport = taskcfg.deploy.ws_port
-        desksets.wsagent_jar = f'ipc-agent-{taskcfg.ipcagent_ver}.jar'
-
-        desk_abspath = Path(taskcfg.desktop_dir).absolute() / taskcfg.desktop_dist_dir / relative_pth
-        desksets.toFile(desk_abspath)
-
-        Utils.logi("============= Desktop Settings:", desk_abspath.absolute())
-        Utils.logi(desksets.toBlock())
-        return relative_pth
-
-    # temp_desktop_sets_pth = f'target/temp_desktop-settings.json'
-    buildcmds = [
-        # # replace app_ver with apk_ver?
-        # [taskcfg.android_dir, 'gradlew assembleRelease' if os.name == 'nt' else 'echo Android APK building skipped.'],
-
-        # desktop
-        # - desktop.ipc-agent
-        [taskcfg.ipcagent_dir, 'mvn clean compile package -DskipTests'],
-        ['.', lambda: (shutil.copy2(
-            os.path.join(taskcfg.ipcagent_dir, 'target', f'ipc-agent-{taskcfg.ipcagent_ver}.jar'),
-            os.path.join(taskcfg.desktop_dir, taskcfg.desktop_dist_dir, 'res') + os.sep), None)[1]],
-        # - build exe itself, and copy app-settings.json -> dist
-        [taskcfg.desktop_dir, f'invoke shallow-pack --appsettings={desktop_settings_pth(taskcfg)}'],
-
-        # # link: web-dist -> anclient/examples/example.js/album/web-dist
-        # ['.', f'rm -f web-dist/res-vol/portfolio-*.apk'],
-        # ['.', lambda: (shutil.copy2(
-        #     os.path.join(taskcfg.android_dir, 'app/build/outputs/apk/release/app-release.apk'),
-        #     f'web-dist/res-vol/portfolio-{taskcfg.apk_ver}.apk')
-        #     if os.name == 'nt' else Path(f'web-dist/res-vol/portfolio-{apk_ver}.apk').touch(), None)[1]], # TODO build apk in Linux...
-        #
-        # ['web-dist/private', lambda: updateApkRes()],
-        # ['.', 'cat web-dist/private/host.json'],
-        # ['web-dist', 'rm -f login*.min.js* portfolio*.min.js* report.html'],
-        # ['../../anclient/examples/example.js/album', 'webpack'],
-        #
-        # ['.', 'mvn clean compile package -DskipTests'],
-        # ['../../html-service/java', 'mvn clean compile package'],
-        #
-        # # use vscode bash for Windows
-        # # ['../synode.py', cmd_build_synodepy3(version, web_ver, html_jar_v)],
-        # ['../synode.py', cmd_build_synodepy3()],
-    ]
-
-    print('--------------  build  ------------------')
-    for pth, cmd in buildcmds:
-        if isinstance(cmd, LambdaType):
-            print(pth, '&&', cmd)
-            cwd = os.getcwd()
-            os.chdir(pth)
-            cmd = cmd()
-            if cmd is not None:
-                print(pth, '&&', cmd)
-                ret = c.run(f'cd {pth} && {cmd}')
-            os.chdir(cwd)
-        else:
-            print(pth, '&&', cmd)
-            ret = c.run(f'cd {pth} && {cmd}')
-            print('OK:', ret.ok, ret.stderr)
-    return False
+    print(f"Removed: {removed}")
+    print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
 
-@task
-def package(c):
+@task(name="config-appsets")
+def copy_settings(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
+    if deploy != "deploy-settings.json":
+        copy_anyway(deploy, Path(dist_dir) / "app-settings.json")
+
+@task(name="shallow-pack")
+def shallow_pack(ctx,
+                 appsettings: str = 'settings/app-settings.json',
+                 config="Debug", target=TARGET_NAME, generator="Ninja"
+                 ):
     """
-    Create a ZIP file.
-    
-    Args:
-        c: Invoke Context object for running commands.
-        zip: Name of the output ZIP file.
+    Assemble dist/ for distribution while avoiding the expensive build step
+    when possible: builds only if the target exe isn't already present,
+    then always (re)copies the runtime DLLs.
+
+    app-settings for packaging must be generated and is ready for distribution.
     """
 
-    jre_img = taskcfg.jre_release.split('/')[-1]
-    temp_jre_path = f'jre17-temp/{jre_img}'
+    exe_path = DIST_DIR / (target + ".exe")
 
-    # dist_name = f'{taskcfg.jre_name if not LangExt.isblank(taskcfg.jre_release) else "online"}-{taskcfg.deploy.market_id}-{taskcfg.deploy.orgid}'
-    # if zip is None:
-    #     zip = f'portfolio-synode-{taskcfg.version}-{dist_name}.zip'
-    zip = taskcfg.zip_name()
+    if exe_path.exists():
+        print(f"{exe_path} already exists — skipping build.")
+    else:
+        print(f"{exe_path} not found — building first.")
+        build(ctx, config=config, target=target, generator=generator)
 
-    resources = {
-        f'bin/html-web-{taskcfg.html_jar_v}.jar': f'../../html-service/java/target/html-web-{taskcfg.html_jar_v}.jar', # clone at github/html-service
-        f'bin/jserv-album-{taskcfg.version}.jar': f'target/jserv-album-{taskcfg.version}.jar',
-        
-        # https://exiftool.org/index.html
-        'bin/exiftool.zip': './task-res-exiftool-13.21_64.zip',
-        
-        temp_jre_path: taskcfg.jre_release,
-
-        'WEB-INF': f'{taskcfg.web_inf_dir}/*',
-
-        'bin/synode_py3-0.8-py3-none-any.whl': f'../synode.py/dist/synode_py3-{taskcfg.version}-py3-none-any.whl',
-        "registry": "../synode.py/registry/*",
-        'winsrv': '../synode.py/winsrv/*',
-        "res": "../synode.py/src/synodepy3/res/*",
-
-        'web-dist': 'web-dist/*',   # use a link for different Anclient folder name
-                                    # ln -s ../Anclient/examples/example.js/album web-dist
-                                    # mklink /D web-dist ..\anclient\examples\example.js\album
-
-        'setup-gui.exe': '../synode.py/dist/setup-gui.exe',
-        'setup-cli.exe': '../synode.py/dist/setup-cli.exe',
-        'uninstall-srv.exe': '../synode.py/dist/uninstall-srv.exe'
-    }
-
-    excludes = ['*.log', 'report.html']
-
-    try:
-
-        print('------------ package resources --------------')
-        print(resources)
-
-        err = False
-
-        # Ensure the output directory for the ZIP exists
-        output_dir = os.path.dirname(zip) or "."
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        
-        if os.path.isfile(zip):
-            os.remove(zip)
-
-        zip2(zip, {**resources, **taskcfg.vol_resource}, excludes)
-
-        if not os.path.exists(taskcfg.dist_dir):
-            os.makedirs(taskcfg.dist_dir, exist_ok=True)
-        # distzip = os.path.join(taskcfg.dist_dir, zip)
-        distzip = taskcfg.get_distzip()
-
-        if os.path.isfile(distzip):
-            os.remove(distzip)
-
-        print(zip, "->", distzip)
-        os.rename(zip, distzip)
-        taskcfg.distzip = distzip
-
-        print('****************************************************************************************************',
-             f'* Distribution ZIP file is created successfully: {distzip}' if not err else 'Errors while making target (creaded zip file)',
-              '****************************************************************************************************',
-              sep='\n')
-
-    except Exception as e:
-        print(f"Error creating ZIP file: {str(e)}", file=sys.stderr)
-        raise
-
-
-@task
-def post_package(c):
-    print('--------------    post build   ------------------')
-    taskcfg.restore_backups()
-    taskcfg.run_deploycmds(c)
-    taskcfg.run_deployscps()
-
-
-@task(clean, create_volume, build, package, post_package)
-def make(c):
-    """
-    Create a ZIP file with the specified resources.
-    
-    Args:
-        c: Invoke Context object for running commands.
-    """
-    print('Package be created successfully.')
-    print('********************************************************************************\n'
-          '* But Task make is deprecated, please use: invoke deploy --deploy tasks.json . *\n'
-          '********************************************************************************')
-
-
-@task(post=[clean, create_volume, build, package, post_package])
-def deploy(c, deploy: str = 'tasks.json'):
-    global taskcfg
-    taskcfg = cast(SynodeTask, Anson.from_file(deploy))
-    print(f'deploying {deploy}, central task: {taskcfg.central_dir} ...')
-
-
-@task
-def landing(c, deploy: str = None):
-    global taskcfg
-    print(deploy)
-    if taskcfg is None:
-        if deploy is None:
-            deploy = 'tasks.json'
-
-        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
-        print(f'deploying {deploy}, central task: {taskcfg.central_dir} ...')
-    
-    taskcfg.publish_landings()
-
-
-@task
-def pause(c):
-    input('Press Enter to continue...')
-
-
-@task(post=[config, pause, post_package])
-def config_post(c, deploy: str = 'tasks.json'):
-    print(f'Testing : {deploy}')
-    global taskcfg
-    taskcfg = cast(SynodeTask, Anson.from_file(deploy))
-
-
-@task(post=[clean])
-def test_clean(c, deploy: str = 'tasks.json'):
-    print(f'Testing : {deploy}')
-    global taskcfg
-    taskcfg = cast(SynodeTask, Anson.from_file(deploy))
-
-
-if __name__ == '__main__':
-    from invoke import Program
-    Program(namespace=globals()).run()
+    copy_dlls(ctx, config=config)
+    # copy_settings(ctx, appsettings)
+    print(f"\nDone. Run: {exe_path}")

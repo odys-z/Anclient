@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "app-window.h"
 #include "helper.h"
 
 #if defined(_WIN32)
@@ -16,9 +15,11 @@
 #include "gen/app_settings.hpp"
 
 #if defined(_WIN32)
-#define WIN32_LEAN_AND_MEAN
+// #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <private/slint_platform_internal.h>
+#include <io/odysz/jprotocol.h>
+#include <gen/app_settings.hpp>
 #elif defined(__APPLE__)
 // Objective-C runtime headers to talk to Cocoa objects directly from pure C++
 #include <objc/message.h>
@@ -89,6 +90,19 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
     return wv;
 }
 
+/**
+ * @brief album_web
+ * Let's keep DesktopSettings::jserv_web as readonly.
+ * @param s
+ * @return e.g. http://localhost:1234/webview.html,
+ * where s.album_web = "1234".
+ */
+string album_web(const anson::DesktopSettings& s) {
+    anson::JServUrl tmpjsv{s.synode_jserv, {"", nullptr}};
+    // tmpjsv.jprotocol.protocolpath = "";
+    return std::format("{}://{}:{}/webview.html", tmpjsv.https ? "https" : "http", tmpjsv.host, s.album_web);
+}
+
 std::atomic<bool> is_webview_open(false);
 
 void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const anson::DesktopSettings & settings) {
@@ -104,8 +118,9 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         return;
     }
 
+    string url = album_web(settings);
     webview::webview w(true, nullptr);
-    w.set_title("Popup Webview");
+    w.set_title(url);
     w.set_size(800, 600, WEBVIEW_HINT_NONE);
 
     string script = std::format(R"(
@@ -116,7 +131,9 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     anlog(script);
     w.init(script);
 
-    w.navigate("http://127.0.0.1:8960/webview.html");
+    // w.navigate("http://127.0.0.1:8960/webview.html");
+    anlog(url);
+    w.navigate(url);
 
     // 3. Notify Slint UI that the window is now active
     slint::invoke_from_event_loop([weak_ui_handle]() {

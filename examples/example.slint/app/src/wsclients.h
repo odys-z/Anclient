@@ -8,6 +8,7 @@
 #include <io/odysz/jprotocol.h>
 #include <io/odysz/gen/doctier.hpp>
 
+#include "gen/app_settings.hpp"
 #include "gen/wsport.hpp"
 
 namespace anson {
@@ -27,21 +28,17 @@ protected:
     OnMsg onMsg;
 
 public:
-
-    inline static const string sysuri = "/sys/cpp";
-    inline static const string synuri = "/syn/cpp";
+    const DesktopSettings& settings;
 
     inline static const string Connecting = "Connecting";
     inline static const string Open = "Open";
     inline static const string Closing = "Closing";
     inline static const string Closed = "Closed";
 
-    WSClient(const JServUrl& jserv, const OnMsg& onmsg);
-    WSClient(const JsonOpt* ctx) : jserv_("ipc", ctx) {}
+    WSClient(const JServUrl& jserv, const DesktopSettings& settings, const OnMsg& onmsg);
+    WSClient(const JsonOpt* ctx, const DesktopSettings& settings) : jserv_("ipc", ctx), settings(settings) {}
 
     ~WSClient();
-
-    // void setup(const string& jserv, const string& protocol_root, const JsonOpt* ctx, const OnMsg& onmsg);
 
     string ipconn_state();
 
@@ -58,11 +55,18 @@ public:
     template <typename R> AnsonMsg<R> pop_envelope();
 
     WSClient* on_msg(OnMsg on) { onMsg = on; return this; }
-    // void place_tasks(PathsPage& tasks, const WSPort port = WSPort{jserv_.jprotocol.ctx, WSPort::docstier});
-    void place_tasks(PathsPage& tasks, const string& port_name = WSPort::docstier) { place_tasks(tasks, WSPort{jserv_.jprotocol.ctx}); }
-    void place_tasks(PathsPage& tasks, const WSPort& p);
+
+    void place_tasks(PathsPage& tasks, const Port& p);
+
+    void place_tasks(PathsPage& tasks, const string& port_name = Port::docstier) {
+        place_tasks(tasks, Port{jserv_.jprotocol.ctx});
+    }
 
 private:
+    /**
+     * WS client uses the same ctx as the syn-ctx, as the ipc agent cannot
+     * handle 2 sets of protocol
+     */
     JServUrl jserv_;
     bool verbose_;
     ix::WebSocket websocket;

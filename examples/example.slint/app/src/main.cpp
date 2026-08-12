@@ -8,7 +8,6 @@
 // This order is to avoid compile error
 #include "helper.h"
 #include "router.h"
-#include "gen/wsport.hpp"
 
 int main(int argc, char **argv) {
     using namespace anson;
@@ -74,7 +73,7 @@ int main(int argc, char **argv) {
         }
 
         insert_status(ui, "Ping: placing tasks ...");
-        slingle.doclientier->push_files(filemap, WSPort::ping);
+        slingle.doclientier->push_files(filemap, Port::ping);
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {
@@ -165,7 +164,7 @@ int main(int argc, char **argv) {
     });
 
     ui->on_update_syncflags([&, ui]() {
-        // TODO: drop the query results silently if current folder changed while querying. 
+        // TODO: drop the query results silently if current folder changed while querying.
         shared_ptr<AnsonResp> qryptr = slingle.dequeue_synode();
         if (!qryptr) return;
         shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
@@ -221,6 +220,9 @@ int main(int argc, char **argv) {
         }
     });
 
+    /**
+     * Open web page to a link.
+     */
     ui->on_open_web([](slint::SharedString url) {
         open_browser(std::string(url));
     });

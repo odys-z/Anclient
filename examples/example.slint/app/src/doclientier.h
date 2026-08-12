@@ -1,6 +1,5 @@
 #pragma once
 
-#include <thread>
 
 #include <io/odysz/clients.h>
 #include <io/odysz/common.h>
@@ -20,9 +19,6 @@ namespace anson {
 
 class AsynClienter : public Doclientier {
 protected:
-    static AstMap wsAsts;
-    static JsonOpt wsctx; //{&wsAsts};
-
     DesktopSettings& appsettings;
 
     OnMsg onmsg = [this]() -> void {
@@ -63,16 +59,6 @@ protected:
     slint::ComponentWeakHandle<App> window_weak; // = main_window;
 
 public:
-    static void registerCtx(const string& protocol_id = "ipc") {
-        register_jserv(&wsctx);
-        register_semantier(&wsctx, "ast");
-        register_doctier(&wsctx, "ast");
-        register_iport<WSPort>(&wsctx, "ast/wsport.ast.json");
-        register_anclient_cmake(&wsctx, "ast");
-        register_desktopsettingsAst(&wsctx);
-        register_langstringAst(&wsctx);
-    };
-
     std::unique_ptr<WSClient> wsclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
@@ -84,17 +70,17 @@ public:
     };
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
-        : Doclientier("h_photos", WSClient::sysuri, WSClient::synuri, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
+        : Doclientier("h_photos", desksets, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
     explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
-        : Doclientier("h_photos", WSClient::sysuri, WSClient::synuri, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
+        : Doclientier("h_photos", desksets, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 
-    // void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::docstier});
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port);
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = WSPort::docstier) {
-        push_files(paths, WSPort{client.jserv.jprotocol.ctx, port_code});
+
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const Port& port);
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = Port::docstier) {
+        push_files(paths, Port{client.jserv.jprotocol.ctx, port_code});
     }
 
     void query_synode(vector<std::string> paths) {
@@ -104,8 +90,8 @@ public:
     void login_synode(const string &uid, const string &pswd, const string& device) noexcept {
         try {
             anlog("''''''''''''''''''' login: "s + client.jserv.jserv() + " ''''''''''''''''''''''");
-            // client.jserv = jserv;
-            client.loginWithUri(sysuri, uid, pswd, device, onErr);
+
+            client.loginWithUri(appsettings.sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
             anwarn(e.what());
             onErr(MsgCode::Code::exSession, e.what(), {});

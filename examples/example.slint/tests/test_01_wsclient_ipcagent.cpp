@@ -64,14 +64,14 @@ protected:
         register_jserv(&opts);
         register_semantier(&opts, "ast");
         register_doctier(&opts, "ast");
-        register_iport<WSPort>(&opts, "ast/wsport.ast.json");
+        register_iport<WSPort_test>(&opts, "ast/wsport.ast.json");
         register_desktopsettingsAst(&opts);
 
         start_agent();
 
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
-        wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, onmsg);
+        wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, settings, onmsg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
     }
@@ -151,7 +151,7 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
-    AnsonMsg<DocsReq> msg(WSPort{&opts, WSPort::ping}, uploadreq);
+    AnsonMsg<DocsReq> msg(Port{&opts, WSPort_test::ping}, uploadreq);
     msg.code = MsgCode::Code::ext; // Should it be a good idea to change name of sentinel to null?
 
     wsclient->asynSend(msg);
@@ -185,7 +185,7 @@ TEST_F(Ipclient, DocTask_upload) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
-    AnsonMsg<DocsReq> msg(WSPort{&opts, WSPort::docstier}, uploadreq);
+    AnsonMsg<DocsReq> msg(Port{&opts, Port::docstier}, uploadreq);
     msg.code = MsgCode::Code::ok;
 
     wsclient->asynSend(msg);
@@ -195,7 +195,7 @@ TEST_F(Ipclient, DocTask_upload) {
     while (has_envl) {
         try {
             resp = wsclient->pop_envelope<DocsResp>();
-            WSPort exp_port{&opts, WSPort::docstier};
+            Port exp_port{&opts, Port::docstier};
             ASSERT_EQ((resp.port.valof()), (exp_port.valof()));
             has_envl = wsclient->block_poll(500);
         } catch(SemanticException& e) {

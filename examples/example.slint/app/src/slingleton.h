@@ -14,7 +14,7 @@
 #include <io/odysz/module/langstring.h>
 
 #include "gen/app_settings.hpp"
-#include "gen/wsport.hpp"
+// #include "gen/wsport.hpp"
 #include "doclientier.h"
 #include "ipcagent_manager.h"
 #include "helper.h"
@@ -65,12 +65,11 @@ namespace anson {
         register_jserv(&opts);
         register_semantier(&opts, "ast");
         register_doctier(&opts, "ast");
-        // register_iport<Port>(&opts, "ast/port.ast.json");
         register_anclient_cmake(&opts, "ast");
         register_desktopsettingsAst(&opts);
         register_langstringAst(&opts);
 
-        AsynClienter::registerCtx("ipc");
+        // AsynClienter::registerCtx("ipc");
 
         // settings
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
@@ -270,7 +269,7 @@ namespace anson {
         // Error popped here because there is no wrapper like asyquery_domconfig() etc.
         try {
             AnsonResp resp = Clients::pingLess(JServUrl{ui_jserv, &opts},
-                                      doclientier->sysuri, "ping by slingleton", AsynClienter::onErr);
+                                      appsettings.sysuri, "ping by slingleton", AsynClienter::onErr);
             insert_status(ui, resp.m);
         }
         catch (const std::exception& e) {

@@ -10,8 +10,8 @@ namespace fs = std::filesystem;
 /**
  * @brief Constructs a WSClient instance with the specified JServUrl and message callback.
  */
-WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
-    : jserv_(jserv), onMsg(onmsg) {
+WSClient::WSClient(const JServUrl& jserv, const DesktopSettings& settings, const OnMsg& onmsg)
+    : jserv_(jserv), onMsg(onmsg), settings(settings) {
     
     string ipcurl = jserv_.wservUri();
     anlog(std::format("WSClient is constructing with jserv: {}", ipcurl));
@@ -24,22 +24,6 @@ WSClient::WSClient(const JServUrl& jserv, const OnMsg& onmsg)
         this->onMessage(msg);
     });
 }
-
-// void WSClient::setup(const string& jserv, const string& protocol_root, const JsonOpt* ctx, const OnMsg& onmsg) {
-//     jserv_ = JServUrl(jserv, JProtocol{protocol_root, ctx});
-//     onMsg = onmsg;
-
-//     string ipcurl = jserv_.wservUri();
-//     aninfo(std::format("[****** WSClient ******] Constructing with jserv: {}", ipcurl));
-//     websocket.setUrl(ipcurl);
-//     websocket.setPingInterval(15);
-    
-//     websocket.disableAutomaticReconnection();
-
-//     websocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
-//         this->onMessage(msg);
-//     });
-// }
 
 WSClient::~WSClient() {
     websocket.stop();
@@ -154,12 +138,12 @@ bool WSClient::block_poll(int wait_ms) {
     return true;
 }
 
-void WSClient::place_tasks(PathsPage& pthpage, const WSPort& port) {
+void WSClient::place_tasks(PathsPage& pthpage, const Port& port) {
     DocsReq uploadreq{"h_photos", {}};
     uploadreq.device = Device{pthpage.device, pthpage.device, pthpage.device};
     uploadreq.syncingPage = pthpage;
     uploadreq.a = DocsReq::A::requestSyn;
-    uploadreq.synuri = synuri;
+    uploadreq.synuri = settings.synuri;
 
     // Port port{jserv_.jprotocol.ctx, port_name};
     AnsonMsg<DocsReq> msg(port, std::move(uploadreq));
