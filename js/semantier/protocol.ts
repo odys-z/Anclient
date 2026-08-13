@@ -1,4 +1,4 @@
-import AES from './aes';
+import AES from './aes2';
 import { SessionClient, SessionInf } from './anclient';
 import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
@@ -225,6 +225,7 @@ class Jregex {
 		else if (typeof str === "string" && str.substring(0, 1) !== "'"
 			&& str.substring(0, 2) != "''")
 			return "'" + str + "'";
+		return str;
 	}
 
 	static isblank(s: any) : boolean {
@@ -908,7 +909,7 @@ export class UpdateReq extends AnsonBody {
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv: string[] | PkVal) {
+    constructor(uri: string, tabl: string, pkv?: string[] | PkVal) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -929,7 +930,7 @@ export class UpdateReq extends AnsonBody {
     mtabl: string;
     nvs: Array<[string, any]>;
     nvss: Array<Array<[string, string]>>;
-    where: any[][];
+    where?: any[][];
 
     limt: string;
     attacheds: AttachMeta[];
@@ -1099,6 +1100,7 @@ export class InsertReq extends UpdateReq {
 		super (uri, tabl, undefined);
 		this.a = CRUD.c;
 		this.type = InsertReq.__type__;
+		this.cols = [];
 		delete this.where;
 	}
 
@@ -1108,19 +1110,21 @@ export class InsertReq extends UpdateReq {
 	 * (with field property)
 	 * @param cols
 	 */
-	columns (cols: Array<DbCol | string> | DbCol | string) {
+	columns (cols: Array<DbCol | string> | DbCol) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
 			this.cols = this.cols.concat(cols.map(
 				(c, x) => typeof c === 'string'
 								? c
-								: c.field ? c.field
-								: c.name
+								: c.field ? c.field as string
+								: c.name as string
 				));
 		}
-        else if (typeof cols === 'object')
-            this.cols.push(cols.field ? cols.field : cols.name);
+        else if (typeof cols === 'object') {
+			let cls = cols as DbCol;
+            this.cols.push(cls.field ? cols.field as string : cols.name as string);
+		}
 		else this.cols.push(cols);
 		return this;
 	}

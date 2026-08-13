@@ -2,7 +2,7 @@
 /**The lower API of jclient/js */
 
 import * as $ from 'jquery';
-import AES from './aes';
+import AES from './aes2';
 import {
 	Protocol, AnsonMsg, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,

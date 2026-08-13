@@ -37,7 +37,7 @@ export function toBool(str: string | number | boolean | object | undefined | nul
 	// 	&& (str === undefined || str === null))
 	if ( isEmpty(str))
 		// return !!undefinedNull;
-		return !isEmpty(undefinedNull) && undefinedNull;
+		return !isEmpty(undefinedNull) && !!undefinedNull;
 
 	return (!str || str === '0' || str === 'false'
 			|| (typeof str === 'string' && str.trim().length === 0)
@@ -65,10 +65,10 @@ export function str_(obj: any) {
 }
 
 export function size(arg: Set<any> | Map<any, any> | object | string | Array<any> | undefined | null) : number {
-		return  arg instanceof Set || arg instanceof Map ?
-				arg.size : 
-				typeof arg === 'object' ?
-				Object.keys(arg).length : len(arg);
+		return  arg instanceof Set || arg instanceof Map
+				? arg.size
+				: typeof arg === 'object'
+				? Object.keys(arg as object).length : len(arg);
 }
 
 export function len(arg: object | string | Array<any> | Set<any> | Map<any, any> | undefined | null) {
@@ -81,7 +81,7 @@ export function len(arg: object | string | Array<any> | Set<any> | Map<any, any>
 		: typeof (arg as any).size === 'number'
 		? (arg as any).size
 		: typeof arg === 'object'
-		? Object.keys(arg).length
+		? Object.keys(arg as object).length
 		: size(arg);
 }
 
