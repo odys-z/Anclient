@@ -11,9 +11,6 @@
 
 namespace anson {
 
-// AstMap AsynClienter::wsAsts;
-// JsonOpt AsynClienter::wsctx{&AsynClienter::wsAsts};
-
 void AsynClienter::reconnect_ipc() {
     if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
@@ -29,13 +26,13 @@ void AsynClienter::reconnect_ipc() {
         }
     }
 
-    int timeout_attempts = 20; // 20 * 100ms = 2 seconds max wait
+    int timeout_attempts = 60; // 60 * 1000ms = 60 seconds max wait
     while (wsclient && timeout_attempts > 0) {
         string state = wsclient.get()->ipconn_state();
         if (state == WSClient::Open) {
             break;
         }
-        std::this_thread::sleep_for(100ms);
+        std::this_thread::sleep_for(1000ms);
         timeout_attempts--;
     }
 

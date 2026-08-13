@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <io/odysz/clients.h>
 #include <io/odysz/common.h>
 #include <io/odysz/jprotocol.h>
@@ -56,7 +55,7 @@ protected:
         });
     };
 
-    slint::ComponentWeakHandle<App> window_weak; // = main_window;
+    slint::ComponentWeakHandle<App> window_weak;
 
 public:
     std::unique_ptr<WSClient> wsclient;

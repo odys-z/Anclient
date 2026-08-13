@@ -145,7 +145,6 @@ void WSClient::place_tasks(PathsPage& pthpage, const Port& port) {
     uploadreq.a = DocsReq::A::requestSyn;
     uploadreq.synuri = settings.synuri;
 
-    // Port port{jserv_.jprotocol.ctx, port_name};
     AnsonMsg<DocsReq> msg(port, std::move(uploadreq));
 
     anlog("-----------------------------------------------\n" + msg.toBlock(*jserv_.jprotocol.ctx));
