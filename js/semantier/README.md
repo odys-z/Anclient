@@ -12,22 +12,7 @@
     npm install @anclient/semantier
 ```
 
-# Troubleshooting
+# Releases
 
-Npm login requires a browser to authenticate while login with CLI.
-
-```
-    check the options "do not challenge from this IP"
-```
-
-Sometimes npm service problem, report at
-
-```
-    https://status.npmjs.org/
-```
-
-see
-
-```
-    https://stackoverflow.com/a/70366952
-```
+- Since 1.0.4, AES package are upgraded, and no longer suppor semantic.transact 1.5.76 or early, which is 
+  using io.odysz.common.AESHelper2 since 1.5.77. 
