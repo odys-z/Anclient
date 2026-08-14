@@ -1,6 +1,6 @@
 {
   "name": "@anclient/album",
-  "version": "0.4.2",
+  "version": "0.4.5",
   "description": "Photo gallery built on Anclient",
   "main": "",
   "scripts": {
