@@ -19,7 +19,14 @@
 	<div id="buttons"></div>
 	<div id="log"></div>
 
-	<!-- built by: npm run test:browser:build -->
+	<!-- built by: npm run test:browser:build
+	     For clickable, source-mapped stack traces below (not minified
+	     bundle lines), your webpack config needs a devtool option, e.g.:
+	       devtool: 'eval-source-map'   // fast rebuilds, good for dev
+	       devtool: 'source-map'        // slower build, most accurate
+	     Omitting it (or building with mode: 'production') disables
+	     source maps and traces will point into the bundled code instead
+	     of your original .ts files. -->
 	<script src="browser/testBundle.browser.js"></script>
 
 	<script>

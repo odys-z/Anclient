@@ -542,7 +542,7 @@ export class AnsonMsg<T extends AnsonBody> {
 	}
 
     Body(ix = 0): T | undefined {
-		return ix >= this.body.length? this.body[ix] : undefined;
+		return ix >= this.body.length? undefined : this.body[ix];
 	}
 
 	Uri(uri: string) {

@@ -11,6 +11,7 @@
  * import + re-expose them here the same way.
  */
 import { case01_2_extDataset } from './01-protocol_ext_mocha-v2';
+import { case02_1_checkTree_relation_recs, case02_2_checkTree_relation_recs } from './02-helpers.mocha';
 
 declare global {
 	interface Window {
@@ -20,4 +21,5 @@ declare global {
 
 window.AnclientTests = {
 	case01_2_extDataset,
+	case02_1_checkTree_relation_recs, case02_2_checkTree_relation_recs
 };
