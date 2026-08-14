@@ -2,7 +2,7 @@
 /**The lower API of jclient/js */
 
 import * as $ from 'jquery';
-import AES from './aes2';
+import AES2 from './aes2';
 import {
 	Protocol, AnsonMsg, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
@@ -24,7 +24,7 @@ interface AjaxReport {
 /**
  * AESLib instance
  * */
-const aes = new AES();
+const aes = new AES2();
 
 /**An client.js core API
  * Java equivalent of
@@ -54,11 +54,11 @@ class AnClient {
      * @param port the port name
      * @return the url
      */
-	servUrl (port: string) : string {
+	servUrl (port: keyof Protocol) : string {
 		// This is a common error in jeasy frame
 		if (port === undefined || port === null) {
 			console.error("Port is null!");
-			return;
+			return port;
 		}
 
 		let ulr: string;
@@ -123,19 +123,24 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body().ssInf;
-				ssInf.jserv = an.cfg.defaultServ;
+				let ssInf = resp.Body()?.ssInf;
+				if (!ssInf) {
+					console.warn("resp.ssInf is empty!");
+				}
+				else {
+					ssInf.jserv = an.cfg.defaultServ;
 
-				console.log(ssInf.ssToken);
-				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
-				console.log(ssInf.ssToken);
+					console.log(ssInf.ssToken);
+					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
+					console.log(ssInf.ssToken);
 
-				let sessionClient = new SessionClient(ssInf, iv, true);
-				sessionClient.an = that;
-				if (typeof onLogin === "function")
-					onLogin(sessionClient);
-				else
-					console.log(sessionClient);
+					let sessionClient = new SessionClient(ssInf, iv, true);
+					sessionClient.an = that;
+					if (typeof onLogin === "function")
+						onLogin(sessionClient);
+					else
+						console.log(sessionClient);
+				}
 			},
 			onError);
 		return this;
@@ -165,19 +170,24 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body().ssInf;
-				ssInf.jserv = an.cfg.defaultServ;
+				let ssInf = resp.Body()?.ssInf;
+				if (!ssInf) {
+					console.warn("resp.ssInf is empty!");
+				}
+				else {
+					ssInf.jserv = an.cfg.defaultServ;
 
-				console.log(ssInf.ssToken);
-				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
-				console.log(ssInf.ssToken);
+					console.log(ssInf.ssToken);
+					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
+					console.log(ssInf.ssToken);
 
-				let sessionClient = new SessionClient(ssInf, iv, true);
-				sessionClient.an = that;
-				if (typeof onLogin === "function")
-					onLogin(sessionClient);
-				else
-					console.log(sessionClient);
+					let sessionClient = new SessionClient(ssInf, iv, true);
+					sessionClient.an = that;
+					if (typeof onLogin === "function")
+						onLogin(sessionClient);
+					else
+						console.log(sessionClient);
+				}
 			},
 			onError);
 		return this;

@@ -289,7 +289,7 @@ export class Protocol {
 		Object.assign(Protocol.Port, newPorts);
 	};
 
-	static ansonTypes = {};
+	static ansonTypes: {[type: string]: (json: any) => AnsonBody} = {};
 
 	/**Extend new protocol - register new body type creater.
 	 * @function
@@ -347,7 +347,7 @@ export class Protocol {
 			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
 					uid, token: tk64, iv: iv64}]
 		});
-		login.Body().A('login');
+		login.Body()!.A('login');
 		return login;
 	}
 
@@ -535,13 +535,14 @@ export class AnsonMsg<T extends AnsonBody> {
     /** A short cut for body[0].post()
      * @param {AnsonBody} pst post sql request
      * @return {AnsonBody} the  first request body[0].post returned value.*/
-    post(pst: AnsonBody): AnsonBody {
+    post(pst: AnsonBody): AnsonBody | undefined {
 		if (this.body !== undefined && this.body.length > 0)
 			return this.body[0].post(pst);
+		return undefined;
 	}
 
     Body(ix = 0): T | undefined {
-		return this.body ? this.body[ix] : undefined;
+		return ix >= this.body.length? this.body[ix] : undefined;
 	}
 
 	Uri(uri: string) {
@@ -572,16 +573,18 @@ export class AnsonBody {
 	 * @param body.uri function uri.
 	 * @see {@link https://odys-z.github.io/Anclient/guide/func-uri.html#func-uri-datasource-mapping Anclient doc}
 	 */
-	constructor(body?: {type: string, a?: string, parent?: string, uri?: string}) {
-		this.type = body?.type;
-		this.a = body?.a
-		this.parent = body?.parent;
-		this.uri = body?.uri;
+	constructor(body?: {type: string, a: string, parent?: string, uri: string}) {
+		if (body) {
+			this.type = body.type;
+			this.a = body.a
+			this.parent = body.parent;
+			this.uri = body.uri;
+		}
 	}
 
     type: string;
     a: string;
-    parent: string; // AnsonMsg<AnsonBody>;
+    parent: string | undefined; 
     uri: string;
 	version?: string;
 	seq?: number;
@@ -625,14 +628,7 @@ export class AnHeader {
         return this;
     }
 
-    usrAct: any[];
-
-	// Seq(seq: number) {
-	// 	let iv = aes.getIv128() as unknown as Uint8Array;
-	// 	this.ssToken = aes.encrypt(`${this.ssid} ${seq}`, this.ssid, iv);
-	// 	this.iv = aes.bytesToB64(iv);
-	// 	return this;
-	// }
+    usrAct: any[] = [];
 }
 
 export class UserReq extends AnsonBody {
@@ -697,17 +693,17 @@ export class QueryReq extends AnsonBody {
 
     exprs: Array<string[]>;
     joins: Array<string[]>;
-    joinings: string[];
+    joinings: string[] = [];
     where: Array<string[]>;
-    orders: Array<string[]>;
-    groups: string[];
-    cond: Array<string[]>;
-    order: Array<string[]>;
-    groupings: Array<string[]>;
+    orders: Array<string[]> = [];
+    groups: string[] = [];
+    cond: Array<string[]> = [];
+    order: Array<string[]> = [];
+    groupings: Array<string[]> = [];
 
-    page: number;
-    pgsize: number;
-    limt: string[];
+    page: number = 0;
+    pgsize: number = -1;
+    limt: string[] = [];
 
 	// constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
 	// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
@@ -929,12 +925,12 @@ export class UpdateReq extends AnsonBody {
 
     mtabl: string;
     nvs: Array<[string, any]>;
-    nvss: Array<Array<[string, string]>>;
+    nvss: Array<Array<[string, string]>> = [];
     where?: any[][];
 
     limt: string;
-    attacheds: AttachMeta[];
-    postUpds: AnsonBody[];
+    attacheds: AttachMeta[] = [];
+    postUpds: AnsonBody[] = [];
 
     /** add n-v
      * @param n
@@ -1277,9 +1273,9 @@ export class AnsonResp extends AnsonBody {
      * cols: array like [ col1, col2, ... ]; <br>
      * rows: array like [ {col1: val1, ...}, ... ]
      */
-    static rs2arr(rs: AnResultset): {cols: Array<string>, rows: Array<{}>} {
-		let cols = [];
-		let rows = [];
+    static rs2arr(rs: AnResultset): {cols: Array<Column>, rows: Array<{}>} {
+		let cols: string[] = [];
+		let rows: {}[] = [];
 
 		if (rs && typeof(rs.colnames) === 'object') {
 			// rs with column index
@@ -1332,7 +1328,7 @@ export class AnsonResp extends AnsonBody {
      */
     static rs2nvs(rs: AnResultset | undefined, nv: NV): {cols: Array<string>, rows: Array<NV>} {
 		let cols = [];
-		let rows = [];
+		let rows: NV[] = [];
 		let ncol = -1, vcol = -1;
 
 		if (!rs)
@@ -1374,8 +1370,8 @@ export class AnsonResp extends AnsonBody {
     m: string;
 	msg() : string { return this.m; }
 
-    code: string;
-    Code(): string { return this.code };
+    code: string | undefined;
+    Code(): string | undefined { return this.code };
 
     rs: AnResultset | Array<AnResultset>;
     Rs(rx = 0): AnResultset {

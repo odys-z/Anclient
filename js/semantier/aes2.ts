@@ -4,7 +4,7 @@
  * can be overriden by user.
  */
 
-import AESLib, { AESHook } from 'opensources/ricmoo-aes';
+import AESLib, { AESHook } from './opensources/ricmoo-aes';
 import {sha256} from 'js-sha256';
 
 /* The ricomoo AES Wrapper.
