@@ -54,7 +54,7 @@ class AnClient {
      * @param port the port name
      * @return the url
      */
-	servUrl (port: keyof Protocol) : string {
+	servUrl (port: keyof typeof Protocol.Port) : string {
 		// This is a common error in jeasy frame
 		if (port === undefined || port === null) {
 			console.error("Port is null!");
@@ -99,7 +99,7 @@ class AnClient {
 		return this;
 	}
 
-	port(name: string) {
+	port(name: keyof typeof Protocol.Port) {
 		return Protocol.Port[name];
 	}
 
@@ -453,7 +453,7 @@ export type SessionInf = {
  */
 class SessionClient {
 	an: AnClient;
-	ssInf: SessionInf;
+	ssInf!: SessionInf;
 
 	currentAct: LogAct = {
 		func: '',
@@ -534,7 +534,7 @@ class SessionClient {
 			// localStorage.setItem(SessionClient.ssInfo, '');
 			if (sstr && sstr !== '' && sstr !== 'null') {
 				ssInf = JSON.parse(sstr);
-				ssInf.iv = aes.b64ToBytes(ssInf.iv);
+				ssInf.iv = aes.b64ToBytes(ssInf.iv); // FIXME Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'string'.
 				an.init(ssInf.jserv);
 			}
 			else
@@ -556,7 +556,7 @@ class SessionClient {
 
 	consumeNotifies() {
 		if (this.ssInf) {
-			return this.ssInf['_notifies_'];
+			return this.ssInf['_notifies_']; // FIXME ssInf doesn't have a notifies field.
 		}
 	}
 

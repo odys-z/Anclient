@@ -1,1 +1,4 @@
-test
+src/
+test/
+dist/testBundle.js
+*.log

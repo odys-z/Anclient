@@ -419,7 +419,7 @@ export class AnsonMsg<T extends AnsonBody> {
     code: string;
     version: string;
     seq: number;
-    port: string;
+    port: keyof typeof Protocol.Port;
 	/**Json string options, like no-null: true for asking server replace null with ''.  */
     opts: {};
     header: AnHeader;
@@ -582,10 +582,10 @@ export class AnsonBody {
 		}
 	}
 
-    type: string;
-    a: string;
+    type: string | undefined;
+    a!: string;
     parent: string | undefined; 
-    uri: string;
+    uri!: string;
 	version?: string;
 	seq?: number;
 
@@ -612,7 +612,7 @@ export class AnHeader {
     ssid: string;
     uid : string;
 
-	iv: string;
+	iv!: string;
 	/** repackec session token */
 	ssToken: string;
 
@@ -668,7 +668,7 @@ export class AnSessionReq extends AnsonBody {
 		this.iv = iv;
     }
 
-    mds: {}; // what's this for?
+    mds!: {}; // what's this for?
 
     uid  : string;
     token: string;
@@ -928,7 +928,7 @@ export class UpdateReq extends AnsonBody {
     nvss: Array<Array<[string, string]>> = [];
     where?: any[][];
 
-    limt: string;
+    limt!: string;
     attacheds: AttachMeta[] = [];
     postUpds: AnsonBody[] = [];
 
@@ -1373,19 +1373,19 @@ export class AnsonResp extends AnsonBody {
     code: string | undefined;
     Code(): string | undefined { return this.code };
 
-    rs: AnResultset | Array<AnResultset>;
+    rs: Array<AnResultset>;
     Rs(rx = 0): AnResultset {
 		return Array.isArray(this.rs) ? this.rs[rx] : this.rs;
 	}
 
-    data: {props?: {}};
+    data!: { props?: {}; };
     getProp(prop: string): object {
 		if (this.data && this.data.props)
 			return this.data.props[prop];
     }
 
     map: {resulved: string | {} };
-    resulved: object;
+    resulved!: object;
     resulve(tabl: any, pk: any, clientRec: any): string {
 		let resulved;
 		if (this.map && this.map.resulved)
@@ -1502,9 +1502,9 @@ export class DatasetReq extends QueryReq {
 		// this.checkt((t || a) as unknown as string);
 	}
 
-    maintbl: string;
-    alias: string;
-    pageInf: object;
+    maintbl!: string;
+    alias!: string;
+    pageInf!: object;
 
     sk: string;
     sqlArgs: any[];
@@ -1616,9 +1616,9 @@ export class AnDatasetReq extends QueryReq {
 		// this.checkt((t || a) as unknown as string);
 	}
 
-    maintbl: string;
-    alias: string;
-    pageInf: object;
+    maintbl!: string;
+    alias!: string;
+    pageInf!: object;
 
     sk: string;
     sqlArgs: any[];
