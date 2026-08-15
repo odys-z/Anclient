@@ -409,6 +409,7 @@ class AnClient {
 		if (resp.body[0].rs[0].results) {
 			return resp.body[0].rs[0].results.splice(start, len)
 		}
+		return [];
 	}
 
 	/// helpers

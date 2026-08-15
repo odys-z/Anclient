@@ -13,7 +13,7 @@
 
     <string name="key_home" translatable="false">home_key</string>
     <string name="home_title"     >Home Name</string>
-    <string name="txt_prefs_jserv">File Service Address</string>
+    <string name="txt_prefs_jserv">Connect to Synode:</string>
     <string name="jserv_title"    >Home Server Address</string>
     <string name="txt_test_conn"  >Test Connection</string>
     <string name="msg_conn_ok"    >Connecting to server succeed.</string>
