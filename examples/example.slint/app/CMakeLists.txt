@@ -133,7 +133,8 @@ endif()
 # ---------------------------------------------------------------------------
 # App assets -> dist/
 # ---------------------------------------------------------------------------
-# Ensure assets copying only when building the main target
+# Ensure assets copying only when building the main target (filter out test res also)
+file(GLOB ABC_JAR "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
 add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/ast"
@@ -141,9 +142,16 @@ add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/app/settings"
         "${ALBUM_DIST_DIR}/settings"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/tests/res"
+
+    # COMMAND ${CMAKE_COMMAND} -E copy_directory
+    #     "${CMAKE_SOURCE_DIR}/tests/res"
+    #     "${ALBUM_DIST_DIR}/res"
+    COMMAND ${CMAKE_COMMAND} -E make_directory
         "${ALBUM_DIST_DIR}/res"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${ABC_JAR}"
+        "${ALBUM_DIST_DIR}/res/"
+
     COMMENT "Syncing assets to dist folder..."
 )
 

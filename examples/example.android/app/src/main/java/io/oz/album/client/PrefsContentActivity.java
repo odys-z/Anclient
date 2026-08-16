@@ -116,7 +116,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
 
     /**
      * On qr-scanning results.
-     * For content format, see {@link AnPrefEntries#insert(String)}
+     * For content format, see {@link AnPrefEntries#insert(String, int)}
      * @param requestCode
      * @param resultCode
      * @param data
@@ -131,7 +131,7 @@ public class PrefsContentActivity extends AppCompatActivity implements JProtocol
                 String format  = intentResult.getFormatName();
                 if (eq(format, "QR_CODE")) {
                     AnPrefEntries jsvEnts = prfConfig.jservs();
-                    if (jsvEnts.insert(content)) {
+                    if (jsvEnts.insert(content, getResources().getInteger(R.integer.max_jserv_entries))) {
                         prefFragment.listJserv.setEntries(jsvEnts.entries);
                         prefFragment.listJserv.setEntryValues(jsvEnts.entVals);
 

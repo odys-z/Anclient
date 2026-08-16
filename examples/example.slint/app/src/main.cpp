@@ -68,8 +68,6 @@ int main(int argc, char **argv) {
 
             std::string updated_status = std::string(std::string_view(status)) + std::string(std::string_view(*f));
             status = slint::SharedString(" "s + updated_status);
-            // anlog("Pinging: "s + file_str);
-
         }
 
         insert_status(ui, "Ping: placing tasks ...");
@@ -270,9 +268,13 @@ int main(int argc, char **argv) {
             insert_status(ui, "Domain Token doesn't march with confirming text.");
 
         DesktopSettings s {slingle.appsettings};
+        s.regiserv = p.regiserv;
+        s.synode_id = p.synode_selected;
+        s.domain = p.domain_selected;
+        s.synode_jserv = p.synode_jserv;
         s.admin = string{p.user_id_text};
         s.domain_token = p.password_text;
-        s.synode_jserv = p.synode_jserv;
+        s.device = p.device;
 
         optional<string> err = Slingleton::validate_settings(s);
         if (!err) {
@@ -282,6 +284,7 @@ int main(int argc, char **argv) {
             anlog("saved: "s + settings_path);
             slingle.appsettings = s;
             slingle.setup_doclientier(ui_weak);
+            insert_status(ui_weak, "Saved"_ans);
         }
         else {
             anwarn(*err);
@@ -289,7 +292,15 @@ int main(int argc, char **argv) {
         }
     });
 
-    // Design Notes: We need a post load event callback API.
+    // Design Notes: call for a post load event callback API.
+    // Tip: data.syncing_status in slint model is backed as an immutable field
+    auto data = ui->global<AppState>().get_model();
+    data.window_title = "Portfolio Desktop";
+    data.enable_vol = slingle.has_synode_vol();
+    data.syncing_status = std::make_shared<slint::VectorModel<slint::SharedString>>(
+        std::vector<slint::SharedString>{"Ready"});
+    ui->global<AppState>().set_model(data);
+
     slint::invoke_from_event_loop([&ui, &slingle]() {
         auto appstat = ui->global<AppState>().get_model();
         auto profile = ui->global<UserProfile>().get_model();

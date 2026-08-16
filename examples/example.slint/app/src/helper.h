@@ -53,6 +53,8 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     bool refresh =  string{p.regiserv} != s.regiserv;
 
     p.market_name = s.market_name;
+    p.device = s.device;
+    p.is_device_locked = !s.device.empty();
     p.regiserv = s.regiserv;
     p.synode_jserv = s.synode_jserv;
     p.domain_selected = s.domain;

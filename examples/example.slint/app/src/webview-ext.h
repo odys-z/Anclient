@@ -123,10 +123,15 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
     w.set_title(url);
     w.set_size(800, 600, WEBVIEW_HINT_NONE);
 
+    // string script = std::format(R"(
+    //     window.addEventListener('DOMContentLoaded', () => {{
+    //             loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
+    //     }}); )", settings.admin, settings.domain_token, settings.synode_id);
     string script = std::format(R"(
-        window.addEventListener('DOMContentLoaded', () => {{
-                loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
-        }}); )", settings.admin, settings.domain_token, settings.synode_id);
+        window.addEventListener('load', () => {{
+        loadAlbum('{}', '{}', {{legacyPDF: true, platform: 'android', serv: '{}'}});
+        }});
+    )", settings.admin, settings.domain_token, settings.synode_id);
 
     anlog(script);
     w.init(script);

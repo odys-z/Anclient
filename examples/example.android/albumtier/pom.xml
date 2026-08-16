@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.odys-z</groupId>
   <artifactId>albumtier</artifactId>
-  <version>0.5.3</version>
+  <version>0.5.4</version>
 
   <name>Album Tier MVP</name>
   <url>http://github.com/odys-z/anclient</url>
@@ -55,7 +55,7 @@
 	<dependency>
 	    <groupId>io.github.odys-z</groupId>
 	    <artifactId>anclient.java</artifactId>
-	    <version>[0.5.20-SNAPSHOT,)</version>
+	    <version>[0.5.20,)</version>
 	</dependency>
 	
 	<!-- Cycles were detected in build paths.

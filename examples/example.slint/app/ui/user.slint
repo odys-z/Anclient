@@ -1,7 +1,7 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
 import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
-import { UserProfile } from "app-state.slint";
+import { UserProfile, AppState } from "app-state.slint";
 
 export component User {
     callback ping-synode(string, string, string, string);
@@ -11,9 +11,6 @@ export component User {
     callback query-orgdoms(string);
     callback query-domnodes(string, string);
     callback change-synode(string);
-    // function notify-changed() {
-    //     UserProfile.model-changed(UserProfile.model);
-    // }
 
     init => {
         debug("User.init => UserProfile.model:", UserProfile.model);
@@ -253,6 +250,7 @@ export component User {
                         font-size: 14pt;
                         text: UserProfile.model.device;
                         placeholder-text: "Name this device uniquely in the domain";
+                        edited(text) => { UserProfile.model.device = text; }
                     }
                     if (UserProfile.model.is_device_locked) : device-label := TextInput {
                             col: 1;
@@ -262,6 +260,10 @@ export component User {
                             text: UserProfile.model.device;
                             enabled: !UserProfile.model.is_device_locked;
                     }
+                }
+
+                Row {
+                    STag{ col: 1; text: AppState.model.syncing_status[0]; }
                 }
 
                 // QR code (centered) | Save
@@ -287,7 +289,7 @@ export component User {
                                 border-color: #ffffff55;
 
                                 Text {
-                                    text: @tr("QR");
+                                    text: @tr("TODO: QR");
                                     color: #ffffff88;
                                     horizontal-alignment: center;
                                     vertical-alignment: center;

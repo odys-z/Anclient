@@ -1,0 +1,3 @@
+<resources>
+    <integer name="max_jserv_entries">16</integer>
+</resources>
