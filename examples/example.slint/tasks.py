@@ -21,9 +21,15 @@ Install once:
 import shutil
 import subprocess
 from pathlib import Path
+from typing import cast
 
 from anson.io.odysz.utils import copy_anyway
 from invoke import task
+from semanticshare.io.oz.anclient.app import DesktopSettings
+from semanticshare.io.odysz.semantic.jprotocol import JServUrl
+from semanticshare.io.oz.invoke import SynodeTask
+
+from anson.io.odysz.anson import Anson, Utils
 
 # ---------------------------------------------------------------------------
 # Project layout — adjust these two if your repo is laid out differently.
@@ -249,14 +255,50 @@ def keepgit_clean(ctx):
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
 
-@task(name="config-appsets")
-def copy_settings(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
-    if deploy != "deploy-settings.json":
-        copy_anyway(deploy, Path(dist_dir) / "app-settings.json")
+def create_desktop_settings(taskcfg: SynodeTask) -> str:
+    """
+    Create an app-settings.json for desktop, return the relative file path, for slint/tasks.py --appsettings arg.
+
+    Initial package only setup market, market-id, java_path, regiserv, centralPswd, wshost, wsport, wsagent_jar.
+
+    Installer needs to setup synode-id and vol, jserv, etc.
+    :return: the generated json's relative path to desktop dir
+    """
+    relative_pth = "dist-settings-temp.json"
+    # desksets = cast(DesktopSettings, Anson.from_file(Path(taskcfg.desktop_dir) / 'app/settings/app-settings.github.json'))
+    desksets = cast(DesktopSettings, Anson.from_file('app/settings/app-settings.github.json'))
+    desksets.market = taskcfg.deploy.market_id
+    desksets.market_name = taskcfg.deploy.market
+    desksets.admin = taskcfg.deploy.admin
+    desksets.domain_token = taskcfg.deploy.domain_token # default, overwrite by installer
+    desksets.org = taskcfg.deploy.orgid
+
+    desksets.java_path = 'jre17/bin/java'
+    desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport,
+                                 protocolroot = taskcfg.deploy.central_path).jserv()
+    desksets.wshost = '127.0.0.1'
+    desksets.wsport = taskcfg.deploy.ws_port
+    desksets.wsagent_jar = f'ipc-agent-{taskcfg.ipcagent_ver}.jar'
+
+    # desk_abspath = Path(taskcfg.desktop_dir).absolute() / taskcfg.desktop_dist_dir / relative_pth
+    desksets.toFile(relative_pth)
+
+    Utils.logi("============= Desktop Settings:", Path(relative_pth).absolute())
+    Utils.logi(desksets.toBlock())
+    return relative_pth
+
+
+@task
+def deploy_settings(ctx, deploy: str = "tasks.json"):
+    taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+    new_sets = create_desktop_settings(taskcfg)
+    Utils.rm_any(Path(taskcfg.desktop_dist_dir) / 'settings')
+    copy_anyway(new_sets, taskcfg.desktop_dist_dir / 'settings' / 'app-settings.json')
+
 
 @task(name="shallow-pack")
 def shallow_pack(ctx,
-                 appsettings: str = 'settings/app-settings.json',
+                 deploy: str = 'tasks.json',
                  config="Debug", target=TARGET_NAME, generator="Ninja"
                  ):
     """
@@ -276,5 +318,5 @@ def shallow_pack(ctx,
         build(ctx, config=config, target=target, generator=generator)
 
     copy_dlls(ctx, config=config)
-    # copy_settings(ctx, appsettings)
+    deploy_settings(ctx, deploy)
     print(f"\nDone. Run: {exe_path}")

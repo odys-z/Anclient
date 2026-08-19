@@ -43,3 +43,4 @@ app-settings.json
 *.gitignore.json
 !app-settings-template.json
 CMakeLists.txt.user
+*-temp.json
