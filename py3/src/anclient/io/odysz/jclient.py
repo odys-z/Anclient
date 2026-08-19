@@ -10,7 +10,7 @@ from semanticshare.io.odysz.semantic.jserv.echo import EchoReq
 from semanticshare.io.odysz.semantic.jserv.signup import SingupReq
 
 
-class OnError(Protocol):
+class OnError:
     err : Callable = None
     def __call__(self, code: MsgCode, msg: str, *args: str) -> None:
         return self.err(code, msg, args)
