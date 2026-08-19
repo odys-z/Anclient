@@ -292,8 +292,9 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
 def deploy_settings(ctx, deploy: str = "tasks.json"):
     taskcfg = cast(SynodeTask, Anson.from_file(deploy))
     new_sets = create_desktop_settings(taskcfg)
-    Utils.rm_any(Path(taskcfg.desktop_dist_dir) / 'settings')
-    copy_anyway(new_sets, taskcfg.desktop_dist_dir / 'settings' / 'app-settings.json')
+    dist_dir = Path(taskcfg.desktop_dist_dir)
+    Utils.rm_any(dist_dir / 'settings')
+    copy_anyway(new_sets, dist_dir / 'settings' / 'app-settings.json')
 
 
 @task(name="shallow-pack")
