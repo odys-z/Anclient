@@ -78,7 +78,7 @@ min-width: 600px;
         menu-data: [
           { id: IDs.m_home, icon: @image-url("imgs/home.svg"),  name: "Home" },
           { id: IDs.m_album,  icon: @image-url("imgs/album-icon.svg"), name: "Album"},
-          { id: IDs.m_volume, icon: UseIcons.icons.Folder,   name: "Volume" },
+          // { id: IDs.m_volume, icon: UseIcons.icons.Folder,   name: "Volume" },
           { id: IDs.m_upload, icon: UseIcons.icons.FileCode, name: "Upload" }
         ];
 
@@ -106,7 +106,11 @@ min-width: 600px;
         width: parent.width;
         height: parent.height;
 
-        if (AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album) : index-page := HomeForm { 
+        // if (AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album) : index-page := HomeForm { 
+        if (AppState.model.menu_id != IDs.m_upload
+            && AppState.model.menu_id != IDs.m_user
+            && AppState.model.menu-id != IDs.m_edge
+          ) : index-page := HomeForm { 
           height: parent.height - 14pt;
           visible: AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album;
           navigate(menuid) => {
@@ -118,11 +122,11 @@ min-width: 600px;
           enable-vol: AppState.model.enable_vol;
         }
 
-        if (AppState.model.menu_id == IDs.m_volume) : Rectangle {
-          background: #b0d0d0;
-          // Volume Information
-          // CustomTableViewPage { width: 100%; height: 100%; }
-        }
+        // if (AppState.model.menu_id == IDs.m_volume) : Rectangle {
+        //   background: #b0d0d0;
+        //   // Volume Information
+        //   // CustomTableViewPage { width: 100%; height: 100%; }
+        // }
 
         if (AppState.model.menu_id == IDs.m_upload) : Rectangle {
           background: #202020;

@@ -98,11 +98,36 @@ export component User {
                     }
                 }
 
+                // Registry User Pswd
+                Row {
+                    Text {
+                        col: 0;
+                        text: "Registry Account"; font-size: 14pt; color: #bbb; }
+                    HorizontalLayout {
+                        col: 1;
+                        spacing: 8px;
+                        horizontal-stretch: 1;
+
+                        regi_uid := LineEdit {
+                            font-size: 14pt; 
+                            placeholder-text: @tr("Registry User ID");
+                            text: "admln";
+                            enabled: false;
+                        }
+                        regi_pswd := LineEdit {
+                            font-size: 14pt; 
+                            placeholder-text: @tr("Registry Password");
+                            text: "**************";
+                            enabled: false;
+                        }
+                    }
+                }
+
                 // orgs | domain | synode
                 Row {
                     Text {
                         col: 0;
-                        text: "Storage Node"; font-size: 14pt; color: #bbb; }
+                        text: "File Node"; font-size: 14pt; color: #bbb; }
                     HorizontalLayout {
                         col: 1;
                         spacing: 8px;
@@ -152,7 +177,7 @@ export component User {
                 Row {
                     Text {
                         col: 0;
-                        text: "Synode Url"; font-size: 14pt; color: #bbb; }
+                        text: "Node Url"; font-size: 14pt; color: #bbb; }
                     url-edit := LineEdit {
                         col: 1;
                         horizontal-stretch: 1;

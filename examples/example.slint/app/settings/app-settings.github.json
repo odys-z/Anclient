@@ -7,14 +7,13 @@
   "sysuri"  : "/sys/qmltest",
   "temp_dir": "temp",
   "java_path": "~/github/semantic-jserv/jserv-album/infor-17.1/jre17/bin/java.exe",
-  "doctier_jar": "res/doctier-0.5.19.jar",
   "wsagent_jar": "res/ws-agent-0.1.0.jar",
   "synode_id": "29-X",
   "synode_vol" : "~/github/semantic-jserv/jserv-album/qqhome/",
-  "synode_jserv":"http://127.0.0.1:0001/jserv-album",
+  "synode_jserv":"generate from tasks shallow-dist",
   "admin" : "ody",
   "domain_token" : "*********",
-  "domain": "*********",
+  "domain": "select one",
   "wshost": "127.0.0.1",
   "wsport": 8700
 }

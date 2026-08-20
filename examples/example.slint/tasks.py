@@ -20,16 +20,19 @@ Install once:
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import cast
 
+from anson.io.odysz.anson import Anson, AnsonException
+from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
 from anson.io.odysz.utils import copy_anyway
 from invoke import task
+from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
 from semanticshare.io.odysz.semantic.jprotocol import JServUrl
 from semanticshare.io.oz.invoke import SynodeTask
 
-from anson.io.odysz.anson import Anson, Utils
 
 # ---------------------------------------------------------------------------
 # Project layout — adjust these two if your repo is laid out differently.
@@ -254,6 +257,30 @@ def keepgit_clean(ctx):
     print(f"Removed: {removed}")
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
+def validsettings(s: DesktopSettings):
+    '''
+    For latest requirement, see slint app slingleton::validsettings()
+    bool validsettings() {
+        // can only be hacked
+        langext::mustnonull(appsettings.market);
+        langext::mustnonull(appsettings.synuri);
+        langext::mustnonull(appsettings.sysuri);
+        langext::mustnonull(appsettings.java_path);
+        langext::mustnonull(appsettings.wsagent_jar);
+        langext::mustnonull(appsettings.wshost);
+        langext::mustin(appsettings.wsport, 1024, 65536);
+        LangExt::mustnonull(appsettings.regiserv);
+    :param s:
+    :return:
+    '''
+    if LangExt.isblank(s.market): raise SemanticException('market id is empty')
+    if LangExt.isblank(s.synuri): raise SemanticException('client syn func-id is empty')
+    if LangExt.isblank(s.sysuri): raise SemanticException('client sys func-id is empty')
+    if LangExt.isblank(s.java_path): raise SemanticException('java-path is empty')
+    if LangExt.isblank(s.wsagent_jar): raise SemanticException('wsagent_jar is empty')
+    if LangExt.isblank(s.wshost): raise SemanticException('wshost is empty')
+    if s.wsport < 1024 or s.wsport >= 65536: raise SemanticException('wsport is not in range of [1024, 65536).')
+    if LangExt.isblank(s.regiserv): raise SemanticException('regiserv is empty')
 
 def create_desktop_settings(taskcfg: SynodeTask) -> str:
     """
@@ -265,22 +292,40 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     :return: the generated json's relative path to desktop dir
     """
     relative_pth = "dist-settings-temp.json"
-    # desksets = cast(DesktopSettings, Anson.from_file(Path(taskcfg.desktop_dir) / 'app/settings/app-settings.github.json'))
+
     desksets = cast(DesktopSettings, Anson.from_file('app/settings/app-settings.github.json'))
+    try: validsettings(desksets)
+    except SemanticException as e:
+        Utils.warn(f'**** ERROR **** Desktop settings is invalid: ' + e.msg)
+        sys.exit(-1)
+
     desksets.market = taskcfg.deploy.market_id
     desksets.market_name = taskcfg.deploy.market
+    desksets.org = taskcfg.deploy.orgid
+    desksets.synode_id = ""
+    desksets.device = ""
     desksets.admin = taskcfg.deploy.admin
     desksets.domain_token = taskcfg.deploy.domain_token # default, overwrite by installer
-    desksets.org = taskcfg.deploy.orgid
 
     desksets.java_path = 'jre17/bin/java'
+    desksets.doctier_jar = f'not used'
     desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport,
                                  protocolroot = taskcfg.deploy.central_path).jserv()
+    desksets.synode_vol = ''
+    desksets.synode_jserv = ''
+    desksets.album_web = str(taskcfg.deploy.web_port)
     desksets.wshost = '127.0.0.1'
     desksets.wsport = taskcfg.deploy.ws_port
     desksets.wsagent_jar = f'ipc-agent-{taskcfg.ipcagent_ver}.jar'
 
-    # desk_abspath = Path(taskcfg.desktop_dir).absolute() / taskcfg.desktop_dist_dir / relative_pth
+    # Portfolio 0.8.0, changing central pswd is not implemented
+    try:
+        LangExt.only_passwdlen(taskcfg.deploy.central_pswd, minlen=6, maxlen=16)
+    except AnsonException:
+        Utils.warn(f"token length must be in [8 ~ 16], allowed special chars: [{passwd_allow_ext}]")
+        sys.exit()
+    desksets.centralPswd = taskcfg.deploy.central_pswd
+
     desksets.toFile(relative_pth)
 
     Utils.logi("============= Desktop Settings:", Path(relative_pth).absolute())
