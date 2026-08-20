@@ -37,6 +37,8 @@
 # CMake build directory
 build
 qt-build
+build-0.8.0
+
 surrealism-0.5.3
 app-settings-*.json
 app-settings.json

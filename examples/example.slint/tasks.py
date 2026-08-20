@@ -18,6 +18,7 @@ Install once:
     pip install invoke
 """
 
+import os
 import shutil
 import subprocess
 import sys
@@ -26,13 +27,15 @@ from typing import cast
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
-from anson.io.odysz.utils import copy_anyway
+from anson.io.odysz.utils import copy_anyway, zip2
 from invoke import task
 from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
 from semanticshare.io.odysz.semantic.jprotocol import JServUrl
 from semanticshare.io.oz.invoke import SynodeTask
 
+
+taskcfg = cast(SynodeTask, None)
 
 # ---------------------------------------------------------------------------
 # Project layout — adjust these two if your repo is laid out differently.
@@ -366,3 +369,62 @@ def shallow_pack(ctx,
     copy_dlls(ctx, config=config)
     deploy_settings(ctx, deploy)
     print(f"\nDone. Run: {exe_path}")
+
+@task
+def zip_standalone(ctx, deploy: str = 'task.json', zip: str = 'album-desktop'):
+    """
+    Create a the stand alone GUI app package.
+    
+    Args:
+        c: Invoke Context object for running commands.
+        zip: Name of the output ZIP file.
+    """
+    shallow_pack(ctx, deploy=deploy)
+    global  taskcfg
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
+    zip = f'{zip}-{taskcfg.version}.zip'
+    resources = {
+       ".": f"{taskcfg.desktop_dist_dir}/*",
+   }
+    excludes = ['*.log', 'report.html', '*.github.json']
+
+    try:
+        print('------------ packing desktop --------------')
+        print(resources)
+
+        err = False
+
+        # Ensure the output directory for the ZIP exists
+        output_dir = os.path.dirname(zip) or "."
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        if os.path.isfile(zip):
+            os.remove(zip)
+
+        print(Path(zip).absolute())
+        zip2(zip, {**resources}, excludes)
+
+        if not os.path.exists(taskcfg.dist_dir):
+            os.makedirs(taskcfg.dist_dir, exist_ok=True)
+        distzip = taskcfg.get_distzip()
+
+        if os.path.isfile(distzip):
+            os.remove(distzip)
+
+        print(zip, "->", distzip)
+        os.rename(zip, distzip)
+        taskcfg.distzip = distzip
+
+        print('****************************************************************************************************',
+             f'* Stand alone ZIP package is created successfully: {distzip}' if not err else 'Errors while making target (creaded zip file)',
+              '****************************************************************************************************',
+              sep='\n')
+
+    except Exception as e:
+        print(f"Error creating ZIP file: {str(e)}", file=sys.stderr)
+        raise
+
+
