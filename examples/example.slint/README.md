@@ -124,10 +124,10 @@
   
 1. clear sources
 
-```
-  rm -rf build/_deps/anson.cmake-src build/_deps/anson.cmake-build build/_deps/anson.cmake-subbuild
-  rm -rf build/_deps/anclient.cmake-src build/_deps/anclient.cmake-build build/_deps/anclient.cmake-subbuild
+   ```
+     rm -rf build/_deps/anson.cmake-src build/_deps/anson.cmake-build build/_deps/anson.cmake-subbuild
+     rm -rf build/_deps/anclient.cmake-src build/_deps/anclient.cmake-build build/_deps/anclient.cmake-subbuild
 
-  rm -rf qt-build/_deps/anson.cmake-src qt-build/_deps/anson.cmake-build qt-build/_deps/anson.cmake-subbuild
-  rm -rf qt-build/_deps/anclient.cmake-src qt-build/_deps/anclient.cmake-build qt-build/_deps/anclient.cmake-subbuild
-```
+     rm -rf qt-build/_deps/anson.cmake-src qt-build/_deps/anson.cmake-build qt-build/_deps/anson.cmake-subbuild
+     rm -rf qt-build/_deps/anclient.cmake-src qt-build/_deps/anclient.cmake-build qt-build/_deps/anclient.cmake-subbuild
+   ```

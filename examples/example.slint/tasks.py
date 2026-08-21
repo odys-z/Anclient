@@ -27,7 +27,7 @@ from typing import cast
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
-from anson.io.odysz.utils import copy_anyway, zip2
+from anson.io.odysz.utils import copy_anyway, zip2, move_anyway
 from invoke import task
 from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
@@ -42,7 +42,41 @@ taskcfg = cast(SynodeTask, None)
 # ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
 BUILD_DIR = ROOT_DIR / "qt-build"
+'''
+@deprecated Use the configure from tasks.json, by calling pth_buildir()
+'''
+def pth_buildir(taskconfig: SynodeTask = None) -> Path:
+    '''
+    :param taskconfig:
+    :return: e.g. qt-build/dist
+    '''
+    global taskcfg
+    if taskconfig is None:
+        taskconfig = taskcfg
+
+    if taskconfig is None:
+        warn("No task configure can be found")
+        sys.exit(-1)
+
+    return Path(taskconfig.desktop_dist_dir)
+
+
+def pth_packagedir(taskconfig: SynodeTask = None) -> Path:
+    global taskcfg
+    if taskconfig is None:
+        taskconfig = taskcfg
+
+    if taskconfig is None:
+        warn("No task configure can be found")
+        sys.exit(-1)
+
+    return Path(taskconfig.package_dir)
+
+
 DIST_DIR = BUILD_DIR / "dist"
+'''
+@deprecated Use the configure from tasks.json
+'''
 
 # Matches VCPKG_INSTALLED_DIR in the root CMakeLists.txt
 # (${CMAKE_SOURCE_DIR}/../../../vcpkg/installed)
@@ -217,11 +251,29 @@ def _rmtree_onerror(func, path, exc_info):
 
 
 @task
-def clean(ctx):
+def clean(ctx, deploy: str = 'tasks.json'):
     """Remove the build directory entirely."""
-    if BUILD_DIR.exists():
-        shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
-        print(f"Removed {BUILD_DIR}")
+    # if BUILD_DIR.exists():
+    #     shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
+    #     print(f"Removed {BUILD_DIR}")
+    # else:
+    #     print("Nothing to clean.")
+
+    global taskcfg
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
+    buildir = pth_buildir(taskcfg)
+    if buildir.exists():
+        shutil.rmtree(buildir, onerror=_rmtree_onerror)
+        print(f"Removed {buildir}")
+    else:
+        print("Nothing to clean.")
+
+    pkg_dir = pth_packagedir()
+    if pkg_dir.exists():
+        shutil.rmtree(pkg_dir, onerror=_rmtree_onerror)
+        print(f"Removed {pkg_dir}")
     else:
         print("Nothing to clean.")
 
@@ -351,11 +403,12 @@ def shallow_pack(ctx,
                  config="Debug", target=TARGET_NAME, generator="Ninja"
                  ):
     """
-    Assemble dist/ for distribution while avoiding the expensive build step
-    when possible: builds only if the target exe isn't already present,
-    then always (re)copies the runtime DLLs.
+    Assemble dist/ for to, e.g. qt-build/dist, in which the resources for final packing,
+    while avoiding the expensive build step when possible:
+    builds only if the target exe isn't already present, then always
+    (re)copies the runtime DLLs.
 
-    app-settings for packaging must be generated and is ready for distribution.
+    The app-settings.json for packaging must be generated and is ready for distribution.
     """
 
     exe_path = DIST_DIR / (target + ".exe")
@@ -370,21 +423,24 @@ def shallow_pack(ctx,
     deploy_settings(ctx, deploy)
     print(f"\nDone. Run: {exe_path}")
 
+app_name: str = 'album-desktop'
+
 @task
-def zip_standalone(ctx, deploy: str = 'task.json', zip: str = 'album-desktop'):
+def zip_standalone(ctx, deploy: str = 'tasks.json'):
     """
-    Create a the stand alone GUI app package.
+    Create a the stand alone GUI app package, into dist_zip(), e.g. build-0.8.0.
     
     Args:
         c: Invoke Context object for running commands.
         zip: Name of the output ZIP file.
     """
     shallow_pack(ctx, deploy=deploy)
-    global  taskcfg
+    global  taskcfg, app_name
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
 
-    zip = f'{zip}-{taskcfg.version}.zip'
+    # zip = f'{app_name}-{taskcfg.version}.zip'
+    zip = taskcfg.deskzip_name()
     resources = {
        ".": f"{taskcfg.desktop_dist_dir}/*",
    }
@@ -407,19 +463,10 @@ def zip_standalone(ctx, deploy: str = 'task.json', zip: str = 'album-desktop'):
         print(Path(zip).absolute())
         zip2(zip, {**resources}, excludes)
 
-        if not os.path.exists(taskcfg.dist_dir):
-            os.makedirs(taskcfg.dist_dir, exist_ok=True)
-        distzip = taskcfg.get_distzip()
-
-        if os.path.isfile(distzip):
-            os.remove(distzip)
-
-        print(zip, "->", distzip)
-        os.rename(zip, distzip)
-        taskcfg.distzip = distzip
+        zip = move_anyway(zip, pth_packagedir(), log=True)
 
         print('****************************************************************************************************',
-             f'* Stand alone ZIP package is created successfully: {distzip}' if not err else 'Errors while making target (creaded zip file)',
+             f'* Stand alone ZIP package is created successfully: {zip}' if not err else 'Errors while making target (creaded zip file)',
               '****************************************************************************************************',
               sep='\n')
 
