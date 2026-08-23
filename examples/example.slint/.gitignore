@@ -46,3 +46,4 @@ app-settings.json
 !app-settings-template.json
 CMakeLists.txt.user
 *-temp.json
+ws-agent-0.2.0.jar
