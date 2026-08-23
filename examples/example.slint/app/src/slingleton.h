@@ -327,7 +327,7 @@ namespace anson {
      */
     bool validsettings() {
         // can only be hacked
-        LangExt::mustnonull(appsettings.market);
+        LangExt::mustnonull(appsettings.market_id);
         LangExt::mustnonull(appsettings.synuri);
         LangExt::mustnonull(appsettings.sysuri);
         LangExt::mustnonull(appsettings.java_path);
@@ -351,7 +351,7 @@ namespace anson {
         anlog(std::format(R"("saving settings:
         market: {}, market_name: {}
         sysuri: {}, synuri: {}")",
-        appsettings.market, appsettings.market_name,
+        appsettings.market_id, appsettings.market_name,
         appsettings.sysuri, appsettings.synuri
         ));
         appsettings.to_file(pth, &opts);
@@ -364,7 +364,7 @@ namespace anson {
     static std::optional<std::string> validate_settings(DesktopSettings s) {
       return [&]() -> std::optional<std::string> {
             if (s.device.empty())		return "device id is empty";
-            if (s.market.empty())		return "market id is empty";
+            if (s.market_id.empty())		return "market id is empty";
             if (s.domain.empty()) 	    return "domain id is mepty";
             if (s.org.empty())		    return "org id is empty";
             if (s.synode_id.empty())	return "synode id is empty";

@@ -70,7 +70,7 @@ void Slingleton::setup_regclient()  {
     registryClient = new RegistryClient(appsettings, regjserv,
                                         onbeat, AsynClienter::onErr);
 
-    registryClient->market  = appsettings.market;
+    registryClient->market  = appsettings.market_id;
     registryClient->orgid   = appsettings.org;
     registryClient->orgname = appsettings.org_name;
 }

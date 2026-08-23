@@ -53,10 +53,6 @@ public class DesktopSettings extends AnclientSettings {
 	public int wstimeout;
 	public String[] ipc_tiers;
 
-	/** Path to settings the agent working as a synode client */
-//	public String synclientjson;
-
-
 	public DesktopSettings() {
 		wstimeout = 60000;
 	}

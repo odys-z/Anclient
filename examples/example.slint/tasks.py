@@ -328,7 +328,7 @@ def validsettings(s: DesktopSettings):
     :param s:
     :return:
     '''
-    if LangExt.isblank(s.market): raise SemanticException('market id is empty')
+    if LangExt.isblank(s.market_id): raise SemanticException('market id is empty')
     if LangExt.isblank(s.synuri): raise SemanticException('client syn func-id is empty')
     if LangExt.isblank(s.sysuri): raise SemanticException('client sys func-id is empty')
     if LangExt.isblank(s.java_path): raise SemanticException('java-path is empty')

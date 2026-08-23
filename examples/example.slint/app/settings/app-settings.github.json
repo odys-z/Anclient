@@ -1,5 +1,5 @@
 { "type"    : "io.oz.anclient.app.DesktopSettings",
-  "market"  : "my",
+  "market_id": "my",
   "market_name"   : "MY 0.1.0",
   "regiserv": "https://.../regist-alpha",
   "device"  : "slint.test",
