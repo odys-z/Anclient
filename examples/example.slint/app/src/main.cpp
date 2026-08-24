@@ -138,10 +138,11 @@ int main(int argc, char **argv) {
         try {
             fs::directory_iterator syncpage = fs::directory_iterator(root);
             for (const auto& entry : syncpage) {
-                pthpage.emplace(Anson::posix_path(entry.path().string()), vector<LangExt::VarType>{ShareFlag::pushing});
+                pthpage.emplace(Anson::posix_path(entry.path().string()),
+                                vector<LangExt::VarType>{ShareFlag::pushing});
             }
 
-            slingle.doclientier->query_syncflags(pthpage, [&ui_weak, &slingle](AnsonResp& resp) {
+            slingle.doclientier->query_syncflags(pthpage, [ui_weak, &slingle](AnsonResp& resp) {
                 // slingle.enqueue_synode(std::make_shared<DocsResp>(resp));
                 if (auto* docs = dynamic_cast<DocsResp*>(&resp)) {
                     slingle.enqueue_synode(std::make_shared<DocsResp>(std::move(*docs)));
@@ -149,7 +150,7 @@ int main(int argc, char **argv) {
                     anwarn("query_syncflags: unexpected response type, dropping");
                     return;
                 }
-                slint::invoke_from_event_loop([&ui_weak, &resp]() {
+                slint::invoke_from_event_loop([ui_weak]() {
                     if (auto handle = ui_weak.lock()) {
                         anlog("querying page ...");
                         (*handle)->invoke_update_syncflags();

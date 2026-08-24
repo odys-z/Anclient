@@ -15,7 +15,6 @@ namespace anson {
 class DesktopSettings : public anson::AnclientSettings {
 public:
     inline static const std::string _type_ = "io.oz.anclient.app.DesktopSettings";
-    string org;
     string org_name;
     string java_path;
     string doctier_jar;
@@ -37,7 +36,6 @@ inline static void register_desktopsettingsAst(JsonOpt* ctx) {
 
     AnsonAst * ast = createAST <DesktopSettings, AnsonAst> (
         *ctx->asts, AnclientSettings::_type_, map <string, AnsonField> {
-        {"org", {.dataAnclass="string"} },
         {"org_name", {.dataAnclass="string"} },
         {"java_path", {.dataAnclass="string"} },
         {"doctier_jar", {.dataAnclass="string"} },
@@ -55,7 +53,6 @@ inline static void register_desktopsettingsAst(JsonOpt* ctx) {
         .type(ast->enttypeid)
         .base<AnclientSettings>()
 
-        .data<&anson::DesktopSettings::org>("org")
         .data<&anson::DesktopSettings::org_name>("org_name")
         .data<&anson::DesktopSettings::java_path>("java_path")
         .data<&anson::DesktopSettings::doctier_jar>("doctier_jar")
@@ -73,8 +70,6 @@ inline static void register_desktopsettingsAst(JsonOpt* ctx) {
         ast->get_field_instance = [ast, ctx](const IJsonable& ans, const string& fieldname) -> meta_any {
             if (ast->fields.contains(fieldname)) {
                 auto& concrete = static_cast<const DesktopSettings&>(ans);
-                if ("org" == fieldname)
-                    return entt::forward_as_meta(concrete.org);
                 if ("org_name" == fieldname)
                     return entt::forward_as_meta(concrete.org_name);
                 if ("java_path" == fieldname)

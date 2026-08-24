@@ -231,6 +231,11 @@ def copy_dlls(ctx, config="Debug"):
     else:
         print("\nAll expected DLLs copied.")
 
+    # global taskcfg
+    # if taskcfg is None:
+    #     taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+    # cp_wsagent_jar(taskcfg)
+
 
 @task
 def dist(ctx, config="Debug", target=TARGET_NAME, generator="Ninja", reconfigure=False):
@@ -371,7 +376,7 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     desksets.album_web = str(taskcfg.deploy.web_port)
     desksets.wshost = '127.0.0.1'
     desksets.wsport = taskcfg.deploy.ws_port
-    desksets.wsagent_jar = f'ipc-agent-{taskcfg.ipcagent_ver}.jar'
+    desksets.wsagent_jar = f'res/ws-agent-{taskcfg.ipcagent_ver}.jar'
 
     # Portfolio 0.8.0, changing central pswd is not implemented
     try:
@@ -388,9 +393,26 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     return relative_pth
 
 
+# def cp_wsagent_jar(taskcfg: SynodeTask) -> None:
+#     def desk_dist_res_dir(taskcfg: SynodeTask) -> str:
+#         return os.path.join(taskcfg.desktop_dist_dir, 'res')
+
+#     def desk_res_dir() -> str:
+#         return os.path.join('tests', 'res')
+
+#     jar_src = os.path.join(taskcfg.ipcagent_dir, 'target', f'ws-agent-{taskcfg.ipcagent_ver}.jar')
+
+#     print(jar_src, "=>", desk_res_dir())
+#     shutil.copy(jar_src, desk_res_dir())
+#     print(jar_src, "=>", desk_dist_res_dir(taskcfg))
+#     shutil.copy(jar_src, desk_dist_res_dir(taskcfg))
+
 @task
 def deploy_settings(ctx, deploy: str = "tasks.json"):
-    taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+    global taskcfg
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
     new_sets = create_desktop_settings(taskcfg)
     dist_dir = Path(taskcfg.desktop_dist_dir)
     Utils.rm_any(dist_dir / 'settings')
@@ -439,11 +461,12 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
 
-    # zip = f'{app_name}-{taskcfg.version}.zip'
-    zip = taskcfg.deskzip_name()
+    zip = taskcfg.deskzip_name() # f'{app_name}-{taskcfg.version}.zip'
     resources = {
-       ".": f"{taskcfg.desktop_dist_dir}/*",
-   }
+        ".": f"{taskcfg.desktop_dist_dir}/*",
+        # TODO fix this
+        # "jre17": taskcfg.jre_release
+    }
     excludes = ['*.log', 'report.html', '*.github.json']
 
     try:

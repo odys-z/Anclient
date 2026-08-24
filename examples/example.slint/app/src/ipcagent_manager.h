@@ -80,8 +80,11 @@ public:
     JavaAgentController(const DesktopSettings& settings) {
         m_java_cmd = resolveHomePath(settings.java_path);
         #ifdef _WIN32
-        if (m_java_cmd.size() < 4 ||
-            m_java_cmd.compare(m_java_cmd.size() - 4, 4, ".exe") != 0) {
+        if (LangExt::endwith(m_java_cmd, "java.dll")) {
+            // Only replace when the trailing filename is exactly "java.dll"
+            m_java_cmd.resize(m_java_cmd.size() - 8); // strip "java.dll"
+            m_java_cmd += "java.exe";
+        } else if (!LangExt::endwith(m_java_cmd, ".exe")) {
             m_java_cmd += ".exe";
         }
         #else
@@ -112,7 +115,7 @@ public:
 
     #ifdef _WIN32
         std::string cmd = std::format("{} -jar {} {}", 
-                                      resolveHomePath(m_java_cmd), m_agent_jar, jarg_agentsetting_path);
+                           resolveHomePath(m_java_cmd), m_agent_jar, jarg_agentsetting_path);
 
         STARTUPINFOA si = { sizeof(STARTUPINFOA) };
         si.dwFlags = STARTF_USESHOWWINDOW;

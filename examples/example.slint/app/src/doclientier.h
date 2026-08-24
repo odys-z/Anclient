@@ -107,7 +107,7 @@ public:
     /// helper
     static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);
-        slint::invoke_from_event_loop([&appwin, &slint_text]() {
+        slint::invoke_from_event_loop([&appwin, slint_text]() {
             if (auto app = appwin.lock()) {
                 anlog("[onmsg] Updating statues report: "s + string{slint_text});
                 auto data = (*app)->global<AppState>().get_model();

@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
     src/helper.h
     src/slingleton.cpp
     src/slingleton.h
+    src/ipcagent_manager.h
     src/gen/app_settings.hpp
     src/gen/wsport.hpp
     src/doctier.cpp
@@ -134,7 +135,7 @@ endif()
 # App assets -> dist/
 # ---------------------------------------------------------------------------
 # Ensure assets copying only when building the main target (filter out test res also)
-file(GLOB ABC_JAR "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
+file(GLOB IPC_JAR "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
 add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/ast"
@@ -149,7 +150,7 @@ add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E make_directory
         "${ALBUM_DIST_DIR}/res"
     COMMAND ${CMAKE_COMMAND} -E copy
-        "${ABC_JAR}"
+        "${IPC_JAR}"
         "${ALBUM_DIST_DIR}/res/"
 
     COMMENT "Syncing assets to dist folder..."

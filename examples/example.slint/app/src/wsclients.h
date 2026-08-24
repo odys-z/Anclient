@@ -36,7 +36,8 @@ public:
     inline static const string Closed = "Closed";
 
     WSClient(const JServUrl& jserv, const DesktopSettings& settings, const OnMsg& onmsg);
-    WSClient(const JsonOpt* ctx, const DesktopSettings& settings) : jserv_("ipc", ctx), settings(settings) {}
+    WSClient(const JsonOpt* ctx, const DesktopSettings& settings)
+        : jserv_("ipc", ctx), settings(settings) {}
 
     ~WSClient();
 
