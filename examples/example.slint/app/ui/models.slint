@@ -42,6 +42,7 @@ export struct AppModel {
 
     current_pth: string,
     filelist: [PathItemData],
+    path_crumbs: [PathItemData], // host-computed breadcrumb segments for current_pth
     enable_vol: bool,
     synode_linked: bool,
 

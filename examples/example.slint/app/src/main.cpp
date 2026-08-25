@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <io/odysz/anserializer.h>
@@ -104,10 +105,41 @@ int main(int argc, char **argv) {
                 table_model->push_back(row);
             }
 
+            // Build the breadcrumb trail: one crumb per ancestor folder of `root`,
+            // from the filesystem root down to the folder just loaded.
+            auto crumbs_model = std::make_shared<slint::VectorModel<PathItemData>>();
+            {
+                fs::path abs_root = fs::absolute(root);
+                std::vector<fs::path> ancestors{abs_root};
+                for (fs::path walk = abs_root; walk.has_parent_path() && walk != walk.parent_path(); ) {
+                    walk = walk.parent_path();
+                    ancestors.push_back(walk);
+                }
+                std::reverse(ancestors.begin(), ancestors.end());
+
+                for (const auto& p : ancestors) {
+                    std::string label = p.filename().string();
+                    if (label.empty())
+                        label = p.string(); // filesystem root, e.g. "/" or "C:\"
+
+                    PathItemData crumb {
+                        .is_folder = true,
+                        .indent = {},
+                        .fname{label},
+                        .size = "",
+                        .type = "Folder",
+                        .fullpath{p.string()},
+                        .iselected = false,
+                        .syncicon = SyncingIcon::Invisible};
+                    crumbs_model->push_back(crumb);
+                }
+            }
+
             {
                 auto data = ui->global<AppState>().get_model();
                 data.filelist = table_model;
                 data.current_pth = pth;
+                data.path_crumbs = crumbs_model;
                 ui->global<AppState>().set_model(data);
             }
 

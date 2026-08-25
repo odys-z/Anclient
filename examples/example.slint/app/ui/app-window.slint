@@ -135,6 +135,7 @@ min-width: 600px;
 
             row_data    : AppState.model.filelist;
             current_path: AppState.model.current_pth;
+            path_crumbs : AppState.model.path_crumbs;
 
             synode-linked: AppState.model.synode_linked;
 
@@ -145,6 +146,11 @@ min-width: 600px;
                 debug("[App Window] callback, loading: " + row.fname);
                 root.load_folder(row.fullpath);
               }
+            }
+
+            breadcrumb-clicked(pth) => {
+              debug("[App Window] breadcrumb clicked, loading: " + pth);
+              root.load_folder(pth);
             }
 
             row-selected(row) => {
