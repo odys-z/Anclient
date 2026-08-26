@@ -8,14 +8,14 @@ import { AnReact } from './anreact';
  * @deprecated 0.6.8 use ExternalHosts instead
  */
 export interface JsonHosts {
-	host: string;
-	[h: string]: string | object,
+	host: string | undefined;
+	[h: string]: string | object | undefined,
 }
 
 export class ExternalHosts implements JsonHosts {
-	[h: string]: string | object;
+	[h: string]: string | object | undefined;
 
-	host: string;
+	host: string | undefined;
 	localip?: string;
 	syndomx?: { [key: string]: string };
 	synodesetups?: { [key: string]: string[] };
@@ -125,14 +125,14 @@ export interface ClientOptions {
 }
 
 export const AnContext = React.createContext({
-	ssInf: undefined as SessionInf,
+	ssInf: undefined as unknown as SessionInf,
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram
-	ihome: undefined as string,
+	ihome: undefined as unknown as string,
 
 	/**default: host */
-	servId: undefined as string,
+	servId: undefined as unknown as string,
 
 	servs: { host: 'http://localhost:8080' } as JsonHosts,
 
@@ -140,11 +140,11 @@ export const AnContext = React.createContext({
 	anReact: undefined,
 
 	error: {
-		onError: undefined as (code: string, resp: AnsonMsg<AnsonResp>) => undefined,
-		msg: undefined as string
+		onError: undefined as unknown as (code: string, resp: AnsonMsg<AnsonResp>) => undefined,
+		msg: undefined as unknown as string
 	} as ErrorCtx,
 	hasError: false,
 
 	/** Only nullable for Login */
-	reactHelper: undefined as AnReact,
+	reactHelper: undefined as unknown as AnReact,
 } as unknown as AnContextType);

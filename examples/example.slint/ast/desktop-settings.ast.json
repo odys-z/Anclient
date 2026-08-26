@@ -2,9 +2,6 @@
   "dataAnclass": "io.oz.anclient.app.DesktopSettings",
   "baseAnclass": "io.odysz.jclient.AnclientSettings",
   "fields" : {
-    "market": {"dataAnclass": "string"},
-    "org"   : {"dataAnclass": "string"},
-    "market_name"   : {"dataAnclass": "string"},
     "org_name"      : {"dataAnclass": "string"},
     "java_path"     : {"dataAnclass": "string"},
     "doctier_jar"   : {"dataAnclass": "string"},

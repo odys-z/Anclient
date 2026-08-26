@@ -1,14 +1,13 @@
 import React from 'react';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
-	ErrorCtx, SessionClient} from '@anclient/semantier';
+import { Inseclient, SessionClient} from '@anclient/semantier';
 
 import { AnReactExt, 
 	CrudCompW, AnContextType, 
 	Comprops,
 	ExternalHosts} from '@anclient/anreact';
 import QRCode from 'react-qr-code';
-import { Box, Card, CardActionArea, Typography, Grid, Paper } from '@material-ui/core';
+import { Card, CardActionArea, Typography, Grid, Paper } from '@material-ui/core';
 import { IcoDownloadApk, IcoLoginAlbum } from '../icons/android';
 import { formatJservQr } from '../tiers/synode-utils';
 

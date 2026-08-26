@@ -18,19 +18,65 @@ Install once:
     pip install invoke
 """
 
+import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
+from typing import cast
 
-from anson.io.odysz.utils import copy_anyway
+from anson.io.odysz.anson import Anson, AnsonException
+from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
+from anson.io.odysz.utils import copy_anyway, zip2, move_anyway
 from invoke import task
+from semanticshare.io.odysz.semantic.x import SemanticException
+from semanticshare.io.oz.anclient.app import DesktopSettings
+from semanticshare.io.odysz.semantic.jprotocol import JServUrl
+from semanticshare.io.oz.invoke import SynodeTask
+
+
+taskcfg = cast(SynodeTask, None)
 
 # ---------------------------------------------------------------------------
 # Project layout — adjust these two if your repo is laid out differently.
 # ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
 BUILD_DIR = ROOT_DIR / "qt-build"
+'''
+@deprecated Use the configure from tasks.json, by calling pth_buildir()
+'''
+def pth_buildir(taskconfig: SynodeTask = None) -> Path:
+    '''
+    :param taskconfig:
+    :return: e.g. qt-build/dist
+    '''
+    global taskcfg
+    if taskconfig is None:
+        taskconfig = taskcfg
+
+    if taskconfig is None:
+        warn("No task configure can be found")
+        sys.exit(-1)
+
+    return Path(taskconfig.desktop_dist_dir)
+
+
+def pth_packagedir(taskconfig: SynodeTask = None) -> Path:
+    global taskcfg
+    if taskconfig is None:
+        taskconfig = taskcfg
+
+    if taskconfig is None:
+        warn("No task configure can be found")
+        sys.exit(-1)
+
+    return Path(taskconfig.package_dir)
+
+
 DIST_DIR = BUILD_DIR / "dist"
+'''
+@deprecated Use the configure from tasks.json
+'''
 
 # Matches VCPKG_INSTALLED_DIR in the root CMakeLists.txt
 # (${CMAKE_SOURCE_DIR}/../../../vcpkg/installed)
@@ -185,6 +231,11 @@ def copy_dlls(ctx, config="Debug"):
     else:
         print("\nAll expected DLLs copied.")
 
+    # global taskcfg
+    # if taskcfg is None:
+    #     taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+    # cp_wsagent_jar(taskcfg)
+
 
 @task
 def dist(ctx, config="Debug", target=TARGET_NAME, generator="Ninja", reconfigure=False):
@@ -205,11 +256,29 @@ def _rmtree_onerror(func, path, exc_info):
 
 
 @task
-def clean(ctx):
+def clean(ctx, deploy: str = 'tasks.json'):
     """Remove the build directory entirely."""
-    if BUILD_DIR.exists():
-        shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
-        print(f"Removed {BUILD_DIR}")
+    # if BUILD_DIR.exists():
+    #     shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
+    #     print(f"Removed {BUILD_DIR}")
+    # else:
+    #     print("Nothing to clean.")
+
+    global taskcfg
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
+    buildir = pth_buildir(taskcfg)
+    if buildir.exists():
+        shutil.rmtree(buildir, onerror=_rmtree_onerror)
+        print(f"Removed {buildir}")
+    else:
+        print("Nothing to clean.")
+
+    pkg_dir = pth_packagedir()
+    if pkg_dir.exists():
+        shutil.rmtree(pkg_dir, onerror=_rmtree_onerror)
+        print(f"Removed {pkg_dir}")
     else:
         print("Nothing to clean.")
 
@@ -248,11 +317,107 @@ def keepgit_clean(ctx):
     print(f"Removed: {removed}")
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
+def validsettings(s: DesktopSettings):
+    '''
+    For latest requirement, see slint app slingleton::validsettings()
+    bool validsettings() {
+        // can only be hacked
+        langext::mustnonull(appsettings.market);
+        langext::mustnonull(appsettings.synuri);
+        langext::mustnonull(appsettings.sysuri);
+        langext::mustnonull(appsettings.java_path);
+        langext::mustnonull(appsettings.wsagent_jar);
+        langext::mustnonull(appsettings.wshost);
+        langext::mustin(appsettings.wsport, 1024, 65536);
+        LangExt::mustnonull(appsettings.regiserv);
+    :param s:
+    :return:
+    '''
+    if LangExt.isblank(s.market_id): raise SemanticException('market id is empty')
+    if LangExt.isblank(s.synuri): raise SemanticException('client syn func-id is empty')
+    if LangExt.isblank(s.sysuri): raise SemanticException('client sys func-id is empty')
+    if LangExt.isblank(s.java_path): raise SemanticException('java-path is empty')
+    if LangExt.isblank(s.wsagent_jar): raise SemanticException('wsagent_jar is empty')
+    if LangExt.isblank(s.wshost): raise SemanticException('wshost is empty')
+    if s.wsport < 1024 or s.wsport >= 65536: raise SemanticException('wsport is not in range of [1024, 65536).')
+    if LangExt.isblank(s.regiserv): raise SemanticException('regiserv is empty')
 
-@task(name="config-appsets")
-def config_appsetss(ctx, dist_dir: str = "qt-build/app/dist", deploy: str = "deploy-settings.json"):
-    if deploy != "deploy-settings.json":
-        copy_anyway(deploy, Path(dist_dir) / "app-settings.json")
+def create_desktop_settings(taskcfg: SynodeTask) -> str:
+    """
+    Create an app-settings.json for desktop, return the relative file path, for slint/tasks.py --appsettings arg.
+
+    Initial package only setup market, market-id, java_path, regiserv, centralPswd, wshost, wsport, wsagent_jar.
+
+    Installer needs to setup synode-id and vol, jserv, etc.
+    :return: the generated json's relative path to desktop dir
+    """
+    relative_pth = "dist-settings-temp.json"
+
+    desksets = cast(DesktopSettings, Anson.from_file('app/settings/app-settings.github.json'))
+    try: validsettings(desksets)
+    except SemanticException as e:
+        Utils.warn(f'**** ERROR **** Desktop settings is invalid: ' + e.msg)
+        sys.exit(-1)
+
+    desksets.market = taskcfg.deploy.market_id
+    desksets.market_name = taskcfg.deploy.market
+    desksets.org = taskcfg.deploy.orgid
+    desksets.synode_id = ""
+    desksets.device = ""
+    desksets.admin = taskcfg.deploy.admin
+    desksets.domain_token = taskcfg.deploy.domain_token # default, overwrite by installer
+
+    desksets.java_path = 'jre17/bin/java'
+    desksets.doctier_jar = f'not used'
+    desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport,
+                                 protocolroot = taskcfg.deploy.central_path).jserv()
+    desksets.synode_vol = ''
+    desksets.synode_jserv = ''
+    desksets.album_web = str(taskcfg.deploy.web_port)
+    desksets.wshost = '127.0.0.1'
+    desksets.wsport = taskcfg.deploy.ws_port
+    desksets.wsagent_jar = f'res/ws-agent-{taskcfg.ipcagent_ver}.jar'
+
+    # Portfolio 0.8.0, changing central pswd is not implemented
+    try:
+        LangExt.only_passwdlen(taskcfg.deploy.central_pswd, minlen=6, maxlen=16)
+    except AnsonException:
+        Utils.warn(f"token length must be in [8 ~ 16], allowed special chars: [{passwd_allow_ext}]")
+        sys.exit()
+    desksets.centralPswd = taskcfg.deploy.central_pswd
+
+    desksets.toFile(relative_pth)
+
+    Utils.logi("============= Desktop Settings:", Path(relative_pth).absolute())
+    Utils.logi(desksets.toBlock())
+    return relative_pth
+
+
+# def cp_wsagent_jar(taskcfg: SynodeTask) -> None:
+#     def desk_dist_res_dir(taskcfg: SynodeTask) -> str:
+#         return os.path.join(taskcfg.desktop_dist_dir, 'res')
+
+#     def desk_res_dir() -> str:
+#         return os.path.join('tests', 'res')
+
+#     jar_src = os.path.join(taskcfg.ipcagent_dir, 'target', f'ws-agent-{taskcfg.ipcagent_ver}.jar')
+
+#     print(jar_src, "=>", desk_res_dir())
+#     shutil.copy(jar_src, desk_res_dir())
+#     print(jar_src, "=>", desk_dist_res_dir(taskcfg))
+#     shutil.copy(jar_src, desk_dist_res_dir(taskcfg))
+
+@task
+def deploy_settings(ctx, deploy: str = "tasks.json"):
+    global taskcfg
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
+    new_sets = create_desktop_settings(taskcfg)
+    dist_dir = Path(taskcfg.desktop_dist_dir)
+    Utils.rm_any(dist_dir / 'settings')
+    copy_anyway(new_sets, dist_dir / 'settings' / 'app-settings.json')
+
 
 @task(name="shallow-pack")
 def shallow_pack(ctx,
@@ -260,12 +425,13 @@ def shallow_pack(ctx,
                  config="Debug", target=TARGET_NAME, generator="Ninja"
                  ):
     """
-    Assemble dist/ for distribution while avoiding the expensive build step
-    when possible: builds only if the target exe isn't already present,
-    then always (re)copies the runtime DLLs.
-    """
+    Assemble dist/ for to, e.g. qt-build/dist, in which the resources for final packing,
+    while avoiding the expensive build step when possible:
+    builds only if the target exe isn't already present, then always
+    (re)copies the runtime DLLs.
 
-    config_appsets(ctx, deploy)
+    The app-settings.json for packaging must be generated and is ready for distribution.
+    """
 
     exe_path = DIST_DIR / (target + ".exe")
 
@@ -276,4 +442,59 @@ def shallow_pack(ctx,
         build(ctx, config=config, target=target, generator=generator)
 
     copy_dlls(ctx, config=config)
+    deploy_settings(ctx, deploy)
     print(f"\nDone. Run: {exe_path}")
+
+app_name: str = 'album-desktop'
+
+@task
+def zip_standalone(ctx, deploy: str = 'tasks.json'):
+    """
+    Create a the stand alone GUI app package, into dist_zip(), e.g. build-0.8.0.
+    
+    Args:
+        c: Invoke Context object for running commands.
+        zip: Name of the output ZIP file.
+    """
+    shallow_pack(ctx, deploy=deploy)
+    global  taskcfg, app_name
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+
+    zip = taskcfg.deskzip_name() # f'{app_name}-{taskcfg.version}.zip'
+    resources = {
+        ".": f"{taskcfg.desktop_dist_dir}/*",
+        # TODO fix this
+        # "jre17": taskcfg.jre_release
+    }
+    excludes = ['*.log', 'report.html', '*.github.json']
+
+    try:
+        print('------------ packing desktop --------------')
+        print(resources)
+
+        err = False
+
+        # Ensure the output directory for the ZIP exists
+        output_dir = os.path.dirname(zip) or "."
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        if os.path.isfile(zip):
+            os.remove(zip)
+
+        print(Path(zip).absolute())
+        zip2(zip, {**resources}, excludes)
+
+        zip = move_anyway(zip, pth_packagedir(), log=True)
+
+        print('****************************************************************************************************',
+             f'* Stand alone ZIP package is created successfully: {zip}' if not err else 'Errors while making target (creaded zip file)',
+              '****************************************************************************************************',
+              sep='\n')
+
+    except Exception as e:
+        print(f"Error creating ZIP file: {str(e)}", file=sys.stderr)
+        raise
+
+

@@ -8,6 +8,7 @@
 #include <io/odysz/jprotocol.h>
 #include <io/odysz/gen/doctier.hpp>
 
+#include "gen/app_settings.hpp"
 #include "gen/wsport.hpp"
 
 namespace anson {
@@ -27,17 +28,18 @@ protected:
     OnMsg onMsg;
 
 public:
+    const DesktopSettings& settings;
+
     inline static const string Connecting = "Connecting";
     inline static const string Open = "Open";
     inline static const string Closing = "Closing";
     inline static const string Closed = "Closed";
 
-    WSClient(const JServUrl& jserv, const OnMsg& onmsg);
-    WSClient() : jserv_("", nullptr) {}
+    WSClient(const JServUrl& jserv, const DesktopSettings& settings, const OnMsg& onmsg);
+    WSClient(const JsonOpt* ctx, const DesktopSettings& settings)
+        : jserv_("ipc", ctx), settings(settings) {}
 
     ~WSClient();
-
-    void setup(const string& jserv, const string& protocol_root, const JsonOpt* ctx, const OnMsg& onmsg);
 
     string ipconn_state();
 
@@ -54,9 +56,18 @@ public:
     template <typename R> AnsonMsg<R> pop_envelope();
 
     WSClient* on_msg(OnMsg on) { onMsg = on; return this; }
-    void place_tasks(PathsPage& tasks, const WSPort port = WSPort{WSPort::docstier});
+
+    void place_tasks(PathsPage& tasks, const Port& p);
+
+    void place_tasks(PathsPage& tasks, const string& port_name = Port::docstier) {
+        place_tasks(tasks, Port{jserv_.jprotocol.ctx});
+    }
 
 private:
+    /**
+     * WS client uses the same ctx as the syn-ctx, as the ipc agent cannot
+     * handle 2 sets of protocol
+     */
     JServUrl jserv_;
     bool verbose_;
     ix::WebSocket websocket;
@@ -70,8 +81,8 @@ private:
 
 template <typename BD>
 int WSClient::asynSend(const AnsonMsg<BD>& reqmsg) {
-    anlog(reqmsg.toBlock());
-    websocket.sendText(reqmsg.toBlock());
+    anlog(reqmsg.toBlock(*jserv_.jprotocol.ctx));
+    websocket.sendText(reqmsg.toBlock(*jserv_.jprotocol.ctx));
     return msg_queue.size();
 }
 
@@ -89,14 +100,14 @@ AnsonMsg<R> WSClient::pop_envelope() {
 
     anlog(top);
     if (Regex::startEnvelope(top)) {
-        AnsonMsg<R> r;
-        Anson::from_json<AnsonMsg<R>>(top, r);
+        AnsonMsg<R> r{jserv_.jprotocol.ctx};
+        Anson::from_json<AnsonMsg<R>>(top, r, jserv_.jprotocol.ctx);
         return r;
     }
 
     if (Regex::start_with(top, "session openned: ")) {
         aninfo("Popping and ignoring expected message: "s + top);
-        AnsonMsg<R> r;
+        AnsonMsg<R> r{jserv_.jprotocol.ctx};
         r.code = MsgCode::Code::_sentinel_;
         return r;
     }

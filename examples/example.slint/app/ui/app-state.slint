@@ -1,4 +1,4 @@
-import { AppModel, UserProfileModel } from "models.slint";
+import { AppModel, UserDialogModel, UserProfileModel } from "models.slint";
 
 export global IDs {
     out property <string> m_home   : "home";
@@ -9,6 +9,9 @@ export global IDs {
     out property <string> m_edge   : "edge";
 
     out property <int> id_int: 0;
+
+    out property <int> dlg_0: 0;
+    out property <int> dlg_user: -1;
 }
 
 export global AppState {
@@ -16,7 +19,10 @@ export global AppState {
         window_title: "Anclient.slint",
         webview_status: "Webview not started",
         syncing_status: ["Ready"],
-        filelist: []
+        filelist: [],
+        path_crumbs: [],
+
+        dlg_type: IDs.dlg_0
     };
 
     // Fired whenever anything in `data` is mutated from within the UI
@@ -26,21 +32,37 @@ export global AppState {
     callback closing() -> bool;
 }
 
+export global UserDialogState {
+    in-out property <UserDialogModel> model: {
+        title: "",
+        detail: "",
+        has-cancel: false,
+        has-abort : false,
+    };
+
+    callback ok();
+    callback cancel();
+    callback abort();
+}
+
 export global UserProfile {
     in-out property <UserProfileModel> model: {
-            info_label: "Portfolio Desktop 0.1.0",
-            detail_label: "Ready",
-            market_name: "MY 0.1.0",
-            org_name: "",
-            regiserv: "http://.../jserv-central",
+        info_label: "Portfolio Desktop 0.1.0",
+        detail_label: "Ready",
+        market_name: "MY 0.1.0",
+        org_name: "",
+        regiserv: "http://.../jserv-central",
 
-            orgs_list: ["Test-1", "Test-2"],
-            org_selected: "",
-            domains_list: [],
-            domain_selected: "",
-            synodes_list: [],
-            synode_selected: "",
-            show_qr_code: false
+        orgs_list: ["Test-1", "Test-2"],
+        org_selected: "",
+        domains_list: [],
+        domain_selected: "",
+        synodes_list: [],
+        jserv_list  : [],
+        synode_selected: "",
+        device: "",
+        is_device_locked: true,
+        show_qr_code: false
     };
 
     callback model-changed(UserProfileModel);

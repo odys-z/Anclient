@@ -17,6 +17,7 @@ var config = {
   plugins: [ ],
 
   resolve: {
+	preferRelative: true,
 	extensions: ['*', '.ts', '.js']
   },
 

@@ -2,7 +2,7 @@
 /**The lower API of jclient/js */
 
 import * as $ from 'jquery';
-import AES from './aes';
+import AES2 from './aes2';
 import {
 	Protocol, AnsonMsg, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
@@ -24,7 +24,7 @@ interface AjaxReport {
 /**
  * AESLib instance
  * */
-const aes = new AES();
+const aes = new AES2();
 
 /**An client.js core API
  * Java equivalent of
@@ -54,11 +54,11 @@ class AnClient {
      * @param port the port name
      * @return the url
      */
-	servUrl (port: string) : string {
+	servUrl (port: keyof typeof Protocol.Port) : string {
 		// This is a common error in jeasy frame
 		if (port === undefined || port === null) {
 			console.error("Port is null!");
-			return;
+			return port;
 		}
 
 		let ulr: string;
@@ -99,7 +99,7 @@ class AnClient {
 		return this;
 	}
 
-	port(name: string) {
+	port(name: keyof typeof Protocol.Port) {
 		return Protocol.Port[name];
 	}
 
@@ -123,19 +123,24 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body().ssInf;
-				ssInf.jserv = an.cfg.defaultServ;
+				let ssInf = resp.Body()?.ssInf;
+				if (!ssInf) {
+					console.warn("resp.ssInf is empty!");
+				}
+				else {
+					ssInf.jserv = an.cfg.defaultServ;
 
-				console.log(ssInf.ssToken);
-				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
-				console.log(ssInf.ssToken);
+					console.log(ssInf.ssToken);
+					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
+					console.log(ssInf.ssToken);
 
-				let sessionClient = new SessionClient(ssInf, iv, true);
-				sessionClient.an = that;
-				if (typeof onLogin === "function")
-					onLogin(sessionClient);
-				else
-					console.log(sessionClient);
+					let sessionClient = new SessionClient(ssInf, iv, true);
+					sessionClient.an = that;
+					if (typeof onLogin === "function")
+						onLogin(sessionClient);
+					else
+						console.log(sessionClient);
+				}
 			},
 			onError);
 		return this;
@@ -165,19 +170,24 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body().ssInf;
-				ssInf.jserv = an.cfg.defaultServ;
+				let ssInf = resp.Body()?.ssInf;
+				if (!ssInf) {
+					console.warn("resp.ssInf is empty!");
+				}
+				else {
+					ssInf.jserv = an.cfg.defaultServ;
 
-				console.log(ssInf.ssToken);
-				ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
-				console.log(ssInf.ssToken);
+					console.log(ssInf.ssToken);
+					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
+					console.log(ssInf.ssToken);
 
-				let sessionClient = new SessionClient(ssInf, iv, true);
-				sessionClient.an = that;
-				if (typeof onLogin === "function")
-					onLogin(sessionClient);
-				else
-					console.log(sessionClient);
+					let sessionClient = new SessionClient(ssInf, iv, true);
+					sessionClient.an = that;
+					if (typeof onLogin === "function")
+						onLogin(sessionClient);
+					else
+						console.log(sessionClient);
+				}
 			},
 			onError);
 		return this;
@@ -399,6 +409,7 @@ class AnClient {
 		if (resp.body[0].rs[0].results) {
 			return resp.body[0].rs[0].results.splice(start, len)
 		}
+		return [];
 	}
 
 	/// helpers
@@ -443,7 +454,7 @@ export type SessionInf = {
  */
 class SessionClient {
 	an: AnClient;
-	ssInf: SessionInf;
+	ssInf!: SessionInf;
 
 	currentAct: LogAct = {
 		func: '',
@@ -524,7 +535,7 @@ class SessionClient {
 			// localStorage.setItem(SessionClient.ssInfo, '');
 			if (sstr && sstr !== '' && sstr !== 'null') {
 				ssInf = JSON.parse(sstr);
-				ssInf.iv = aes.b64ToBytes(ssInf.iv);
+				ssInf.iv = aes.b64ToBytes(ssInf.iv); // FIXME Type 'Uint8Array<ArrayBufferLike>' is not assignable to type 'string'.
 				an.init(ssInf.jserv);
 			}
 			else
@@ -546,7 +557,7 @@ class SessionClient {
 
 	consumeNotifies() {
 		if (this.ssInf) {
-			return this.ssInf['_notifies_'];
+			return this.ssInf['_notifies_']; // FIXME ssInf doesn't have a notifies field.
 		}
 	}
 

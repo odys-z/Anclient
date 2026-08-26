@@ -42,7 +42,7 @@ public class AnPrefEntries extends Anson {
      * @return true if content seems usable
      * @since 0.3.0
      */
-    public boolean insert(String jserv) {
+    public boolean insert(String jserv, int maxEntries) {
         String[] jss = jserv.split("\n");
         if (jss != null && jss.length >= 2 && !isblank(jss[0]) && !isblank(jss[1])) {
             int i = indexOf(entries, jss[0]);
@@ -59,9 +59,18 @@ public class AnPrefEntries extends Anson {
                 ix = 0;
             }
             entVals[0] = jss[1];
+            trim(maxEntries);
             return true;
         }
         return false;
+    }
+
+    private void trim(int maxEntries) {
+        if (maxEntries > 0 && entries != null && entries.length > maxEntries) {
+            entries = java.util.Arrays.copyOf(entries, maxEntries);
+            entVals = java.util.Arrays.copyOf(entVals, maxEntries);
+            if (ix >= maxEntries) ix = 0;
+        }
     }
 
     /** Get current entry.

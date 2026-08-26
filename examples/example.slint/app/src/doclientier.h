@@ -1,13 +1,9 @@
 #pragma once
 
-#include <thread>
-
 #include <io/odysz/clients.h>
 #include <io/odysz/common.h>
 #include <io/odysz/jprotocol.h>
 
-#include <thread>
-#include <chrono>
 #include <io/odysz/jprotocol.h>
 #include <io/odysz/jclient/syn.h>
 #include <io/odysz/gen/doctier.hpp>
@@ -17,13 +13,11 @@
 
 #include "app-window.h"
 #include "wsclients.h"
-#include "ipcagent_manager.h"
 
 namespace anson {
 
 class AsynClienter : public Doclientier {
 protected:
-
     DesktopSettings& appsettings;
 
     OnMsg onmsg = [this]() -> void {
@@ -46,7 +40,7 @@ protected:
             // anlog("Show be the ws connection report ...");
         }
         else { //if (!rep.body.empty()) {
-            string clientpath_state = map2str(rep.Body().syncingPage.clientPaths);
+            string clientpath_state = map2str(rep.Body().syncingPage.clientPaths, *client.jserv.jprotocol.ctx);
             string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
             anlog(status_txt);
             inv_insert_status(window_weak, status_txt);
@@ -61,31 +55,32 @@ protected:
         });
     };
 
-    slint::ComponentWeakHandle<App> window_weak; // = main_window;
+    slint::ComponentWeakHandle<App> window_weak;
 
 public:
-    inline static const string sysuri = "/sys/cpp";
-    inline static const string synuri = "/syn/cpp";
-
     std::unique_ptr<WSClient> wsclient;
 
     inline static OnError onErr = [](MsgCode c, const string& e, const vector<string> &a) {
-        anerror(std::format("[ERROR code {}], error: {}", AnsonJavaEnumAst::name<MsgCode>(c), e));
+        anerror(std::format("[ERROR code {}], error: {}", c.to_string(c.valeur), e));
     };
 
     inline static OnProgress onprogress = [](const string& m, const string &a) {
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink)
-        : Doclientier("h_photos", sysuri, synuri, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
+        : Doclientier("h_photos", desksets, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, OnLink onlink, OnError err)
-        : Doclientier("h_photos", sysuri, synuri, onlink, err), window_weak(appwin), appsettings(desksets) {}
+    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
+        : Doclientier("h_photos", desksets, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const WSPort& port = WSPort{WSPort::docstier});
+
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const Port& port);
+    void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = Port::docstier) {
+        push_files(paths, Port{client.jserv.jprotocol.ctx, port_code});
+    }
 
     void query_synode(vector<std::string> paths) {
         std::cout << "'''''''''''''''''''''''''''''''''''''''''''''''";
@@ -94,8 +89,8 @@ public:
     void login_synode(const string &uid, const string &pswd, const string& device) noexcept {
         try {
             anlog("''''''''''''''''''' login: "s + client.jserv.jserv() + " ''''''''''''''''''''''");
-            // client.jserv = jserv;
-            client.loginWithUri(sysuri, uid, pswd, device, onErr);
+
+            client.loginWithUri(appsettings.sysuri, uid, pswd, device, onErr);
         } catch (const std::logic_error e) {
             anwarn(e.what());
             onErr(MsgCode::Code::exSession, e.what(), {});
@@ -112,7 +107,7 @@ public:
     /// helper
     static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);
-        slint::invoke_from_event_loop([&appwin, &slint_text]() {
+        slint::invoke_from_event_loop([&appwin, slint_text]() {
             if (auto app = appwin.lock()) {
                 anlog("[onmsg] Updating statues report: "s + string{slint_text});
                 auto data = (*app)->global<AppState>().get_model();

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <io/odysz/anserializer.h>
@@ -8,7 +9,6 @@
 // This order is to avoid compile error
 #include "helper.h"
 #include "router.h"
-#include "gen/wsport.hpp"
 
 int main(int argc, char **argv) {
     using namespace anson;
@@ -69,12 +69,10 @@ int main(int argc, char **argv) {
 
             std::string updated_status = std::string(std::string_view(status)) + std::string(std::string_view(*f));
             status = slint::SharedString(" "s + updated_status);
-            // anlog("Pinging: "s + file_str);
-
         }
 
         insert_status(ui, "Ping: placing tasks ...");
-        slingle.doclientier->push_files(filemap, WSPort{WSPort::ping});
+        slingle.doclientier->push_files(filemap, Port::ping);
     });
 
     ui->on_load_folder([&](slint::SharedString pth) {
@@ -107,10 +105,41 @@ int main(int argc, char **argv) {
                 table_model->push_back(row);
             }
 
+            // Build the breadcrumb trail: one crumb per ancestor folder of `root`,
+            // from the filesystem root down to the folder just loaded.
+            auto crumbs_model = std::make_shared<slint::VectorModel<PathItemData>>();
+            {
+                fs::path abs_root = fs::absolute(root);
+                std::vector<fs::path> ancestors{abs_root};
+                for (fs::path walk = abs_root; walk.has_parent_path() && walk != walk.parent_path(); ) {
+                    walk = walk.parent_path();
+                    ancestors.push_back(walk);
+                }
+                std::reverse(ancestors.begin(), ancestors.end());
+
+                for (const auto& p : ancestors) {
+                    std::string label = p.filename().string();
+                    if (label.empty())
+                        label = p.string(); // filesystem root, e.g. "/" or "C:\"
+
+                    PathItemData crumb {
+                        .is_folder = true,
+                        .indent = {},
+                        .fname{label},
+                        .size = "",
+                        .type = "Folder",
+                        .fullpath{p.string()},
+                        .iselected = false,
+                        .syncicon = SyncingIcon::Invisible};
+                    crumbs_model->push_back(crumb);
+                }
+            }
+
             {
                 auto data = ui->global<AppState>().get_model();
                 data.filelist = table_model;
                 data.current_pth = pth;
+                data.path_crumbs = crumbs_model;
                 ui->global<AppState>().set_model(data);
             }
 
@@ -126,7 +155,7 @@ int main(int argc, char **argv) {
         else
             fileselection.emplace(string{fileitem.fullpath}, std::vector<LangExt::VarType>{"syncing"});
         
-        string status = std::format("Total selected files: \n{}.", map2str(fileselection));
+        string status = std::format("Total selected files: \n{}.", map2str(fileselection, Slingleton::opts));
         anlog(status);
     });
 
@@ -141,10 +170,11 @@ int main(int argc, char **argv) {
         try {
             fs::directory_iterator syncpage = fs::directory_iterator(root);
             for (const auto& entry : syncpage) {
-                pthpage.emplace(Anson::posix_path(entry.path().string()), vector<LangExt::VarType>{ShareFlag::pushing});
+                pthpage.emplace(Anson::posix_path(entry.path().string()),
+                                vector<LangExt::VarType>{ShareFlag::pushing});
             }
 
-            slingle.doclientier->query_syncflags(pthpage, [&ui_weak, &slingle](AnsonResp& resp) {
+            slingle.doclientier->query_syncflags(pthpage, [ui_weak, &slingle](AnsonResp& resp) {
                 // slingle.enqueue_synode(std::make_shared<DocsResp>(resp));
                 if (auto* docs = dynamic_cast<DocsResp*>(&resp)) {
                     slingle.enqueue_synode(std::make_shared<DocsResp>(std::move(*docs)));
@@ -152,7 +182,7 @@ int main(int argc, char **argv) {
                     anwarn("query_syncflags: unexpected response type, dropping");
                     return;
                 }
-                slint::invoke_from_event_loop([&ui_weak, &resp]() {
+                slint::invoke_from_event_loop([ui_weak]() {
                     if (auto handle = ui_weak.lock()) {
                         anlog("querying page ...");
                         (*handle)->invoke_update_syncflags();
@@ -165,13 +195,13 @@ int main(int argc, char **argv) {
     });
 
     ui->on_update_syncflags([&, ui]() {
-        // TODO: drop the query results silently if current folder changed while querying. 
+        // TODO: drop the query results silently if current folder changed while querying.
         shared_ptr<AnsonResp> qryptr = slingle.dequeue_synode();
         if (!qryptr) return;
         shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
         if (!qry) {
             anwarn("Dropping expected DocsResp ===========");
-            anwarn(qryptr->toBlock());
+            anwarn(qryptr->toBlock(Slingleton::opts));
             return;
         }
 
@@ -221,6 +251,9 @@ int main(int argc, char **argv) {
         }
     });
 
+    /**
+     * Open web page to a link.
+     */
     ui->on_open_web([](slint::SharedString url) {
         open_browser(std::string(url));
     });
@@ -247,26 +280,48 @@ int main(int argc, char **argv) {
         slingle.ping_synode(ui, string{org}, string{domain}, string{synid}, string{jserv});
     });
 
-    ui->on_save_userinfo([&ui, &settings_path, &slingle]() {
+    ui->on_select_synode([&ui, &slingle](const ss& synid) {
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.on_select_synode(synid);
+    });
+
+    ui->on_test_synlogin([&ui, &slingle](const ss& uid, const ss& pswd, const ss& pswd2){
+        // create a temp ssclient & a temp jserv for test login
+        auto profile = ui->global<UserProfile>().get_model();
+        slingle.on_test_synlogin(ui, string{uid}, string{pswd}, string{pswd2}, string{profile.synode_jserv});
+    });
+
+    ui->on_save_userinfo([&ui, &ui_weak, &settings_path, &slingle]() {
         UserProfileModel p = ui->global<UserProfile>().get_model();
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 
         // We need a better validation pattern. See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
         if (string{p.password_text} != string{p.confirm_password_text})
-            insert_status(ui, "Confirm password / token doesn't march.");
+            insert_status(ui, "Domain Token doesn't march with confirming text.");
+
+        if (LangExt::isblank(slingle.appsettings.device)) {
+            // TASK: check device with the synode.
+        }
 
         DesktopSettings s {slingle.appsettings};
+        s.regiserv = p.regiserv;
+        s.synode_id = p.synode_selected;
+        s.domain = p.domain_selected;
+        s.synode_jserv = p.synode_jserv;
         s.admin = string{p.user_id_text};
         s.domain_token = p.password_text;
-        s.synode_jserv = p.synode_jserv;
+        s.device = p.device;
 
         optional<string> err = Slingleton::validate_settings(s);
         if (!err) {
             slingle.settings(s);
-            s.to_file(settings_path);
+            // s.to_file(settings_path, &slingle.opts);
+            slingle.save_settings(settings_path);
             anlog("saved: "s + settings_path);
             slingle.appsettings = s;
+            slingle.setup_doclientier(ui_weak);
+            insert_status(ui_weak, "Saved"_ans);
         }
         else {
             anwarn(*err);
@@ -274,7 +329,15 @@ int main(int argc, char **argv) {
         }
     });
 
-    // Design Notes: We need a post load event callback API.
+    // Design Notes: call for a post load event callback API.
+    // Tip: data.syncing_status in slint model is backed as an immutable field
+    auto data = ui->global<AppState>().get_model();
+    data.window_title = "Portfolio Desktop";
+    data.enable_vol = slingle.has_synode_vol();
+    data.syncing_status = std::make_shared<slint::VectorModel<slint::SharedString>>(
+        std::vector<slint::SharedString>{"Ready"});
+    ui->global<AppState>().set_model(data);
+
     slint::invoke_from_event_loop([&ui, &slingle]() {
         auto appstat = ui->global<AppState>().get_model();
         auto profile = ui->global<UserProfile>().get_model();
@@ -292,6 +355,10 @@ int main(int argc, char **argv) {
         ui->global<UserProfile>().set_model(profile);
     });
 
-    ui->run();
+    try { ui->run();
+    } catch(runtime_error e) {
+        anerror(e.what());
+    }
+    slingle.agentController->stop_agent();
     return 0;
 }

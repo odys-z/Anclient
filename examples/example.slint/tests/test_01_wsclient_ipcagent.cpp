@@ -2,11 +2,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <regex>
-#include <filesystem>
 #include <thread>
 #include <chrono>
-#include <cstdlib>
 
 #include <io/odysz/utils.h>
 #include <io/odysz/anson.h>
@@ -22,7 +19,6 @@
 
 #include "../app/src/wsclients.h"
 #include "../app/src/gen/wsport.hpp"
-#include "../app/src/doclientier.h"
 #include "../app/src/gen/app_settings.hpp"
 #include "../app/src/ipcagent_manager.h"
 
@@ -53,7 +49,7 @@ protected:
     void SetUp() override {}
 
     static void start_agent() {
-        Anson::from_file(settings_json, settings);
+        Anson::from_file(settings_json, settings, &opts);
         agentController = new JavaAgentController(settings);
 
         if (!agentController->start_agent(settings_json)) {
@@ -65,17 +61,17 @@ protected:
     }
 
     static void SetUpTestSuite() {
-        register_jserv(asts, opts);
-        register_semantier(asts, "ast");
-        register_doctier(asts, "ast");
-        register_iport<WSPort>(asts, "ast/wsport.ast.json");
-        register_desktopsettingsAst(asts);
+        register_jserv(&opts);
+        register_semantier(&opts, "ast");
+        register_doctier(&opts, "ast");
+        register_iport<WSPort_test>(&opts, "ast/wsport.ast.json");
+        register_desktopsettingsAst(&opts);
 
         start_agent();
 
         ix::initNetSystem();
         string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
-        wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, onmsg);
+        wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, settings, onmsg);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         wsclient->connect();
     }
@@ -122,7 +118,7 @@ WSClient*       Ipclient::wsclient;
 TEST_F(Ipclient, Echo) {
     EchoReq echo{EchoReq::A::echo};
     echo.echo = "TEST_F(Ipcproxy, PING_Proxy) from C++";
-    AnsonMsg<EchoReq> echomsg(Port(Port::echo), echo);
+    AnsonMsg<EchoReq> echomsg(Port(&opts, Port::echo), echo);
 
     wsclient->asynSend(echomsg);
     wsclient->block_poll();
@@ -155,12 +151,12 @@ TEST_F(Ipclient, PING_Place_Task) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
-    AnsonMsg<DocsReq> msg(WSPort{WSPort::ping}, uploadreq);
+    AnsonMsg<DocsReq> msg(Port{&opts, WSPort_test::ping}, uploadreq);
     msg.code = MsgCode::Code::ext; // Should it be a good idea to change name of sentinel to null?
 
     wsclient->asynSend(msg);
 
-    AnsonMsg<DocsResp> resp;
+    AnsonMsg<DocsResp> resp{&opts};
     bool has_envl = wsclient->block_poll();
     int c = 0;
     while (has_envl) {
@@ -189,17 +185,18 @@ TEST_F(Ipclient, DocTask_upload) {
     uploadreq.syncingPage = {pthpage};
     uploadreq.syncingPage.end = clientPaths.size();
     uploadreq.syncingPage.start = 0;
-    AnsonMsg<DocsReq> msg(WSPort{WSPort::docstier}, uploadreq);
+    AnsonMsg<DocsReq> msg(Port{&opts, Port::docstier}, uploadreq);
     msg.code = MsgCode::Code::ok;
 
     wsclient->asynSend(msg);
 
-    AnsonMsg<DocsResp> resp;
+    AnsonMsg<DocsResp> resp{&opts};
     bool has_envl = wsclient->block_poll();
     while (has_envl) {
         try {
             resp = wsclient->pop_envelope<DocsResp>();
-            ASSERT_EQ(resp.port.valof(), WSPort{WSPort::docstier}.valof());
+            Port exp_port{&opts, Port::docstier};
+            ASSERT_EQ((resp.port.valof()), (exp_port.valof()));
             has_envl = wsclient->block_poll(500);
         } catch(SemanticException& e) {
             FAIL() << "expecting upload task replies ...";

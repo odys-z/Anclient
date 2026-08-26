@@ -1,19 +1,7 @@
 import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit, Button } from "std-widgets.slint";
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
-
-export enum SyncingIcon { invisible, pushing, publish, private, /** TODO Synchronized to local synode? */localonly }
-
-export struct PathItemData {
-    is_folder: bool,
-    indent   : [string], // [+, |, T, L, -]
-    fname    : string,
-    size     : string,
-    type     : string,
-    fullpath : string,
-    iselected: bool,
-    syncicon : SyncingIcon
-}
+import { PathItemData, SyncingIcon } from "models.slint";
 
 export component FileTable {
     width: 600px;
@@ -35,10 +23,20 @@ export component FileTable {
     callback row-double-click(PathItemData);
     callback upload();
 
+    /** Fired when a breadcrumb button is clicked; carries that segment's fullpath. */
+    callback breadcrumb-clicked(string);
+
     pure callback filter_sort_model([PathItemData], string, int, bool) -> [PathItemData];
     filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
         return row-data; 
     }
+
+    /** Breadcrumb segments for current_path, computed and supplied by the host
+     * (see App::on_load_folder in main.cpp) since generic path/string splitting
+     * isn't available in the .slint language itself. fname is the crumb label,
+     * fullpath is what gets passed to load_folder() when the crumb is clicked;
+     * the remaining PathItemData fields are unused here. */
+    in property <[PathItemData]> path_crumbs: [];
 
     function icons(idx: string) -> image {
         if ("d" == idx) {
@@ -65,7 +63,41 @@ export component FileTable {
 
       VerticalLayout {
         HorizontalLayout {
-            Text { text: root.current_path; }
+            spacing: 2pt;
+
+            // Breadcrumb bar: one button per folder in current_path, separated by a chevron.
+            breadcrumb-bar := HorizontalLayout {
+                horizontal-stretch: 1;
+                alignment: start;
+                spacing: 2pt;
+
+                for seg[i] in root.path_crumbs : HorizontalLayout {
+                    spacing: 2pt;
+
+                    crumb-touch := TouchArea {
+                        clicked => { root.breadcrumb_clicked(seg.fullpath); }
+
+                        Rectangle {
+                            background: crumb-touch.has-hover ? rgba(255, 255, 255, 0.08) : transparent;
+                            animate background { duration: 120ms; }
+
+                            Text {
+                                text: seg.fname;
+                                color: crumb-touch.has-hover ? #7fd7ff : #cfefff;
+                                font-weight: 700;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    if (i < root.path_crumbs.length - 1) : Image {
+                        source: root.icons("|");
+                        width: 10pt;
+                        height: 10pt;
+                    }
+                }
+            }
+
             Button {
                 // icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
                 // show-icon: true;

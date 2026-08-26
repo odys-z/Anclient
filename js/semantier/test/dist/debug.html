@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>anclient - debug (browser)</title>
+	<style>
+		body { font-family: monospace; padding: 1.5rem; }
+		button { display: block; margin: 4px 0; padding: 6px 12px; cursor: pointer; }
+		.pass { color: #2e7d32; }
+		.fail { color: #c62828; white-space: pre-wrap; }
+		#log { margin-top: 1rem; }
+	</style>
+</head>
+<body>
+	<h3>Direct case runner (no mocha)</h3>
+	<p>Open devtools → Sources → find the file under <code>webpack://</code>,
+	   set a breakpoint, then click a case below.</p>
+
+	<div id="buttons"></div>
+	<div id="log"></div>
+
+	<!-- built by: npm run test:browser:build
+	     For clickable, source-mapped stack traces below (not minified
+	     bundle lines), your webpack config needs a devtool option, e.g.:
+	       devtool: 'eval-source-map'   // fast rebuilds, good for dev
+	       devtool: 'source-map'        // slower build, most accurate
+	     Omitting it (or building with mode: 'production') disables
+	     source maps and traces will point into the bundled code instead
+	     of your original .ts files. -->
+	<script src="browser/testBundle.browser.js"></script>
+
+	<script>
+		const buttons = document.getElementById('buttons');
+		const log = document.getElementById('log');
+
+		Object.entries(window.AnclientTests || {}).forEach(([name, fn]) => {
+			const btn = document.createElement('button');
+			btn.textContent = 'run: ' + name;
+			btn.onclick = () => runCase(name, fn);
+			buttons.appendChild(btn);
+		});
+
+		function runCase(name, fn) {
+			const line = document.createElement('div');
+			try {
+				fn();
+				line.className = 'pass';
+				line.textContent = '✓ ' + name + ' passed';
+			} catch (err) {
+				line.className = 'fail';
+				line.textContent = '✗ ' + name + ' failed\n' + (err && err.stack || err);
+
+				console.error(err);
+			}
+			log.prepend(line);
+		}
+	</script>
+	<p style="opacity:0.8; font-size:1.2em; margin-top:2rem;">Generated with Claude</p>
+</body>
+</html>

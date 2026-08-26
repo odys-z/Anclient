@@ -37,9 +37,13 @@
 # CMake build directory
 build
 qt-build
+build-0.8.0
+
 surrealism-0.5.3
 app-settings-*.json
 app-settings.json
 *.gitignore.json
 !app-settings-template.json
 CMakeLists.txt.user
+*-temp.json
+ws-agent-0.2.0.jar

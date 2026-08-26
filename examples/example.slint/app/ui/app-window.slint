@@ -1,15 +1,18 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, SPopup, STag } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
+import { StandardButton } from "std-widgets.slint";
 
+import { PathItemData } from "models.slint";
+import { IDs, AppState, UserDialogState } from "app-state.slint";
 import { TableViewPage } from "./table_view_page.slint";
 import { CustomTableViewPage } from "./custom-table.slint";
 import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
-import { PathItemData, FileTable } from "file-table.slint";
+import { FileTable } from "file-table.slint";
 import { User } from "user.slint";
-import { IDs, AppState } from "app-state.slint";
+import { UserDialog } from "./controls/user-dialog.slint";
 
-export { IDs, AppState, UserProfile } from "app-state.slint";
+export { IDs, AppState, UserDialogState, UserProfile } from "app-state.slint";
 
 export component App inherits Window {
 
@@ -58,7 +61,9 @@ min-width: 600px;
   /** Query with profile.model.regiserv. */
   callback query_orgdoms(string);
   callback query_domnodes(string, string);
+  callback select_synode(string);
   callback ping_synode(string, string, string, string);
+  callback test_synlogin(string, string, string);
   callback save_userinfo();
 
   function notify-changed() {
@@ -76,14 +81,14 @@ min-width: 600px;
         menu-data: [
           { id: IDs.m_home, icon: @image-url("imgs/home.svg"),  name: "Home" },
           { id: IDs.m_album,  icon: @image-url("imgs/album-icon.svg"), name: "Album"},
-          { id: IDs.m_volume, icon: UseIcons.icons.Folder,   name: "Volume" },
+          // { id: IDs.m_volume, icon: UseIcons.icons.Folder,   name: "Volume" },
           { id: IDs.m_upload, icon: UseIcons.icons.FileCode, name: "Upload" }
         ];
 
         
         sub-menu-data: [
-          {id: IDs.m_user, icon:UseIcons.icons.Avatar,name:"User"},
-          {id: IDs.m_edge, icon:UseIcons.icons.Setting-two,name:"Settings"}
+          {id: IDs.m_user, icon:UseIcons.icons.Setting-two, name:"User"},
+          {id: IDs.m_edge, icon:UseIcons.icons.Info, name:"Settings"}
         ];
 
 
@@ -104,7 +109,11 @@ min-width: 600px;
         width: parent.width;
         height: parent.height;
 
-        if (AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album) : index-page := HomeForm { 
+        // if (AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album) : index-page := HomeForm { 
+        if (AppState.model.menu_id != IDs.m_upload
+            && AppState.model.menu_id != IDs.m_user
+            && AppState.model.menu-id != IDs.m_edge
+          ) : index-page := HomeForm { 
           height: parent.height - 14pt;
           visible: AppState.model.menu_id == IDs.m_home || AppState.model.menu_id == IDs.m_album;
           navigate(menuid) => {
@@ -116,11 +125,11 @@ min-width: 600px;
           enable-vol: AppState.model.enable_vol;
         }
 
-        if (AppState.model.menu_id == IDs.m_volume) : Rectangle {
-          background: #b0d0d0;
-          // Volume Information
-          // CustomTableViewPage { width: 100%; height: 100%; }
-        }
+        // if (AppState.model.menu_id == IDs.m_volume) : Rectangle {
+        //   background: #b0d0d0;
+        //   // Volume Information
+        //   // CustomTableViewPage { width: 100%; height: 100%; }
+        // }
 
         if (AppState.model.menu_id == IDs.m_upload) : Rectangle {
           background: #202020;
@@ -129,6 +138,7 @@ min-width: 600px;
 
             row_data    : AppState.model.filelist;
             current_path: AppState.model.current_pth;
+            path_crumbs : AppState.model.path_crumbs;
 
             synode-linked: AppState.model.synode_linked;
 
@@ -139,6 +149,11 @@ min-width: 600px;
                 debug("[App Window] callback, loading: " + row.fname);
                 root.load_folder(row.fullpath);
               }
+            }
+
+            breadcrumb-clicked(pth) => {
+              debug("[App Window] breadcrumb clicked, loading: " + pth);
+              root.load_folder(pth);
             }
 
             row-selected(row) => {
@@ -157,6 +172,8 @@ min-width: 600px;
             ping-synode(org, dom, synid, synjserv) => { root.ping_synode(org, dom, synid, synjserv); }
             query-orgdoms(org) => { root.query_orgdoms(org); }
             query-domnodes(org, domain) => { root.query_domnodes(org, domain); }
+            change-synode(synode) => { root.select_synode(synode); }
+            login_synode(uid, pswd, re_paswd) => { root.test_synlogin(uid, pswd, re_paswd); }
             save-profile(jserv, u, p) => {
               root.save_userinfo();
               debug("save-profile: => save_userinfo()");
@@ -194,9 +211,62 @@ min-width: 600px;
         for i in Math.min(15, AppState.model.syncing-status.length): Text {
             text: AppState.model.syncing-status[i];
             font-size: 14px;
-            color: #333333;
+            color: #b3b3b3;
         }
       }
     }
+  }
+
+  dialog-bg := PopupWindow {
+    x: (root.width - self.width) / 2;
+    y: (root.height - self.height) / 2;
+    width: root.width;
+    height: root.height;
+
+    // can dialog is actually showing the cpp contolled dynamic component here?
+    if AppState.model.dlg_type == IDs.dlg_0 : Dialog {
+      VerticalLayout {
+        Text {
+          text: UserDialogState.model.title;
+          wrap: word-wrap;
+        }
+
+        Text {
+          text: UserDialogState.model.title;
+          wrap: word-wrap;
+        }
+      }
+
+      // Standard Dialog buttons automatically align by platform guidelines
+      StandardButton {
+          kind: ok;
+          clicked => {
+              UserDialogState.ok();
+              dialog-bg.close();
+          }
+      }
+
+      StandardButton {
+          kind: cancel;
+          visible: UserDialogState.model.has-cancel;
+          clicked => {
+              UserDialogState.cancel();
+              dialog-bg.close();
+          }
+      }
+    }
+
+    StandardButton {
+        kind: ignore;
+        visible: UserDialogState.model.has-abort;
+        clicked => {
+            UserDialogState.cancel();
+            dialog-bg.close();
+        }
+    }
+  }
+
+
+  if AppState.model.dlg-type == IDs.dlg_user : UserDialog {
   }
 }

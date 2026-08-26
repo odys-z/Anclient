@@ -1,12 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <regex>
-#include <filesystem>
-#include <thread>
-#include <chrono>
-#include <cstdlib>
 
 #include <io/odysz/utils.h>
 #include <io/odysz/anson.h>
@@ -20,11 +12,6 @@
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
 
-#include "../app/src/wsclients.h"
-#include "../app/src/gen/wsport.hpp"
-#include "../app/src/doclientier.h"
-#include "../app/src/gen/app_settings.hpp"
-#include "../app/src/ipcagent_manager.h"
 #include "../app/src/slingleton.h"
 
 #ifdef _WIN32
@@ -41,8 +28,8 @@ using namespace anson;
 TEST(DOCSTIER, DE_ReserializeDocsResp) {
     AstMap asts;
     JsonOpt opts{&asts};
-    register_jserv(asts, opts);
-    register_doctier(asts, "ast");
+    register_jserv(&opts);
+    register_doctier(&opts, "ast");
 
     auto ui = App::create();
     slint::ComponentWeakHandle<App> ui_weak = ui;
@@ -54,13 +41,14 @@ R"json({"type": "io.odysz.semantic.jprotocol.AnsonMsg", "code": "ok", "opts": nu
 , "map": null}
 ], "addr": null, "version": "1.1", "seq": 0})json";
 
-    AnsonMsg<DocsResp> msg;
-    Anson::from_json(r, msg);
+    AnsonMsg<DocsResp> msg{&opts};
+    Anson::from_json(r, msg, &opts);
 
     ASSERT_EQ(MsgCode::Code::ok, msg.code);
-    ASSERT_EQ(Port{Port::docstier}, msg.port);
+    Port exp{&opts, Port::docstier};
+    ASSERT_EQ(exp, msg.port);
 
-    string s = msg.toBlock();
+    string s = msg.toBlock(opts);
     aninfo(s);
     slingle.enqueue_synode(std::make_shared<DocsResp>(std::move(msg.Body())));
     // aninfo(msg.toBlock());
@@ -70,7 +58,7 @@ R"json({"type": "io.odysz.semantic.jprotocol.AnsonMsg", "code": "ok", "opts": nu
     shared_ptr<DocsResp> qry = std::dynamic_pointer_cast<DocsResp>(qryptr);
     if (!qry) {
         anwarn("Dropping expected DocsResp ===========");
-        anwarn(qryptr->toBlock());
+        anwarn(qryptr->toBlock(opts));
         FAIL() << "pointer cast failed.";
     }
 }
