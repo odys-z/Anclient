@@ -296,13 +296,17 @@ int main(int argc, char **argv) {
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 
+        if (LangExt::isblank(slingle.appsettings.device)) {
+            // TASK: check device with the synode.
+            if (!slingle.doclientier.bringup_synlink()) {
+                show_dlg(ui_weak, "Warning", "Must login to domain for create a new device.");
+                return;
+            }
+        }
+
         // We need a better validation pattern. See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
         if (string{p.password_text} != string{p.confirm_password_text})
             insert_status(ui, "Domain Token doesn't march with confirming text.");
-
-        if (LangExt::isblank(slingle.appsettings.device)) {
-            // TASK: check device with the synode.
-        }
 
         DesktopSettings s {slingle.appsettings};
         s.regiserv = p.regiserv;

@@ -136,4 +136,8 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     });
     query_thread.detach();
 }
+
+void AsynClienter::asy_register_dev(const string& device, const string& devname, OnOk ok) {
+
+}
 }

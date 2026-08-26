@@ -104,6 +104,8 @@ public:
 
     void query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok);
 
+    void asy_register_dev(const string& device, const string& devname, OnOk ok);
+
     /// helper
     static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);

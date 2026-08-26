@@ -20,14 +20,13 @@ Install once:
 
 import os
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 from typing import cast
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
-from anson.io.odysz.utils import copy_anyway, zip2, move_anyway
+from anson.io.odysz.utils import zip2
 from invoke import task
 from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
@@ -317,6 +316,10 @@ def keepgit_clean(ctx):
     print(f"Removed: {removed}")
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
+    wsjar_path = ROOT_DIR / 'test' / 'res'
+    copied = Utils.copy_anyway('../example.wsagent/target/ws-agent-?.?.?.jar', wsjar_path)
+    print(f"Copied:", copied)
+
 def validsettings(s: DesktopSettings):
     '''
     For latest requirement, see slint app slingleton::validsettings()
@@ -393,20 +396,6 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     return relative_pth
 
 
-# def cp_wsagent_jar(taskcfg: SynodeTask) -> None:
-#     def desk_dist_res_dir(taskcfg: SynodeTask) -> str:
-#         return os.path.join(taskcfg.desktop_dist_dir, 'res')
-
-#     def desk_res_dir() -> str:
-#         return os.path.join('tests', 'res')
-
-#     jar_src = os.path.join(taskcfg.ipcagent_dir, 'target', f'ws-agent-{taskcfg.ipcagent_ver}.jar')
-
-#     print(jar_src, "=>", desk_res_dir())
-#     shutil.copy(jar_src, desk_res_dir())
-#     print(jar_src, "=>", desk_dist_res_dir(taskcfg))
-#     shutil.copy(jar_src, desk_dist_res_dir(taskcfg))
-
 @task
 def deploy_settings(ctx, deploy: str = "tasks.json"):
     global taskcfg
@@ -416,7 +405,7 @@ def deploy_settings(ctx, deploy: str = "tasks.json"):
     new_sets = create_desktop_settings(taskcfg)
     dist_dir = Path(taskcfg.desktop_dist_dir)
     Utils.rm_any(dist_dir / 'settings')
-    copy_anyway(new_sets, dist_dir / 'settings' / 'app-settings.json')
+    Utils.copy_anyway(new_sets, dist_dir / 'settings' / 'app-settings.json')
 
 
 @task(name="shallow-pack")
@@ -486,7 +475,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
         print(Path(zip).absolute())
         zip2(zip, {**resources}, excludes)
 
-        zip = move_anyway(zip, pth_packagedir(), log=True)
+        zip = Utils.move_anyway(zip, pth_packagedir(), log=True)
 
         print('****************************************************************************************************',
              f'* Stand alone ZIP package is created successfully: {zip}' if not err else 'Errors while making target (creaded zip file)',
