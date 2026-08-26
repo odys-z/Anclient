@@ -1,15 +1,18 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, SPopup, STag } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
+import { StandardButton } from "std-widgets.slint";
 
+import { PathItemData } from "models.slint";
+import { IDs, AppState, UserDialogState } from "app-state.slint";
 import { TableViewPage } from "./table_view_page.slint";
 import { CustomTableViewPage } from "./custom-table.slint";
 import { HomeForm } from "home.slint";
 import { EdgeHealth } from "edge-health.slint";
-import { PathItemData, FileTable } from "file-table.slint";
+import { FileTable } from "file-table.slint";
 import { User } from "user.slint";
-import { IDs, AppState } from "app-state.slint";
+import { UserDialog } from "./controls/user-dialog.slint";
 
-export { IDs, AppState, UserProfile } from "app-state.slint";
+export { IDs, AppState, UserDialogState, UserProfile } from "app-state.slint";
 
 export component App inherits Window {
 
@@ -208,9 +211,62 @@ min-width: 600px;
         for i in Math.min(15, AppState.model.syncing-status.length): Text {
             text: AppState.model.syncing-status[i];
             font-size: 14px;
-            color: #333333;
+            color: #b3b3b3;
         }
       }
     }
+  }
+
+  dialog-bg := PopupWindow {
+    x: (root.width - self.width) / 2;
+    y: (root.height - self.height) / 2;
+    width: root.width;
+    height: root.height;
+
+    // can dialog is actually showing the cpp contolled dynamic component here?
+    if AppState.model.dlg_type == IDs.dlg_0 : Dialog {
+      VerticalLayout {
+        Text {
+          text: UserDialogState.model.title;
+          wrap: word-wrap;
+        }
+
+        Text {
+          text: UserDialogState.model.title;
+          wrap: word-wrap;
+        }
+      }
+
+      // Standard Dialog buttons automatically align by platform guidelines
+      StandardButton {
+          kind: ok;
+          clicked => {
+              UserDialogState.ok();
+              dialog-bg.close();
+          }
+      }
+
+      StandardButton {
+          kind: cancel;
+          visible: UserDialogState.model.has-cancel;
+          clicked => {
+              UserDialogState.cancel();
+              dialog-bg.close();
+          }
+      }
+    }
+
+    StandardButton {
+        kind: ignore;
+        visible: UserDialogState.model.has-abort;
+        clicked => {
+            UserDialogState.cancel();
+            dialog-bg.close();
+        }
+    }
+  }
+
+
+  if AppState.model.dlg-type == IDs.dlg_user : UserDialog {
   }
 }

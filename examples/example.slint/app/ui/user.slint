@@ -15,6 +15,7 @@ export component User {
     init => {
         debug("User.init => UserProfile.model:", UserProfile.model);
         debug("loading", UserProfile.model.regiserv);
+        debug("loading", UserProfile.model.domain-selected);
         root.query-orgdoms(UserProfile.model.org_selected); // TODO make sure org_selected is set when loading settings
     }
 
@@ -126,6 +127,13 @@ export component User {
                 // orgs | domain | synode
                 Row {
                     Text {
+                        col: 1;
+                        text: "debug model=[" + UserProfile.model.domain_selected + "] combo=[" + domain-combo.current-value + "]";
+                        color: #ff0;
+                    }
+                }
+                Row {
+                    Text {
                         col: 0;
                         text: "File Node"; font-size: 14pt; color: #bbb; }
                     HorizontalLayout {
@@ -151,7 +159,8 @@ export component User {
                         domain-combo := ComboBox {
                             horizontal-stretch: 1;
                             model: UserProfile.model.domains_list;
-                            current-value: UserProfile.model.domain_selected;
+                            // current-value: UserProfile.model.domain_selected;
+                            current-index: UserProfile.model.domain_selected_idx;
                             selected(value) => {
                                 UserProfile.model.domain_selected = value;
                                 // root.notify-changed();
@@ -162,7 +171,8 @@ export component User {
                         node-combo := ComboBox {
                             horizontal-stretch: 1;
                             model: UserProfile.model.synodes_list;
-                            current-value: UserProfile.model.synode_selected;
+                            // current-value <=> UserProfile.model.synode_selected;
+                            current-index: UserProfile.model.synode_selected_idx;
                             selected(value) => {
                                 UserProfile.model.synode_selected = value;
                                 // root.notify-changed();
@@ -307,8 +317,8 @@ export component User {
                                 source: UserProfile.model.qr_code_image;
                             }
                             if !UserProfile.model.show_qr_code: Rectangle {
-                                width: 160px;
-                                height: 160px;
+                                width: 100px;
+                                height: 100px;
                                 background: #00000022;
                                 border-width: 1px;
                                 border-color: #ffffff55;

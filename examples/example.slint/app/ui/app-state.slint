@@ -1,4 +1,4 @@
-import { AppModel, UserProfileModel } from "models.slint";
+import { AppModel, UserDialogModel, UserProfileModel } from "models.slint";
 
 export global IDs {
     out property <string> m_home   : "home";
@@ -9,6 +9,9 @@ export global IDs {
     out property <string> m_edge   : "edge";
 
     out property <int> id_int: 0;
+
+    out property <int> dlg_0: 0;
+    out property <int> dlg_user: -1;
 }
 
 export global AppState {
@@ -17,7 +20,9 @@ export global AppState {
         webview_status: "Webview not started",
         syncing_status: ["Ready"],
         filelist: [],
-        path_crumbs: []
+        path_crumbs: [],
+
+        dlg_type: IDs.dlg_0
     };
 
     // Fired whenever anything in `data` is mutated from within the UI
@@ -25,6 +30,19 @@ export global AppState {
     // tracking individual properties/callbacks across components.
     callback model-changed(AppModel);
     callback closing() -> bool;
+}
+
+export global UserDialogState {
+    in-out property <UserDialogModel> model: {
+        title: "",
+        detail: "",
+        has-cancel: false,
+        has-abort : false,
+    };
+
+    callback ok();
+    callback cancel();
+    callback abort();
 }
 
 export global UserProfile {

@@ -1,0 +1,17 @@
+
+import { StandardButton } from "std-widgets.slint";
+import { UserDialogState } from "../app-state.slint";
+export { IDs, AppState, UserDialogState } from "../app-state.slint";
+
+/**
+ * v 0.1.3 Only for design and MVC pattern verifying.
+ */
+export component UserDialog inherits Dialog {
+    init => {
+        debug(UserDialogState.model.title);
+    }
+
+    Text {
+        text: "EXPERIMENTAL";
+    }
+}

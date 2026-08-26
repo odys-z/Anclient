@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <string>
 #include <algorithm>
+#include <memory>
+#include <vector>
 #include "app-window.h"
 #include "gen/app_settings.hpp"
 #include "ipcagent_manager.h"
@@ -43,7 +45,13 @@ inline static void open_file_explorer(std::string path) {
 }
 
 /**
- * p's domain list & synode list is not bind here.
+ * jserv_list is not bind here (populated later via query_domnodes/on_domnodes,
+ * it isn't shown in a ComboBox so it doesn't need the same startup seeding).
+ * domains_list and synodes_list are seeded with just the configured value so
+ * their ComboBoxes have a consistent (model, current-value) pair immediately;
+ * on_org_domains()/on_domnodes() replace them with the full registry-provided
+ * lists once those async calls return, and re-assert the configured value as
+ * selected there too.
  * @brief bind_profile
  * @param p
  * @param s
@@ -57,8 +65,12 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.is_device_locked = !s.device.empty();
     p.regiserv = s.regiserv;
     p.synode_jserv = s.synode_jserv;
+    p.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
+        std::vector<slint::SharedString>{slint::SharedString(s.domain)});
     p.domain_selected = s.domain;
     p.org_selected = s.org;
+    p.synodes_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
+        std::vector<slint::SharedString>{slint::SharedString(s.synode_id)});
     p.synode_selected = s.synode_id;
     p.user_id_text = s.admin;
     p.password_text = s.domain_token;

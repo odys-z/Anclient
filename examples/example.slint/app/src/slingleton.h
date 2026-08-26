@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <chrono>
+
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
 
@@ -14,7 +17,6 @@
 #include <io/odysz/module/langstring.h>
 
 #include "gen/app_settings.hpp"
-// #include "gen/wsport.hpp"
 #include "doclientier.h"
 #include "ipcagent_manager.h"
 #include "helper.h"
@@ -152,11 +154,19 @@ namespace anson {
 
       vector<string> domains(res.orgDomains.begin(), res.orgDomains.end());
 
+      // The domain configured in settings.json is authoritative: keep it
+      // selected even if the registry's response doesn't (yet) list it,
+      // and make sure it's actually present in the model so the ComboBox
+      // can display/select it consistently (an unlisted current-value
+      // won't reliably show in std-widgets' ComboBox).
       string configured = appsettings.domain;
-      string selected = domains.empty() ? "" : domains.front();
-      for (auto& d : domains) if (d == configured) { selected = d; break; }
+      if (!configured.empty() && std::find(domains.begin(), domains.end(), configured) == domains.end())
+        domains.insert(domains.begin(), configured);
 
-      slint::invoke_from_event_loop([this, domains, selected]() {
+      string selected = !configured.empty() ? configured : (domains.empty() ? "" : domains.front());
+      int selectIx = LangExt::ix(domains, selected);
+
+      slint::invoke_from_event_loop([this, domains, selected, selectIx]() {
         if (auto app = window_weak.lock()) {
           auto profile = (*app)->global<UserProfile>().get_model();
           vector<slint::SharedString> sl;
@@ -164,8 +174,27 @@ namespace anson {
 
           profile.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
           profile.domain_selected = slint::SharedString(selected);
+          profile.domain_selected_idx = selectIx;
           profile.detail_label = domains.empty() ? "No domains found." : "Loading synodes ...";
           (*app)->global<UserProfile>().set_model(profile);
+
+          // Same node-combo ComboBox quirk as domain-combo (slint-ui/slint#5214,
+          // #7632): re-assert domain_selected on a real later tick — nesting
+          // another invoke_from_event_loop() here isn't enough, since both
+          // callbacks can drain in the same iteration before the engine
+          // actually repaints the ComboBox against the new model. A short
+          // single_shot timer forces an actual separate pass.
+          anlog("+++++++++++++++++++++* triggering in single slot... "s + selected);
+          slint::Timer::single_shot(std::chrono::milliseconds(3000), [this, selected]() {
+            anlog("********************** triggered in single slot..."s + selected);
+            slint::invoke_from_event_loop([this, selected]() {
+              if (auto app2 = window_weak.lock()) {
+                auto profile2 = (*app2)->global<UserProfile>().get_model();
+                profile2.domain_selected = slint::SharedString(selected);
+                (*app2)->global<UserProfile>().set_model(profile2);
+              }
+            });
+          });
 
           if (!selected.empty())
             query_domnodes(string{profile.domain_selected}, selected);
@@ -187,8 +216,10 @@ namespace anson {
 
       string configured = appsettings.synode_id;
       string selected = synodes.empty() ? "" : synodes.front();
+      // int    selectIx = synodes.empty() ? -1 : 0;
 
       for (auto& s : synodes) if (s == configured) { selected = s; break; }
+      int selectIx = LangExt::ix(synodes, selected);
 
       string jserv;
       for (auto& peer : res.diction.peers) if (peer.synid == selected) {
@@ -197,7 +228,7 @@ namespace anson {
 
       vector<Synode> peers = res.diction.peers;
 
-      slint::invoke_from_event_loop([this, synodes, peers, selected, jserv]() {
+      slint::invoke_from_event_loop([this, synodes, peers, selected, selectIx, jserv]() {
         if (auto app = window_weak.lock()) {
           auto profile = (*app)->global<UserProfile>().get_model();
           vector<slint::SharedString> sl;
@@ -209,12 +240,25 @@ namespace anson {
           profile.jserv_list = std::make_shared<slint::VectorModel<slint::SharedString>>(jservlst);
           profile.synodes_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
           profile.synode_selected = slint::SharedString(selected);
+          profile.synode_selected_idx = selectIx;
           profile.detail_label = synodes.empty() ? "No synodes found in domain." : "Ready.";
 
           if (!jserv.empty())
               profile.synode_jserv = jserv;
 
           (*app)->global<UserProfile>().set_model(profile);
+
+          // Same fix as domain-combo: a real timer, not a nested
+          // invoke_from_event_loop(), to force an actual later render pass.
+          slint::Timer::single_shot(std::chrono::milliseconds(50), [this, selected]() {
+            slint::invoke_from_event_loop([this, selected]() {
+              if (auto app2 = window_weak.lock()) {
+                auto profile2 = (*app2)->global<UserProfile>().get_model();
+                profile2.synode_selected = slint::SharedString(selected);
+                (*app2)->global<UserProfile>().set_model(profile2);
+              }
+            });
+          });
         }
       });
     }

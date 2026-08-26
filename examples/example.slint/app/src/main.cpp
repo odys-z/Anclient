@@ -300,6 +300,10 @@ int main(int argc, char **argv) {
         if (string{p.password_text} != string{p.confirm_password_text})
             insert_status(ui, "Domain Token doesn't march with confirming text.");
 
+        if (LangExt::isblank(slingle.appsettings.device)) {
+            // TASK: check device with the synode.
+        }
+
         DesktopSettings s {slingle.appsettings};
         s.regiserv = p.regiserv;
         s.synode_id = p.synode_selected;

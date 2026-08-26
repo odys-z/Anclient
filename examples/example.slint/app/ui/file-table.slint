@@ -1,19 +1,7 @@
 import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit, Button } from "std-widgets.slint";
 import { SCheckbox } from "@surrealism/index.slint";
 import { SButton } from "../../surrealism-0.5.3/index.slint";
-
-export enum SyncingIcon { invisible, pushing, publish, private, /** TODO Synchronized to local synode? */localonly }
-
-export struct PathItemData {
-    is_folder: bool,
-    indent   : [string], // [+, |, T, L, -]
-    fname    : string,
-    size     : string,
-    type     : string,
-    fullpath : string,
-    iselected: bool,
-    syncicon : SyncingIcon
-}
+import { PathItemData, SyncingIcon } from "models.slint";
 
 export component FileTable {
     width: 600px;
