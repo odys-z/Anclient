@@ -106,6 +106,23 @@ public:
 
     void asy_register_dev(const string& device, const string& devname, OnOk ok);
 
+    bool bringup_synlink() {
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
+            anlog("Login to "s + appsettings.synode_jserv);
+            login_synode(this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
+            client.openLink(appsettings.sysuri);
+        }
+
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
+            return false;
+        }
+        if (!client.heartbeating) {
+            client.openLink(appsettings.sysuri);
+            return false;
+        }
+        return true;
+    }
+
     /// helper
     static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);

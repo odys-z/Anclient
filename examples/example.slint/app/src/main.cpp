@@ -298,7 +298,7 @@ int main(int argc, char **argv) {
 
         if (LangExt::isblank(slingle.appsettings.device)) {
             // TASK: check device with the synode.
-            if (!slingle.doclientier.bringup_synlink()) {
+            if (!slingle.doclientier->bringup_synlink()) {
                 show_dlg(ui_weak, "Warning", "Must login to domain for create a new device.");
                 return;
             }

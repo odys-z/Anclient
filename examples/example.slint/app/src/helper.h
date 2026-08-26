@@ -111,4 +111,3 @@ inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const strin
         }
     });
 }
-}
