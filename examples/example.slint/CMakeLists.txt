@@ -3,8 +3,22 @@ cmake_minimum_required(VERSION 3.30)
 set(VCPKG_MANIFEST_MODE OFF CACHE BOOL "" FORCE)
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/../../../vcpkg/installed" CACHE PATH "vcpkg install dir")
-set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
-set(VCPKG_HOST_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+
+# set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+# set(VCPKG_HOST_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+    if(WIN32)
+        set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+    elseif(APPLE)
+        set(VCPKG_TARGET_TRIPLET "x64-osx" CACHE STRING "")
+    else()
+        set(VCPKG_TARGET_TRIPLET "x64-linux" CACHE STRING "")
+    endif()
+endif()
+
+if(NOT DEFINED VCPKG_HOST_TRIPLET)
+    set(VCPKG_HOST_TRIPLET "${VCPKG_TARGET_TRIPLET}" CACHE STRING "")
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,6 +34,7 @@ find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 # vcpkg install ixwebsocket[core,openssl]:x64-mingw-dynamic
+# ./vcpkg install "ixwebsocket[core,openssl]:x64-linux"
 find_package(ixwebsocket REQUIRED)
 
 include(FetchContent)
