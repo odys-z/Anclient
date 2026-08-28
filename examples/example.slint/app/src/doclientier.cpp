@@ -138,9 +138,14 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     query_thread.detach();
 }
 
-void AsynClienter::asy_register_dev(const string& device, const string& devname, OnOk ok) {
-    std::thread query_thread([this, syncing_paths, ok]() {
-        if (!bringup_synlink(this->appsettings)) return;
+void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err) {
+    std::thread registdev_thread([this, set_inst, ok, err]() {
+        if (!bringup_synlink(set_inst)) {
+            err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
+            return;
+        }
+        regist_device(set_inst, ok, err);
     });
+    registdev_thread.detach();
 }
 }
