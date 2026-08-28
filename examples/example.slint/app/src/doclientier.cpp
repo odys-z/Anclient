@@ -97,7 +97,7 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         //     client.openLink(appsettings.sysuri);
         //     return;
         // }
-        if (!bringup_synlink()) return;
+        if (!bringup_synlink(this->appsettings)) return;
         
         client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 
@@ -139,6 +139,8 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
 }
 
 void AsynClienter::asy_register_dev(const string& device, const string& devname, OnOk ok) {
-
+    std::thread query_thread([this, syncing_paths, ok]() {
+        if (!bringup_synlink(this->appsettings)) return;
+    });
 }
 }

@@ -106,18 +106,24 @@ public:
 
     void asy_register_dev(const string& device, const string& devname, OnOk ok);
 
-    bool bringup_synlink() {
+    /**
+     * FIXME move to syn.h?
+     * @brief bringup_synlink
+     * @param sets_inst
+     * @return
+     */
+    bool bringup_synlink(DesktopSettings sets_inst) {
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
-            anlog("Login to "s + appsettings.synode_jserv);
-            login_synode(this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
-            client.openLink(appsettings.sysuri);
+            anlog("Login to "s + sets_inst.synode_jserv);
+            login_synode(sets_inst.admin, sets_inst.domain_token, sets_inst.device);
+            client.openLink(sets_inst.sysuri);
         }
 
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             return false;
         }
         if (!client.heartbeating) {
-            client.openLink(appsettings.sysuri);
+            client.openLink(sets_inst.sysuri);
             return false;
         }
         return true;
