@@ -104,7 +104,7 @@ public:
 
     void query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok);
 
-    void asy_register_dev(const string& device, const string& devname, OnOk ok);
+    void asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err);
 
     /**
      * FIXME move to syn.h?

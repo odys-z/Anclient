@@ -334,7 +334,10 @@ namespace anson {
     }
 
     void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
-        doclientier->asy_register_dev(s_inst);
+        doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
+            insert_status(ui, r.m);
+            show_dlg(ui, "Success", r.m);
+        }, AsynClienter::onErr);
     }
 
     /**
