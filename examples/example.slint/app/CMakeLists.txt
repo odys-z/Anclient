@@ -6,6 +6,9 @@ get_filename_component(SURREALISM_UI_DIR
 )
 message(STATUS "=========================================== app: CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
+# download and extract zip: https://github.com/Surrealism-All/SurrealismUI
+message(STATUS "=========================================== SURREALIMS ${CMAKE_CURRENT_SOURCE_DIR}/../surrealism-0.5.3")
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/helper.h

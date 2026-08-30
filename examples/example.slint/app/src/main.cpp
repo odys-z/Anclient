@@ -4,6 +4,15 @@
 #include <io/odysz/anserializer.h>
 #include "app-window.h"
 #include "webview-ext.h"
+
+// webview-ext.h -> webview.h -> gtk.h:
+// `#define Status int`, which clashes with cpr::ThreadPool's `enum Status`
+// So undefine Status, as gtk is donw.
+// Claude.ai: This is a well know confliction, including that of OpenCV.
+#ifdef Status
+#undef Status
+#endif
+
 #include "slingleton.h"
 
 // This order is to avoid compile error
@@ -300,10 +309,6 @@ int main(int argc, char **argv) {
         if (string{p.password_text} != string{p.confirm_password_text})
             insert_status(ui, "Domain Token doesn't march with confirming text.");
 
-        if (LangExt::isblank(slingle.appsettings.device)) {
-            // TASK: check device with the synode.
-        }
-
         DesktopSettings s {slingle.appsettings};
         s.regiserv = p.regiserv;
         s.synode_id = p.synode_selected;
@@ -315,6 +320,17 @@ int main(int argc, char **argv) {
 
         optional<string> err = Slingleton::validate_settings(s);
         if (!err) {
+            if (LangExt::isblank(slingle.appsettings.device)) {
+                // TASK: check device with the synode.
+                if (!slingle.doclientier->bringup_synlink(s)) {
+                    show_dlg(ui_weak, "Warning", "Must login to domain for create a new device.");
+                    return;
+                }
+                slingle.on_register_device(ui, s);
+                slingle.appsettings.device = s.device;
+                p.is_device_locked = true;
+            }
+
             slingle.settings(s);
             // s.to_file(settings_path, &slingle.opts);
             slingle.save_settings(settings_path);

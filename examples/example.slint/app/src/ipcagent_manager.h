@@ -165,7 +165,7 @@ public:
         m_agent_pid = fork();
         if (m_agent_pid == 0) {
             // Child process: close standard streams or redirect if necessary
-            execl(m_java_exe.c_str(), m_java_exe.c_str(), "-jar", m_agent_jar.c_str(), 
+            execl(m_java_cmd.c_str(), m_java_cmd.c_str(), "-jar", m_agent_jar.c_str(),
                   jarg_agentsetting_path.c_str(), (char*)NULL);
             
             anwarn("[***** Agent Controller *****] Failed to execute background process via execl!");
@@ -176,7 +176,7 @@ public:
         } else {
             m_is_running = true;
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            aninfo("[***** Agent Controller *****] Background Agent started. PID (POSIX): "s + m_agent_pid);
+            aninfo("[***** Agent Controller *****] Background Agent started. PID (POSIX): "s + std::to_string(m_agent_pid));
             return true;
         }
     #endif
@@ -233,7 +233,7 @@ public:
         pid_t stop_pid = fork();
         if (stop_pid == 0) {
             // Inside child execution context: execute stop utility class mapping
-            execl(m_java_exe.c_str(), m_java_exe.c_str(), "-cp", m_agent_jar.c_str(), 
+            execl(m_java_cmd.c_str(), m_java_cmd.c_str(), "-cp", m_agent_jar.c_str(),
                   "io.oz.anclient.ipcagent.StopAgent", (char*)NULL);
             exit(1);
         } else if (stop_pid > 0) {
