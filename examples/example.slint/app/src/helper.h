@@ -71,6 +71,8 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.org_selected = s.org;
     p.synodes_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
         std::vector<slint::SharedString>{slint::SharedString(s.synode_id)});
+    p.jserv_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
+        std::vector<slint::SharedString>{slint::SharedString(s.synode_jserv)});
     p.synode_selected = s.synode_id;
     p.user_id_text = s.admin;
     p.password_text = s.domain_token;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <chrono>
 
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
@@ -144,6 +143,7 @@ namespace anson {
         [this](AnsonResp& resp) {
             RegistResp& r = static_cast<RegistResp&>(resp); // no copy
             anlog("asyquery_orgdoms() resp: "s + r.toBlock(registry_opts));
+            insert_status(window_weak, std::format("Loaded org: {}", r.diction.org.orgId));
             on_org_domains(r); },
         AsynClienter::onErr);
     }
@@ -172,26 +172,6 @@ namespace anson {
           profile.domain_selected_idx = selectIx;
           profile.detail_label = domains.empty() ? "No domains found." : "Loading synodes ...";
           (*app)->global<UserProfile>().set_model(profile);
-
-          /*
-          // Same node-combo ComboBox quirk as domain-combo (slint-ui/slint#5214,
-          // #7632): re-assert domain_selected on a real later tick — nesting
-          // another invoke_from_event_loop() here isn't enough, since both
-          // callbacks can drain in the same iteration before the engine
-          // actually repaints the ComboBox against the new model. A short
-          // single_shot timer forces an actual separate pass.
-          anlog("+++++++++++++++++++++* triggering in single slot... "s + selected);
-          slint::Timer::single_shot(std::chrono::milliseconds(3000), [this, selected]() {
-            anlog("********************** triggered in single slot..."s + selected);
-            slint::invoke_from_event_loop([this, selected]() {
-              if (auto app2 = window_weak.lock()) {
-                auto profile2 = (*app2)->global<UserProfile>().get_model();
-                profile2.domain_selected = slint::SharedString(selected);
-                (*app2)->global<UserProfile>().set_model(profile2);
-              }
-            });
-          });
-          */
 
           if (!selected.empty())
             query_domnodes(string{profile.domain_selected}, selected);
@@ -244,20 +224,6 @@ namespace anson {
               profile.synode_jserv = jserv;
 
           (*app)->global<UserProfile>().set_model(profile);
-
-          /*
-          // Same fix as domain-combo: a real timer, not a nested
-          // invoke_from_event_loop(), to force an actual later render pass.
-          slint::Timer::single_shot(std::chrono::milliseconds(50), [this, selected]() {
-            slint::invoke_from_event_loop([this, selected]() {
-              if (auto app2 = window_weak.lock()) {
-                auto profile2 = (*app2)->global<UserProfile>().get_model();
-                profile2.synode_selected = slint::SharedString(selected);
-                (*app2)->global<UserProfile>().set_model(profile2);
-              }
-            });
-          });
-          */
         }
       });
     }
@@ -292,7 +258,7 @@ namespace anson {
             insert_status(ui, err.value());
             return;
         }
-        if (pswd != pswd) {
+        if (pswd != pswd2) {
             insert_status(ui, "The password and teh confirm are not the same.");
             return;
         }
@@ -325,6 +291,17 @@ namespace anson {
         }
         catch (const std::exception& e) {
             anerror(e.what());
+            slint::ComponentWeakHandle<App> ui_weak = ui;
+            if (auto app = ui_weak.lock()) {
+                auto data = (*app)->global<AppState>().get_model();
+                data.syncing_status;
+
+                auto status_model = data.syncing_status;
+                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
+
+                anlog("");
+            }
+
             AsynClienter::onErr(MsgCode::Code::exIo, e.what(), {});
         }
         catch (...) {
@@ -383,14 +360,14 @@ namespace anson {
      */
     bool validsettings() {
         // can only be hacked
-        LangExt::mustnonull(appsettings.market_id);
-        LangExt::mustnonull(appsettings.synuri);
-        LangExt::mustnonull(appsettings.sysuri);
-        LangExt::mustnonull(appsettings.java_path);
-        LangExt::mustnonull(appsettings.wsagent_jar);
-        LangExt::mustnonull(appsettings.wshost);
-        LangExt::mustin(appsettings.wsport, 1024, 65536);
-        LangExt::mustnonull(appsettings.regiserv);
+        LangExt::mustnonull(appsettings.market_id, "Market ID must not be empty!");
+        LangExt::mustnonull(appsettings.synuri, "Synuri must not be empty!");
+        LangExt::mustnonull(appsettings.sysuri, "Sysuri must not be empty!");
+        LangExt::mustnonull(appsettings.java_path, "Java-path must not be empty!");
+        LangExt::mustnonull(appsettings.wsagent_jar, "IPC-agent jar must not be empty!");
+        LangExt::mustnonull(appsettings.wshost, "IPC host must not be empty!");
+        LangExt::mustin(appsettings.wsport, 1024, 65536, "Port must in range [0, 65535]!");
+        LangExt::mustnonull(appsettings.regiserv, "Registry-jserv must not be empty!");
 
         return !appsettings.synode_jserv.empty()
             && !appsettings.device.empty()
@@ -419,10 +396,10 @@ namespace anson {
      */
     static std::optional<std::string> validate_settings(DesktopSettings s) {
       return [&]() -> std::optional<std::string> {
-            if (s.device.empty())		return "device id is empty";
-            if (s.market_id.empty())		return "market id is empty";
-            if (s.domain.empty()) 	    return "domain id is mepty";
-            if (s.org.empty())		    return "org id is empty";
+            if (s.device.empty())	return "device id is empty";
+            if (s.market_id.empty())	return "market id is empty";
+            if (s.domain.empty()) 	return "domain id is mepty";
+            if (s.org.empty())		return "org id is empty";
             if (s.synode_id.empty())	return "synode id is empty";
             if (s.java_path.empty())    return "Java path cannot be empty";
             if (s.synode_jserv.empty()) return "Synode Jserv cannot be empty";

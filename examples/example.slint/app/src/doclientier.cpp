@@ -101,7 +101,7 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         
         client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 
-		DocsReq req;
+        DocsReq req;
         DesktopSettings& s = Slingleton::appsettings;
         req.syncingPage = PathsPage{s.device, 0, static_cast<int>(syncing_paths.size())};
         req.syncingPage.clientPaths = syncing_paths;
@@ -124,15 +124,19 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         } 
         catch (const SemanticException& e) {
             anerror(e.what());
+            insert_status(window_weak, e.what());
         } 
         catch (const AnsonException& e) {
             anerror(e.what());
-        } 
+            insert_status(window_weak, e.what());
+        }
         catch (const std::exception& e) {
             anerror(e.what());
-        } 
+            insert_status(window_weak, e.what());
+        }
         catch (...) {
             anerror("Caught unknown exception.");
+            insert_status(window_weak, "Caught unknown exception.");
         }
     });
     query_thread.detach();
@@ -144,7 +148,10 @@ void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, On
             err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
             return;
         }
-        regist_device(set_inst, ok, err);
+        try {regist_device(set_inst, ok, err);
+        } catch(logic_error e) {
+            err(MsgCode::Code::exGeneral, "Cannot Register Diveice: "s + e.what(), {});
+        }
     });
     registdev_thread.detach();
 }
