@@ -6,6 +6,9 @@ get_filename_component(SURREALISM_UI_DIR
 )
 message(STATUS "=========================================== app: CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
 
+# download and extract zip: https://github.com/Surrealism-All/SurrealismUI
+message(STATUS "=========================================== SURREALIMS ${CMAKE_CURRENT_SOURCE_DIR}/../surrealism-0.5.3")
+
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/helper.h
@@ -135,7 +138,7 @@ endif()
 # App assets -> dist/
 # ---------------------------------------------------------------------------
 # Ensure assets copying only when building the main target (filter out test res also)
-file(GLOB IPC_JAR "${CMAKE_SOURCE_DIR}/test/res/ws-agent-*.jar")
+file(GLOB IPC_JAR "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
 add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/ast"

@@ -64,7 +64,6 @@ inline void set_webview_visible(webview::webview* wv, bool visible) {
  * @param app The Slint application window component pointer
  * @param wv  Reference to the persistent webview unique_ptr
  * @param url The target address to load on initial creation
- */
 std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
         std::unique_ptr<webview::webview>& wv, const std::string& url) {
     if (!app) return wv;
@@ -89,6 +88,7 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
 
     return wv;
 }
+ */
 
 /**
  * @brief album_web

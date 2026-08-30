@@ -4,6 +4,15 @@
 #include <io/odysz/anserializer.h>
 #include "app-window.h"
 #include "webview-ext.h"
+
+// webview-ext.h -> webview.h -> gtk.h:
+// `#define Status int`, which clashes with cpr::ThreadPool's `enum Status`
+// So undefine Status, as gtk is donw.
+// Claude.ai: This is a well know confliction, including that of OpenCV.
+#ifdef Status
+#undef Status
+#endif
+
 #include "slingleton.h"
 
 // This order is to avoid compile error
