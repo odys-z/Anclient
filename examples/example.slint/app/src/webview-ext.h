@@ -99,7 +99,6 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
  */
 string album_web(const anson::DesktopSettings& s) {
     anson::JServUrl tmpjsv{s.synode_jserv, {"", nullptr}};
-    // tmpjsv.jprotocol.protocolpath = "";
     return std::format("{}://{}:{}/webview.html", tmpjsv.https ? "https" : "http", tmpjsv.host, s.album_web);
 }
 
