@@ -66,6 +66,63 @@
    Deprecated: Also tried in *.vscode/settings.json*, the GDB debugger should running faster
    as system dlls' symbols loading is disabled. 
 
+# Build on Ubuntu
+
+1. System packages
+
+    ```
+      sudo apt update
+      sudo apt install -y build-essential ninja-build git curl zip unzip tar \
+          pkg-config autoconf automake libtool python3
+      sudo apt install -y libwebkit2gtk-4.1-dev
+    ```
+
+    `libwebkit2gtk-4.1-dev` provides the WebKitGTK API the `webview` dependency
+    needs. If it's unavailable on your Ubuntu release, check
+    `apt-cache search webkit2gtk` / `webkitgtk` for the closest match
+    (`libwebkit2gtk-4.0-dev` or `libwebkitgtk-6.0-dev` on some releases).
+
+1. CMake
+
+    Verfified with CMake v4.4.2.
+
+1. Rust
+
+    Slint's C++ bindings are built from Rust via Corrosion, so a Rust toolchain
+    is required:
+
+    ```
+      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      source "$HOME/.cargo/env"
+    ```
+
+    Verify with `rustc --version` (this project currently needs 1.92+).
+
+1. vcpkg
+
+    Clone vcpkg as a sibling directory to `anclient/` and bootstrap it:
+
+    ```
+      git clone https://github.com/microsoft/vcpkg.git
+      cd vcpkg
+      ./bootstrap-vcpkg.sh
+    ```
+
+    Install the dependencies for the Linux triplet:
+
+    ```
+      ./vcpkg install openssl:x64-linux boost-url:x64-linux \
+          entt:x64-linux nlohmann-json:x64-linux
+      ./vcpkg install "ixwebsocket[core,openssl]:x64-linux"
+    ```
+
+    `CMakeLists.txt` auto-selects the `x64-linux` triplet on Linux, so no extra
+    `-DVCPKG_TARGET_TRIPLET` flag is needed for a native build.
+
+1. Build
+
+  Use this as a Qt project.
+
 # Tips
 
 1. Speedup GDB session by exclude Windows Definder Scanning:

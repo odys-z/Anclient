@@ -154,11 +154,6 @@ namespace anson {
 
       vector<string> domains(res.orgDomains.begin(), res.orgDomains.end());
 
-      // The domain configured in settings.json is authoritative: keep it
-      // selected even if the registry's response doesn't (yet) list it,
-      // and make sure it's actually present in the model so the ComboBox
-      // can display/select it consistently (an unlisted current-value
-      // won't reliably show in std-widgets' ComboBox).
       string configured = appsettings.domain;
       if (!configured.empty() && std::find(domains.begin(), domains.end(), configured) == domains.end())
         domains.insert(domains.begin(), configured);
@@ -178,6 +173,7 @@ namespace anson {
           profile.detail_label = domains.empty() ? "No domains found." : "Loading synodes ...";
           (*app)->global<UserProfile>().set_model(profile);
 
+          /*
           // Same node-combo ComboBox quirk as domain-combo (slint-ui/slint#5214,
           // #7632): re-assert domain_selected on a real later tick — nesting
           // another invoke_from_event_loop() here isn't enough, since both
@@ -195,6 +191,7 @@ namespace anson {
               }
             });
           });
+          */
 
           if (!selected.empty())
             query_domnodes(string{profile.domain_selected}, selected);
@@ -248,6 +245,7 @@ namespace anson {
 
           (*app)->global<UserProfile>().set_model(profile);
 
+          /*
           // Same fix as domain-combo: a real timer, not a nested
           // invoke_from_event_loop(), to force an actual later render pass.
           slint::Timer::single_shot(std::chrono::milliseconds(50), [this, selected]() {
@@ -259,6 +257,7 @@ namespace anson {
               }
             });
           });
+          */
         }
       });
     }
@@ -285,12 +284,18 @@ namespace anson {
     void on_test_synlogin(const slint::ComponentHandle<App>& ui,
                           const string& uid, const string& pswd, const string& pswd2, const string& synjserv) {
 
-        if (auto err = validate_jserv(synjserv))
+        if (auto err = validate_jserv(synjserv)) {
             insert_status(ui, err.value());
-        if (auto err = validate_token(pswd))
+            return;
+        }
+        if (auto err = validate_token(pswd)) {
             insert_status(ui, err.value());
-        if (pswd != pswd)
-            insert_status(ui, "Passwords are not same.");
+            return;
+        }
+        if (pswd != pswd) {
+            insert_status(ui, "The password and teh confirm are not the same.");
+            return;
+        }
 
         std::string msg{std::format("login {} -> {}", uid, synjserv)};
         insert_status(ui, msg);
@@ -326,6 +331,13 @@ namespace anson {
             anerror("Caught unknown exception.");
         }
         insert_status(ui, {"Pinging OK: "s + ui_jserv});
+    }
+
+    void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
+        doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
+            insert_status(ui, r.m);
+            show_dlg(ui, "Success", r.m);
+        }, AsynClienter::onErr);
     }
 
     /**

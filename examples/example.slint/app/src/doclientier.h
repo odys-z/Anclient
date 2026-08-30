@@ -104,6 +104,31 @@ public:
 
     void query_syncflags(const map<string, vector<LangExt::VarType>>& syncing_paths, OnOk ok);
 
+    void asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err);
+
+    /**
+     * FIXME move to syn.h?
+     * @brief bringup_synlink
+     * @param sets_inst
+     * @return
+     */
+    bool bringup_synlink(DesktopSettings sets_inst) {
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
+            anlog("Login to "s + sets_inst.synode_jserv);
+            login_synode(sets_inst.admin, sets_inst.domain_token, sets_inst.device);
+            client.openLink(sets_inst.sysuri);
+        }
+
+        if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
+            return false;
+        }
+        if (!client.heartbeating) {
+            client.openLink(sets_inst.sysuri);
+            return false;
+        }
+        return true;
+    }
+
     /// helper
     static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);

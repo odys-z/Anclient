@@ -78,7 +78,6 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     return refresh;
 }
 
-
 inline static void insert_status(slint::ComponentWeakHandle<App> weak_ui, std::string s) {
     slint::invoke_from_event_loop([weak_ui, s = std::move(s)]() {
         if (auto ui = weak_ui.lock()) {
@@ -99,4 +98,16 @@ inline static void insert_status(slint::ComponentWeakHandle<App> weak_ui, std::s
 inline static void insert_status(const slint::ComponentHandle<App>& ui, std::string s) {
     slint::ComponentWeakHandle<App> ui_weak = ui;
     insert_status(ui_weak, s);
+}
+
+inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const string& title, const string& inform) {
+    slint::invoke_from_event_loop([weak_ui, title, inform]() {
+        if (auto ui = weak_ui.lock()) {
+            auto data = (*ui)->global<AppState>().get_model();
+            auto status_model = data.syncing_status;
+
+            auto dlg_model = (*ui)->global<UserDialogState>().get_model();
+
+        }
+    });
 }
