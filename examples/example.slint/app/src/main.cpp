@@ -322,12 +322,15 @@ int main(int argc, char **argv) {
         if (!err) {
             if (LangExt::isblank(slingle.appsettings.device)) {
                 // TASK: check device with the synode.
-                auto temp_doclientier = std::make_shared<AsynClienter>(ui_weak, s, JServUrl{s.synode_jserv, &slingle.opts},
+                shared_ptr temp_doclientier = std::make_shared<AsynClienter>(ui_weak, s, JServUrl{s.synode_jserv, &slingle.opts},
                         [ui_weak](connect_state connstates) {
-                            anlog("Reaching here is nothing");
+                            anlog("Temp-link should never be openned");
                         });
 
-                if (temp_doclientier->bringup_synlink()) {
+
+                temp_doclientier->login_synode(s.admin, s.domain_token, s.device);
+
+                if (temp_doclientier->client.ssInf.ssid.empty()) {
                     show_dlg(ui_weak, "Warning", "Must login to a synode for creating a new device.");
                     return; // Automatically destroyed here (ref count hits 0)
                 }

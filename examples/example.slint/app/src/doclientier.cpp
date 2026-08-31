@@ -142,12 +142,21 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     query_thread.detach();
 }
 
+/**
+ * This can only work after this asy-doclientier is logged in. Avoid bring up beating thread for
+ * avoiding temp-client leads to memory access violation in jthread.
+ *
+ * @brief AsynClienter::asy_register_dev
+ * @param set_inst
+ * @param ok
+ * @param err
+ */
 void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err) {
     std::thread registdev_thread([this, set_inst, ok, err]() {
-        if (!bringup_synlink()) {
-            err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
-            return;
-        }
+        // if (!bringup_synlink()) {
+        //     err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
+        //     return;
+        // }
         try {
             regist_device(set_inst, ok, err);
         } catch(logic_error e) {
