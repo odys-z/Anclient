@@ -126,11 +126,11 @@ export component User {
 
                 // orgs | domain | synode
                 Row {
-                    Text {
-                        col: 1;
-                        text: "debug model=[" + UserProfile.model.domain_selected + "] combo=[" + domain-combo.current-value + "]";
-                        color: #ff0;
-                    }
+                    // Text {
+                    //     col: 1;
+                    //     text: "debug model=[" + UserProfile.model.domain_selected + "] combo=[" + domain-combo.current-value + "]";
+                    //     color: #ff0;
+                    // }
                 }
                 Row {
                     Text {
@@ -297,23 +297,19 @@ export component User {
                     }
                 }
 
-                Row {
-                    STag{ col: 1; text: AppState.model.syncing_status[0]; }
-                }
-
                 // QR code (centered) | Save
                 Row {
                     // Text { text: "x"; }
                     Rectangle {
                         col: 1;
-                        height: 160px;
+                        height: 80px;
 
                         HorizontalLayout {
                             alignment: center;
 
                             if UserProfile.model.show_qr_code: Image {
-                                width: 160px;
-                                height: 160px;
+                                width: 120px;
+                                height: 80px;
                                 source: UserProfile.model.qr_code_image;
                             }
                             if !UserProfile.model.show_qr_code: Rectangle {
@@ -349,6 +345,11 @@ export component User {
                     }
                 }
             }
+
+            // STag{
+            //     horizontal-stretch: 1;
+            //     font-color: #ff0;
+            //     text: AppState.model.syncing_status[0]; }
         }
     }
 }

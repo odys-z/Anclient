@@ -298,14 +298,15 @@ namespace anson {
 
                 auto status_model = data.syncing_status;
                 auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-
-                anlog("");
             }
 
             AsynClienter::onErr(MsgCode::Code::exIo, e.what(), {});
+            return;
         }
         catch (...) {
             anerror("Caught unknown exception.");
+            AsynClienter::onErr(MsgCode::Code::exGeneral, "Internal Error.", {});
+            return;
         }
         insert_status(ui, {"Pinging OK: "s + ui_jserv});
     }

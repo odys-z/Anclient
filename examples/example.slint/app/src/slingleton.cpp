@@ -43,22 +43,25 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, cons
         }
     };
 
-    if (doclientier)
+    if (doclientier) {
         doclientier->turndown_synlink();
+        delete doclientier;
+        doclientier = nullptr;
+    }
 
     // if (!doclientier) {
         if (ctx == nullptr)
             ctx = &opts;
-        doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [&appwin](connect_state connstates) {
-        instance->constates = connstates;
+        doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [appwin](connect_state connstates) {
+            instance->constates = connstates;
 
-        // debug notes: cannot capture outer lamda's 'connstates' as it quit immediatly, before this one is running.
-        slint::invoke_from_event_loop([&appwin]() {
-            if (auto app = appwin.lock()) {
-                auto data = (*app)->global<AppState>().get_model();
-                data.synode_linked = instance->constates.synlink == connect_state::online;
-                (*app)->global<AppState>().set_model(data);
-            }});
+            // debug notes: cannot capture outer lamda's 'connstates' as it quit immediatly, before this one is running.
+            slint::invoke_from_event_loop([appwin]() {
+                if (auto app = appwin.lock()) {
+                    auto data = (*app)->global<AppState>().get_model();
+                    data.synode_linked = instance->constates.synlink == connect_state::online;
+                    (*app)->global<AppState>().set_model(data);
+                }});
         });
     // }
 }
