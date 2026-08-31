@@ -322,19 +322,30 @@ int main(int argc, char **argv) {
         if (!err) {
             if (LangExt::isblank(slingle.appsettings.device)) {
                 // TASK: check device with the synode.
-                if (!slingle.doclientier->bringup_synlink(s)) {
-                    show_dlg(ui_weak, "Warning", "Must login to a synode for creating a new device.");
-                    return;
-                }
-                slingle.on_register_device(ui, s);
-            }
+                auto temp_doclientier = std::make_shared<AsynClienter>(ui_weak, s, JServUrl{s.synode_jserv, &slingle.opts},
+                        [ui_weak](connect_state connstates) {
+                            anlog("Reaching here is nothing");
+                        });
 
-            slingle.settings(s);
-            slingle.save_settings(settings_path);
-            anlog("saved: "s + settings_path);
-            slingle.appsettings = s;
-            slingle.setup_doclientier(ui_weak);
-            insert_status(ui_weak, "Saved"_ans);
+                if (temp_doclientier->bringup_synlink()) {
+                    show_dlg(ui_weak, "Warning", "Must login to a synode for creating a new device.");
+                    return; // Automatically destroyed here (ref count hits 0)
+                }
+
+                // Capture temp_doclientier in the lambda to keep it alive until the network callback executes
+                temp_doclientier->asy_register_dev(s, [ui, temp_doclientier](const AnsonResp& r) {
+                    slint::invoke_from_event_loop([ui]() {
+                        UserProfileModel p = ui->global<UserProfile>().get_model();
+                        p.is_device_locked = true;
+                        ui->global<UserProfile>().set_model(p);
+                    });
+
+                    insert_status(ui, r.m);
+                    show_dlg(ui, "Saved", r.m);
+                }, [temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
+                    AsynClienter::onErr(c, e, a);
+                });
+            }
         }
         else {
             anwarn(*err);

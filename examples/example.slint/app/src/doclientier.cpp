@@ -97,7 +97,7 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         //     client.openLink(appsettings.sysuri);
         //     return;
         // }
-        if (!bringup_synlink(this->appsettings)) return;
+        if (!bringup_synlink()) return;
         
         client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
 
@@ -144,11 +144,12 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
 
 void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err) {
     std::thread registdev_thread([this, set_inst, ok, err]() {
-        if (!bringup_synlink(set_inst)) {
+        if (!bringup_synlink()) {
             err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
             return;
         }
-        try {regist_device(set_inst, ok, err);
+        try {
+            regist_device(set_inst, ok, err);
         } catch(logic_error e) {
             err(MsgCode::Code::exGeneral, "Cannot Register Diveice: "s + e.what(), {});
         }

@@ -311,19 +311,19 @@ namespace anson {
         insert_status(ui, {"Pinging OK: "s + ui_jserv});
     }
 
-    void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
-        doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
+    // void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
+    //     doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
 
-            slint::invoke_from_event_loop([ui]() {
-                UserProfileModel p = ui->global<UserProfile>().get_model();
-                p.is_device_locked = true;
-                ui->global<UserProfile>().set_model(p);
-            });
+    //         slint::invoke_from_event_loop([ui]() {
+    //             UserProfileModel p = ui->global<UserProfile>().get_model();
+    //             p.is_device_locked = true;
+    //             ui->global<UserProfile>().set_model(p);
+    //         });
 
-            insert_status(ui, r.m);
-            show_dlg(ui, "Saved", r.m);
-        }, AsynClienter::onErr);
-    }
+    //         insert_status(ui, r.m);
+    //         show_dlg(ui, "Saved", r.m);
+    //     }, AsynClienter::onErr);
+    // }
 
     /**
      * To covert returns to DocsResp:

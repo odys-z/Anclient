@@ -111,18 +111,18 @@ public:
      * @param sets_inst
      * @return
      */
-    bool bringup_synlink(DesktopSettings sets_inst) {
+    bool bringup_synlink() {
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
-            anlog("Login to "s + sets_inst.synode_jserv);
-            login_synode(sets_inst.admin, sets_inst.domain_token, sets_inst.device);
-            client.openLink(sets_inst.sysuri);
+            anlog("Login to "s + appsettings.synode_jserv);
+            login_synode(appsettings.admin, appsettings.domain_token, appsettings.device);
+            client.openLink(appsettings.sysuri);
         }
 
         if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
             return false;
         }
         if (!client.heartbeating) {
-            client.openLink(sets_inst.sysuri);
+            client.openLink(appsettings.sysuri);
             return false;
         }
         return true;
