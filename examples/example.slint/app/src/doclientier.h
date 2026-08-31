@@ -76,7 +76,6 @@ public:
 
     void reconnect_ipc();
 
-
     void push_files(const map<string, vector<LangExt::VarType>>& paths, const Port& port);
     void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = Port::docstier) {
         push_files(paths, Port{client.jserv.jprotocol.ctx, port_code});
@@ -127,6 +126,10 @@ public:
             return false;
         }
         return true;
+    }
+
+    void turndown_synlink() {
+        client.stopbeat();
     }
 
     /// helper

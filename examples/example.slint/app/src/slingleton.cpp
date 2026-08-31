@@ -43,7 +43,10 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, cons
         }
     };
 
-    if (!doclientier) {
+    if (doclientier)
+        doclientier->turndown_synlink();
+
+    // if (!doclientier) {
         if (ctx == nullptr)
             ctx = &opts;
         doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [&appwin](connect_state connstates) {
@@ -57,7 +60,7 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, cons
                 (*app)->global<AppState>().set_model(data);
             }});
         });
-    }
+    // }
 }
 
 void Slingleton::setup_regclient()  {

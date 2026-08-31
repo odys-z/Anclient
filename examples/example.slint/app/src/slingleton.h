@@ -312,13 +312,20 @@ namespace anson {
 
     void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
         doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
+
+            slint::invoke_from_event_loop([ui]() {
+                UserProfileModel p = ui->global<UserProfile>().get_model();
+                p.is_device_locked = true;
+                ui->global<UserProfile>().set_model(p);
+            });
+
             insert_status(ui, r.m);
-            show_dlg(ui, "Success", r.m);
+            show_dlg(ui, "Saved", r.m);
         }, AsynClienter::onErr);
     }
 
     /**
-     * To conert returns to DocsResp:
+     * To covert returns to DocsResp:
      * 
      * std::dynamic_pointer_cast<DocsResp>(returns);
      * 
@@ -384,8 +391,8 @@ namespace anson {
         anlog(std::format(R"("saving settings:
         market: {}, market_name: {}
         sysuri: {}, synuri: {}")",
-        appsettings.market_id, appsettings.market_name,
-        appsettings.sysuri, appsettings.synuri
+            appsettings.market_id, appsettings.market_name,
+            appsettings.sysuri, appsettings.synuri
         ));
         appsettings.to_file(pth, &opts);
     }

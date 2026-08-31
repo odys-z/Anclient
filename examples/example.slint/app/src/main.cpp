@@ -323,16 +323,13 @@ int main(int argc, char **argv) {
             if (LangExt::isblank(slingle.appsettings.device)) {
                 // TASK: check device with the synode.
                 if (!slingle.doclientier->bringup_synlink(s)) {
-                    show_dlg(ui_weak, "Warning", "Must login to domain for create a new device.");
+                    show_dlg(ui_weak, "Warning", "Must login to a synode for creating a new device.");
                     return;
                 }
                 slingle.on_register_device(ui, s);
-                slingle.appsettings.device = s.device;
-                p.is_device_locked = true;
             }
 
             slingle.settings(s);
-            // s.to_file(settings_path, &slingle.opts);
             slingle.save_settings(settings_path);
             anlog("saved: "s + settings_path);
             slingle.appsettings = s;

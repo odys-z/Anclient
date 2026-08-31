@@ -109,7 +109,6 @@ inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const strin
             auto status_model = data.syncing_status;
 
             auto dlg_model = (*ui)->global<UserDialogState>().get_model();
-
         }
     });
 }
