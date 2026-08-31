@@ -283,10 +283,6 @@ public class Doclientier extends Semantier {
 	 * @param docsOk
 	 * @param errHandler
 	 * @return response list
-	 * @throws TransException
-	 * @throws IOException
-	 * @throws SQLException 
-	 * @throws AnsonException 
 	 */
 	static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
@@ -344,7 +340,7 @@ public class Doclientier extends Semantier {
 					.resetChain(true)
 					.blockStart(p, ssinf);
 			
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req) // 2026-8-31 Shouldn't be SynDocollPort.docstier?
 									.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 			try {

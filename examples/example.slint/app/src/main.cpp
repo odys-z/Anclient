@@ -336,12 +336,17 @@ int main(int argc, char **argv) {
                 }
 
                 // Capture temp_doclientier in the lambda to keep it alive until the network callback executes
-                temp_doclientier->asy_register_dev(s, [ui, temp_doclientier](const AnsonResp& r) {
+                temp_doclientier->asy_register_dev(s, [ui, ui_weak, s, &slingle, settings_path, temp_doclientier](const AnsonResp& r) {
                     slint::invoke_from_event_loop([ui]() {
                         UserProfileModel p = ui->global<UserProfile>().get_model();
                         p.is_device_locked = true;
                         ui->global<UserProfile>().set_model(p);
                     });
+
+                    slingle.settings(s);
+                    slingle.save_settings(settings_path);
+                    slingle.setup_doclientier(ui_weak);
+                    anlog("saved: "s + settings_path);
 
                     insert_status(ui, r.m);
                     show_dlg(ui, "Saved", r.m);

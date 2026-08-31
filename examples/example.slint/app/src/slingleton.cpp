@@ -22,23 +22,9 @@ bool Slingleton::load_settings(const string& settings_json, const JsonOpt& opts)
     return true;
 }
 
-void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx) {
+void Slingleton::setup_doclientier(const slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx) {
     AsynClienter::onErr = [appwin](MsgCode::Code c, const string& e, vector<string>args) {
         if (!instance->validsettings()) {
-            // anerror(std::format("[ERROR code {}], error: {}", MsgCode::to_string(c), e));
-            // slint::invoke_from_event_loop([&appwin]() {
-            // if (auto app = appwin.lock()) {
-            //     auto data = (*app)->global<AppState>().get_model();
-
-            //     auto status_model = data.syncing_status;
-            //     auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-
-            //     if (vec_model) {
-            //         vec_model->insert(0, "Status not able to read.");
-            //     }
-
-            //     (*app)->global<AppState>().set_model(data);
-            // }});
             insert_status(appwin, e);
         }
     };
@@ -49,21 +35,18 @@ void Slingleton::setup_doclientier(slint::ComponentWeakHandle<App>& appwin, cons
         doclientier = nullptr;
     }
 
-    // if (!doclientier) {
-        if (ctx == nullptr)
-            ctx = &opts;
-        doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [appwin](connect_state connstates) {
-            instance->constates = connstates;
+    if (ctx == nullptr)
+        ctx = &opts;
 
-            // debug notes: cannot capture outer lamda's 'connstates' as it quit immediatly, before this one is running.
-            slint::invoke_from_event_loop([appwin]() {
-                if (auto app = appwin.lock()) {
-                    auto data = (*app)->global<AppState>().get_model();
-                    data.synode_linked = instance->constates.synlink == connect_state::online;
-                    (*app)->global<AppState>().set_model(data);
-                }});
-        });
-    // }
+    doclientier = new AsynClienter(appwin, appsettings, {appsettings.synode_jserv, ctx}, [appwin](connect_state connstates) {
+        instance->constates = connstates;
+        slint::invoke_from_event_loop([appwin]() {
+            if (auto app = appwin.lock()) {
+                auto data = (*app)->global<AppState>().get_model();
+                data.synode_linked = instance->constates.synlink == connect_state::online;
+                (*app)->global<AppState>().set_model(data);
+            }});
+    });
 }
 
 void Slingleton::setup_regclient()  {

@@ -70,8 +70,6 @@ namespace anson {
         register_desktopsettingsAst(&opts);
         register_langstringAst(&opts);
 
-        // AsynClienter::registerCtx("ipc");
-
         // settings, and validate as some fields is enforced for going on
         aninfo("Loading settings from: "s + resolveHomePath(settings_path));
         instance->load_settings(settings_path, opts);
@@ -127,7 +125,7 @@ namespace anson {
 
     void setup_regclient();
 
-    void setup_doclientier(slint::ComponentWeakHandle<App>& appwin, const JsonOpt* ctx = &opts) ;
+    void setup_doclientier(const slint::ComponentWeakHandle<App> &appwin, const JsonOpt* ctx = &opts) ;
 
     void query_orgdoms(const string & orgid) {
       slint::invoke_from_event_loop([this]() {
@@ -310,20 +308,6 @@ namespace anson {
         }
         insert_status(ui, {"Pinging OK: "s + ui_jserv});
     }
-
-    // void on_register_device(const slint::ComponentHandle<App>& ui, const DesktopSettings& s_inst) {
-    //     doclientier->asy_register_dev(s_inst, [ui](const AnsonResp& r) {
-
-    //         slint::invoke_from_event_loop([ui]() {
-    //             UserProfileModel p = ui->global<UserProfile>().get_model();
-    //             p.is_device_locked = true;
-    //             ui->global<UserProfile>().set_model(p);
-    //         });
-
-    //         insert_status(ui, r.m);
-    //         show_dlg(ui, "Saved", r.m);
-    //     }, AsynClienter::onErr);
-    // }
 
     /**
      * To covert returns to DocsResp:

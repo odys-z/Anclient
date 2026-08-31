@@ -84,19 +84,6 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
     }
     
     std::thread query_thread([this, syncing_paths, ok]() {
-        // if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
-        //     anlog("Login to "s + appsettings.synode_jserv);
-        //     login_synode(this->appsettings.admin, this->appsettings.domain_token, this->appsettings.device);
-        //     client.openLink(appsettings.sysuri);
-        // }
-
-        // if (LangExt::isblank(client.ssInf.ssid) || !client.heartbeating) {
-        //     return;
-        // }
-        // if (!client.heartbeating) {
-        //     client.openLink(appsettings.sysuri);
-        //     return;
-        // }
         if (!bringup_synlink()) return;
         
         client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");
@@ -153,10 +140,6 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
  */
 void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err) {
     std::thread registdev_thread([this, set_inst, ok, err]() {
-        // if (!bringup_synlink()) {
-        //     err(MsgCode::Code::exSession, "Cannot login to "s + set_inst.jserv, {});
-        //     return;
-        // }
         try {
             regist_device(set_inst, ok, err);
         } catch(logic_error e) {

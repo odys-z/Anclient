@@ -55,7 +55,7 @@ protected:
         });
     };
 
-    slint::ComponentWeakHandle<App> window_weak;
+    const slint::ComponentWeakHandle<App> window_weak;
 
 public:
     std::unique_ptr<WSClient> wsclient;
@@ -68,16 +68,19 @@ public:
         aninfo(std::vformat(m, std::make_format_args(a)));
     };
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
+    explicit AsynClienter(const slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink)
         : Doclientier("h_photos", desksets, jserv, onlink, onErr), window_weak(appwin), appsettings(desksets) {}
 
-    explicit AsynClienter(slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
+    explicit AsynClienter(const slint::ComponentWeakHandle<App>& appwin, DesktopSettings& desksets, const JServUrl& jserv, OnLink onlink, OnError err)
         : Doclientier("h_photos", desksets, jserv, onlink, err), window_weak(appwin), appsettings(desksets) {}
 
     void reconnect_ipc();
 
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const Port& port);
-    void push_files(const map<string, vector<LangExt::VarType>>& paths, const string& port_code = Port::docstier) {
+    void push_files(const map<string, vector<LangExt::VarType>>& paths,
+                    const Port& port);                          // should be SynDocollPort, FIXME untill fixing java version
+
+    void push_files(const map<string, vector<LangExt::VarType>>& paths,
+                    const string& port_code = Port::docstier) { // should be SynDocollPort, FIXME untill fixing java version
         push_files(paths, Port{client.jserv.jprotocol.ctx, port_code});
     }
 
@@ -133,7 +136,7 @@ public:
     }
 
     /// helper
-    static void inv_insert_status(slint::ComponentWeakHandle<App>& appwin, const string& txt) {
+    static void inv_insert_status(const slint::ComponentWeakHandle<App>& appwin, const string& txt) {
         slint::SharedString slint_text(txt);
         slint::invoke_from_event_loop([&appwin, slint_text]() {
             if (auto app = appwin.lock()) {
