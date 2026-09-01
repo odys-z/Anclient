@@ -2,7 +2,7 @@
 Invoke tasks for building album_gui and assembling a runnable dist/ folder.
 
 Usage:
-    inv configure                 # cmake configure (Debug by default)
+    inv configure_cmake                 # cmake configure (Debug by default)
     inv build                     # cmake build (runs configure if needed)
     inv copy-dlls                 # locate + copy runtime DLLs into dist/
     inv dist                      # build + copy-dlls in one shot
@@ -181,7 +181,7 @@ def _generator_output_exists(generator):
 
 
 @task
-def configure(ctx, config="Debug", generator="MinGW Makefiles"):
+def configure_cmake(ctx, config="Debug", generator="Ninja"):
     """cmake configure step."""
     requir_executable(
         "cmake",
@@ -200,7 +200,7 @@ def configure(ctx, config="Debug", generator="MinGW Makefiles"):
 def build(ctx, config="Debug", target=TARGET_NAME, generator="MinGW Makefiles", reconfigure=False):
     """cmake build step (configures first if missing, incomplete, or --reconfigure)."""
     if reconfigure or not _generator_output_exists(generator):
-        configure(ctx, config=config, generator=generator)
+        configure_cmake(ctx, config=config, generator=generator)
     ctx.run(f'cmake --build "{BUILD_DIR}" --target {target} --config {config}')
 
 
@@ -268,12 +268,6 @@ def _rmtree_onerror(func, path, exc_info):
 @task
 def clean(ctx, deploy: str = 'tasks.json'):
     """Remove the build directory entirely."""
-    # if BUILD_DIR.exists():
-    #     shutil.rmtree(BUILD_DIR, onerror=_rmtree_onerror)
-    #     print(f"Removed {BUILD_DIR}")
-    # else:
-    #     print("Nothing to clean.")
-
     global taskcfg
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
@@ -331,6 +325,7 @@ def keepgit_clean(ctx):
     copied = Utils.copy_anyway('../example.wsagent/target/ws-agent-?.?.?.jar', wsjar_path)
     print(f"Copied:", copied)
 
+
 def validsettings(s: DesktopSettings):
     '''
     For latest requirement, see slint app slingleton::validsettings()
@@ -355,6 +350,7 @@ def validsettings(s: DesktopSettings):
     if LangExt.isblank(s.wshost): raise SemanticException('wshost is empty')
     if s.wsport < 1024 or s.wsport >= 65536: raise SemanticException('wsport is not in range of [1024, 65536).')
     if LangExt.isblank(s.regiserv): raise SemanticException('regiserv is empty')
+
 
 def create_desktop_settings(taskcfg: SynodeTask) -> str:
     """
@@ -439,6 +435,7 @@ def shallow_pack(ctx,
         print(f"{exe_path} already exists — skipping build.")
     else:
         print(f"{exe_path} not found — run build task first.")
+        configure_cmake(ctx)
         build(ctx, config=config, target=target, generator=generator)
 
     copy_dlls(ctx, config=config)
