@@ -24,10 +24,15 @@ import sys
 from pathlib import Path
 from typing import cast
 
+
+from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
+requir_pkg("anson.py3", "0.6.3")
+requir_pkg("semantics.py3", "0.6.1")
+
 from anson.io.odysz.anson import Anson, AnsonException
-from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils
 from anson.io.odysz.utils import zip2
 from invoke import task
+
 from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
 from semanticshare.io.odysz.semantic.jprotocol import JServUrl
@@ -178,6 +183,12 @@ def _generator_output_exists(generator):
 @task
 def configure(ctx, config="Debug", generator="MinGW Makefiles"):
     """cmake configure step."""
+    requir_executable(
+        "cmake",
+        "\tEither install CMake,\n"
+        "\tor make ensure it is added to the PATH variable, e.g.\n"
+        "\texport PATH=$PATH:~/Qt/Tools/CMake/bin/"
+    )
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     ctx.run(
         f'cmake -S "{ROOT_DIR}" -B "{BUILD_DIR}" -G "{generator}" '
@@ -427,7 +438,7 @@ def shallow_pack(ctx,
     if exe_path.exists():
         print(f"{exe_path} already exists — skipping build.")
     else:
-        print(f"{exe_path} not found — building first.")
+        print(f"{exe_path} not found — run build task first.")
         build(ctx, config=config, target=target, generator=generator)
 
     copy_dlls(ctx, config=config)

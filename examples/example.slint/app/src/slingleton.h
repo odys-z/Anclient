@@ -266,13 +266,23 @@ namespace anson {
 
         SessionClient ssclient{JServUrl{synjserv, &opts}, {}, {}};
 
-        ssclient.loginWithUri(appsettings.sysuri, uid, pswd, "test-device",
+        try {
+            ssclient.loginWithUri(appsettings.sysuri, uid, pswd, "test-device",
                               [ui, this](MsgCode::Code c, const string& e, const vector<string>& args) {
             insert_status(ui, e);
-        });
+            });
 
-        if (!ssclient.ssInf.ssid.empty())
-            insert_status(ui, "Ok!");
+            if (!ssclient.ssInf.ssid.empty())
+                insert_status(ui, "Ok!");
+        }
+        catch (SemanticException e) {
+            anerror(e.what());
+            AsynClienter::onErr(MsgCode::Code::exIo, "Network or server failed. "s + e.what(), {});
+        }
+        catch (exception e) {
+            anerror(e.what());
+            AsynClienter::onErr(MsgCode::Code::exGeneral, e.what(), {});
+        }
     }
 
     void ping_synode(const slint::ComponentHandle<App>& ui,
