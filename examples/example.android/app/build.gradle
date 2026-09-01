@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+
 android {
     namespace "io.oz"
 
@@ -16,10 +22,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            storeFile = localProperties.getProperty('release.storeFile') ? file(localProperties.getProperty('release.storeFile')) : null
+            storePassword = localProperties.getProperty('release.storePassword')
+            keyAlias = localProperties.getProperty('release.keyAlias')
+            keyPassword = localProperties.getProperty('release.keyPassword')
         }
     }
 
