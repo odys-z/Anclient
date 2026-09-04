@@ -197,7 +197,7 @@ def configure_cmake(ctx, config="Debug", generator="Ninja"):
 
 
 @task
-def build(ctx, config="Debug", target=TARGET_NAME, generator="MinGW Makefiles", reconfigure=False):
+def build(ctx, config="Debug", target=TARGET_NAME, generator="Ninja", reconfigure=False):
     """cmake build step (configures first if missing, incomplete, or --reconfigure)."""
     if reconfigure or not _generator_output_exists(generator):
         configure_cmake(ctx, config=config, generator=generator)
@@ -429,7 +429,7 @@ def shallow_pack(ctx,
     The app-settings.json for packaging must be generated and is ready for distribution.
     """
 
-    exe_path = DIST_DIR / (target + ".exe")
+    exe_path = DIST_DIR / ((target + ".exe") if os.name == "nt" else target)
 
     if exe_path.exists():
         print(f"{exe_path} already exists — skipping build.")
