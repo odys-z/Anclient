@@ -26,15 +26,10 @@ from typing import cast
 
 
 from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
-<<<<<<< HEAD
+from deprecated import deprecated
 requir_pkg("anson.py3", "0.6.4")
 requir_pkg("semantics.py3", "0.6.4")
 requir_pkg("jre-mirror", "0.1.0")
-=======
-from deprecated import deprecated
-requir_pkg("anson.py3", "0.6.4")
-requir_pkg("semantics.py3", "0.6.3")
->>>>>>> a61387610e2a6532dc905f22529e4034a713b8e5
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.utils import zip2
