@@ -326,7 +326,7 @@ def keepgit_clean(ctx):
     print(f"Removed: {removed}")
     print(f"Kept (preserved to avoid re-fetch/re-build): {kept}")
 
-    wsjar_path = ROOT_DIR / 'test' / 'res'
+    wsjar_path = ROOT_DIR / 'tests' / 'res'
     copied = Utils.copy_anyway('../example.wsagent/target/ws-agent-?.?.?.jar', wsjar_path)
     print(f"Copied:", copied)
 
