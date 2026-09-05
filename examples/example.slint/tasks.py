@@ -26,8 +26,9 @@ from typing import cast
 
 
 from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
-requir_pkg("anson.py3", "0.6.3")
-requir_pkg("semantics.py3", "0.6.1")
+requir_pkg("anson.py3", "0.6.4")
+requir_pkg("semantics.py3", "0.6.4")
+requir_pkg("jre-mirror", "0.1.0")
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.utils import zip2
@@ -37,6 +38,7 @@ from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
 from semanticshare.io.odysz.semantic.jprotocol import JServUrl
 from semanticshare.io.oz.invoke import SynodeTask
+from semanticshare.io.oz.edge import extract_check_jretree
 
 
 taskcfg = cast(SynodeTask, None)
@@ -416,10 +418,8 @@ def deploy_settings(ctx, deploy: str = "tasks.json"):
 
 
 @task(name="shallow-pack")
-def shallow_pack(ctx,
-                 deploy: str = 'tasks.json',
-                 config="Debug", target=TARGET_NAME, generator="Ninja"
-                 ):
+def shallow_pack(ctx, deploy: str = 'tasks.json',
+                 config="Debug", target=TARGET_NAME, generator="Ninja"):
     """
     Assemble dist/ for to, e.g. qt-build/dist, in which the resources for final packing,
     while avoiding the expensive build step when possible:
@@ -458,12 +458,18 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
 
-    zip = taskcfg.deskzip_name() # f'{app_name}-{taskcfg.version}.zip'
+    def pth_jre():
+        if os.name == "nt":
+            temp_jre = taskcfg.check_local_resource(taskcfg.jre_release)
+            return extract_check_jretree(temp_jre, pth_packagedir())
+        return None
+
+    zip = taskcfg.deskzip_name()
     resources = {
         ".": f"{taskcfg.desktop_dist_dir}/*",
-        # TODO fix this
-        # "jre17": taskcfg.jre_release
+        'jre17': pth_jre()
     }
+
     excludes = ['*.log', 'report.html', '*.github.json']
 
     try:
@@ -493,5 +499,3 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     except Exception as e:
         print(f"Error creating ZIP file: {str(e)}", file=sys.stderr)
         raise
-
-
