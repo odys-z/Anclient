@@ -26,9 +26,15 @@ from typing import cast
 
 
 from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
+<<<<<<< HEAD
 requir_pkg("anson.py3", "0.6.4")
 requir_pkg("semantics.py3", "0.6.4")
 requir_pkg("jre-mirror", "0.1.0")
+=======
+from deprecated import deprecated
+requir_pkg("anson.py3", "0.6.4")
+requir_pkg("semantics.py3", "0.6.3")
+>>>>>>> a61387610e2a6532dc905f22529e4034a713b8e5
 
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.utils import zip2
@@ -48,9 +54,8 @@ taskcfg = cast(SynodeTask, None)
 # ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
 BUILD_DIR = ROOT_DIR / "qt-build"
-'''
-@deprecated Use the configure from tasks.json, by calling pth_buildir()
-'''
+
+@deprecated(reason="Use the configure from tasks.json, by calling pth_buildir()")
 def pth_buildir(taskconfig: SynodeTask = None) -> Path:
     '''
     :param taskconfig:
@@ -141,6 +146,7 @@ def _vcpkg_bin_dir(config):
     return (base / "debug" / "bin") if config.lower() == "debug" else (base / "bin")
 
 
+@deprecated(reason="Replaced by io.odysz.common.copy_anyway()")
 def _copy_if_found(src_dir, name_patterns, dest, label):
     """Glob src_dir for each pattern and copy first match to dest. Warns if none found."""
     dest.mkdir(parents=True, exist_ok=True)
@@ -157,8 +163,12 @@ def _copy_if_found(src_dir, name_patterns, dest, label):
 
 
 def _copy_from_tree(search_root, filenames, dest):
-    """Recursively search search_root for exact filenames (used for FetchContent
-    build outputs, whose folder names vary), copy first match of each."""
+    """
+        Recursively search search_root for exact filenames
+        (used for FetchContent build outputs, whose folder names vary),
+        copy first match of each.
+        
+    """
     dest.mkdir(parents=True, exist_ok=True)
     copied = []
     for name in filenames:
@@ -438,7 +448,9 @@ def shallow_pack(ctx, deploy: str = 'tasks.json',
         configure_cmake(ctx)
         build(ctx, config=config, target=target, generator=generator)
 
-    copy_dlls(ctx, config=config)
+    if os.name != "nt":
+        copy_dlls(ctx, config=config)
+
     deploy_settings(ctx, deploy)
     print(f"\nDone. Run: {exe_path}")
 
@@ -448,7 +460,9 @@ app_name: str = 'album-desktop'
 def zip_standalone(ctx, deploy: str = 'tasks.json'):
     """
     Create a the stand alone GUI app package, into dist_zip(), e.g. build-0.8.0.
-    
+
+    Not ready yet for POSIX.
+
     Args:
         c: Invoke Context object for running commands.
         zip: Name of the output ZIP file.
