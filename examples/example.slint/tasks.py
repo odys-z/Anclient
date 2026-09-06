@@ -33,7 +33,7 @@ requir_pkg("deprecated")
 
 from deprecated import deprecated
 from anson.io.odysz.anson import Anson, AnsonException
-from anson.io.odysz.utils import zip2
+from anson.io.odysz.utils import gzip2
 from invoke import task
 
 from semanticshare.io.odysz.semantic.x import SemanticException
@@ -470,7 +470,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
 
     def pth_jre():
         if os.name == "nt":
-            temp_jre = taskcfg.check_local_resource(taskcfg.jre_release)
+            temp_jre = taskcfg.check_local_resource(Path('..') / taskcfg.jre_release)
             return extract_check_jretree(temp_jre, pth_packagedir())
         return None
 
@@ -497,7 +497,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
             os.remove(zip)
 
         print(Path(zip).absolute())
-        zip2(zip, {**resources}, excludes)
+        gzip2(zip, {**resources}, excludes)
 
         zip = Utils.move_anyway(zip, pth_packagedir(), log=True)
 
