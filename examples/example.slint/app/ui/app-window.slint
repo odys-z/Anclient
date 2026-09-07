@@ -60,7 +60,13 @@ min-width: 600px;
   // user
   /** Query with profile.model.regiserv. */
   callback query_orgdoms(string);
+
+  /**
+   * Query domain nodes from a synode.
+   * arg1: org, arg2: domain
+   */
   callback query_domnodes(string, string);
+
   callback select_synode(string);
   callback ping_synode(string, string, string, string);
   callback test_synlogin(string, string, string);

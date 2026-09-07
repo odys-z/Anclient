@@ -164,7 +164,7 @@ export component User {
                             selected(value) => {
                                 UserProfile.model.domain_selected = value;
                                 // root.notify-changed();
-                                query-orgdoms(UserProfile.model.org_selected);
+                                query-domnodes(UserProfile.model.org_selected, value);
                             }
                         }
 
@@ -176,7 +176,6 @@ export component User {
                             selected(value) => {
                                 UserProfile.model.synode_selected = value;
                                 // root.notify-changed();
-                                // query-domnodes(UserProfile.model.org_selected, UserProfile.model.domain_selected);
                                 change-synode(value);
                             }
                         }
@@ -345,11 +344,6 @@ export component User {
                     }
                 }
             }
-
-            // STag{
-            //     horizontal-stretch: 1;
-            //     font-color: #ff0;
-            //     text: AppState.model.syncing_status[0]; }
         }
     }
 }

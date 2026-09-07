@@ -141,7 +141,8 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
 void AsynClienter::asy_register_dev(const DesktopSettings& set_inst, OnOk ok, OnError err) {
     std::thread registdev_thread([this, set_inst, ok, err]() {
         try {
-            regist_device(set_inst, ok, err);
+            string devname = cleanz_devname(set_inst.device);
+            regist_device(set_inst, devname, ok, err);
         } catch(logic_error e) {
             err(MsgCode::Code::exGeneral, "Cannot Register Diveice: "s + e.what(), {});
         }

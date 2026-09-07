@@ -101,7 +101,6 @@ public class PrefsWrapper extends Anson {
     /**
      * Write jservs list through shared preferences.
      *
-     * @param anlist
      * @return this
      */
     public PrefsWrapper jservs(AnPrefEntries anlist) {

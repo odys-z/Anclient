@@ -123,8 +123,9 @@ public class AlbumContext {
         userInf.device = device;
         this.pswd = pswd;
         this.device.id = device;
-        this.device.synode0 = device;
-        this.device.devname = f("%s[%s]", device, userInf.userName());
+        // this.device.synode0 = device;
+        // this.device.devname = f("%s[%s]", device, userInf.userName());
+        this.device.devname = device;
 
         jserv = jservroot;
         Clients.init(jservroot, false);
@@ -210,6 +211,7 @@ public class AlbumContext {
     public AlbumContext devname(String name) {
         if (device == null)
 			device = new Device(userInf.device, name);
+        else device.devname = name;
         return this;
     }
 

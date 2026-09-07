@@ -112,3 +112,14 @@ inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const strin
         }
     });
 }
+
+/**
+ * @brief cleanz_devname
+ * @param suspecious
+ * @return e.g. my-device[001] => my-device
+ */
+inline static string cleanz_devname(const string& suspecious) {
+    std::regex pattern(R"(\[[^\]]*\])");
+    std::string result = std::regex_replace(suspecious, pattern, "");
+    return result;
+}

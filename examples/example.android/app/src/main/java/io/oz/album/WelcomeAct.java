@@ -116,6 +116,7 @@ public class WelcomeAct extends AppCompatActivity implements View.OnClickListene
         PrefsWrapper c = AlbumApp.prfConfig
                        = PrefsWrapper.loadPrefs(getApplicationContext(), sharedPrefs, getString(R.string.url_landing));
         clientext.init(c.homeName, c.uid, c.pswd, c.device, c.jserv());
+        clientext.devname(c.devname);
 
         setContentView(R.layout.welcome);
         msgv = findViewById(R.id.tv_status);

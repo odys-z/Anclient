@@ -327,7 +327,6 @@ int main(int argc, char **argv) {
                             anlog("Temp-link should never be openned");
                         });
 
-
                 temp_doclientier->login_synode(s.admin, s.domain_token, s.device);
 
                 if (temp_doclientier->client.ssInf.ssid.empty()) {
@@ -348,8 +347,10 @@ int main(int argc, char **argv) {
                     slingle.setup_doclientier(ui_weak);
                     anlog("saved: "s + settings_path);
 
-                    insert_status(ui, r.m);
-                    show_dlg(ui, "Saved", r.m);
+                    insert_status(ui, "Saved! "s + r.m);
+                    show_dlg(ui, "Saved",
+                            std::format("User: {}\n Device {}\n Domain: {}\n{}",
+                                        s.admin, s.device, s.domain, r.m)); // FIXME not working
                 }, [temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
                     AsynClienter::onErr(c, e, a);
                 });
