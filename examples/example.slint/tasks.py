@@ -40,7 +40,7 @@ from semanticshare.io.odysz.semantic.x import SemanticException
 from semanticshare.io.oz.anclient.app import DesktopSettings
 from semanticshare.io.odysz.semantic.jprotocol import JServUrl
 from semanticshare.io.oz.invoke import SynodeTask
-from semanticshare.io.oz.edge import extract_check_jretree
+from semanticshare.io.oz.edge import Temurin17Release
 
 
 taskcfg = cast(SynodeTask, None)
@@ -474,7 +474,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     def pth_jre_nt():
         if os.name == "nt":
             temp_jre = taskcfg.check_local_resource(Path('..') / taskcfg.jre_release)
-            return extract_check_jretree(temp_jre, pth_packagedir())
+            return Temurin17Release.aextract_check_jretree(temp_jre, pth_packagedir())
         return None
 
     zip = taskcfg.deskzip_name()
