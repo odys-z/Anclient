@@ -69,6 +69,9 @@ def pth_buildir(taskconfig: SynodeTask = None) -> Path:
 
 
 def pth_packagedir(taskconfig: SynodeTask = None) -> Path:
+    '''
+    Get taskcfg.package_dir, e.g. build-0.8.0. If taskcfg is None, exits with -1.
+    '''
     global taskcfg
     if taskconfig is None:
         taskconfig = taskcfg
@@ -468,7 +471,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
 
-    def pth_jre():
+    def pth_jre_nt():
         if os.name == "nt":
             temp_jre = taskcfg.check_local_resource(Path('..') / taskcfg.jre_release)
             return extract_check_jretree(temp_jre, pth_packagedir())
@@ -477,7 +480,7 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     zip = taskcfg.deskzip_name()
     resources = {
         ".": f"{taskcfg.desktop_dist_dir}/*",
-        'jre17': pth_jre()
+        'jre17': pth_jre_nt()
     }
 
     excludes = ['*.log', 'report.html', '*.github.json']
