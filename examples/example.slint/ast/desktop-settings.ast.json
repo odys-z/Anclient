@@ -1,0 +1,18 @@
+{ "type": "io.odysz.reflect.AnsonAst",
+  "dataAnclass": "io.oz.anclient.app.DesktopSettings",
+  "baseAnclass": "io.odysz.jclient.AnclientSettings",
+  "fields" : {
+    "org_name"      : {"dataAnclass": "string"},
+    "java_path"     : {"dataAnclass": "string"},
+    "doctier_jar"   : {"dataAnclass": "string"},
+    "wsagent_jar"   : {"dataAnclass": "string"},
+    "synode_id"     : {"dataAnclass": "string"},
+    "synode_vol"    : {"dataAnclass": "string"},
+    "synode_jserv"  : {"dataAnclass": "string"},
+    "album_web"     : {"dataAnclass": "string"},
+    "wshost"        : {"dataAnclass": "string"},
+    "wsport"        : {"dataAnclass": "int"},
+    "wstimeout"     : {"dataAnclass": "int"}
+  },
+  "ctorsemantics": [ ]
+}

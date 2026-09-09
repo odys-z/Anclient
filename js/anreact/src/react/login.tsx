@@ -1,5 +1,6 @@
 
 import React from 'react';
+import clsx from 'clsx';
 	import { Theme, withStyles } from '@material-ui/core/styles';
 	import Collapse from '@material-ui/core/Collapse';
 	import Button from '@material-ui/core/Button';
@@ -9,12 +10,18 @@ import React from 'react';
 import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol } from '@anclient/semantier';
 
 import { an, SessionClient } from '@anclient/semantier';
-	import {AnContext, AnContextType} from './reactext';
+	import {AnContext, AnContextType, ExternalHosts, JsonHosts} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
 import { ClassNames } from './anreact';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import IconButton from '@material-ui/core/IconButton';
+import { VisibilityOff, Visibility } from '@material-ui/icons';
+import FormControl from '@material-ui/core/FormControl';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
 
 const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
@@ -56,12 +63,13 @@ class LoginComp extends React.Component<LoginProps> {
     };
 
 	an: AnClient;
-	ssClient: SessionClient;
-	confirm: JSX.Element;
+	ssClient?: SessionClient;
+	confirm?: JSX.Element;
 
 	state: {
 		userId: string,
-		pswd: string
+		pswd: string,
+		showPswd?: boolean
 	};
 
 	/**
@@ -116,7 +124,7 @@ class LoginComp extends React.Component<LoginProps> {
 	 * Login and go main page (sys.jsx). Target html page is first specified by
 	 * login.serv (SessionInf.home).
 	 */
-	toLogin(classes? : ClassNames) {
+	toLogin(classes : ClassNames) {
 		let that = this;
 		let uid = this.state.userId;
 		let pwd = this.state.pswd;
@@ -132,7 +140,7 @@ class LoginComp extends React.Component<LoginProps> {
 			let hosturl = ctx.servs[serv] as string;
 
 			if (ctx.servs.syndomx) {
-				// Synode 0.7.1
+				// @ts-ignore - Synode 0.7.1
 				hosturl = ctx.servs.syndomx[serv] || hosturl;
 			}
 			if (hosturl === undefined || !hosturl.startsWith('http')) {
@@ -182,8 +190,9 @@ class LoginComp extends React.Component<LoginProps> {
 
 	render() {
 		let that = this;
-		const { classes } = this.props;
-		return (<div className={classes.root}>
+		let { classes } = this.props;
+		classes = classes!;
+		return (<div className={classes!.root}>
 			<Box display={!this.config.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
@@ -192,23 +201,57 @@ class LoginComp extends React.Component<LoginProps> {
 				</Button>
 			</Box>
 			<Collapse in={this.config.show} timeout="auto" >
-				<TextField className={classes.field2}
-					autoFocus
-					required id="userid" label={L("User Id")}
-					autoComplete="username"
-					defaultValue={this.config.userid}
-					onChange={event => this.setState({userId: event.target.value})} />
-				<TextField className={classes.field2}
+				<FormControl className={clsx(classes.margin, classes.textField)}>
+					<InputLabel htmlFor="userid">{L("User Id")}</InputLabel>
+					<Input 
+						autoFocus required id="userid"
+						// label={L("User Id")}
+						autoComplete="username"
+						defaultValue={this.config.userid}
+						onChange={event => this.setState({userId: event.target.value})} />
+				</FormControl>
+				<FormControl className={clsx(classes.margin, classes.textField)}>
+					<InputLabel htmlFor="pwsd">Password</InputLabel>
+					<Input
+						id="pswd"
+						type={this.state.showPswd ? 'text' : 'password'}
+						defaultValue = {this.config.pswd}
+						onChange={event => this.setState({pswd: event.target.value})}
+						endAdornment={
+						<InputAdornment position="end">
+							<IconButton
+							aria-label="toggle password visibility"
+							onClick={() => this.setState({ showPswd: !this.state.showPswd })}
+							onMouseDown={(e) => e.preventDefault()}
+							>
+							{this.state.showPswd ? <Visibility /> : <VisibilityOff />}
+							</IconButton>
+						</InputAdornment>
+						}
+					/>
+				</FormControl>
+				{/* <Box display="flex" alignItems="flex-end" className={classes!.field2}>
+				<TextField className={classes!.field2}
 					id="pswd" label={L("Password")}
-					type="password"
+					type={this.state.showPswd ? "text" : "password"}
 					autoComplete="new-password"
-					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin(classes);} }
+					onKeyUp={(e) => {if (e.code === "Enter") that.toLogin(classes!);} }
 					defaultValue={this.config.pswd}
-					onChange={event => this.setState({pswd: event.target.value})} />
-				<Button className={classes.field2}
+					onChange={event => this.setState({pswd: event.target.value})}
+				/>
+				<IconButton className={classes!.field3}
+					aria-label="toggle password visibility"
+					onClick={() => this.setState({ showPswd: !this.state.showPswd })}
+					onMouseDown={(e) => e.preventDefault()}
+					// style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
+				>
+					{this.state.showPswd ? <VisibilityOff /> : <Visibility />}
+				</IconButton>
+				</Box> */}
+				<Button className={classes!.field2}
 					variant="contained"
 					color="primary"
-					onClick={() => this.toLogin(classes)} >{L('Login')}</Button>
+					onClick={() => this.toLogin(classes!)} >{L('Login')}</Button>
 			</Collapse>
 			{this.confirm}
 		</div>);

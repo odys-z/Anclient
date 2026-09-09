@@ -24,7 +24,7 @@ import org.apache.commons.io.IOUtils;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
@@ -98,7 +98,6 @@ public class HttpServClient {
 		// Send post request
 		con.setDoOutput(true);
 
-		// JHelper.writeAnsonReq(con.getOutputStream(), jreq);
 		jreq.toBlock(con.getOutputStream());
 
 		if (Clients.verbose) Utils.logi("[Clients.verbose] %s", url);
@@ -295,7 +294,7 @@ public class HttpServClient {
  	 * @throws IOException
  	 */
 	public static String escapeUrlParam(AnsonMsg<? extends DocsReq> jreq) throws AnsonException, IOException {
-		return AESHelper.encode64(jreq.toBlock().getBytes()).replaceAll("\\+", "%2B");
+		return AESHelper2.encode64(jreq.toBlock().getBytes()).replaceAll("\\+", "%2B");
 	}
 
 	/**

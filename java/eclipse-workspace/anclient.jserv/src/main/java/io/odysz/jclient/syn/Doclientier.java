@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 import io.odysz.anson.Anson;
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.FilenameUtils;
 import io.odysz.common.Utils;
 import io.odysz.jclient.Clients;
@@ -61,8 +61,8 @@ public class Doclientier extends Semantier {
 
 	public SessionClient client;
 	
-	/** @since 2.0.0 changed to static */
-	protected static ErrorCtx errCtx;
+	/** @since 0.5.0 changed to static */
+	protected static OnError errCtx;
 
 	protected ExpDocRobot robt;
 
@@ -86,7 +86,7 @@ public class Doclientier extends Semantier {
 	 * @throws SQLException 
 	 * @throws SemanticException 
 	 */
-	public Doclientier(String doctbl, String sysuri, String synuri, ErrorCtx errCtx)
+	public Doclientier(String doctbl, String sysuri, String synuri, OnError errCtx)
 			throws SemanticException, IOException {
 		mustnonull(doctbl);
 		mustnonull(sysuri);
@@ -116,45 +116,23 @@ public class Doclientier extends Semantier {
 	}
 
 	/**
+	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
 	 * 
-	 * @deprecated use {@link #loginWithUri(String, String, String)} instead
-	 * 
-	 * @param workerId
+	 * @param jservrt jserv
+	 * @param usrid
 	 * @param device
 	 * @param pswd
 	 * @return this
-	 * @throws SemanticException 
-	 * @throws SQLException
-	 * @throws AnsonException
-	 * @throws IOException
-	 * @throws TransException 
-	 * @throws SsException 
-	public Doclientier login(String workerId, String device, String pswd)
-			throws SemanticException, AnsonException, SsException, IOException {
-
-		client = Clients.login(workerId, pswd, device);
-
-		return onLogin(client);
-	}
-	 */
-
-	/**
-	 * Login to hub, where hub root url is initialized with {@link Clients#init(String, boolean...)}.
-	 * 
-	 * @param workerId
-	 * @param device
-	 * @param pswd
-	 * @return
 	 * @throws SemanticException
 	 * @throws AnsonException
 	 * @throws SsException
 	 * @throws IOException
 	 */
-	public Doclientier loginWithUri(String jservrt, String workerId, String device, String pswd)
+	public Doclientier loginWithUri(String jservrt, String usrid, String device, String pswd)
 			throws SemanticException, AnsonException, SsException, IOException {
 
-		// client = Clients.loginWithUri(uri, workerId, pswd, device);
-		client = SessionClient.loginWithUri(jservrt, uri, workerId, pswd, device);
+		mustnonull(jservrt, "Arg jservrt for login is null!");
+		client = SessionClient.loginWithUri(jservrt, uri, usrid, pswd, device);
 
 		return onLogin(client);
 	}
@@ -197,10 +175,22 @@ public class Doclientier extends Semantier {
 		return this;
 	}
 	
+	/**
+	 * 
+	 * @param doclient
+	 * @param atdev
+	 * @param respath
+	 * @param entityName
+	 * @param share
+	 * @param ok
+	 * @param proc
+	 * @throws Exception
+	 * @deprecated for test only?
+	 */
 	public static ExpSyncDoc videoUpByApp(Doclientier doclient, Device atdev, String respath,
  			String entityName, ShareFlag share, OnOk ok, OnProcess proc) throws Exception {
 
-		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc()
+		ExpSyncDoc doc = (ExpSyncDoc) new ExpSyncDoc(null, "")
 					.share(doclient.robt.uid(), share.name(), new Date())
 					.shareflag(ShareFlag.publish.name())
 					.folder(atdev.tofolder)
@@ -225,6 +215,8 @@ public class Doclientier extends Semantier {
 	 * @throws TransException 
 	 * @throws AnsonException 
 	 * @throws IOException 
+	 * 
+	 * FIXME not used?
 	 */
 	List<DocsResp> syncUp(ExpDocTableMeta meta, AnResultset rs, OnProcess onProc)
 			throws TransException, AnsonException, IOException {
@@ -240,9 +232,9 @@ public class Doclientier extends Semantier {
 		}
 	}
 
-	public List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
+	private List<DocsResp> syncUp(String tabl, List<IFileDescriptor> videos,
 			OnProcess onProc, OnDocsOk... docsOk)
-			throws TransException, AnsonException, IOException, SQLException {
+			throws TransException, AnsonException, IOException {
 		return startPushs(
 				null, tabl, videos, onProc,
 				isNull(docsOk) ? new OnDocsOk() {
@@ -269,9 +261,10 @@ public class Doclientier extends Semantier {
 	 */
 	public List<DocsResp> startPushs(ExpSyncDoc template, String tbl, List<IFileDescriptor> videos,
 				OnProcess proc, OnDocsOk docOk, OnError ... onErr)
-				throws TransException, IOException, AnsonException, SQLException {
+				throws TransException, IOException, AnsonException {
 		OnError err = onErr == null || onErr.length == 0 ? errCtx : onErr[0];
-		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper.blockSize(), template,
+		mustnonull(client);
+		return pushBlocks(client, synuri, tbl, videos, fileProvider, AESHelper2.blockSize(), template,
 				proc, docOk, isNull(onErr) ? err : onErr[0]);
 	}
 
@@ -290,15 +283,11 @@ public class Doclientier extends Semantier {
 	 * @param docsOk
 	 * @param errHandler
 	 * @return response list
-	 * @throws TransException
-	 * @throws IOException
-	 * @throws SQLException 
-	 * @throws AnsonException 
 	 */
-	public static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
+	static List<DocsResp> pushBlocks(SessionClient client, String uri, String tbl,
 			List<IFileDescriptor> videos, IFileProvider fileProvider, int blocksize, ExpSyncDoc template,
 			OnProcess proc, OnDocsOk docsOk, OnError errHandler)
-			throws TransException, IOException, AnsonException, SQLException {
+			throws TransException, IOException, AnsonException {
 
 		SessionInf ssinf = client.ssInfo();
 
@@ -310,22 +299,22 @@ public class Doclientier extends Semantier {
 
 		List<DocsResp> reslts = new ArrayList<DocsResp>(videos.size());
 
-		for ( int px = 0; px < videos.size(); px++ ) {
+		for ( int rx = 0; rx < videos.size(); rx++ ) {
 
 			FileInputStream ifs = null;
 			int seq = 0;
 			int totalBlocks = 0;
 
 			/* 
-			 * 025-03-02 fix class casting error while pick files on Android.
+			 * 2025-03-02 fix class casting error while pick ingfiles on Android.
 			 * 2025-03-04 fix error of reading non-latin file name.
 			 */
 
-			IFileDescriptor f = videos.get(px);
+			IFileDescriptor f = videos.get(rx);
 			if (fileProvider == null) {
 				if (isblank(f.fullpath()) || isblank(f.clientname()) || isblank(f.cdate()))
 					throw new IOException(
-							f("File information is not enough: %s, %s, create time %s",
+							f("File information is not enough: name %s, %s, create time %s",
 							f.clientname(), f.fullpath(), f.cdate()));
 			}
 			else if (fileProvider.meta(f) < 0) {
@@ -351,8 +340,8 @@ public class Doclientier extends Semantier {
 					.resetChain(true)
 					.blockStart(p, ssinf);
 			
-			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req)
-									.header(header);
+			AnsonMsg<DocsReq> q = client.<DocsReq>userReq(uri, Port.docstier, req) // 2026-8-31 Shouldn't be SynDocollPort.docstier?
+									.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 			try {
 				resp0 = client.commit(q, errHandler);
@@ -366,11 +355,15 @@ public class Doclientier extends Semantier {
 				// totalBlocks = (int) ((Files.size(Paths.get(pth)) + 1) / blocksize);
 				totalBlocks = (int) (Math.max(0, p.size - 1) / blocksize) + 1;
 
-				if (proc != null) proc.proc(videos.size(), px, 0, totalBlocks, resp0);
+				if (proc != null) {
+					if (resp0.xdoc != null && isblank(resp0.xdoc.shareflag()))
+						resp0.xdoc.shareflag(ShareFlag.pushing);
+					proc.proc(rx, videos.size(), 0, totalBlocks, resp0);
+				}
 
 				ifs = (FileInputStream) fileProvider.open(f);
 
-				String b64 = AESHelper.encode64(ifs, blocksize);
+				String b64 = AESHelper2.encode64(ifs, blocksize);
 				while (b64 != null) {
 					req = new DocsReq(tbl, uri).blockUp(seq, p, b64, ssinf);
 					seq++;
@@ -379,16 +372,24 @@ public class Doclientier extends Semantier {
 								.header(header);
 
 					respi = client.commit(q, errHandler);
-					if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+					if (proc != null) {
+						if (respi.xdoc != null && isblank(respi.xdoc.shareflag()))
+							respi.xdoc.shareflag(ShareFlag.pushing);
+						proc.proc(rx, videos.size(), seq, totalBlocks, respi);
+					}
 
-					b64 = AESHelper.encode64(ifs, blocksize);
+					b64 = AESHelper2.encode64(ifs, blocksize);
 				}
 				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
 
 				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
 				respi = client.commit(q, errHandler);
-				if (proc != null) proc.proc(px, videos.size(), seq, totalBlocks, respi);
+				if (proc != null) {
+					if (respi.xdoc != null && isblank(respi.xdoc.shareflag()))
+						respi.xdoc.shareflag(ShareFlag.publish);
+					proc.proc(rx, videos.size(), seq, totalBlocks, respi);
+				}
 
 				reslts.add(respi);
 			}
@@ -412,12 +413,6 @@ public class Doclientier extends Semantier {
 					// Tag: MVP - This is not correct way of deserialize exception at client side
 					if (!isblank(exmsg)) {
 						try {
-							// Code: ext, mesage: {
-							//   \"type\": \"io.odysz.semantics.SemanticObject\",
-							//   \"props\": {\"code\": 99,
-							//   \"reasons\": [\"Found existing file for device & client path.\",
-							//                 \"0001\", \"/storage/emulated/0/Download/1732626036337.pdf\"]}}\n
-
 							String reasons = exmsg;
 							SemanticObject exp = null; 
 							try {
@@ -448,11 +443,6 @@ public class Doclientier extends Semantier {
 							ex.getClass().getName(), isblank(ex.getCause()) ? null : ex.getCause().getMessage());
 				}
 			}
-//			finally {
-//				if (ifs != null)
-//					ifs.close();
-//				// DocLocks.readed(p.fullpath());
-//			}
 		}
 		if (docsOk != null) docsOk.ok(reslts);
 
@@ -577,16 +567,19 @@ public class Doclientier extends Semantier {
 	 * @throws TransException
 	 * @throws IOException
 	 * @throws SQLException
+	 * 
+	 * @deprecated for test only?
 	 */
-	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc, OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
-			throws TransException, IOException, SQLException {
+	public DocsResp startPush(ExpSyncDoc template, String tabl, ExpSyncDoc doc,
+			OnOk follow, OnProcess onproc, ErrorCtx ... errorCtx)
+			throws TransException, IOException {
 		List<IFileDescriptor> videos = new ArrayList<IFileDescriptor>();
 		videos.add(doc);
 		
 		OnDocsOk follows = new OnDocsOk() {
 			@Override
 			public void ok(List<? extends AnsonResp> resps)
-					throws IOException, AnsonException, TransException, SQLException {
+					throws IOException, AnsonException, TransException {
 				follow.ok(isNull(resps) ? null : resps.get(0));
 			}
 		};
@@ -616,7 +609,7 @@ public class Doclientier extends Semantier {
 
 		AnsonMsg<DocsReq> q = client
 				.<DocsReq>userReq(synuri, port, req)
-				.header(header);
+				.header(header); // ISSUE must be a bug .header(client.ssInfo())
 
 		DocsResp resp = client.commit(q, errCtx);
 

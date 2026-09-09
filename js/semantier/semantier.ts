@@ -226,23 +226,23 @@ export class Semantier {
     uiHelper: any;
 
     /** list's columns */
-    _cols: Array<TierCol>;
+    _cols: Array<TierCol> = [];
     /** client function / CRUD identity */
     uri: string;
     /** Fields in details from, e.g. maintable's record fields */
-    _fields: TierCol[];
+    _fields: TierCol[] = [];
 
     /** current crud */
-    crud: CRUD;
+    crud: CRUD = undefined;
     /** current list's data */
-    rows: Tierec[];
+    rows: Tierec[] = [];
     /** current pk value */
     pkval: PkVal = {pk: undefined, v: undefined};
     /** current record */
     rec: Tierec | undefined;
 
     /** All sub table's relationships */
-    relMeta: {[tabl: string]: DbRelations};
+    relMeta: { [tabl: string]: DbRelations; } | undefined;
 
     /**
      *
@@ -271,15 +271,15 @@ export class Semantier {
 		if (!context || !context.anClient)
 			console.error(this, "Setup semantic tier without React context (with anClient)?");
 
-		this.client = context.anClient;
+		this.client = context.anClient as SessionClient;
 		this.uiHelper = context.uiHelper;
 		this.errCtx = context.error;
 		return this;
 	}
 
-    client: SessionClient | Inseclient;
+    client: SessionClient | Inseclient | undefined;
 
-    errCtx: ErrorCtx;
+    errCtx: ErrorCtx | undefined;
 
     disableValidate: any;
 

@@ -1,6 +1,6 @@
 {
   "name": "@anclient/semantier",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "The anclient's common package depending on pure js object that can be used for js unit test.",
   "main": "./anclient.ts",
   "directories": {},
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "csstype": "^3.1.2",
-    "jquery": "^3.7.0"
+    "jquery": "^3.7.0",
+    "js-sha256": "^1.0.0"
   }
 }

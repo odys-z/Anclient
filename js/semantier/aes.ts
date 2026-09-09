@@ -3,7 +3,9 @@
  * AES is just only one of crypto algorithms, so we need make this pluginized so
  * can be overriden by user.
  */
-import AESLib from './opensources/ricmoo-aes.js';
+
+import AESLib, {AESHook} from 'opensources/ricmoo-aes';
+// import AESLib, { AESHook } from 'AESLib';
 
 /* The ricomoo AES Wrapper.
  * The dependee class is ported from github/ricomoo, the original soruce file doesn't have any license declarations.
@@ -18,8 +20,9 @@ import AESLib from './opensources/ricmoo-aes.js';
 export default function AES () {
 	var verbose = false;
 	let hook = {aesjs: undefined}
-	var aesLib = new AESLib(hook);
-	let aesjs = hook.aesjs;
+	// var aesLib = new AESLib(hook);
+	AESLib(hook);
+	let aesjs = hook.aesjs!;
 
 	/**
 	 * get byte[] of random 128bits iv

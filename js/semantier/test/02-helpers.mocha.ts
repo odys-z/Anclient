@@ -149,85 +149,169 @@ const AnContext = {
 	error: {} as ErrorCtx,
 }
 
+export function case02_1_checkTree_relation_recs () {
+	debugger
+	let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+					"jserv": undefined,
+					"uid": "admin", "roleId": undefined, "ssid": "001eysTj"
+				} as SessionInf;
+	let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
+
+	let semantier = new Semantier({uri: 'test'});
+	semantier.rels = {a_role_func: []};
+
+	// 1.
+	// using AnReact to collect role-func relation table's records
+	// note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
+	let columnMap = {
+		funcId: 'nodeId',
+		roleId: 'r-001', // hard coded data, e.g. a pk value.
+	};
+
+	let rf = Semantier.inserTreeChecked(
+				checkBoxForest as any,
+				{ table: 'a_role_func',
+					columnMap,
+					check: 'checked',
+					reshape: true  // middle nodes been corrected according to children
+				} );
+
+	assert.equal(len(rf.nvss), 0, 'internal node deselected as no leaf node checked');
+
+	let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
+	n.checked = true; // reshaped
+	rf = Semantier.inserTreeChecked(
+				checkBoxForest as any,
+				{ table: 'a_role_func',
+					columnMap,
+					check: 'checked',
+					reshape: true  // middle nodes been corrected according to children
+				} );
+
+	// [ [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ],
+	//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ] ]
+	assert.equal(rf.nvss.length, 2, 'records');
+	assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
+	assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
+	assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
+};
+
+export function case02_2_checkTree_relation_recs () {
+	let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+					"jserv": undefined,
+					"uid": "admin", "roleId": undefined, "ssid": "001eysTj"
+				} as SessionInf;
+	let semantier = new Semantier({uri: 'test'});
+
+	let columnMap = {
+		funcId: 'nodeId',
+		roleId: 'r-001', // hard coded data, e.g. a pk value.
+	};
+
+	let rf = Semantier.inserTreeChecked(
+				forest2 as any,
+				{ table: 'a_role_func',
+					columnMap,
+					check: 'checked',
+					reshape: true  // middle nodes been corrected according to children
+				} );
+
+	// [ [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r-001' ] ],
+	//   [ [ 'funcId', 'sys-role' ], [ 'roleId', 'r-001' ] ],
+	//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ]
+	//   [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ] ],
+	assert.equal(rf.nvss.length, 3, 'records');
+	assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
+	assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
+	assert.equal(rf.nvss[1][0][0], 'funcId', '[ funcId, ... ]');
+	assert.equal(rf.nvss[1][0][1], 'sys-role', '[ funcId, ... ]');
+	assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
+};
+
+if (typeof describe === 'function') {
 describe('case: [02.0 dataset + s-tree]', () => {
-	it('[protocol] checkTree -> relation records', () => {
-		debugger
-		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "jserv": undefined,
-					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
-					} as SessionInf;
-		let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 
-		let semantier = new Semantier({uri: 'test'});
-		semantier.rels = {a_role_func: []};
+	it('[recursive] checkTree -> relation records-2', case02_1_checkTree_relation_recs);
+	it('[recursive] checkTree -> relation records-2', case02_2_checkTree_relation_recs);
 
-		// 1.
-		// using AnReact to collect role-func relation table's records
-		// note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
-		let columnMap = {
-			funcId: 'nodeId',
-			roleId: 'r-001', // hard coded data, e.g. a pk value.
-		};
+	// it('[protocol] checkTree -> relation records 1', () => {
+	// 	debugger
+	// 	let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+	// 				  "jserv": undefined,
+	// 				  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
+	// 				} as SessionInf;
+	// 	let client = new SessionClient(ssInf, 'iv 3456789ABCDEF', true);
 
-		let rf = Semantier.inserTreeChecked(
-					checkBoxForest as any,
-					{ table: 'a_role_func',
-					  columnMap,
-					  check: 'checked',
-					  reshape: true  // middle nodes been corrected according to children
-					} );
+	// 	let semantier = new Semantier({uri: 'test'});
+	// 	semantier.rels = {a_role_func: []};
 
-		assert.equal(rf.nvss, undefined, 'internal node deselected as no leaf node checked');
+	// 	// 1.
+	// 	// using AnReact to collect role-func relation table's records
+	// 	// note 'nodeId' is not the same with DB as some fields are mapped in datase.xml
+	// 	let columnMap = {
+	// 		funcId: 'nodeId',
+	// 		roleId: 'r-001', // hard coded data, e.g. a pk value.
+	// 	};
 
-		let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
-		n.checked = true; // reshaped
-		rf = Semantier.inserTreeChecked(
-					checkBoxForest as any,
-					{ table: 'a_role_func',
-					  columnMap,
-					  check: 'checked',
-					  reshape: true  // middle nodes been corrected according to children
-					} );
+	// 	let rf = Semantier.inserTreeChecked(
+	// 				checkBoxForest as any,
+	// 				{ table: 'a_role_func',
+	// 				  columnMap,
+	// 				  check: 'checked',
+	// 				  reshape: true  // middle nodes been corrected according to children
+	// 				} );
 
-		// [ [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ],
-		//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ] ]
-		assert.equal(rf.nvss.length, 2, 'records');
-		assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
-		assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
-	});
+	// 	assert.equal(rf.nvss, undefined, 'internal node deselected as no leaf node checked');
 
-	it('[recursive] checkTree -> relation records', () => {
-		let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
-					  "jserv": undefined,
-					  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
-					} as SessionInf;
-		let semantier = new Semantier({uri: 'test'});
+	// 	let n = checkBoxForest[0].node.children[0].node as unknown as {checked: boolean}; //.checked = true;
+	// 	n.checked = true; // reshaped
+	// 	rf = Semantier.inserTreeChecked(
+	// 				checkBoxForest as any,
+	// 				{ table: 'a_role_func',
+	// 				  columnMap,
+	// 				  check: 'checked',
+	// 				  reshape: true  // middle nodes been corrected according to children
+	// 				} );
 
-		let columnMap = {
-			funcId: 'nodeId',
-			roleId: 'r-001', // hard coded data, e.g. a pk value.
-		};
+	// 	// [ [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ],
+	// 	//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ] ]
+	// 	assert.equal(rf.nvss.length, 2, 'records');
+	// 	assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
+	// 	assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
+	// 	assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
+	// });
 
-		let rf = Semantier.inserTreeChecked(
-					forest2 as any,
-					{ table: 'a_role_func',
-					  columnMap,
-					  check: 'checked',
-					  reshape: true  // middle nodes been corrected according to children
-					} );
+	// it('[recursive] checkTree -> relation records', () => {
+	// 	let ssInf = { "type": "io.odysz.semantic.jsession.SessionInf",
+	// 				  "jserv": undefined,
+	// 				  "uid": "admin", "roleId": undefined, "ssid": "001eysTj"
+	// 				} as SessionInf;
+	// 	let semantier = new Semantier({uri: 'test'});
 
-		// [ [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r-001' ] ],
-		//   [ [ 'funcId', 'sys-role' ], [ 'roleId', 'r-001' ] ],
-		//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ]
-		//   [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ] ],
-		assert.equal(rf.nvss.length, 3, 'records');
-		assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
-		assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvss[1][0][0], 'funcId', '[ funcId, ... ]');
-		assert.equal(rf.nvss[1][0][1], 'sys-role', '[ funcId, ... ]');
-		assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
-	});
+	// 	let columnMap = {
+	// 		funcId: 'nodeId',
+	// 		roleId: 'r-001', // hard coded data, e.g. a pk value.
+	// 	};
+
+	// 	let rf = Semantier.inserTreeChecked(
+	// 				forest2 as any,
+	// 				{ table: 'a_role_func',
+	// 				  columnMap,
+	// 				  check: 'checked',
+	// 				  reshape: true  // middle nodes been corrected according to children
+	// 				} );
+
+	// 	// [ [ [ 'funcId', 'sys-domain' ], [ 'roleId', 'r-001' ] ],
+	// 	//   [ [ 'funcId', 'sys-role' ], [ 'roleId', 'r-001' ] ],
+	// 	//   [ [ 'funcId', 'sys-1.1' ], [ 'roleId', 'r-001' ] ]
+	// 	//   [ [ 'funcId', 'sys' ], [ 'roleId', 'r-001' ] ] ],
+	// 	assert.equal(rf.nvss.length, 3, 'records');
+	// 	assert.equal(rf.nvss[0].length, 2, '[ funcId, sys ]');
+	// 	assert.equal(rf.nvss[0][0][0], 'funcId', '[ funcId, ... ]');
+	// 	assert.equal(rf.nvss[1][0][0], 'funcId', '[ funcId, ... ]');
+	// 	assert.equal(rf.nvss[1][0][1], 'sys-role', '[ funcId, ... ]');
+	// 	assert.equal(rf.nvss[1][1][1], 'r-001', '[ ..., r-001 ]');
+	// });
 
 
 	it('[Helper] len()', () => {
@@ -251,3 +335,5 @@ describe('case: [02.0 dataset + s-tree]', () => {
 		assert.equal(2, len({roleName: '', orgId: 'ap02'}), '7')
 	});
 });
+
+}

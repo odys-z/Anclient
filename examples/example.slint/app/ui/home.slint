@@ -1,0 +1,173 @@
+import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
+import { UseIcons } from "@surrealism/use/index.slint";
+
+import { TableViewPage } from "./table_view_page.slint";
+import { CustomTableViewPage } from "./custom-table.slint";
+import { IDs } from "app-state.slint";
+
+export component HomeForm {
+
+    in-out property <string> ws-status: @tr("Ready");
+    in-out property <bool> enable-vol: false;
+
+    callback navigate(string);
+    callback open-web(string);
+
+    Rectangle {
+        height: 100%; width: 100%;
+        VerticalLayout {
+          HorizontalLayout {
+            padding: 8px;
+            alignment: center;
+            header := SHeader {
+                value: [{label:"Album Desktop", value:"1"}, {label:"Home", value:"2"}];
+            }
+          }
+
+          HorizontalLayout {
+            padding: 24pt;
+            alignment: center;
+            spacing: 24pt;
+            // album
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("imgs/album.svg");
+                        clicked => { navigate(IDs.m_album) };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Album");
+                    font-size: 14pt;
+                    color: #ddd;
+                }
+            }
+
+            // volume
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    background: (root.enable-vol) ? black : grey;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/folder-open-filled.svg");
+                        clicked => {
+                            debug("Volume Enabled:", root.enable-vol);
+                            if (root.enable-vol) { navigate(IDs.m_volume); } };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Volume");
+                    font-size: 14pt;
+                    color: #ddd;
+                }
+            }
+          }
+
+          HorizontalLayout {
+            padding: 24pt;
+            alignment: center;
+            spacing: 24pt;
+
+            // upload
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/file-code.svg");
+                        clicked => { navigate(IDs.m_upload) };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Uploads");
+                    font-size: 14pt;
+                    color: #ddd;
+                }
+            }
+ 
+            // setup
+            VerticalLayout {
+                spacing: 8pt;
+                alignment: start; 
+                SCard {
+                    width: 92pt;
+                    height: 92pt;
+                    SIcon {
+                        width: 100%;
+                        height: 100%;
+                        source: @image-url("@surrealism/icons/setting-two.svg");
+                        clicked => { navigate(IDs.m_user) };
+                    }
+                }
+                Text {
+                    horizontal-alignment: center;
+                    text: @tr("Setup");
+                    font-size: 14pt;
+                    color: #ddd;
+                }
+            }
+          }
+
+          HorizontalLayout {
+            padding: 24px;
+            alignment: space-around;
+            SButton {
+                font-size: 9pt;
+                theme: Primary;
+                text: "About Portfolio";
+                clicked => {
+                    popup.open();
+                }
+            }
+
+            SButton {
+                icon: UseIcons.icons.Smiling-face;
+                font-size: 9pt;
+                text: "Data Privacy";
+                clicked => { root.open_web("https://odys-z.github.io/products/portfolio/privacy-policy.html"); }
+            }
+
+            SButton {
+                icon: UseIcons.icons.Share;
+                text: "Credits";
+                font-size: 9pt;
+                clicked => {
+                    root.open-web("https://odys-z.github.io/products/portfolio/credits.html");
+                }
+            }
+          }
+        }
+
+        popup := SPopup {
+            Rectangle {
+              background: #ad9678;
+              VerticalLayout {
+                padding: 12px;
+                alignment: center;
+                Text{ horizontal-alignment: center; font-size: 24pt; text: "Portfolio 0.8 for Desktop"; }
+                Text{ horizontal-alignment: center; font-size: 18pt; color: #223623; text: "License: MIT";}
+                Text{ horizontal-alignment: center; font-size: 12pt; color: #223623; text: "Copyright @ odys-z.github.io, 2026";}
+                Text{ horizontal-alignment: center; font-size: 12pt; color: #223623; text: "All Rights Reserved";}
+              }
+            }
+        }
+    }
+}

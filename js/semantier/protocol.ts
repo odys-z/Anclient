@@ -1,4 +1,4 @@
-import AES from './aes';
+import AES from './aes2';
 import { SessionClient, SessionInf } from './anclient';
 import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
@@ -225,6 +225,7 @@ class Jregex {
 		else if (typeof str === "string" && str.substring(0, 1) !== "'"
 			&& str.substring(0, 2) != "''")
 			return "'" + str + "'";
+		return str;
 	}
 
 	static isblank(s: any) : boolean {
@@ -288,7 +289,7 @@ export class Protocol {
 		Object.assign(Protocol.Port, newPorts);
 	};
 
-	static ansonTypes = {};
+	static ansonTypes: {[type: string]: (json: any) => AnsonBody} = {};
 
 	/**Extend new protocol - register new body type creater.
 	 * @function
@@ -346,7 +347,7 @@ export class Protocol {
 			body: [{type: 'io.odysz.semantic.jsession.AnSessionReq',
 					uid, token: tk64, iv: iv64}]
 		});
-		login.Body().A('login');
+		login.Body()!.A('login');
 		return login;
 	}
 
@@ -418,7 +419,7 @@ export class AnsonMsg<T extends AnsonBody> {
     code: string;
     version: string;
     seq: number;
-    port: string;
+    port: keyof typeof Protocol.Port;
 	/**Json string options, like no-null: true for asking server replace null with ''.  */
     opts: {};
     header: AnHeader;
@@ -534,13 +535,14 @@ export class AnsonMsg<T extends AnsonBody> {
     /** A short cut for body[0].post()
      * @param {AnsonBody} pst post sql request
      * @return {AnsonBody} the  first request body[0].post returned value.*/
-    post(pst: AnsonBody): AnsonBody {
+    post(pst: AnsonBody): AnsonBody | undefined {
 		if (this.body !== undefined && this.body.length > 0)
 			return this.body[0].post(pst);
+		return undefined;
 	}
 
     Body(ix = 0): T | undefined {
-		return this.body ? this.body[ix] : undefined;
+		return ix >= this.body.length? undefined : this.body[ix];
 	}
 
 	Uri(uri: string) {
@@ -571,17 +573,19 @@ export class AnsonBody {
 	 * @param body.uri function uri.
 	 * @see {@link https://odys-z.github.io/Anclient/guide/func-uri.html#func-uri-datasource-mapping Anclient doc}
 	 */
-	constructor(body?: {type: string, a?: string, parent?: string, uri?: string}) {
-		this.type = body?.type;
-		this.a = body?.a
-		this.parent = body?.parent;
-		this.uri = body?.uri;
+	constructor(body?: {type: string, a: string, parent?: string, uri: string}) {
+		if (body) {
+			this.type = body.type;
+			this.a = body.a
+			this.parent = body.parent;
+			this.uri = body.uri;
+		}
 	}
 
-    type: string;
-    a: string;
-    parent: string; // AnsonMsg<AnsonBody>;
-    uri: string;
+    type: string | undefined;
+    a!: string;
+    parent: string | undefined; 
+    uri!: string;
 	version?: string;
 	seq?: number;
 
@@ -608,7 +612,7 @@ export class AnHeader {
     ssid: string;
     uid : string;
 
-	iv: string;
+	iv!: string;
 	/** repackec session token */
 	ssToken: string;
 
@@ -624,14 +628,7 @@ export class AnHeader {
         return this;
     }
 
-    usrAct: any[];
-
-	// Seq(seq: number) {
-	// 	let iv = aes.getIv128() as unknown as Uint8Array;
-	// 	this.ssToken = aes.encrypt(`${this.ssid} ${seq}`, this.ssid, iv);
-	// 	this.iv = aes.bytesToB64(iv);
-	// 	return this;
-	// }
+    usrAct: any[] = [];
 }
 
 export class UserReq extends AnsonBody {
@@ -671,7 +668,7 @@ export class AnSessionReq extends AnsonBody {
 		this.iv = iv;
     }
 
-    mds: {}; // what's this for?
+    mds!: {}; // what's this for?
 
     uid  : string;
     token: string;
@@ -696,17 +693,17 @@ export class QueryReq extends AnsonBody {
 
     exprs: Array<string[]>;
     joins: Array<string[]>;
-    joinings: string[];
+    joinings: string[] = [];
     where: Array<string[]>;
-    orders: Array<string[]>;
-    groups: string[];
-    cond: Array<string[]>;
-    order: Array<string[]>;
-    groupings: Array<string[]>;
+    orders: Array<string[]> = [];
+    groups: string[] = [];
+    cond: Array<string[]> = [];
+    order: Array<string[]> = [];
+    groupings: Array<string[]> = [];
 
-    page: number;
-    pgsize: number;
-    limt: string[];
+    page: number = 0;
+    pgsize: number = -1;
+    limt: string[] = [];
 
 	// constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
 	// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
@@ -908,7 +905,7 @@ export class UpdateReq extends AnsonBody {
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv: string[] | PkVal) {
+    constructor(uri: string, tabl: string, pkv?: string[] | PkVal) {
 		super();
 		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
 		this.uri = uri;
@@ -928,12 +925,12 @@ export class UpdateReq extends AnsonBody {
 
     mtabl: string;
     nvs: Array<[string, any]>;
-    nvss: Array<Array<[string, string]>>;
-    where: any[][];
+    nvss: Array<Array<[string, string]>> = [];
+    where?: any[][];
 
-    limt: string;
-    attacheds: AttachMeta[];
-    postUpds: AnsonBody[];
+    limt!: string;
+    attacheds: AttachMeta[] = [];
+    postUpds: AnsonBody[] = [];
 
     /** add n-v
      * @param n
@@ -1099,6 +1096,7 @@ export class InsertReq extends UpdateReq {
 		super (uri, tabl, undefined);
 		this.a = CRUD.c;
 		this.type = InsertReq.__type__;
+		this.cols = [];
 		delete this.where;
 	}
 
@@ -1108,19 +1106,21 @@ export class InsertReq extends UpdateReq {
 	 * (with field property)
 	 * @param cols
 	 */
-	columns (cols: Array<DbCol | string> | DbCol | string) {
+	columns (cols: Array<DbCol | string> | DbCol) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
 			this.cols = this.cols.concat(cols.map(
 				(c, x) => typeof c === 'string'
 								? c
-								: c.field ? c.field
-								: c.name
+								: c.field ? c.field as string
+								: c.name as string
 				));
 		}
-        else if (typeof cols === 'object')
-            this.cols.push(cols.field ? cols.field : cols.name);
+        else if (typeof cols === 'object') {
+			let cls = cols as DbCol;
+            this.cols.push(cls.field ? cols.field as string : cols.name as string);
+		}
 		else this.cols.push(cols);
 		return this;
 	}
@@ -1273,9 +1273,9 @@ export class AnsonResp extends AnsonBody {
      * cols: array like [ col1, col2, ... ]; <br>
      * rows: array like [ {col1: val1, ...}, ... ]
      */
-    static rs2arr(rs: AnResultset): {cols: Array<string>, rows: Array<{}>} {
-		let cols = [];
-		let rows = [];
+    static rs2arr(rs: AnResultset): {cols: Array<Column>, rows: Array<{}>} {
+		let cols: string[] = [];
+		let rows: {}[] = [];
 
 		if (rs && typeof(rs.colnames) === 'object') {
 			// rs with column index
@@ -1328,7 +1328,7 @@ export class AnsonResp extends AnsonBody {
      */
     static rs2nvs(rs: AnResultset | undefined, nv: NV): {cols: Array<string>, rows: Array<NV>} {
 		let cols = [];
-		let rows = [];
+		let rows: NV[] = [];
 		let ncol = -1, vcol = -1;
 
 		if (!rs)
@@ -1370,22 +1370,22 @@ export class AnsonResp extends AnsonBody {
     m: string;
 	msg() : string { return this.m; }
 
-    code: string;
-    Code(): string { return this.code };
+    code: string | undefined;
+    Code(): string | undefined { return this.code };
 
-    rs: AnResultset | Array<AnResultset>;
+    rs: Array<AnResultset>;
     Rs(rx = 0): AnResultset {
 		return Array.isArray(this.rs) ? this.rs[rx] : this.rs;
 	}
 
-    data: {props?: {}};
+    data!: { props?: {}; };
     getProp(prop: string): object {
 		if (this.data && this.data.props)
 			return this.data.props[prop];
     }
 
     map: {resulved: string | {} };
-    resulved: object;
+    resulved!: object;
     resulve(tabl: any, pk: any, clientRec: any): string {
 		let resulved;
 		if (this.map && this.map.resulved)
@@ -1502,9 +1502,9 @@ export class DatasetReq extends QueryReq {
 		// this.checkt((t || a) as unknown as string);
 	}
 
-    maintbl: string;
-    alias: string;
-    pageInf: object;
+    maintbl!: string;
+    alias!: string;
+    pageInf!: object;
 
     sk: string;
     sqlArgs: any[];
@@ -1616,9 +1616,9 @@ export class AnDatasetReq extends QueryReq {
 		// this.checkt((t || a) as unknown as string);
 	}
 
-    maintbl: string;
-    alias: string;
-    pageInf: object;
+    maintbl!: string;
+    alias!: string;
+    pageInf!: object;
 
     sk: string;
     sqlArgs: any[];

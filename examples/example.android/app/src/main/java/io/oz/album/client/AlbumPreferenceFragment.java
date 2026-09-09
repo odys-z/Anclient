@@ -138,7 +138,7 @@ public class AlbumPreferenceFragment extends PreferenceFragmentCompat {
             }
             else if (eqk(R.string.key_device, k)) {
                 if (eq(stringValue, buff_devname) && !initing) {
-                    new ComfirmDlg(null)
+                    new ComfirmDlg()
                         .dlgMsg(0, 0)
                         .msg(getString(R.string.msg_repace_devname, buff_devname, buff_device))
                         .onOk((dialog, id) -> {
