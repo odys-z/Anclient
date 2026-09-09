@@ -52,8 +52,13 @@ Go to: http://localhost:8900/[testing-html].html
 
 To solve this problem, make sure everything always referencing to a sole copy of ReactJs.
 
+# Release Notes
+
+- Since 0.7.0, the AES helper of @anclient/semantier, is upgraded to PCKS #7 Padding,
+  and session management is not compitable to previous versions.
+
 # Demo
 
-Docker image
+Docker image (Out of maintenance)
 
 - @Anclient/anreact test: [Jsample client (TS) docker image](https://hub.docker.com/r/odysz/jserv-sample)

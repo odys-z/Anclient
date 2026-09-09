@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import io.odysz.anson.AnsonException;
-import io.odysz.common.AESHelper;
+import io.odysz.common.AESHelper2;
 import io.odysz.common.Utils;
 import io.odysz.semantic.jprotocol.AnsonBody;
 import io.odysz.semantic.jprotocol.AnsonMsg;
@@ -41,10 +41,15 @@ public class Clients {
 	 */
 	public static boolean verbose = false;
 
-	/** @deprecated 0.5.18, replaced with JServUrl */
+	/**
+	 * @deprecated 0.5.20 To connect to different service, that's how edge computation works,
+	 * this must be moved into client instance.
+	 * @deprecated 0.5.18, replaced with {@link io.odysz.semantic.jprotocol.JServUrl}
+	 */
 	public static String servRt;
 
-	/**Initialize configuration.
+	/**
+	 * Initialize configuration.
 	 * @param servRoot
 	 */
 	public static void init(String servRoot, boolean ... enableVerbose) {
@@ -110,12 +115,12 @@ public class Clients {
 	public static void loginAsync(String uid, String pswdPlain, OnLogin onOk, OnError onErr, String... mac) {
 		new Thread(new Runnable() {
 	        public void run() {
-				byte[] iv =   AESHelper.getRandom();
-				String iv64 = AESHelper.encode64(iv);
+				byte[] iv =   AESHelper2.getRandom();
+				String iv64 = AESHelper2.encode64(iv);
 				if (uid == null || pswdPlain == null)
 					onErr.err(MsgCode.exGeneral, "user id and password can not be null.");
 				try {
-					String tk64 = AESHelper.encrypt(uid, pswdPlain, iv);
+					String tk64 = AESHelper2.encrypt(uid, pswdPlain, iv);
 					
 					AnsonMsg<AnSessionReq> reqv11 = AnSessionReq.formatLogin(uid, tk64, iv64, mac);
 
@@ -181,7 +186,7 @@ public class Clients {
 	 */
 	public static AnsonResp pingLess(String funcUri, OnError errCtx)
 			throws SemanticException, AnsonException, IOException {
-		EchoReq req = new EchoReq(null);
+		EchoReq req = new EchoReq();
 		req.a(A.echo);
 
 		InsecureClient client = new InsecureClient(Clients.servRt);

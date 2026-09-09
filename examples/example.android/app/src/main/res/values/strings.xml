@@ -13,7 +13,7 @@
 
     <string name="key_home" translatable="false">home_key</string>
     <string name="home_title"     >Home Name</string>
-    <string name="txt_prefs_jserv">File Service Address</string>
+    <string name="txt_prefs_jserv">Connect to Synode:</string>
     <string name="jserv_title"    >Home Server Address</string>
     <string name="txt_test_conn"  >Test Connection</string>
     <string name="msg_conn_ok"    >Connecting to server succeed.</string>
@@ -59,7 +59,7 @@
     <string name="msg_templ_progress">File: %d / %d, File Blocks: %s (%.1f%%)</string>
     <string name="msg_upload_failed" >Uploading failed.\n%s\n%s</string>
     <string name="msg_login_uid"     >Login as %s</string>
-    <string name="msg_login_required">Login first fot the operation.</string>
+    <string name="msg_login_required">Login first for the operation.</string>
     <string name="err_pref_login"    >\"Login failed!\n%s %s\"</string>
     <string name="err_empty_pswd"    >Password is empty!</string>
     <string name="err_empty_uid"     >User ID is empty!</string>

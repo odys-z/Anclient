@@ -58,7 +58,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
         if (template != null) {
             mustnonull(template.shareby, "Forcing template's sharer cannot be empty.");
             mustnonull(template.device(), "Forcing template's device info cannot be empty.");
-            mustnonull(template.shareflag, "Forcing template's share-flag cannot be empty.");
+            mustnonull(template.shareflag(), "Forcing template's share-flag cannot be empty.");
         }
 
         return template == null ?
@@ -82,7 +82,7 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
                 .clientpath(clientpath)
 
                 .shareby(template.shareby)
-                .shareflag(template.shareflag)
+                .shareflag(template.shareflag())
                 .sharedate(shared)
                 .cdate(d)
                 .folder(isblank(this.folder) ? template.folder() : folder())

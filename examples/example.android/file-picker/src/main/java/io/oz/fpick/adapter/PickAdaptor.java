@@ -207,7 +207,8 @@ public abstract class PickAdaptor<T extends AndroidFile, VH extends ViewHolder4G
                 (View view) -> startMediaViewer(mContext, mediaViewType(), file.fullpath()));
 
         holder.glideThumb.setOnClickListener((View h) -> {
-            ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            // ShareFlag share = file.shareflag == null ? null : ShareFlag.valueOf(file.shareflag);
+            ShareFlag share = isblank(file.shareflag()) ? null : ShareFlag.valueOf(file.shareflag());
             if (!file.isSelected() && (ShareFlag.publish == share || ShareFlag.prv == share)) // revoke is not supported on devices
                 return;
 

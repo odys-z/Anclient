@@ -61,26 +61,25 @@ export class AnTreeNode implements Tierec {
 	 * FIXME: but why field of application's business here, such as mime and shareby?
 	 * (no such things in java peer)
 	 * */
-	node : {
-		checked? : boolean | '0' | '1' | 0 | 1 | 'true' | 'false' | 'True' | 'False' | 'TRUE' | 'FALSE';
-		nodetype?: 'p' | 'card' | 'gallery' | undefined;  // string;
+	node!: {
+		checked?: boolean | '0' | '1' | 0 | 1 | 'true' | 'false' | 'True' | 'False' | 'TRUE' | 'FALSE';
+		nodetype?: 'p' | 'card' | 'gallery' | undefined; // string;
 		children?: Array<AnTreeNode>;
 		expandChildren?: boolean;
 
 		/** With icon as a special field? */
-		css?: CSS.Properties & {icon?: AnTreeIconsType, size?: number[]};
+		css?: CSS.Properties & { icon?: AnTreeIconsType; size?: number[]; };
 
 		// mime?: string;
 		// shareby?: string;
-
 		/** Any data by jserv */
 		[d: string]: AnsonValue;
 	};
 
-	id: string;
-	parent: string;
+	id!: string;
+	parent!: string;
 	islastSibling?: boolean;
-	level: number;
+	level!: number;
 
 	/** Indent icon names */
 	indents?: Array<IndentName>;
@@ -107,7 +106,7 @@ export class StreeTier extends Semantier {
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */
     port: string;
 
-	forest: AnTreeNode[];
+	forest!: AnTreeNode[];
 
     /**
      * @param opts uri: client id; port: jserv port

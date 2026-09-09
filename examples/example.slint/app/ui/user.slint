@@ -1,0 +1,349 @@
+import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
+import { UseIcons } from "@surrealism/use/index.slint";
+import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
+import { UserProfile, AppState } from "app-state.slint";
+
+export component User {
+    callback ping-synode(string, string, string, string);
+    callback login_synode(string, string, string);
+    /** jserv, uid, pswd */
+    callback save-profile(string, string, string);
+    callback query-orgdoms(string);
+    callback query-domnodes(string, string);
+    callback change-synode(string);
+
+    init => {
+        debug("User.init => UserProfile.model:", UserProfile.model);
+        debug("loading", UserProfile.model.regiserv);
+        debug("loading", UserProfile.model.domain-selected);
+        root.query-orgdoms(UserProfile.model.org_selected); // TODO make sure org_selected is set when loading settings
+    }
+
+    Rectangle {
+        height: 100%;
+        width: 100%;
+        vertical-stretch: 1;
+        background: #1f1f14;
+
+        Image {
+            width: 100%;
+            height: 100%;
+            source: @image-url("imgs/album.svg");
+            image-fit: cover; // fills as much area as possible while preserving aspect ratio
+            opacity: 0.16;
+        }
+
+        VerticalLayout {
+            alignment: center;
+            padding: 8pt;
+            VerticalLayout {
+                padding-bottom: 26pt; 
+                horizontal-stretch: 1;
+                alignment: center;
+                Text { horizontal-alignment: center; padding-bottom: 8pt;
+                    text: UserProfile.model.info_label; font-size: 20pt; color: #b6d0f6;
+                 }
+                Text { text: UserProfile.model.detail_label; font-size: 14pt; color: #ccc; }
+            }
+
+            GridLayout {
+                spacing: 8pt;
+
+                // market name
+                Row {
+                    Text { 
+                        col: 0;
+                        width: 72pt;
+                        text: "Market ID"; font-size: 14pt; color: #bbb; }
+                    Rectangle {
+                        col: 1;
+                        background: #8a8a8a;
+                        border-radius: 4px;
+                        LineEdit {
+                            width: 100%;
+                            horizontal-stretch: 1;
+                            read-only: true;
+                            text: UserProfile.model.market_name;
+                            font-size: 16pt;
+                            horizontal-alignment: center;
+                        }
+                    }
+                }
+
+                // Registry Jserv
+                Row {
+                    Text {
+                        col: 0;
+                        text: "Registry"; font-size: 14pt; color: #bbb; }
+                    registjserv_edit := LineEdit {
+                        col: 1;
+                        horizontal-stretch: 1;
+                        font-size: 14pt; 
+                        text: UserProfile.model.regiserv;
+                        edited(text) => {
+                        }
+                    }
+
+                    SButton {
+                        col: 2;
+                        horizontal-stretch: 0;
+                        width: 90pt;
+                        show-icon: true;
+                        icon: @image-url("imgs/refresh.svg");
+                        text: @tr("Find Nodes");
+                        clicked => {
+                            UserProfile.model.regiserv = registjserv_edit.text;
+                            debug(UserProfile.model.regiserv);
+                            root.query-orgdoms(UserProfile.model.org_selected);
+                        }
+                    }
+                }
+
+                // Registry User Pswd
+                Row {
+                    Text {
+                        col: 0;
+                        text: "Registry Account"; font-size: 14pt; color: #bbb; }
+                    HorizontalLayout {
+                        col: 1;
+                        spacing: 8px;
+                        horizontal-stretch: 1;
+
+                        regi_uid := LineEdit {
+                            font-size: 14pt; 
+                            placeholder-text: @tr("Registry User ID");
+                            text: "admln";
+                            enabled: false;
+                        }
+                        regi_pswd := LineEdit {
+                            font-size: 14pt; 
+                            placeholder-text: @tr("Registry Password");
+                            text: "**************";
+                            enabled: false;
+                        }
+                    }
+                }
+
+                // orgs | domain | synode
+                Row {
+                    // Text {
+                    //     col: 1;
+                    //     text: "debug model=[" + UserProfile.model.domain_selected + "] combo=[" + domain-combo.current-value + "]";
+                    //     color: #ff0;
+                    // }
+                }
+                Row {
+                    Text {
+                        col: 0;
+                        text: "File Node"; font-size: 14pt; color: #bbb; }
+                    HorizontalLayout {
+                        col: 1;
+                        spacing: 8px;
+
+                        // orgs-combo := ComboBox {
+                        //     horizontal-stretch: 1;
+                        //     model: AppState.data.profile.orgs_model;
+                        //     current-value: AppState.data.profile.selected_org;
+                        //     selected(value) => {
+                        //         AppState.data.profile.selected_org = value;
+                        //         root.notify-changed();
+                        //         org-domain-node-changed(AppState.data.profile.selected_org, AppState.data.profile.selected_domain, AppState.data.profile.selected_node);
+                        //     }
+                        // }
+                        LineEdit {
+                            text: UserProfile.model.org_selected;
+                            enabled: false;
+                            font-size: 14pt;
+                        }
+
+                        domain-combo := ComboBox {
+                            horizontal-stretch: 1;
+                            model: UserProfile.model.domains_list;
+                            // current-value: UserProfile.model.domain_selected;
+                            current-index: UserProfile.model.domain_selected_idx;
+                            selected(value) => {
+                                UserProfile.model.domain_selected = value;
+                                // root.notify-changed();
+                                query-domnodes(UserProfile.model.org_selected, value);
+                            }
+                        }
+
+                        node-combo := ComboBox {
+                            horizontal-stretch: 1;
+                            model: UserProfile.model.synodes_list;
+                            // current-value <=> UserProfile.model.synode_selected;
+                            current-index: UserProfile.model.synode_selected_idx;
+                            selected(value) => {
+                                UserProfile.model.synode_selected = value;
+                                // root.notify-changed();
+                                change-synode(value);
+                            }
+                        }
+                    }
+                }
+
+                // jserv-url | Ping
+                Row {
+                    Text {
+                        col: 0;
+                        text: "Node Url"; font-size: 14pt; color: #bbb; }
+                    url-edit := LineEdit {
+                        col: 1;
+                        horizontal-stretch: 1;
+                        font-size: 14pt;
+                        placeholder-text: "http://ip:port(ask admin)/jserv-album";
+                        text <=> UserProfile.model.synode_jserv;
+                        edited(text) => {
+                            debug("ping synode:", UserProfile.model.synode_jserv);
+                        }
+                    }
+
+                    SButton {
+                        col: 2;
+                        horizontal-stretch: 0;
+                        width: 90pt;
+                        show-icon: true;
+                        icon: UseIcons.icons.Info;
+                        text: @tr("    Ping");
+                        clicked => {
+                            debug("ping-synode:",
+                                        UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected, url-edit.text);
+                            ping-synode(UserProfile.model.org_selected, UserProfile.model.domain_selected, UserProfile.model.synode_selected, url-edit.text);
+                        }
+                    }
+                }
+
+                // [ uid ]   [ pswd | pswd-2 ] | Login  (single flat row, flows horizontally)
+                Row {
+                    VerticalLayout {
+                        col: 0;
+                        padding-top: 2pt;
+                        Text {
+                            text: "Domain User"; font-size: 14pt; color: #bbb; }
+                    }
+                    HorizontalLayout {
+                        col: 1;
+                        spacing: 8px;
+
+                        user-id-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("User ID");
+                            text: UserProfile.model.user_id_text;
+                            // edited(text) => {
+                            //     UserProfile.model.user_id_text = text;
+                            // }
+                        }
+
+                        // spacer to visually separate uid from the pswd/pswd-2 pair
+                        Rectangle {
+                            width: 16px;
+                        }
+
+                        password-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("Password");
+                            input-type: password;
+                            text: UserProfile.model.password_text;
+                            // edited(text) => {
+                            //     UserProfile.model.password_text = text;
+                            //     root.notify-changed();
+                            // }
+                        }
+
+                        confirm-password-edit := LineEdit {
+                            horizontal-stretch: 1;
+                            placeholder-text: @tr("Confirm");
+                            input-type: password;
+                            text: UserProfile.model.confirm_password_text;
+                            // edited(text) => {
+                            //     UserProfile.model.confirm_password_text = text;
+                            //     root.notify-changed();
+                            // }
+                        }
+                    }
+
+                    SButton {
+                        col: 2;
+                        show-icon: true;
+                        icon: UseIcons.icons.Avatar;
+                        width: 90pt;
+                        text: "   Login";
+                        clicked => {
+                            root.login_synode(user-id-edit.text, password-edit.text, confirm-password-edit.text);
+                        }
+                    }
+                }
+
+                // Device
+                Row {
+                    Text { col: 0; text: "Device"; font-size: 14pt; color: #bbb; }
+
+                    if (!UserProfile.model.is_device_locked) : device-edit := LineEdit {
+                        col: 1;
+                        horizontal-stretch: 1;
+                        font-size: 14pt;
+                        text: UserProfile.model.device;
+                        placeholder-text: "Name this device uniquely in the domain";
+                        edited(text) => { UserProfile.model.device = text; }
+                    }
+                    if (UserProfile.model.is_device_locked) : device-label := TextInput {
+                            col: 1;
+                            horizontal-stretch: 1;
+                            font-size: 14pt;
+                            color: #ffffffbb;
+                            text: UserProfile.model.device;
+                            enabled: !UserProfile.model.is_device_locked;
+                    }
+                }
+
+                // QR code (centered) | Save
+                Row {
+                    // Text { text: "x"; }
+                    Rectangle {
+                        col: 1;
+                        height: 80px;
+
+                        HorizontalLayout {
+                            alignment: center;
+
+                            if UserProfile.model.show_qr_code: Image {
+                                width: 120px;
+                                height: 80px;
+                                source: UserProfile.model.qr_code_image;
+                            }
+                            if !UserProfile.model.show_qr_code: Rectangle {
+                                width: 100px;
+                                height: 100px;
+                                background: #00000022;
+                                border-width: 1px;
+                                border-color: #ffffff55;
+
+                                Text {
+                                    text: @tr("TODO: QR");
+                                    color: #ffffff88;
+                                    horizontal-alignment: center;
+                                    vertical-alignment: center;
+                                }
+                            }
+                        }
+                    }
+
+                    SButton {
+                        col: 2;
+                        horizontal-stretch: 0;
+                        width: 96px;
+                        show-icon: true;
+                        icon: @image-url("imgs/save.svg");
+                        theme: Primary;
+                        text: "Save";
+                        clicked => {
+                            // we need a better validation patter. see https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
+                            debug("url-edit.text, user-id-edit.text, password-edit.text");
+                            save-profile(url-edit.text, user-id-edit.text, password-edit.text);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

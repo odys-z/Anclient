@@ -5,21 +5,26 @@ import { AnReact } from './anreact';
 
 /**
  * The configuration data object used by user App to setup jserv root URL.
+ * @deprecated 0.6.8 use ExternalHosts instead
  */
 export interface JsonHosts {
-	host: string;
-	[h: string]: string | object,
+	host: string | undefined;
+	[h: string]: string | object | undefined,
 }
 
 export class ExternalHosts implements JsonHosts {
-	[h: string]: string | object;
+	[h: string]: string | object | undefined;
 
-	host: string;
+	host: string | undefined;
 	localip?: string;
 	syndomx?: { [key: string]: string };
+	synodesetups?: { [key: string]: string[] };
 
 
-	constructor(json: {host: string, localip?: string, syndomx?: { [key: string]: string }}) {
+	constructor(json: {host: string, localip?: string,
+				syndomx?: { [key: string]: string },
+				synodesetups?: { [key: string]: string[] }}) {
+
 		Object.assign(this, json);
 
 		if (json !== undefined && json.host !== undefined) 
@@ -41,6 +46,27 @@ export class ExternalHosts implements JsonHosts {
 			.filter(([x, v]) => x !== 'domain')
 			.map(([k, v]) => {return {n: k, v}});
 		return this;
+	}
+
+	static
+	to_arch_os_readable(zip_name: string): string {
+		let arc, os: string;
+		if (zip_name.indexOf('x64') >= 0)
+			arc = '64-bit';
+		else if (zip_name.indexOf('x86') >= 0)
+			arc = '32-bit';
+		else
+			arc = 'AMD';
+		if (zip_name.indexOf('win') >= 0)
+			os = 'Windows';
+		else if (zip_name.indexOf('linux') >= 0)
+			os = 'Linux';
+		else if (zip_name.indexOf('mac') >= 0)
+			os = 'MacOS';
+		else
+			os = 'OS';
+		
+		return `${os} ${arc}`;
 	}
 }
 
@@ -68,12 +94,6 @@ export interface AnContextType extends Semantext {
 	host_json: string,
 
 	/**
-	 * e.g.: res-vol/res.json
-	 * @since 0.6.5
-	res_vol: string,
-	 */
-
-	/**
 	 * @since 0.6.5
 	 */
 	clientOpts?: ClientOptions
@@ -87,7 +107,7 @@ export interface AnContextType extends Semantext {
 }
 
 /**
- * @since 0.6.5 
+ * @since 0.6.5
  */
 export interface ClientOptions {
 	/**
@@ -105,14 +125,14 @@ export interface ClientOptions {
 }
 
 export const AnContext = React.createContext({
-	ssInf: undefined as SessionInf,
+	ssInf: undefined as unknown as SessionInf,
 
 	pageOrigin: '.',
 	iparent: {},    // usually the parent window of ifram
-	ihome: undefined as string,
+	ihome: undefined as unknown as string,
 
 	/**default: host */
-	servId: undefined as string,
+	servId: undefined as unknown as string,
 
 	servs: { host: 'http://localhost:8080' } as JsonHosts,
 
@@ -120,11 +140,11 @@ export const AnContext = React.createContext({
 	anReact: undefined,
 
 	error: {
-		onError: undefined as (code: string, resp: AnsonMsg<AnsonResp>) => undefined,
-		msg: undefined as string
+		onError: undefined as unknown as (code: string, resp: AnsonMsg<AnsonResp>) => undefined,
+		msg: undefined as unknown as string
 	} as ErrorCtx,
 	hasError: false,
 
 	/** Only nullable for Login */
-	reactHelper: undefined as AnReact,
+	reactHelper: undefined as unknown as AnReact,
 } as unknown as AnContextType);

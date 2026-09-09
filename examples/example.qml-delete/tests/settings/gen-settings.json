@@ -1,0 +1,11 @@
+{ "type"       : "io.odysz.reflect.PeerSettings",
+  "tier_name"  : "qmltest",
+  "ansonMsg"   : "io.odysz.semantic.jprotocol.AnsonMsg",
+  "ansons"     : ["qmltest-settings.ast.json"],
+  "scopeEnums" : [],
+  "javaEnums"  : [],
+  "ansonBody"  : "io.odysz.semantic.jprotocol.AnsonBody",
+  "anRequests" : [],
+  "cpp_include": [],
+  "cpp_gen"    : "gen/test_settings.hpp"
+}

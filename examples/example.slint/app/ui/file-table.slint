@@ -1,0 +1,227 @@
+import { HorizontalBox, StandardTableView, ScrollView, GroupBox, StyleMetrics, LineEdit, Button } from "std-widgets.slint";
+import { SCheckbox } from "@surrealism/index.slint";
+import { SButton } from "../../surrealism-0.5.3/index.slint";
+import { PathItemData, SyncingIcon } from "models.slint";
+
+export component FileTable {
+    width: 600px;
+    height: 400px;
+    
+    property <int> sort-index: -1;
+    property <bool> sort-ascending;
+
+    in property <bool> synode-linked : false;
+
+    in-out property <string> current_path;
+
+    in-out property <[PathItemData]> row_data: [
+        {is_folder: false, indent: [], fname: "test",   type: "test-type", size: "0", fullpath: "~/x/y.z", iselected: false, syncicon: SyncingIcon.pushing},
+        {is_folder: true,  indent: [], fname: "folder", type: "folder",    size: "",  fullpath: "~/x/dir", iselected: false}
+    ];
+
+    callback row-selected(PathItemData);
+    callback row-double-click(PathItemData);
+    callback upload();
+
+    /** Fired when a breadcrumb button is clicked; carries that segment's fullpath. */
+    callback breadcrumb-clicked(string);
+
+    pure callback filter_sort_model([PathItemData], string, int, bool) -> [PathItemData];
+    filter_sort_model(row-data, filter, sort-index, sort-ascending) => { 
+        return row-data; 
+    }
+
+    /** Breadcrumb segments for current_path, computed and supplied by the host
+     * (see App::on_load_folder in main.cpp) since generic path/string splitting
+     * isn't available in the .slint language itself. fname is the crumb label,
+     * fullpath is what gets passed to load_folder() when the crumb is clicked;
+     * the remaining PathItemData fields are unused here. */
+    in property <[PathItemData]> path_crumbs: [];
+
+    function icons(idx: string) -> image {
+        if ("d" == idx) {
+            return @image-url("@surrealism/icons/folder-open.svg");
+        }
+        if ("|" == idx) {
+            return @image-url("@surrealism/icons/right.svg");
+        }
+        if ("e" == idx) {
+            return @image-url("@surrealism/icons/link-left.svg");
+        }
+
+        if ("prv" == idx) {
+            return @image-url("imgs/lock.svg");
+        }
+        if ("publish" == idx) {
+            return @image-url("imgs/web.svg");
+        }
+        return @image-url("@surrealism/icons/more.svg");
+    }
+
+    HorizontalBox {
+      vertical-stretch: 1;
+
+      VerticalLayout {
+        HorizontalLayout {
+            spacing: 2pt;
+
+            // Breadcrumb bar: one button per folder in current_path, separated by a chevron.
+            breadcrumb-bar := HorizontalLayout {
+                horizontal-stretch: 1;
+                alignment: start;
+                spacing: 2pt;
+
+                for seg[i] in root.path_crumbs : HorizontalLayout {
+                    spacing: 2pt;
+
+                    crumb-touch := TouchArea {
+                        clicked => { root.breadcrumb_clicked(seg.fullpath); }
+
+                        Rectangle {
+                            background: crumb-touch.has-hover ? rgba(255, 255, 255, 0.08) : transparent;
+                            animate background { duration: 120ms; }
+
+                            Text {
+                                text: seg.fname;
+                                color: crumb-touch.has-hover ? #7fd7ff : #cfefff;
+                                font-weight: 700;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    if (i < root.path_crumbs.length - 1) : Image {
+                        source: root.icons("|");
+                        width: 10pt;
+                        height: 10pt;
+                    }
+                }
+            }
+
+            Button {
+                // icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
+                // show-icon: true;
+                max-width: 30pt;
+                icon: root.synode-linked ? @image-url("imgs/web-online.svg") : @image-url("imgs/web-offline.svg");
+                icon-size: 12pt;
+                enabled: root.synode-linked;
+                text: @tr("Upload");
+                primary: true;
+                clicked => { root.upload(); }
+            }
+        }
+
+        // Table Header
+        HorizontalLayout {
+            padding: 8px;
+            Text { text: @tr("Name"); width: 30%; color: #bbb; font-weight: 700; }
+            Text { text: @tr("Type"); width: 35%; color: #bbb; font-weight: 700; }
+            Text { text: @tr("Size"); width: 35%; color: #bbb; font-weight: 700; }
+        }
+
+        ScrollView {
+          VerticalLayout {
+            for row in root.row_data : Rectangle {
+                background: row.iselected ? rgba(0, 120, 215, 0.2) : rgba(0, 0, 0, 0.02);
+                height: 24pt;
+                touchbox := TouchArea {
+                    clicked => {
+                        debug("TouchArea.cliced()");
+                        row.iselected = !row.iselected;
+                        chkbox.actived = row.iselected;
+                        root.row_selected(row);
+                    }
+                    double-clicked => { root.row_double_click(row); }
+                    
+                    Rectangle {
+                        background: parent.has-hover ? rgba(0.2, 0.2, 0.2, 0.08) : transparent;
+                        animate background { duration: 150ms; }
+                    }
+                }
+
+                HorizontalLayout {
+                    padding: 8px;
+                    HorizontalLayout {
+                        width: 30%; height: parent.height;
+                        padding-top: 6pt;
+                        padding-bottom: 6pt;
+                        for icon in row.indent : Image {
+                            source: root.icons(icon);
+                            width: 12pt;
+                            height: 12pt;
+                        }
+
+                        chkbox := SCheckbox {
+                            text: "";
+                            actived: row.iselected;
+                            disabled: row.is_folder || row.syncicon != SyncingIcon.invisible;
+                            height: 22pt; width: 22pt;
+                            clicked(text, value, actived) => {
+                                touchbox.clicked();
+                            }
+                        }
+
+                        /**
+                            Claude can only optimize like this:
+                            for icon-name in [
+                                row.syncicon == SyncingIcon.pushing ? "rotat" : "",
+                                row.syncicon == SyncingIcon.publish ? "album" : "",
+                                row.syncicon == SyncingIcon.private ? "prv" : "",
+                                row.syncicon == SyncingIcon.localonly ? "locked" : "",
+                                row.is-folder ? "d" : "",
+                                (!row.is-folder && row.syncicon == SyncingIcon.invisible) ? "e" : "",
+                            ] : Image {
+                                visible: icon-name != "";
+                                source: root.icons(icon-name);
+                                width: 14pt;
+                                height: 14pt;
+                            }
+                         */
+                        if (row.syncicon == SyncingIcon.pushing) : Image {
+                            source: root.icons("rotat");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.syncicon == SyncingIcon.publish) : Image {
+                            source: root.icons("album");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.syncicon == SyncingIcon.private) : Image {
+                            source: root.icons("prv");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.syncicon == SyncingIcon.localonly) : Image {
+                            source: root.icons("locked");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (row.is-folder) : Image {
+                            source: root.icons("d");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        if (!row.is-folder && root.synode-linked ): Image {
+                            source: root.icons("e");
+                            width: 14pt; height: 14pt;
+                        }
+
+                        Text {
+                            color: #e5ffff;
+                            text: row.fname;
+                            font-weight: 700;
+                            horizontal-stretch: 1;
+                            overflow: elide;
+                        }
+                    }
+
+                    Text { width: 35%; color: #ccc; text: row.type; vertical-alignment: center; }
+                    Text { width: 35%; color: #ccc; text: row.size; vertical-alignment: center; }
+                }
+            }
+          }
+        }
+      }
+    }
+}

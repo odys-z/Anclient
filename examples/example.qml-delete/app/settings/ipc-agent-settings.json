@@ -1,0 +1,5 @@
+{ "type"     : "io.oz.anclient.ipcagent.AgentSettings",
+  "whitelist": [],
+  "wsport"   : 8700,
+  "tiers"    : ["not-used in 0.1.0"]
+}
