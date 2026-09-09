@@ -81,7 +81,11 @@
     "@vscode/test-electron": "^1.6.2",
     "eslint": "^7.32.0",
     "glob": "^7.1.7",
+<<<<<<< HEAD
     "mocha": "^12.0.0",
+=======
+    "mocha": "^11.7.4",
+>>>>>>> 47a5de8c4aa37e9f6df77ca9a3315f760b7c621d
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.4",
     "webpack": "^5.105.0",
