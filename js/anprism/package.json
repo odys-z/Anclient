@@ -15,39 +15,45 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-  ],
+  "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      { "command": "anprism.load",
+      {
+        "command": "anprism.load",
         "title": "Load Anprism",
         "category": "Anprism"
       },
-      { "command": "anprism.parse",
+      {
+        "command": "anprism.parse",
         "title": "Parse Envelope",
         "category": "Anprism"
       },
-      { "command": "anprism.refresh",
+      {
+        "command": "anprism.refresh",
         "title": "Refresh Anprism",
         "category": "Anprism"
       },
-      { "command": "anprism.restartServer",
+      {
+        "command": "anprism.restartServer",
         "title": "Start server",
         "category": "Anprism"
       },
-      { "command": "anprism.shutdownServer",
+      {
+        "command": "anprism.shutdownServer",
         "title": "Shutdown server",
         "category": "Anprism"
       }
     ],
     "menus": {
       "explorer/context": [
-        { "when": "resourceLangId == html",
+        {
+          "when": "resourceLangId == html",
           "command": "anprism.load",
           "group": "navigation"
         },
-        { "when": "resourceLangId == json",
+        {
+          "when": "resourceLangId == json",
           "command": "anprism.parse",
           "group": "navigation"
         }
@@ -70,12 +76,13 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "14.x",
     "@types/vscode": "^1.61.0",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
     "@vscode/test-electron": "^1.6.2",
-    "eslint": "^7.32.0",
+    "eslint": "^9.39.1",
     "glob": "^7.1.7",
-    "mocha": "^11.7.4",
+    "mocha": "^11.7.5",
+    "mocha": "^12.0.0",
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.4",
     "webpack": "^5.105.0",
