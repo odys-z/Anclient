@@ -22,7 +22,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import cast
+from typing import Optional, cast
 
 
 from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
@@ -471,10 +471,12 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
     if taskcfg is None:
         taskcfg = cast(SynodeTask, Anson.from_file(deploy))
 
-    def pth_jre_nt():
+    def pth_jre_nt() -> Optional[str]:
         if os.name == "nt":
             temp_jre = taskcfg.check_local_resource(Path('..') / taskcfg.jre_release)
-            return Temurin17Release.extract_check_jretree(temp_jre, pth_packagedir())
+            pkdir = Temurin17Release.extract_check_jretree(temp_jre, pth_packagedir())
+            if pkdir:
+                return pkdir.as_posix()
         return None
 
     zip = taskcfg.deskzip_name()
@@ -499,8 +501,9 @@ def zip_standalone(ctx, deploy: str = 'tasks.json'):
         if os.path.isfile(zip):
             os.remove(zip)
 
-        print(Path(zip).absolute())
-        gzip2(zip, {**resources}, excludes)
+        abs_zip = Path(zip).as_posix()
+        print(abs_zip)
+        gzip2(abs_zip, {**resources}, excludes)
 
         zip = Utils.move_anyway(zip, pth_packagedir(), log=True)
 
