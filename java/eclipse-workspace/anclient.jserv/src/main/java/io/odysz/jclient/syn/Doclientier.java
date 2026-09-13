@@ -598,7 +598,7 @@ public class Doclientier extends Semantier {
 	 */
 	public <T extends IPort> DocsResp synQueryPathsPage(PathsPage page, T port)
 			throws TransException, IOException {
-		String[] act = AnsonHeader.usrAct("synclient.java", "query", "r/states", "query sync");
+		String[] act = AnsonHeader.usrAct(synuri, port.name(), A.selectSyncs, "query sync");
 		AnsonHeader header = client.header().act(act);
 
 		DocsReq req = (DocsReq) new DocsReq()

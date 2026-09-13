@@ -14,7 +14,7 @@ android {
         applicationId "io.oz.portfolio"
         minSdkVersion 26
         targetSdk 34
-        versionCode 10
+        versionCode 11
         versionName "$app_ver"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
