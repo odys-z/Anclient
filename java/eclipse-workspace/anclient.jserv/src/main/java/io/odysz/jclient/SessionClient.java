@@ -178,7 +178,6 @@ public class SessionClient {
 		stoplink = false;
 
 		HeartBeat beat = new HeartBeat(null, clientUri, ssInf.ssid(), ssInf.uid());
-		// AnsonHeader header = new AnsonHeader(ssInf.ssid(), ssInf.uid(), ssInf.ssToken);
 		beatReq = new AnsonMsg<HeartBeat>(Port.heartbeat)
 				.header(ssInf)
 				.body(beat);
@@ -499,19 +498,6 @@ public class SessionClient {
 			return null;
 		}
 	}
-
-	/**
-	 * TODO Commit over web socket.
-	 * @param <R>
-	 * @param <A>
-	 * @param req
-	 * @param err
-	 * @return response
-	 * @since 0.5.19
-	public <R extends AnsonBody, A extends AnsonResp> A commit_ws(AnsonMsg<R> req, OnError err) {
-		throw new AnsonException(0, "TODO");
-	}
-	 */
 
 	public void logout() {
 		closeLink();
