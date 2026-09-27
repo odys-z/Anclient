@@ -38,14 +38,15 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
+    "@anclient/anreact": "^0.7.1",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/react": "^11.9.0",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/styles": "^4.11.4",
     "@types/react": "^17.0.83",
     "@types/react-dom": "^17.0.26",
-    "ag-grid-community": "^26.2.1",
-    "ag-grid-react": "^26.2.0",
+    "ag-grid-community": "^36.2.0",
+    "ag-grid-react": "^36.2.0",
     "babel": "^6.23.0",
     "core-js": "^3.21.1",
     "css-loader": "^6.8.1",
