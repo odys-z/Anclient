@@ -150,19 +150,6 @@ namespace anson {
             });
     }
 
-    /*
-    void query_orgdoms(const string & orgid) {
-      slint::invoke_from_event_loop([this]() { ... "Loading organization domains ..." ... });
-
-      registryClient->asyquery_orgdoms(orgid,
-        [this](AnsonResp& resp) { ... on_org_domains(r); },
-        [this](MsgCode c, const string& e, const vector<string>& args) {
-            AsynClienter::onErr(c, e, args);          // keep the log line
-            clear_domains("Failed to load domains.");
-        });
-    }
-    */
-
     void clear_domains(const string& label) {
       slint::invoke_from_event_loop([this, label]() {
         if (auto app = window_weak.lock()) {
