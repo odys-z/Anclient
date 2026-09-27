@@ -143,7 +143,42 @@ namespace anson {
             anlog("asyquery_orgdoms() resp: "s + r.toBlock(registry_opts));
             insert_status(window_weak, std::format("Loaded org: {}", r.diction.org.orgId));
             on_org_domains(r); },
-        AsynClienter::onErr);
+            // AsynClienter::onErr);
+            [this](MsgCode::Code c, const string& e, const vector<string>& args) {
+                AsynClienter::onErr(c, e, args);          // keep the log line
+                clear_domains("Failed to load domains.");
+            });
+    }
+
+    /*
+    void query_orgdoms(const string & orgid) {
+      slint::invoke_from_event_loop([this]() { ... "Loading organization domains ..." ... });
+
+      registryClient->asyquery_orgdoms(orgid,
+        [this](AnsonResp& resp) { ... on_org_domains(r); },
+        [this](MsgCode c, const string& e, const vector<string>& args) {
+            AsynClienter::onErr(c, e, args);          // keep the log line
+            clear_domains("Failed to load domains.");
+        });
+    }
+    */
+
+    void clear_domains(const string& label) {
+      slint::invoke_from_event_loop([this, label]() {
+        if (auto app = window_weak.lock()) {
+          auto p = (*app)->global<UserProfile>().get_model();
+          auto empty = [] { return std::make_shared<slint::VectorModel<slint::SharedString>>(); };
+          p.domains_list        = empty();
+          p.domain_selected     = "";
+          p.domain_selected_idx = -1;
+          p.synodes_list        = empty();   // nodes of a domain we no longer have
+          p.jserv_list          = empty();
+          p.synode_selected     = "";
+          p.synode_selected_idx = -1;
+          p.detail_label        = slint::SharedString(label);
+          (*app)->global<UserProfile>().set_model(p);
+        }
+      });
     }
 
     void on_org_domains(RegistResp& res) {
