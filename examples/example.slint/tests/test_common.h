@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <io/odysz/common.h>
+#include <io/odysz/common.h> // disable clangd warnings
 #include <io/odysz/clients.h>
 #include <io/odysz/jprotocol.h>
 
