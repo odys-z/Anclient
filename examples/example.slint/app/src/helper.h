@@ -64,6 +64,8 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.device = s.device;
     p.is_device_locked = !s.device.empty();
     p.regiserv = s.regiserv;
+    p.regist_uid  = s.centralUid;
+    p.regist_pswd = s.centralPswd;
     p.synode_jserv = s.synode_jserv;
     p.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
         std::vector<slint::SharedString>{slint::SharedString(s.domain)});
@@ -114,6 +116,8 @@ inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const strin
 }
 
 /**
+ * Clean the name string to avoid formatted readable string polution.
+ *
  * @brief cleanz_devname
  * @param suspecious
  * @return e.g. my-device[001] => my-device

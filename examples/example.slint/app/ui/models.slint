@@ -13,7 +13,11 @@ export struct UserProfileModel {
 
     org_name: string,
     market_name: string,
+
+    regist_busy: bool, // Not a persisted one
     regiserv: string,
+    regist_uid: string,
+    regist_pswd: string,
 
     orgs_list: [string],
     org_selected: string,

@@ -51,8 +51,9 @@ public class AnclientSettings extends Anson {
     public String admin;
     public String domain_token;
     public String regiserv;
-    public String regiprotopath;
+    public String centralUid;
     public String centralPswd;
+    public String regiprotopath;
     
     public AnclientSettings(String jprotocol_rootpath) {
     	jprotocolpath = jprotocol_rootpath;

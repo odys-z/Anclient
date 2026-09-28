@@ -127,6 +127,7 @@ namespace anson {
 
     void setup_doclientier(const slint::ComponentWeakHandle<App> &appwin, const JsonOpt* ctx = &opts) ;
 
+    /*
     void query_orgdoms(const string & orgid) {
       slint::invoke_from_event_loop([this]() {
         if (auto app = window_weak.lock()) {
@@ -148,6 +149,35 @@ namespace anson {
                 AsynClienter::onErr(c, e, args);          // keep the log line
                 clear_domains("Failed to load domains.");
             });
+    }*/
+
+    void query_orgdoms(const string & orgid) {
+      slint::invoke_from_event_loop([this]() {
+        if (auto app = window_weak.lock()) {
+          auto profile = (*app)->global<UserProfile>().get_model();
+          profile.detail_label = "Loading organization domains ...";
+          profile.org_name = appsettings.org_name;
+          (*app)->global<UserProfile>().set_model(profile);
+        }
+      });
+
+      registryClient->asyquery_orgdoms(orgid,
+        [this](AnsonResp& resp) {
+            RegistResp& r = static_cast<RegistResp&>(resp); // no copy
+            anlog("asyquery_orgdoms() resp: "s + r.toBlock(registry_opts));
+            insert_status(window_weak, std::format("Loaded org: {}", r.diction.org.orgId));
+            on_org_domains(r); },
+        [this](MsgCode::Code c, const string& e, const vector<string>& args) {
+            AsynClienter::onErr(c, e, args);          // keep the log line
+            clear_domains("Failed to load domains.");
+            slint::invoke_from_event_loop([this]() {
+              if (auto app = window_weak.lock()) {
+                auto profile = (*app)->global<UserProfile>().get_model();
+                profile.regist_busy = false;
+                (*app)->global<UserProfile>().set_model(profile);
+              }
+            });
+        });
     }
 
     void clear_domains(const string& label) {
@@ -194,16 +224,36 @@ namespace anson {
           (*app)->global<UserProfile>().set_model(profile);
 
           if (!selected.empty())
-            query_domnodes(string{profile.domain_selected}, selected);
+            // TODO FIXME to be verified (why it's working?)
+            // passes the domain as the org argument. It should probably be profile.org_selected.
+            // query_domnodes(string{profile.domain_selected}, selected);
+            query_domnodes(string{profile.org_selected}, selected);
         }
       });
 
     }
 
+    /*
     void query_domnodes(const string & org, const string& domain) {
       registryClient->asyquery_domconfig(org, domain,
                         [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
                         AsynClienter::onErr);
+    }
+    */
+    void query_domnodes(const string & org, const string& domain) {
+      registryClient->asyquery_domconfig(org, domain,
+        [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
+        [this](MsgCode::Code c, const string& e, const vector<string>& args) {
+            AsynClienter::onErr(c, e, args);
+            slint::invoke_from_event_loop([this]() {
+              if (auto app = window_weak.lock()) {
+                auto profile = (*app)->global<UserProfile>().get_model();
+                profile.detail_label = "Failed to load synodes.";
+                profile.regist_busy = false;
+                (*app)->global<UserProfile>().set_model(profile);
+              }
+            });
+        });
     }
 
     void on_domnodes(RegistResp& res) {
@@ -373,9 +423,34 @@ namespace anson {
       synode_msgs.push(msg);
     }
 
+    /**
+     * @brief update_regjserv
+     * @param url
+     * @return
     std::optional<std::string> update_regjserv(const string& url) {
         if (auto err = validate_jserv(url)) return err;
         registryClient->setjserv(url);
+        return std::nullopt;
+    }
+     */
+
+    /**
+     * Apply registry url & central account from the UI.
+     * Re-creates the registry client only when the account changed.
+     */
+    std::optional<std::string> update_registry(const string& url, const string& uid, const string& pswd) {
+        if (auto err = validate_jserv(url)) return err;
+        if (LangExt::isblank(uid)) return "Registry user id is empty.";
+        if (pswd.size() < 6 || pswd.size() > 32) return "Registry password length must be in [6, 32].";
+
+        bool relogin = uid != appsettings.centralUid || pswd != appsettings.centralPswd;
+
+        appsettings.regiserv    = url;
+        appsettings.centralUid  = uid;
+        appsettings.centralPswd = pswd;
+
+        if (relogin) setup_regclient();
+        else registryClient->setjserv(url);
         return std::nullopt;
     }
 

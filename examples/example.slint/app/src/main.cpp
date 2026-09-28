@@ -274,7 +274,15 @@ int main(int argc, char **argv) {
     // user
     ui->on_query_orgdoms([&ui, &slingle](const slint::SharedString& org) {
         auto profile = ui->global<UserProfile>().get_model();
-        slingle.update_regjserv(string{profile.regiserv});
+
+        // slingle.update_regjserv(string{profile.regiserv});
+        if (auto err = slingle.update_registry(string{profile.regiserv},
+                                               string{profile.regist_uid},
+                                               string{profile.regist_pswd})) {
+            insert_status(ui, *err);
+            return;
+        }
+
         slingle.query_orgdoms(string{org});
     });
 
@@ -311,6 +319,8 @@ int main(int argc, char **argv) {
 
         DesktopSettings s {slingle.appsettings};
         s.regiserv = p.regiserv;
+        s.centralUid  = string{p.regist_uid};
+        s.centralPswd = string{p.regist_pswd};
         s.synode_id = p.synode_selected;
         s.domain = p.domain_selected;
         s.synode_jserv = p.synode_jserv;
