@@ -380,7 +380,7 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
         Utils.warn(f'**** ERROR **** Desktop settings is invalid: ' + e.msg)
         sys.exit(-1)
 
-    desksets.market = taskcfg.deploy.market_id
+    desksets.market_id = taskcfg.deploy.market_id
     desksets.market_name = taskcfg.deploy.market
     desksets.org = taskcfg.deploy.orgid
     desksets.synode_id = ""
