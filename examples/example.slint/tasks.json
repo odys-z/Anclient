@@ -32,7 +32,7 @@
     "langs"         : {"en": {}},
     "root_key"      : "*************"},
   "deploy_scps": [{
-    "issue"      : "Google AI: Python SCP won't work in Python 3.9. post_cmds for legacy.",
+    "issue"      : "Works in Python 3.9 for legacy.",
     "host"       : "localhost",
     "port"       : 22,
     "user"       : "ody",
