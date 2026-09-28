@@ -170,7 +170,7 @@ class LoginComp extends React.Component<LoginProps> {
 		function onError (code: string, resp: AnsonMsg<AnsonResp>) {
 			if (typeof ctx.error === 'object') {
 				let errCtx = ctx.error;
-				errCtx.msg = resp.Body().msg();
+				errCtx.msg = resp.Body()?.msg();
 				if (typeof errCtx.onError === 'function')
 					errCtx.onError(code, resp);
 			}

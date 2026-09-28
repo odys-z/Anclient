@@ -2,7 +2,7 @@
 Invoke tasks for building album_gui and assembling a runnable dist/ folder.
 
 Usage:
-    inv configure_cmake                 # cmake configure (Debug by default)
+    inv configure_cmake           # cmake configure (Debug by default)
     inv build                     # cmake build (runs configure if needed)
     inv copy-dlls                 # locate + copy runtime DLLs into dist/
     inv dist                      # build + copy-dlls in one shot
@@ -380,7 +380,7 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
         Utils.warn(f'**** ERROR **** Desktop settings is invalid: ' + e.msg)
         sys.exit(-1)
 
-    desksets.market = taskcfg.deploy.market_id
+    desksets.market_id = taskcfg.deploy.market_id
     desksets.market_name = taskcfg.deploy.market
     desksets.org = taskcfg.deploy.orgid
     desksets.synode_id = ""
@@ -390,8 +390,12 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
 
     desksets.java_path = 'jre17/bin/java'
     desksets.doctier_jar = f'not used'
+
     desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport,
                                  protocolroot = taskcfg.deploy.central_path).jserv()
+    desksets.centralUid = 'admin'
+    desksets.centralPswd = taskcfg.deploy.central_pswd # place holder, e.g. 'by email'
+
     desksets.synode_vol = ''
     desksets.synode_jserv = ''
     desksets.album_web = str(taskcfg.deploy.web_port)
@@ -405,7 +409,6 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     except AnsonException:
         Utils.warn(f"token length must be in [8 ~ 16], allowed special chars: [{passwd_allow_ext}]")
         sys.exit()
-    desksets.centralPswd = taskcfg.deploy.central_pswd
 
     desksets.toFile(relative_pth)
 

@@ -130,6 +130,8 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
 }
 
 /**
+ * Register a device.
+ *
  * This can only work after this asy-doclientier is logged in. Avoid bring up beating thread for
  * avoiding temp-client leads to memory access violation in jthread.
  *

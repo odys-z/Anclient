@@ -1,6 +1,6 @@
 import { SMenu, SCard, SHeader, SIcon, SButton, STip, STag, SPopup } from "@surrealism/index.slint";
 import { UseIcons } from "@surrealism/use/index.slint";
-import { LineEdit, ComboBox, VerticalBox } from "std-widgets.slint";
+import { LineEdit, ComboBox, VerticalBox, Button } from "std-widgets.slint";
 import { UserProfile, AppState } from "app-state.slint";
 
 export component User {
@@ -16,6 +16,9 @@ export component User {
         debug("User.init => UserProfile.model:", UserProfile.model);
         debug("loading", UserProfile.model.regiserv);
         debug("loading", UserProfile.model.domain-selected);
+
+        UserProfile.model.regist_busy = true;
+
         root.query-orgdoms(UserProfile.model.org_selected); // TODO make sure org_selected is set when loading settings
     }
 
@@ -84,22 +87,22 @@ export component User {
                         }
                     }
 
-                    SButton {
+                    Button {
                         col: 2;
                         horizontal-stretch: 0;
                         width: 90pt;
-                        show-icon: true;
                         icon: @image-url("imgs/refresh.svg");
-                        text: @tr("Find Nodes");
+                        text: UserProfile.model.regist_busy ? @tr("Loading") : @tr("Find Nodes");
+                        enabled: !UserProfile.model.regist_busy;
                         clicked => {
+                            UserProfile.model.regist_busy = true;
                             UserProfile.model.regiserv = registjserv_edit.text;
-                            debug(UserProfile.model.regiserv);
                             root.query-orgdoms(UserProfile.model.org_selected);
                         }
                     }
                 }
 
-                // Registry User Pswd
+                // Registry account (central user), applied by "Find Nodes"
                 Row {
                     Text {
                         col: 0;
@@ -110,16 +113,17 @@ export component User {
                         horizontal-stretch: 1;
 
                         regi_uid := LineEdit {
-                            font-size: 14pt; 
+                            horizontal-stretch: 1;
+                            font-size: 14pt;
                             placeholder-text: @tr("Registry User ID");
-                            text: "admln";
-                            enabled: false;
+                            text <=> UserProfile.model.regist_uid;
                         }
                         regi_pswd := LineEdit {
-                            font-size: 14pt; 
+                            horizontal-stretch: 1;
+                            font-size: 14pt;
                             placeholder-text: @tr("Registry Password");
-                            text: "**************";
-                            enabled: false;
+                            input-type: password;
+                            text <=> UserProfile.model.regist_pswd;
                         }
                     }
                 }
@@ -158,6 +162,7 @@ export component User {
 
                         domain-combo := ComboBox {
                             horizontal-stretch: 1;
+                            enabled: !UserProfile.model.regist_busy;
                             model: UserProfile.model.domains_list;
                             // current-value: UserProfile.model.domain_selected;
                             current-index: UserProfile.model.domain_selected_idx;

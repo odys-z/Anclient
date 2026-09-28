@@ -50,7 +50,6 @@ void Slingleton::setup_doclientier(const slint::ComponentWeakHandle<App>& appwin
 }
 
 void Slingleton::setup_regclient()  {
-
     JServUrl regjserv{appsettings.regiserv, &registry_opts};
 
     OnLink onbeat = [](connect_state conn) {
