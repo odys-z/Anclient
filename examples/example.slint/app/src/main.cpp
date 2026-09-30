@@ -275,11 +275,13 @@ int main(int argc, char **argv) {
     ui->on_query_orgdoms([&ui, &slingle](const slint::SharedString& org) {
         auto profile = ui->global<UserProfile>().get_model();
 
-        // slingle.update_regjserv(string{profile.regiserv});
         if (auto err = slingle.update_registry(string{profile.regiserv},
                                                string{profile.regist_uid},
                                                string{profile.regist_pswd})) {
             insert_status(ui, *err);
+
+            profile.regist_busy = false;
+            ui->global<UserProfile>().set_model(profile);
             return;
         }
 
@@ -344,6 +346,15 @@ int main(int argc, char **argv) {
                     return; // Automatically destroyed here (ref count hits 0)
                 }
 
+
+                // FIXME 2026-09-30 Same name devices can be registered:
+                // synode0   device  devname  mac  org     owner  cdate                io_oz_synuid
+                // --------  ------  -------  ---  ------  -----  -------------------  -------------
+                // pm-4-hub  0001    h30           pmking  admin  2026-08-24 12:58:39  pm-4-hub,0001
+                // pm-4-hub  0002                  pmking  admin  2026-08-31 11:00:50  pm-4-hub,0002
+                // pm-4-hub  0003    test-1        pmking  admin  2026-09-30 08:36:29  pm-4-hub,0003
+                // pm-4-hub  0004    test-1        pmking  admin  2026-09-30 09:09:44  pm-4-hub,0004
+                //
                 // Capture temp_doclientier in the lambda to keep it alive until the network callback executes
                 temp_doclientier->asy_register_dev(s, [ui, ui_weak, s, &slingle, settings_path, temp_doclientier](const AnsonResp& r) {
                     slint::invoke_from_event_loop([ui]() {

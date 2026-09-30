@@ -217,6 +217,7 @@ namespace anson {
           vector<slint::SharedString> sl;
           for (auto& d : domains) sl.push_back(slint::SharedString(d));
 
+          profile.regist_busy = false;
           profile.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(sl);
           profile.domain_selected = slint::SharedString(selected);
           profile.domain_selected_idx = selectIx;
