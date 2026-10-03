@@ -90,17 +90,6 @@ std::unique_ptr<webview::webview>& show_and_align_webview(App* app,
 }
  */
 
-/**
- * @brief album_web
- * Let's keep DesktopSettings::jserv_web as readonly.
- * @param s
- * @return e.g. http://localhost:1234/webview.html,
- * where s.album_web = "1234".
- */
-string album_web(const anson::DesktopSettings& s) {
-    anson::JServUrl tmpjsv{s.synode_jserv, {"", nullptr}};
-    return std::format("{}://{}:{}/webview.html", tmpjsv.https ? "https" : "http", tmpjsv.host, s.album_web);
-}
 
 std::atomic<bool> is_webview_open(false);
 
@@ -117,7 +106,7 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         return;
     }
 
-    string url = album_web(settings);
+    string url = resolve_album_web(settings);
     webview::webview w(true, nullptr);
     w.set_title(url);
     w.set_size(800, 600, WEBVIEW_HINT_NONE);

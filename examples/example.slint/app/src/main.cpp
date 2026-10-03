@@ -329,9 +329,31 @@ int main(int argc, char **argv) {
         s.admin = string{p.user_id_text};
         s.domain_token = p.password_text;
         s.device = p.device;
+        s.album_web = string{p.synode_web};
+        s.album_web = resolve_album_web(s);
+        if (s.album_web.empty() && !LangExt::isblank(string{p.synode_web})) {
+            insert_status(ui, "Web Url is not recognizable: "s + string{p.synode_web});
+            return;
+        }
 
         optional<string> err = Slingleton::validate_settings(s);
         if (!err) {
+            auto weburl = slingle.ping_synode(ui, string{p.org_selected}, string{p.domain_selected},
+                                              string{p.synode_selected}, s.synode_jserv);
+            if (!weburl) {
+                insert_status(ui, "The synode is unreachable. Settings are not saved.");
+                return;
+            }
+
+            if (p.link_weburl && !weburl->empty())
+                s.album_web = *weburl;
+
+            {
+                auto profile = ui->global<UserProfile>().get_model();
+                profile.synode_web = slint::SharedString(s.album_web);
+                ui->global<UserProfile>().set_model(profile);
+            }
+
             if (LangExt::isblank(slingle.appsettings.device)) {
                 // TASK: check device with the synode.
                 shared_ptr temp_doclientier = std::make_shared<AsynClienter>(ui_weak, s, JServUrl{s.synode_jserv, &slingle.opts},

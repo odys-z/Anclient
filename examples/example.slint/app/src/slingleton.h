@@ -358,38 +358,90 @@ namespace anson {
         }
     }
 
-    void ping_synode(const slint::ComponentHandle<App>& ui,
+    /**
+     * Web url from a ping response of EchoReq::A::pubConfig. The synode (Echo.pubConfg()) replies
+     * <pre>new AnsonResp().msg(String.format("%s:%s", appSettings.reverseIp(), appSettings.reversedWebPort(syncfg.https)))</pre>
+     * i.e. resp.m = "ip:port", e.g. "192.168.0.2:8900". Tolerated:
+     * - a bare IPv6 ip, "fe80::1:8900" (the port is after the last ':'), which is bracketed;
+     * - a blank or "null" ip (Java formats null as "null"): the port is taken on the pinged jserv's host.
+     * The scheme isn't in the response; it follows the pinged jserv's, as the port does on the server side.
+     *
+     * @param resp
+     * @param ui_jserv the jserv being pinged
+     * @return normalized web url, or "" if resp.m has no usable port.
+     */
+    static string weburl_of(const AnsonResp& resp, const string& ui_jserv) {
+        anlog(std::format("[ping pubConfig] resp.m: [{}]", resp.m));
+        string m = LangExt::trim(resp.m);
+
+        size_t colon = m.rfind(':');
+        if (colon == string::npos) return "";
+
+        string ip   = LangExt::trim(m.substr(0, colon));
+        string port = m.substr(colon + 1);
+        if (!JServUrl::valid_port(port)) return "";
+
+        JServUrl pinged{ui_jserv, web_protocol};
+
+        if (ip.empty() || ip == "null")
+            m = port; // port-only, on the pinged host
+        else {
+            if (ip.find(':') != string::npos && ip.front() != '[')
+                ip = "[" + ip + "]"; // bare IPv6
+            m = std::format("{}://{}:{}", pinged.https ? "https" : "http", ip, port);
+        }
+
+        JServUrl web{m, web_protocol};
+        return web.valid() ? web.jserv() : "";
+    }
+
+    /**
+     * Ping the synode at ui_jserv (a temp jserv, not doclientier's).
+     * If UserProfile.model.link_weburl is checked, the web url it reports replaces UserProfile.model.synode_web,
+     * otherwise the user's text is left alone.
+     * Must be called on the Slint event loop thread, as UI callbacks are.
+     * @return the web url the synode reports, normalized (empty if none or not recognizable),
+     *         or nullopt if the ping failed.
+     */
+    std::optional<string> ping_synode(const slint::ComponentHandle<App>& ui,
                      const string& org, const string& domain, const string& synid, const string& ui_jserv) {
-        std::string msg{std::format("Pinging {}/{}/{} : {}", org, domain, synid, ui_jserv)};
-        insert_status(ui, msg);
-        // Desgin / Debug Notes
-        // use temp jserv, not doclientier's
+        insert_status(ui, std::format("Pinging {}/{}/{} : {}", org, domain, synid, ui_jserv));
         // Error popped here because there is no wrapper like asyquery_domconfig() etc.
+        string weburl;
         try {
             AnsonResp resp = Clients::pingLess(JServUrl{ui_jserv, &opts},
                                       appsettings.sysuri, "ping by slingleton", AsynClienter::onErr, EchoReq::A::pubConfig);
-            insert_status(ui, resp.m);
+            weburl = weburl_of(resp, ui_jserv);
+            insert_status(ui, "Synode web url: "s + (weburl.empty() ? "(none)"s : weburl));
+        }
+        catch (const SemanticException& e) {
+            // Thrown by SessionClient::commit() after it has already reported through AsynClienter::onErr.
+            anerror(e.what());
+            return std::nullopt;
         }
         catch (const std::exception& e) {
             anerror(e.what());
-            slint::ComponentWeakHandle<App> ui_weak = ui;
-            if (auto app = ui_weak.lock()) {
-                auto data = (*app)->global<AppState>().get_model();
-                data.syncing_status;
-
-                auto status_model = data.syncing_status;
-                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-            }
-
             AsynClienter::onErr(MsgCode::Code::exIo, e.what(), {});
-            return;
+            return std::nullopt;
         }
         catch (...) {
             anerror("Caught unknown exception.");
             AsynClienter::onErr(MsgCode::Code::exGeneral, "Internal Error.", {});
-            return;
+            return std::nullopt;
         }
-        insert_status(ui, {"Pinging OK: "s + ui_jserv});
+
+        insert_status(ui, "Pinging OK: "s + ui_jserv);
+
+        auto profile = ui->global<UserProfile>().get_model();
+        if (profile.link_weburl) {
+            if (weburl.empty())
+                insert_status(ui, "The synode reported no recognizable web url. Web Url is not changed.");
+            else {
+                profile.synode_web = slint::SharedString(weburl);
+                ui->global<UserProfile>().set_model(profile);
+            }
+        }
+        return weburl;
     }
 
     /**

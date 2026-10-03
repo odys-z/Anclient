@@ -30,6 +30,14 @@ export struct UserProfileModel {
     synode_selected_idx: int,
 
     synode_jserv: string,
+    /** Album web url, user editable, saved as DesktopSettings::album_web. */
+    synode_web: string,
+    /**
+     * If true, synode_web is read-only and a ping (EchoReq::A::pubConfig) overwrites it with the url the synode reports.
+     * Not persisted. Set true by User.init, i.e. each time the user page is shown;
+     * elsewhere synode_web is just DesktopSettings::album_web from app-settings.json.
+     */
+    link_weburl: bool,
     user_id_text: string,
     password_text: string,
     confirm_password_text: string,
