@@ -367,7 +367,7 @@ namespace anson {
         // Error popped here because there is no wrapper like asyquery_domconfig() etc.
         try {
             AnsonResp resp = Clients::pingLess(JServUrl{ui_jserv, &opts},
-                                      appsettings.sysuri, "ping by slingleton", AsynClienter::onErr);
+                                      appsettings.sysuri, "ping by slingleton", AsynClienter::onErr, EchoReq::A::pubConfig);
             insert_status(ui, resp.m);
         }
         catch (const std::exception& e) {
