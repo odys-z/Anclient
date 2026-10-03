@@ -294,6 +294,7 @@ int main(int argc, char **argv) {
         slingle.query_domnodes(string{org}, string{domain});
     });
 
+    // ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
     ui->on_ping_synode([&ui, &slingle](const ss& org, const ss& domain, const ss& synid, const ss& jserv) {
         auto profile = ui->global<UserProfile>().get_model();
         slingle.ping_synode(ui, string{org}, string{domain}, string{synid}, string{jserv});

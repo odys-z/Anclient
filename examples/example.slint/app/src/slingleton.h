@@ -366,6 +366,8 @@ namespace anson {
      * - a blank or "null" ip (Java formats null as "null"): the port is taken on the pinged jserv's host.
      * The scheme isn't in the response; it follows the pinged jserv's, as the port does on the server side.
      *
+     * ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
+     *
      * @param resp
      * @param ui_jserv the jserv being pinged
      * @return normalized web url, or "" if resp.m has no usable port.

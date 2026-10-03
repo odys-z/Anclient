@@ -1,0 +1,95 @@
+diff --git a/examples/example.slint/app/src/main.cpp b/examples/example.slint/app/src/main.cpp
+index 7f009d7..1da0e96 100644
+--- a/examples/example.slint/app/src/main.cpp
++++ b/examples/example.slint/app/src/main.cpp
+@@ -294,6 +294,7 @@ int main(int argc, char **argv) {
+         slingle.query_domnodes(string{org}, string{domain});
+     });
+ 
++    // ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
+     ui->on_ping_synode([&ui, &slingle](const ss& org, const ss& domain, const ss& synid, const ss& jserv) {
+         auto profile = ui->global<UserProfile>().get_model();
+         slingle.ping_synode(ui, string{org}, string{domain}, string{synid}, string{jserv});
+diff --git a/examples/example.slint/app/src/slingleton.h b/examples/example.slint/app/src/slingleton.h
+index d065af3..224dc9f 100644
+--- a/examples/example.slint/app/src/slingleton.h
++++ b/examples/example.slint/app/src/slingleton.h
+@@ -366,6 +366,8 @@ namespace anson {
+      * - a blank or "null" ip (Java formats null as "null"): the port is taken on the pinged jserv's host.
+      * The scheme isn't in the response; it follows the pinged jserv's, as the port does on the server side.
+      *
++     * ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
++     *
+      * @param resp
+      * @param ui_jserv the jserv being pinged
+      * @return normalized web url, or "" if resp.m has no usable port.
+diff --git a/examples/example.slint/app/ui/user.slint b/examples/example.slint/app/ui/user.slint
+index 630a03e..b36e685 100644
+--- a/examples/example.slint/app/ui/user.slint
++++ b/examples/example.slint/app/ui/user.slint
+@@ -221,6 +221,7 @@ export component User {
+                 }
+ 
+                 // web-url | [x] link web url
++                // ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
+                 // Linked: read-only, filled by Ping (or Save). Unlinked: user editable.
+                 Row {
+                     Text {
+diff --git a/examples/example.slint/issues/i-2026-10-03.md b/examples/example.slint/issues/i-2026-10-03.md
+new file mode 100644
+index 0000000..1cd1e7b
+--- /dev/null
++++ b/examples/example.slint/issues/i-2026-10-03.md
+@@ -0,0 +1,52 @@
++# ISSUE MERGE-WEBROOT: one way to find the album web url
++
++- Status: open, deferred to the version after portfolio-0.8
++- Tag in code: `ISSUE MERGE-WEBROOT` (grep it in Anclient and semantic-jserv)
++- Since: Anclient `2d81ff2`, semantic-jserv `95b6f72` (branch `portfolio-0.8`)
++
++## Problem
++
++The desktop and Android clients find the album web url in two different ways.
++
++| | Android (example.android) | Desktop (example.slint) |
++|---|---|---|
++| Request | `AlbumReq.A.getPrefs` on port `docoll`, after login | `EchoReq.A.pubConfig` on port `echo`, no session |
++| Server | `SynDocollects.profile()` | `AlbumEcho.pubConfg()` |
++| Web root of | the user's org: `org.webroot`, or `getLocalWebroot(https)` if it is this synode | always the pinged synode |
++| Reply | `AlbumResp.profils.webnode`, `http(s)://ip[:port]` | `AnsonResp.m`, `ip:port`, no scheme |
++| Client | `AlbumApp.login()`, `PrefsWrapper.policy2Prefs()` | `Slingleton::weburl_of()`, `ping_synode()` |
++
++They agree only when `org.webroot` is the pinged synode. If it is another synode, e.g. a hub,
++Android opens the hub's album page and the desktop opens the pinged synode's.
++
++## Why not merged in 0.8
++
++The C++ client can't deserialize `AlbumResp.profils`. There are no ASTs or generated types for
++`io.oz.album.peer.AlbumResp`, `Profiles` or `AlbumReq`, and the deserializer picks types by the
++declared field, not by `"type"`, so a plain `AnsonResp` can't carry it.
++
++## To merge
++
++Desktop (Anclient, example.slint):
++
++1. ASTs and generated types:
++   - `io.oz.album.peer.Profiles` (base `Anson`): `uid`, `defltAlbum`, `webnode`, `servroot`, `home`, `servId`, `maxUsers`, `servtype`;
++   - `io.oz.album.peer.AlbumResp` (base `DocsResp`): field `profils` (Java's spelling); skip `forest`, `photos`, which can't be expressed;
++   - `io.oz.album.peer.AlbumReq` (base `DocsReq`): `SynDocollects` is a `ServPort<AlbumReq>`, a `DocsReq` body will fail.
++2. After login, request `A.getPrefs` with Doclientier's session via `commit<AlbumResp>()`.
++3. Drop `weburl_of()`, and the web url update in `ping_synode()` and on saving (the "Link web url" check box in `user.slint`).
++
++Server (semantic-jserv), whichever way is kept:
++
++- Reply one format, `getLocalWebroot(https)`.
++- `reverseIp()` is null before `merge_ip_json2db()` (`localIp` is `ignoreFrom`), so `pubConfg()` may reply `null:port`; `reportRversedIp()` has a fallback.
++- `reversedWebPort()` defaults `port`, not `webport` / `webProxyPort`, when 0, so it may reply `ip:0`.
++- `SynDocollects.profile()` Javadoc says webroot is looked up in `syn_node.jserv`; the code returns `org.webroot` as is.
++
++Android:
++
++- `PrefsWrapper.loadPrefs()` overwrites a saved `albumroot` with `url_landing` (the `if / else` looks inverted).
++
++## Done when
++
++Both clients get the album web url from the same server reply, and the desktop no longer parses `ip:port` from a ping.
