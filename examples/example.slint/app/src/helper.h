@@ -45,6 +45,22 @@ inline static void open_file_explorer(std::string path) {
 }
 
 /**
+ * The album web page, i.e. the root path of every web url, for JServUrl(url, jprotocol).
+ * Users never type it; whatever path is in a url is replaced by this one, and shown.
+ */
+inline static const anson::JProtocol web_protocol{"webview.html", nullptr};
+
+/**
+ * @return DesktopSettings::album_web, parsed by JServUrl with album_webroot, i.e.
+ * scheme://host:port/webview.html, whatever path is typed; a port-only value, e.g. "8900"
+ * (also the legacy album_web), is taken on synode_jserv's host. "" if no valid host and port.
+ */
+inline static string resolve_album_web(const anson::DesktopSettings& s) {
+    anson::JServUrl web{s.album_web, web_protocol};
+    return web.valid() ? web.jserv() : "";
+}
+
+/**
  * jserv_list is not bind here (populated later via query_domnodes/on_domnodes,
  * it isn't shown in a ComboBox so it doesn't need the same startup seeding).
  * domains_list and synodes_list are seeded with just the configured value so
@@ -67,6 +83,7 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.regist_uid  = s.centralUid;
     p.regist_pswd = s.centralPswd;
     p.synode_jserv = s.synode_jserv;
+    p.synode_web = resolve_album_web(s);
     p.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
         std::vector<slint::SharedString>{slint::SharedString(s.domain)});
     p.domain_selected = s.domain;
