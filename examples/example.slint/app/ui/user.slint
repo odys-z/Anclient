@@ -222,7 +222,7 @@ export component User {
 
                 // web-url | [x] link web url
                 // ISSUE MERGE-WEBROOT, see issues/i-2026-10-03.md
-                // Linked: read-only, filled by Ping (or Save). Unlinked: user editable.
+                // Linked: disabled (not focusable, dimmed), filled by Ping (or Save). Unlinked: user editable.
                 Row {
                     Text {
                         col: 0;
@@ -231,7 +231,8 @@ export component User {
                         col: 1;
                         horizontal-stretch: 1;
                         font-size: 14pt;
-                        read-only: UserProfile.model.link_weburl;
+                        // enabled, not read-only: a read-only LineEdit still takes focus and shows a cursor.
+                        enabled: !UserProfile.model.link_weburl;
                         placeholder-text: UserProfile.model.link_weburl
                             ? @tr("Ping the node to get its web url")
                             : @tr("ip:port, e.g. 192.168.0.2:8900");

@@ -49,6 +49,14 @@ int main(int argc, char **argv) {
             return;
         }
 
+        if (menu_id == menu_user) {
+            // UserProfile is a global and survives page switches; show what's saved, not stale edits.
+            // menu-changed fires before the conditional User page is instantiated (and its init queries orgs).
+            auto p = ui->global<UserProfile>().get_model();
+            bind_profile(p, slingle.appsettings);
+            ui->global<UserProfile>().set_model(p);
+        }
+
         if (menu_id == menu_album) {
             launch_webview_window(ui, slingle.appsettings);
         }
@@ -310,14 +318,35 @@ int main(int argc, char **argv) {
         slingle.on_test_synlogin(ui, string{uid}, string{pswd}, string{pswd2}, string{profile.synode_jserv});
     });
 
-    ui->on_save_userinfo([&ui, &ui_weak, &settings_path, &slingle]() {
+    /**
+     * Commit, persist and apply settings. Must run on the Slint event loop thread:
+     * setup_doclientier() deletes the live doclientier and appsettings is read by UI callbacks.
+     */
+    auto commit_settings = [&slingle, &settings_path, ui_weak](const DesktopSettings& s, const string& msg) {
+        slingle.settings(s);
+        slingle.save_settings(settings_path);
+        slingle.setup_doclientier(ui_weak);
+        if (auto app = ui_weak.lock()) {
+            auto p = (*app)->global<UserProfile>().get_model();
+            p.synode_jserv = slint::SharedString(s.synode_jserv);
+            p.synode_web   = slint::SharedString(s.album_web);
+            p.is_device_locked = !s.device.empty();
+            (*app)->global<UserProfile>().set_model(p);
+        }
+        anlog("saved: "s + settings_path);
+        insert_status(ui_weak, "Saved! "s + msg);
+    };
+
+    ui->on_save_userinfo([&ui, &ui_weak, &slingle, commit_settings]() {
         UserProfileModel p = ui->global<UserProfile>().get_model();
 
         anlog("on_save_userinfo(): jserv = "s + string{p.synode_jserv});
 
         // We need a better validation pattern. See https://claude.ai/share/a00185d7-3a8d-460f-9c35-5fa8189b0c1f
-        if (string{p.password_text} != string{p.confirm_password_text})
-            insert_status(ui, "Domain Token doesn't march with confirming text.");
+        if (string{p.password_text} != string{p.confirm_password_text}) {
+            insert_status(ui, "Domain Token doesn't match with confirming text.");
+            return;
+        }
 
         DesktopSettings s {slingle.appsettings};
         s.regiserv = p.regiserv;
@@ -378,25 +407,23 @@ int main(int argc, char **argv) {
                 // pm-4-hub  0004    test-1        pmking  admin  2026-09-30 09:09:44  pm-4-hub,0004
                 //
                 // Capture temp_doclientier in the lambda to keep it alive until the network callback executes
-                temp_doclientier->asy_register_dev(s, [ui, ui_weak, s, &slingle, settings_path, temp_doclientier](const AnsonResp& r) {
-                    slint::invoke_from_event_loop([ui]() {
-                        UserProfileModel p = ui->global<UserProfile>().get_model();
-                        p.is_device_locked = true;
-                        ui->global<UserProfile>().set_model(p);
+                temp_doclientier->asy_register_dev(s,
+                    [ui_weak, s, commit_settings, temp_doclientier](const AnsonResp& r) {
+                        string m = r.m;
+                        // network thread -> UI thread
+                        slint::invoke_from_event_loop([ui_weak, s, m, commit_settings]() {
+                            commit_settings(s, m);
+                            show_dlg(ui_weak, "Saved",
+                                     std::format("User: {}\n Device {}\n Domain: {}\n{}",
+                                                 s.admin, s.device, s.domain, m));
+                        });
+                    }, [temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
+                        AsynClienter::onErr(c, e, a);
                     });
-
-                    slingle.settings(s);
-                    slingle.save_settings(settings_path);
-                    slingle.setup_doclientier(ui_weak);
-                    anlog("saved: "s + settings_path);
-
-                    insert_status(ui, "Saved! "s + r.m);
-                    show_dlg(ui, "Saved",
-                            std::format("User: {}\n Device {}\n Domain: {}\n{}",
-                                        s.admin, s.device, s.domain, r.m)); // FIXME not working
-                }, [temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
-                    AsynClienter::onErr(c, e, a);
-                });
+            }
+            else {
+                // device already registered: this path used to drop s without saving it.
+                commit_settings(s, "");
             }
         }
         else {

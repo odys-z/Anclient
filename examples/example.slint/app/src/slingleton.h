@@ -243,6 +243,10 @@ namespace anson {
         jserv = peer.jserv;
       }
 
+      // The saved (possibly user-forced) jserv of the configured synode overrides the registry's.
+      if (selected == configured && !appsettings.synode_jserv.empty())
+        jserv = appsettings.synode_jserv;
+
       vector<Synode> peers = res.diction.peers;
 
       slint::invoke_from_event_loop([this, synodes, peers, selected, selectIx, jserv]() {

@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-project(album VERSION 1.0 LANGUAGES CXX)
+project(album VERSION 0.1.2 LANGUAGES CXX)
 
 set(CMAKE_TOOLCHAIN_FILE_openssl "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake")
 message(STATUS "=========================================== CMAKE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE_openssl}")
