@@ -362,7 +362,7 @@ namespace anson {
             m = std::format("{}://{}:{}", pinged.https ? "https" : "http", ip, port);
         }
 
-        return normalize_weburl(m, ui_jserv);
+        return resolve_album_weburl(m, ui_jserv);
     }
 
     /**

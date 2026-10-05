@@ -113,7 +113,7 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");
     #endif
 
-    string url = resolve_album_web(settings);
+    string url = resolve_album_weburl(settings.album_web, settings.synode_jserv);
     webview::webview w(true, nullptr);
     w.set_title(url);
     w.set_size(800, 600, WEBVIEW_HINT_NONE);

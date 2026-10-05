@@ -7,8 +7,7 @@
 
 // webview-ext.h -> webview.h -> gtk.h:
 // `#define Status int`, which clashes with cpr::ThreadPool's `enum Status`
-// So undefine Status, as gtk is donw.
-// Claude.ai: This is a well know confliction, including that of OpenCV.
+// So undefine Status, as gtk is done.
 #ifdef Status
 #undef Status
 #endif
@@ -331,7 +330,7 @@ int main(int argc, char **argv) {
         s.domain_token = p.password_text;
         s.device = p.device;
         s.album_web = string{p.synode_web};
-        s.album_web = resolve_album_web(s);
+        s.album_web = resolve_album_weburl(s.album_web, s.synode_jserv);
         if (s.album_web.empty() && !LangExt::isblank(string{p.synode_web})) {
             insert_status(ui, "Web Url is not recognizable: "s + string{p.synode_web});
             return;

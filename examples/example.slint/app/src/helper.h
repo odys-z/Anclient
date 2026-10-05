@@ -62,7 +62,7 @@ public:
 
     /**
      * @param port_only a port, e.g. "8900" (the legacy album_web)
-     * @param on_jserv the jserv whose scheme and host the port is taken on
+     * @param on_jserv the jserv whose scheme and host the port is replaced with for guessing the web-url
      */
     WebUrl(const string& port_only, const string& on_jserv) : WebUrl(on_jserv) {
         port = std::stoi(anson::LangExt::trim(port_only));
@@ -82,7 +82,7 @@ public:
  * @param on_jserv the jserv whose scheme and host a port-only url is taken on.
  * @return normalized url, scheme://host:port/webview.html, or "" if not valid.
  */
-inline static string normalize_weburl(const string& url, const string& on_jserv) {
+inline static string resolve_album_weburl(const string& url, const string& on_jserv) {
     if (anson::LangExt::isblank(url)) return "";
     WebUrl web = anson::JServUrl::valid_port(url) ? WebUrl{url, on_jserv} : WebUrl{url};
     return web.valid() ? web.jserv() : "";
@@ -92,10 +92,10 @@ inline static string normalize_weburl(const string& url, const string& on_jserv)
  * @return DesktopSettings::album_web, normalized by normalize_weburl(), i.e.
  * scheme://host:port/webview.html, whatever path is typed; a port-only value, e.g. "8900"
  * (also the legacy album_web), is taken on synode_jserv's host. "" if no valid host and port.
- */
 inline static string resolve_album_web(const anson::DesktopSettings& s) {
     return normalize_weburl(s.album_web, s.synode_jserv);
 }
+ */
 
 /**
  * jserv_list is not bind here (populated later via query_domnodes/on_domnodes,
@@ -120,7 +120,7 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.regist_uid  = s.centralUid.empty() ? "admin" : s.centralUid;
     p.regist_pswd = s.centralPswd;
     p.synode_jserv = s.synode_jserv;
-    p.synode_web = resolve_album_web(s);
+    p.synode_web = resolve_album_weburl(s.album_web, s.synode_jserv);
     p.domains_list = std::make_shared<slint::VectorModel<slint::SharedString>>(
         std::vector<slint::SharedString>{slint::SharedString(s.domain)});
     p.domain_selected = s.domain;
