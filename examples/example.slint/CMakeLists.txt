@@ -42,7 +42,7 @@ include(FetchContent)
 FetchContent_Declare(
   anson.cmake
   GIT_REPOSITORY https://github.com/odys-z/anson.cmake.git
-  GIT_TAG        main
+  GIT_TAG        portfolio-0.8
 )
 
 set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -51,7 +51,7 @@ FetchContent_MakeAvailable(anson.cmake)
 FetchContent_Declare(
   anclient.cmake
   GIT_REPOSITORY https://github.com/odys-z/Anclient.cmake.git
-  GIT_TAG        main
+  GIT_TAG        portfolio-0.8
 )
 
 set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)

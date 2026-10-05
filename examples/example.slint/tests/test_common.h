@@ -1,6 +1,6 @@
 #pragma once
 
-#include <thread>
+// #include <thread>
 #include <string>
 #include <format>
 #include <chrono>
@@ -14,7 +14,7 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 
-#include "../app/src/gen/app_settings.hpp"
+// #include "../app/src/gen/app_settings.hpp"
 
 
 namespace fs = std::filesystem;

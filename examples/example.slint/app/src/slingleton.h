@@ -80,7 +80,8 @@ namespace anson {
         else {
           aninfo("[***** DEVICE *****] "s + appsettings.device);
           anlog(std::format("org   : {}\ndomain: {}\ndevice: {}\nsynode: {}\njserv : {}\nregistry: {}",
-              appsettings.org, appsettings.domain, appsettings.device, appsettings.synode_id, appsettings.synode_jserv, appsettings.regiserv));
+              appsettings.org, appsettings.domain, appsettings.device,
+              appsettings.synode_id, appsettings.synode_jserv, appsettings.regiserv));
         }
 
         // ipc
@@ -126,30 +127,6 @@ namespace anson {
     void setup_regclient();
 
     void setup_doclientier(const slint::ComponentWeakHandle<App> &appwin, const JsonOpt* ctx = &opts) ;
-
-    /*
-    void query_orgdoms(const string & orgid) {
-      slint::invoke_from_event_loop([this]() {
-        if (auto app = window_weak.lock()) {
-          auto profile = (*app)->global<UserProfile>().get_model();
-          profile.detail_label = "Loading organization domains ...";
-          profile.org_name = appsettings.org_name;
-          (*app)->global<UserProfile>().set_model(profile);
-        }
-      });
-
-      registryClient->asyquery_orgdoms(orgid,
-        [this](AnsonResp& resp) {
-            RegistResp& r = static_cast<RegistResp&>(resp); // no copy
-            anlog("asyquery_orgdoms() resp: "s + r.toBlock(registry_opts));
-            insert_status(window_weak, std::format("Loaded org: {}", r.diction.org.orgId));
-            on_org_domains(r); },
-            // AsynClienter::onErr);
-            [this](MsgCode::Code c, const string& e, const vector<string>& args) {
-                AsynClienter::onErr(c, e, args);          // keep the log line
-                clear_domains("Failed to load domains.");
-            });
-    }*/
 
     void query_orgdoms(const string & orgid) {
       slint::invoke_from_event_loop([this]() {
@@ -234,13 +211,6 @@ namespace anson {
 
     }
 
-    /*
-    void query_domnodes(const string & org, const string& domain) {
-      registryClient->asyquery_domconfig(org, domain,
-                        [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
-                        AsynClienter::onErr);
-    }
-    */
     void query_domnodes(const string & org, const string& domain) {
       registryClient->asyquery_domconfig(org, domain,
         [this](AnsonResp& resp) { on_domnodes(static_cast<RegistResp&>(resp)); },
@@ -264,7 +234,6 @@ namespace anson {
 
       string configured = appsettings.synode_id;
       string selected = synodes.empty() ? "" : synodes.front();
-      // int    selectIx = synodes.empty() ? -1 : 0;
 
       for (auto& s : synodes) if (s == configured) { selected = s; break; }
       int selectIx = LangExt::ix(synodes, selected);
@@ -477,17 +446,6 @@ namespace anson {
       anlog("Enqueuing: "s + msg->toBlock(opts));
       synode_msgs.push(msg);
     }
-
-    /**
-     * @brief update_regjserv
-     * @param url
-     * @return
-    std::optional<std::string> update_regjserv(const string& url) {
-        if (auto err = validate_jserv(url)) return err;
-        registryClient->setjserv(url);
-        return std::nullopt;
-    }
-     */
 
     /**
      * Apply registry url & central account from the UI.

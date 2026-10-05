@@ -24,13 +24,21 @@ import sys
 from pathlib import Path
 from typing import Optional, cast
 
-
-from anson.io.odysz.common import requir_pkg, passwd_allow_ext, LangExt, Utils, requir_executable
-requir_pkg("anson.py3", "0.6.4")
-requir_pkg("semantics.py3", "0.6.4")
-requir_pkg("jre-mirror", "0.1.0")
+from anson.io.odysz.common import requir_pkg, requir_cmake_fetchcontent
+requir_pkg("anson.py3", "0.6.10")
+requir_pkg("semantics.py3", "0.6.10")
+requir_pkg("jre-mirror", "0.1.2")
 requir_pkg("deprecated")
 
+# ---------------------------------------------------------------------------
+# Project layout — adjust these two if your repo is laid out differently.
+# ---------------------------------------------------------------------------
+ROOT_DIR = Path(__file__).resolve().parent
+BUILD_DIR = ROOT_DIR / "qt-build"
+requir_cmake_fetchcontent(BUILD_DIR, "anson.cmake", "0.1.4")
+requir_cmake_fetchcontent(BUILD_DIR, "anclient.cmake", "0.1.1")
+
+from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils, requir_executable
 from deprecated import deprecated
 from anson.io.odysz.anson import Anson, AnsonException
 from anson.io.odysz.utils import gzip2
@@ -44,12 +52,6 @@ from semanticshare.io.oz.edge import Temurin17Release
 
 
 taskcfg = cast(SynodeTask, None)
-
-# ---------------------------------------------------------------------------
-# Project layout — adjust these two if your repo is laid out differently.
-# ---------------------------------------------------------------------------
-ROOT_DIR = Path(__file__).resolve().parent
-BUILD_DIR = ROOT_DIR / "qt-build"
 
 @deprecated(reason="Use the configure from tasks.json, by calling pth_buildir()")
 def pth_buildir(taskconfig: SynodeTask = None) -> Path:
