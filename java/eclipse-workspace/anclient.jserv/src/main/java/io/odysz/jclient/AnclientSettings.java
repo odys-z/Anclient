@@ -19,6 +19,7 @@ import io.odysz.anson.Anson;
 		"admin" : {"dataAnclass": "string"},
 		"domain_token" : {"dataAnclass": "string"},
 		"regiserv"     : {"dataAnclass": "string"},
+		"centralUid"   : {"dataAnclass": "string"},
 		"centralPswd"  : {"dataAnclass": "string"},
 		"temp_dir"     : {"dataAnclass": "string"}
 	  },

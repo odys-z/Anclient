@@ -26,7 +26,7 @@ from typing import Optional, cast
 
 from anson.io.odysz.common import requir_pkg, requir_cmake_fetchcontent
 requir_pkg("anson.py3", "0.6.10")
-requir_pkg("semantics.py3", "0.6.10")
+requir_pkg("semantics.py3", "0.6.11")
 requir_pkg("jre-mirror", "0.1.2")
 requir_pkg("deprecated")
 
@@ -369,7 +369,7 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
     """
     Create an app-settings.json for desktop, return the relative file path, for slint/tasks.py --appsettings arg.
 
-    Initial package only setup market, market-id, java_path, regiserv, centralPswd, wshost, wsport, wsagent_jar.
+    Initial package only setup market, market-id, java_path, regiserv, centralUid, centralPswd, wshost, wsport, wsagent_jar.
 
     Installer needs to setup synode-id and vol, jserv, etc.
     :return: the generated json's relative path to desktop dir
@@ -395,7 +395,7 @@ def create_desktop_settings(taskcfg: SynodeTask) -> str:
 
     desksets.regiserv = JServUrl(https= False, iport =taskcfg.deploy.central_iport,
                                  protocolroot = taskcfg.deploy.central_path).jserv()
-    desksets.centralUid = 'admin'
+    desksets.centralUid = taskcfg.deploy.centralUid
     desksets.centralPswd = taskcfg.deploy.central_pswd # place holder, e.g. 'by email'
 
     desksets.synode_vol = ''
