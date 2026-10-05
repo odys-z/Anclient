@@ -51,13 +51,50 @@ inline static void open_file_explorer(std::string path) {
 inline static const anson::JProtocol web_protocol{"webview.html", nullptr};
 
 /**
- * @return DesktopSettings::album_web, parsed by JServUrl with album_webroot, i.e.
+ * A web url, i.e. a JServUrl with web_protocol, scheme://host:port/webview.html, whatever path is typed.
+ *
+ * JServUrl::valid() also requires jprotocol.ctx (a JsonOpt for serializing), which web_protocol hasn't,
+ * so every web url, typed or pinged, was rejected. WebUrl::valid() doesn't check it.
+ */
+class WebUrl : public anson::JServUrl {
+public:
+    explicit WebUrl(const string& url) : anson::JServUrl(anson::LangExt::trim(url), web_protocol) {}
+
+    /**
+     * @param port_only a port, e.g. "8900" (the legacy album_web)
+     * @param on_jserv the jserv whose scheme and host the port is taken on
+     */
+    WebUrl(const string& port_only, const string& on_jserv) : WebUrl(on_jserv) {
+        port = std::stoi(anson::LangExt::trim(port_only));
+    }
+
+    /** Hides JServUrl::valid(): the same checks, but jprotocol.ctx, and only http(s). */
+    bool valid() const {
+        return !host.empty()
+            && (scheme == "http" || scheme == "https")
+            && anson::validUrlPort(port, {1, 65535})
+            && urlValidator.isValid(jserv());
+    }
+};
+
+/**
+ * @param url http(s)://host[:port][/path], host[:port], or a port only, e.g. "8900".
+ * @param on_jserv the jserv whose scheme and host a port-only url is taken on.
+ * @return normalized url, scheme://host:port/webview.html, or "" if not valid.
+ */
+inline static string normalize_weburl(const string& url, const string& on_jserv) {
+    if (anson::LangExt::isblank(url)) return "";
+    WebUrl web = anson::JServUrl::valid_port(url) ? WebUrl{url, on_jserv} : WebUrl{url};
+    return web.valid() ? web.jserv() : "";
+}
+
+/**
+ * @return DesktopSettings::album_web, normalized by normalize_weburl(), i.e.
  * scheme://host:port/webview.html, whatever path is typed; a port-only value, e.g. "8900"
  * (also the legacy album_web), is taken on synode_jserv's host. "" if no valid host and port.
  */
 inline static string resolve_album_web(const anson::DesktopSettings& s) {
-    anson::JServUrl web{s.album_web, web_protocol};
-    return web.valid() ? web.jserv() : "";
+    return normalize_weburl(s.album_web, s.synode_jserv);
 }
 
 /**

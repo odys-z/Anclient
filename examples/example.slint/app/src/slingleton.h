@@ -352,7 +352,7 @@ namespace anson {
         string port = m.substr(colon + 1);
         if (!JServUrl::valid_port(port)) return "";
 
-        JServUrl pinged{ui_jserv, web_protocol};
+        WebUrl pinged{ui_jserv};
 
         if (ip.empty() || ip == "null")
             m = port; // port-only, on the pinged host
@@ -362,8 +362,7 @@ namespace anson {
             m = std::format("{}://{}:{}", pinged.https ? "https" : "http", ip, port);
         }
 
-        JServUrl web{m, web_protocol};
-        return web.valid() ? web.jserv() : "";
+        return normalize_weburl(m, ui_jserv);
     }
 
     /**
