@@ -80,7 +80,7 @@ inline static bool bind_profile(UserProfileModel& p, const anson::DesktopSetting
     p.device = s.device;
     p.is_device_locked = !s.device.empty();
     p.regiserv = s.regiserv;
-    p.regist_uid  = s.centralUid;
+    p.regist_uid  = s.centralUid.empty() ? "admin" : s.centralUid;
     p.regist_pswd = s.centralPswd;
     p.synode_jserv = s.synode_jserv;
     p.synode_web = resolve_album_web(s);

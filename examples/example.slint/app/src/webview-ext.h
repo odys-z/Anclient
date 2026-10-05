@@ -108,7 +108,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
 
     // SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
     //                         L"--proxy-bypass-list=<local>;10.*;192.168.*;172.16.*;127.*;localhost");
-    SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");
+    #if defined(_WIN32)
+        // WebView2 (Windows only): bypass system proxy for the local synode web.
+        SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");
+    #endif
 
     string url = resolve_album_web(settings);
     webview::webview w(true, nullptr);
