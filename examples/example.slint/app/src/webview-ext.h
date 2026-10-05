@@ -106,6 +106,10 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         return;
     }
 
+    // SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+    //                         L"--proxy-bypass-list=<local>;10.*;192.168.*;172.16.*;127.*;localhost");
+    SetEnvironmentVariableW(L"WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", L"--no-proxy-server");
+
     string url = resolve_album_web(settings);
     webview::webview w(true, nullptr);
     w.set_title(url);
@@ -121,12 +125,17 @@ void launch_webview_window(slint::ComponentWeakHandle<App> weak_ui_handle, const
         }});
     )", settings.admin, settings.domain_token, settings.synode_id);
 
+    w.bind("__report", [](const std::string& req) -> std::string {
+        anlog("document created: " + req);
+        return "";
+    });
     anlog(script);
-    w.init(script);
+    w.init("window.__report(location.href);\n" + script);
+    // w.init(script);
 
     // w.navigate("http://127.0.0.1:8960/webview.html");
     anlog(url);
-    w.navigate(url);
+    auto r = w.navigate(url);
 
     // 3. Notify Slint UI that the window is now active
     slint::invoke_from_event_loop([weak_ui_handle]() {
