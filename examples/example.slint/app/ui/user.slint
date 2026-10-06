@@ -238,13 +238,17 @@ export component User {
                             : @tr("ip:port, e.g. 192.168.0.2:8900");
                         text <=> UserProfile.model.synode_web;
                     }
-                    CheckBox {
+                    Rectangle {
                         col: 2;
-                        horizontal-stretch: 0;
-                        width: 90pt;
-                        text: @tr("Link web url");
-                        checked <=> UserProfile.model.link_weburl;
-                    }
+                        CheckBox {
+                            horizontal-stretch: 0;
+                            width: 90pt;
+                            // text: @tr("Link web url");
+                            checked <=> UserProfile.model.link_weburl;
+                        }
+                        Text {
+                            text: "Auto-link"; font-size: 14pt; color: #bbb; }
+                        }
                 }
 
                 // [ uid ]   [ pswd | pswd-2 ] | Login  (single flat row, flows horizontally)
