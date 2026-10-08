@@ -5,12 +5,16 @@ import { AnContext, AnError, AnReact, L, Login, Comprops, AnreactAppOptions, Jso
 import { AnsonMsg, AnsonResp, NV, SessionClient, SessionInf } from '@anclient/semantier';
 import { Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography/Typography';
-import Card from '@material-ui/core/Card/Card';
 import QRCode from 'react-qr-code';
 import { IcoLoginAlbum } from './icons/android';
 import Box from '@material-ui/core/Box';
 import { formatJservQr } from './tiers/synode-utils';
-import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+
+/** Both login cards share one width, side by side or stacked. */
+const cardStyle: React.CSSProperties = {
+	flex: '1 1 360px', maxWidth: 440, padding: 32, borderRadius: 12, boxSizing: 'border-box'
+};
 
 const styles = (theme: Theme) => ({
 	root: {
@@ -97,7 +101,7 @@ class LoginApp extends React.Component<LoginProps> {
 
 	render() {
 		let that = this;
-		let {domain, host, jserv, jservNvs, synodesetups} = this.servdoms as ExternalHosts;
+		let {domain, host, jserv, jservNvs} = this.servdoms as ExternalHosts;
 
 		return (
 			<AnContext.Provider value={{
@@ -116,53 +120,66 @@ class LoginApp extends React.Component<LoginProps> {
 				host_json:'private/host.json',
 				clientOpts: this.props.clientOpts,
 			}} >
-				<AnQueryst
-					uri={this.uri}
-					hideButtons={true} style={{minWidth: '20em'}}
-					conds = { {
-						// pageInf: new PageInf(0, 20),
-						query: [ { 
-							type: 'cbb', options: jservNvs,
-							label: domain, // L('Select Synode'),
-							field: '__delete__',
-							grid: {sm: 12, md: 7, lg: 4},
-							val: {n: host, v: jserv},
-							onSelectChange: (v: NV) => {
-								if (v && v.n) {
-									(that.servdoms as ExternalHosts).host = v.n;
-									(that.servdoms as ExternalHosts).jserv = v.v as string;
-								}
-								else
-									(that.servdoms as ExternalHosts).host = undefined as any;
-								this.setState({})}
-						} ] } }
-				/>
-				<Login onLogin={this.onLogin} uri={this.uri}/>
+				<Box minHeight='100vh' display='flex' alignItems='center' justifyContent='center'
+					style={{background: '#f4f5fb', padding: '24px 16px', boxSizing: 'border-box'}}>
+				<Box display='flex' flexWrap='wrap' justifyContent='center' alignItems='stretch'
+					style={{gap: 24, maxWidth: 904, width: '100%'}}>
 
-				<Typography variant='subtitle2' color='primary' gutterBottom>
-					{L('Download Synode Setup:')}.
-				</Typography>
-				<Typography variant='body2' color='textSecondary' gutterBottom>
-					{synodesetups && Object.keys(synodesetups).map((org) => {
-						return (
-						<Box key={org} style={{marginBottom: '1em'}}>
-							<strong>{org}</strong>: &nbsp;
-							{synodesetups[org] && synodesetups[org].length > 0 && synodesetups[org].map((zip, zx) => {
-								return <Link key={zx} href={zip} color="primary" underline="hover" download={true} >
-										{ExternalHosts.to_arch_os_readable(zip)}
-										</Link>})}
-						</Box>)
-					})} 	
-				</Typography>
+				{/* Left: synode picker + credentials */}
+				<Paper elevation={3} style={{...cardStyle}}>
+					<Typography variant='h5' style={{fontWeight: 600}}>{L('Album')}</Typography>
+					<Typography variant='body2' color='textSecondary' gutterBottom>
+						{L('Sign in to your synode')}
+					</Typography>
 
-				{this.servdoms && this.servdoms.host && <>
-				<Typography variant='subtitle2' color='primary' gutterBottom>{L('Scan here for login on Andriod:')}</Typography>
-				<Box style={{'justifyContent': 'center', 'width': '70vw', 'display': 'flex'}}>
-				<Card style={{'position': 'absolute'}}>
-					<QRCode value={formatJservQr(host, jserv as string)}
-							bgColor={'#FFFFFF'} fgColor={'#000000'} size={320} level='H' />
-					<IcoLoginAlbum containersize={320} size={48} />
-				</Card></Box></>}
+					<Box mt={3}>
+					<AnQueryst
+						uri={this.uri}
+						hideButtons={true} style={{minWidth: '20em'}}
+						conds = { {
+							query: [ {
+								type: 'cbb', options: jservNvs,
+								label: domain,
+								field: '__delete__',
+								grid: {sm: 12, md: 12, lg: 12},
+								val: {n: host, v: jserv},
+								onSelectChange: (v: NV) => {
+									if (v && v.n) {
+										(that.servdoms as ExternalHosts).host = v.n;
+										(that.servdoms as ExternalHosts).jserv = v.v as string;
+									}
+									else
+										(that.servdoms as ExternalHosts).host = undefined as any;
+									this.setState({})}
+							} ] } }
+					/>
+					</Box>
+					<Login onLogin={this.onLogin} uri={this.uri}/>
+
+				</Paper>
+
+				{/* Right: QR login for the Android app */}
+				{this.servdoms && this.servdoms.host &&
+				<Paper elevation={3} style={{...cardStyle,
+						display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+					<Typography variant='subtitle1' style={{fontWeight: 600}}>
+						{L('Scan here for login on Android:')}
+					</Typography>
+					<Typography variant='caption' color='textSecondary' align='center' gutterBottom>
+						{host}
+					</Typography>
+					<Box mt={2} style={{position: 'relative', width: 240, height: 240,
+							padding: 8, background: '#fff', borderRadius: 8, border: '1px solid #e0e0e0'}}>
+						<Box style={{position: 'relative', width: 240, height: 240}}>
+							<QRCode value={formatJservQr(host, jserv as string)}
+								bgColor={'#FFFFFF'} fgColor={'#000000'} size={240} level='H' />
+							<IcoLoginAlbum containersize={240} size={40} />
+						</Box>
+					</Box>
+				</Paper>}
+
+				</Box>
+				</Box>
 
 				{ this.state.hasError &&
 				  <AnError

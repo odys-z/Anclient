@@ -140,7 +140,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
 		<Grid item md={4} xs={12} sm={12} >
 		<Paper style={{"height": 200}}>
-		<Typography variant='h6' color='primary' gutterBottom>Login on Andriod.</Typography>
+		<Typography variant='h6' color='primary' gutterBottom>Login on Android.</Typography>
 		<Card style={{'position': 'absolute'}}>
 			{this.servdoms &&  this.servdoms.syndomx && 
 				<QRCode value={formatJservQr(this.servdoms.host, this.servdoms.syndomx[this.servdoms.host] as string)}
