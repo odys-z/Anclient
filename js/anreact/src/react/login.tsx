@@ -30,6 +30,13 @@ const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	container: {
 		maxWidth: "20vw",
 		maxHeight: "20vh"
+	},
+	/** Layout for LoginProps.stacked: one column, fields and button at full width. */
+	stacked: {
+		'& .MuiCollapse-wrapperInner': {
+			display: 'flex', flexDirection: 'column', gap: theme.spacing(1),
+		},
+		'& .MuiButton-root': { marginTop: theme.spacing(1.5) },
 	}
 });
 
@@ -43,6 +50,10 @@ interface LoginProps extends Comprops {
 
 	/** Default pswd and user-id, usually for debug. */
 	config: {pswd?: string, userid?: string};
+
+	/** Stack user id, password and the login button in one full-width column
+	 * (for a login card), instead of the default inline row. */
+	stacked?: boolean;
 }
 
 /**
@@ -190,9 +201,10 @@ class LoginComp extends React.Component<LoginProps> {
 
 	render() {
 		let that = this;
-		let { classes } = this.props;
+		let { classes, stacked } = this.props;
 		classes = classes!;
-		return (<div className={classes!.root}>
+		const onEnter = (e: React.KeyboardEvent) => { if (e.key === 'Enter') that.toLogin(classes!); };
+		return (<div className={stacked ? classes!.stacked : classes!.root}>
 			<Box display={!this.config.show ? "flex" : "none"}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
@@ -201,19 +213,22 @@ class LoginComp extends React.Component<LoginProps> {
 				</Button>
 			</Box>
 			<Collapse in={this.config.show} timeout="auto" >
-				<FormControl className={clsx(classes.margin, classes.textField)}>
+				<FormControl className={clsx(classes.margin, classes.textField)} fullWidth={stacked}>
 					<InputLabel htmlFor="userid">{L("User Id")}</InputLabel>
 					<Input 
 						autoFocus required id="userid"
+						onKeyUp={onEnter}
 						// label={L("User Id")}
 						autoComplete="username"
 						defaultValue={this.config.userid}
 						onChange={event => this.setState({userId: event.target.value})} />
 				</FormControl>
-				<FormControl className={clsx(classes.margin, classes.textField)}>
-					<InputLabel htmlFor="pwsd">Password</InputLabel>
+				<FormControl className={clsx(classes.margin, classes.textField)} fullWidth={stacked}>
+					<InputLabel htmlFor="pswd">{L("Password")}</InputLabel>
 					<Input
 						id="pswd"
+						autoComplete="current-password"
+						onKeyUp={onEnter}
 						type={this.state.showPswd ? 'text' : 'password'}
 						defaultValue = {this.config.pswd}
 						onChange={event => this.setState({pswd: event.target.value})}
@@ -248,7 +263,8 @@ class LoginComp extends React.Component<LoginProps> {
 					{this.state.showPswd ? <VisibilityOff /> : <Visibility />}
 				</IconButton>
 				</Box> */}
-				<Button className={classes!.field2}
+				<Button className={stacked ? undefined : classes!.field2}
+					fullWidth={stacked}
 					variant="contained"
 					color="primary"
 					onClick={() => this.toLogin(classes!)} >{L('Login')}</Button>

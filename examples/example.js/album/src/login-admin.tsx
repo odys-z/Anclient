@@ -214,7 +214,7 @@ class LoginApp extends React.Component<LoginProps> {
 								type: 'cbb', options: jservNvs,
 								label: domain,
 								field: '__delete__',
-								grid: {sm: 12, md: 12, lg: 12},
+								grid: {xs: 12},
 								val: {n: host, v: jserv},
 								onSelectChange: (v: NV) => {
 									if (v && v.n) {
