@@ -119,7 +119,7 @@ export class App extends CrudCompW<AlbumProps> {
 	login() {
 		let hosturl = this.servs?.syndomx && this.servs.syndomx[this.config.servId] as string;
 
-		// for Synode 0.7.1, use syndomx[servId] as hosturl
+		// Since Synode 0.7.1, use syndomx[servId] as hosturl
 		if (this.servs.syndomx && hosturl && this.servs.syndomx.hasOwnProperty(hosturl)) {
 			hosturl = (this.servs.syndomx as any)[hosturl] || hosturl;
 		}
@@ -170,7 +170,7 @@ export class App extends CrudCompW<AlbumProps> {
 		  }} >
 			<Sys msHideAppBar={0} tree={this.portfolioMenu} landingUrl={'/home'}
 				hideAppBar={this.props.clientOpts?.platform && this.props.clientOpts?.platform !== 'browser'}
-				sys={L('Portfolio 0.7')} menuTitle={L('Sys Menu')}
+				sys={L('Portfolio 0.8')} menuTitle={L('Sys Menu')}
 				// myInfo={myInfoPanels}
 				onLogout={this.logout}
 				/>
