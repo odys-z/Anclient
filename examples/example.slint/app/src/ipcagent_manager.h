@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <fcntl.h>
 #endif
 
 #include <io/odysz/utils.h>
@@ -164,7 +165,14 @@ public:
         */
         m_agent_pid = fork();
         if (m_agent_pid == 0) {
-            // Child process: close standard streams or redirect if necessary
+            // Child process: redirect stdout/stderr to the same log file as on Windows,
+            // so CI can upload it when the agent fails to start.
+            int log_fd = open(log_file.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (log_fd >= 0) {
+                dup2(log_fd, STDOUT_FILENO);
+                dup2(log_fd, STDERR_FILENO);
+                close(log_fd);
+            }
             execl(m_java_cmd.c_str(), m_java_cmd.c_str(), "-jar", m_agent_jar.c_str(),
                   jarg_agentsetting_path.c_str(), (char*)NULL);
             
