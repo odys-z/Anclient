@@ -160,17 +160,21 @@ bool            Ipclient::agent_ready = false;
 string          Ipclient::setup_error;
 
 TEST_F(Ipclient, Echo) {
-    EchoReq echo{EchoReq::A::echo};
-    echo.echo = "TEST_F(Ipcproxy, PING_Proxy) from C++";
-    AnsonMsg<EchoReq> echomsg(Port(&opts, Port::echo), echo);
-
-    wsclient->asynSend(echomsg);
-    wsclient->block_poll();
+    /*
+     * The agent's first message on a new connection. SetUpTestSuite() waits until the socket is
+     * open, so it is already queued: pop it before sending anything. (An echo sent before it
+     * would get a reply nobody pops, and the next test would count it.)
+     */
+    if (!wsclient->block_poll(3000))
+        FAIL() << "expecting session open ...";
 
     AnsonMsg<AnsonResp> resp = wsclient->pop_envelope<AnsonResp>();
     ASSERT_EQ(MsgCode::Code::_sentinel_, resp.code) << "expecting session open ...";
     anlog("✅ Echo Opening message verified");
 
+    EchoReq echo{EchoReq::A::echo};
+    echo.echo = "TEST_F(Ipcproxy, PING_Proxy) from C++";
+    AnsonMsg<EchoReq> echomsg(Port(&opts, Port::echo), echo);
     echomsg.code = MsgCode::Code::ok;
     wsclient->asynSend(echomsg);
     if (!wsclient->block_poll(3000))
