@@ -26,10 +26,6 @@
 using namespace anson;
 
 TEST(DOCSTIER, DE_ReserializeDocsResp) {
-    const char* app_settings = "../app/settings/app-settings-reddish.json";
-    if (!std::filesystem::exists(app_settings))
-        GTEST_SKIP() << app_settings << " is not found (gitignored; not available on CI).";
-
     AstMap asts;
     JsonOpt opts{&asts};
     register_jserv(&opts);
@@ -37,7 +33,8 @@ TEST(DOCSTIER, DE_ReserializeDocsResp) {
 
     auto ui = App::create();
     slint::ComponentWeakHandle<App> ui_weak = ui;
-    Slingleton& slingle = Slingleton::get_instance(ui_weak, app_settings);
+    // the source folder app/settings: the build doesn't copy it beside the tests (see tests/CMakeLists.txt)
+    Slingleton& slingle = Slingleton::get_instance(ui_weak, ALBUM_APP_SETTINGS_DIR "/app-settings-reddish.json");
 
     string r =
 R"json({"type": "io.odysz.semantic.jprotocol.AnsonMsg", "code": "ok", "opts": null, "port": "docstier", "header": null, "body": [{"type": "io.odysz.semantic.tier.docs.DocsResp", "syndomain": "infor-17-1", "rs": null, "parent": "io.odysz.semantic.jprotocol.AnsonMsg", "a": null, "org": null, "collectId": null, "stamp": null, "m": null, "uri": null, "syncingPage": {"type": "io.odysz.semantic.tier.docs.PathsPage", "start": 0, "end": 9, "clientPaths": {"C:/Users/Alice/github/anclient/examples/example.slint/build/app/ast/desktop-settings.ast.json": ["slint.test", "prv", "admin", "2026-07-22", 0]}, "device": "slint.test"}
