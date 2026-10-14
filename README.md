@@ -17,7 +17,7 @@ together with
 
 - Anclient.java
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.odys-z/anclient.java/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.odys-z/anclient.java)](https://central.sonatype.com/artifact/io.github.odys-z/anclient.java)
 Anclient for Java
 
 - Anclient.py3
