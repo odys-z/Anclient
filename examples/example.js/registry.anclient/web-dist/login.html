@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
+	<title>Registry Anclient Login</title>
+	<style>html, body { margin: 0; padding: 0; background: #f4f5fb; }</style>
+</head>
+
+<body>
+	<div id="login"></div>
+	<noscript>You need to enable JavaScript to run this app.</noscript>
+	<script src="login.min.js"></script>
+	<script>
+		let searchParams = new URLSearchParams(window.location.search);
+		let serv = searchParams.get('serv') || 'host';
+		// parent: the window to be redirected, if this page is loaded in an iframe.
+		registier.LoginApp.bindHtml('login', {serv, parent, home: 'index.html'});
+	</script>
+</body>
+</html>
