@@ -836,10 +836,14 @@ def interact():
     v_sk = RegexValidator(r'\S+', 'No spaces.')
     v_pkg = RegexValidator(r'(@[a-z0-9][a-z0-9._-]*/)?' + name_regex, 'npm package name, e.g. @anclient/my-app')
 
+    # PromptSession keeps the last prompt's validator when validator=None is passed,
+    # so a prompt without its own validator must pass this one explicitly.
+    v_any = Validator.from_callable(lambda _: True)
+
     def edit(message: str, current: str, validator: Optional[Validator] = None) -> str:
         """Edit one setting. Empty input keeps the current value."""
         answer = session.prompt(message=message + ' (empty to keep): ', default=current,
-                                validator=validator, validate_while_typing=False).strip()
+                                validator=validator or v_any, validate_while_typing=False).strip()
         return answer or current
 
     print('Create a ReactJS + TypeScript client on @anclient/anreact & @anclient/semantier.')
@@ -937,7 +941,7 @@ Settings (type a number to change):
         elif n == 9:
             # can be cleared
             cfg.author = session.prompt(message='9. Author in package.json (can be empty): ',
-                                        default=cfg.author).strip()
+                                        default=cfg.author, validator=v_any).strip()
         elif n == 10:
             cfg.package = edit('10. npm package name', cfg.package, v_pkg); edited.add('package')
         elif n == 11:
