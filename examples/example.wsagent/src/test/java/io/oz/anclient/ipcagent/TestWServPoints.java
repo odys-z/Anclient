@@ -145,7 +145,7 @@ public class TestWServPoints {
 		ArrayList<DocsResp> pongs = new ArrayList<DocsResp>(paths.size());
 		
 		DocsReq reqbd = (DocsReq) new DocsReq(settings.synuri)
-						.device(settings.sysuri)
+						.device(settings.device)
 						.a(DocsReq.A.requestSyn);
 
 		PathsPage pthpage = new PathsPage();

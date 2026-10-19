@@ -69,7 +69,8 @@ protected:
         agentController = new JavaAgentController(settings);
 
         if (!agentController->start_agent(settings_json)) {
-            setup_error = "failed to launch the Java IPC agent process.";
+            setup_error = "failed to launch the Java IPC agent process. log/ipc_agent_java.log:"
+                        + log_tail("log/ipc_agent_java.log");
             return false;
         }
         anlog(std::format("Synode Volume: {}", settings.synode_vol));
@@ -110,7 +111,9 @@ protected:
         int wait_ms = env_int("ALBUM_AGENT_WAIT_MS", 30000);
         int wsport = agentController->wait_wsport(std::chrono::milliseconds(wait_ms));
         if (wsport == 0) {
-            setup_error = std::format("the agent didn't report its port in {} ms, see log/ipc_agent_java.log", wait_ms);
+            // An agent jar built before the port-file change never writes it.
+            setup_error = std::format("the agent didn't write log/ipc-agent.port in {} ms, is res/ws-agent-*.jar rebuilt? "
+                                      "log/ipc_agent_java.log:{}", wait_ms, log_tail("log/ipc_agent_java.log"));
             return;
         }
 

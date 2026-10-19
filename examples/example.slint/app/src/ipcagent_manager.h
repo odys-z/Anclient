@@ -157,6 +157,19 @@ inline bool spawn_logged(const fs::path& exe, const std::vector<std::wstring>& a
 }
 #endif
 
+/** Last lines of a log file, for reporting why the agent failed. */
+inline std::string log_tail(const fs::path& log_file, size_t max_lines = 20) {
+    std::ifstream f(log_file);
+    std::vector<std::string> lines;
+    for (std::string l; std::getline(f, l); ) {
+        lines.push_back(l);
+        if (lines.size() > max_lines) lines.erase(lines.begin());
+    }
+    std::string s;
+    for (auto& l : lines) s += "\n    " + l;
+    return s;
+}
+
 class JavaAgentController {
 private:
     /** As configured, for messages. */
@@ -292,8 +305,8 @@ public:
         if (WaitForSingleObject(m_agent_process_handle, 500) == WAIT_OBJECT_0) {
             DWORD code = 0;
             GetExitCodeProcess(m_agent_process_handle, &code);
-            anwarn(std::format("[***** Agent Controller *****] Java Agent exited immediately, code {}. See {}",
-                               code, path_to_u8(log_file)));
+            anwarn(std::format("[***** Agent Controller *****] Java Agent exited immediately, code {}. {}:{}",
+                               code, path_to_u8(log_file), log_tail(log_file)));
             CloseHandle(m_agent_process_handle);
             m_agent_process_handle = nullptr;
             m_agent_pid = 0;
@@ -331,8 +344,8 @@ public:
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         int status = 0;
         if (waitpid(m_agent_pid, &status, WNOHANG) == m_agent_pid) {
-            anwarn(std::format("[***** Agent Controller *****] Java Agent exited immediately, status {}. See {}",
-                               status, logf));
+            anwarn(std::format("[***** Agent Controller *****] Java Agent exited immediately, exit code {}. {}:{}",
+                               WIFEXITED(status) ? WEXITSTATUS(status) : status, logf, log_tail(log_file)));
             m_agent_pid = -1;
             return false;
         }

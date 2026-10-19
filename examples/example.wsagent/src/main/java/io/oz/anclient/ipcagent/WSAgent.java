@@ -69,7 +69,7 @@ public class WSAgent {
 		for (int p = from; p <= to; p++) {
 			c.setPort(p);
 			try { c.open(); return c.getLocalPort(); }
-			catch (IOException inuse) { c.close(); }
+			catch (IOException inuse) { logi("Port %s is not available: %s", p, inuse.getMessage()); }
 		}
 		throw new IOException(String.format("No free port in [%s, %s]", from, to));
 	}
@@ -110,7 +110,9 @@ public class WSAgent {
 	    ipHandler.include("::1");
 	    ipHandler.include("192.168.0.0/24");
 	    ipHandler.include("10.0.0.0/24");
-	    ipHandler.include(server.getURI().getAuthority());
+	    // host only: the connector is already bound, so the authority would carry ":port",
+	    // which is not an address pattern ("Bad pattern: 127.0.1.1:8700")
+	    ipHandler.include(server.getURI().getHost());
 	    context.insertHandler(ipHandler);
 
 	    JakartaWebSocketServletContainerInitializer.configure(context, (servletContext, container) -> {
