@@ -26,8 +26,6 @@
 namespace fs = std::filesystem;
 
 namespace anson {
-// resolveHomePath() (~, $HOME, $VOLUME_HOME) is in anson.cmake, io/odysz/utils.h: anson::EnvPath.
-
 /** UTF-8 std::string (as read from the settings json) -> fs::path, without the ANSI code page. */
 inline fs::path u8_to_path(const std::string& s) {
     return fs::path(std::u8string(s.begin(), s.end()));
@@ -71,7 +69,7 @@ inline fs::path exe_dir() {
  */
 inline std::optional<fs::path> locate_file(const std::string& setting, bool parent_fallback,
                                            std::vector<fs::path>& tried) {
-    fs::path p = u8_to_path(resolveHomePath(setting));
+    fs::path p = u8_to_path(EnvPath::replaceEnv(setting));
     std::vector<fs::path> candidates;
     if (p.is_absolute())
         candidates.push_back(p);

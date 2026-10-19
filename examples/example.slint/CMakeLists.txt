@@ -39,20 +39,32 @@ find_package(ixwebsocket REQUIRED)
 
 include(FetchContent)
 
+# anson.cmake and anclient.cmake follow their branch: both are fetched again on every CMake run.
+# With CMP0168 NEW (cmake_minimum_required 3.30), FetchContent never re-fetches a branch once
+# populated, so these two are declared with CMP0168 OLD (sub-build, whose update step always runs).
+# The policy is captured by FetchContent_Declare(), not by FetchContent_MakeAvailable().
+# Other dependencies (Slint, webview) keep NEW and are not updated once downloaded.
+# Offline: configure with -DFETCHCONTENT_FULLY_DISCONNECTED=ON.
+set(FETCHCONTENT_UPDATES_DISCONNECTED_ANSON.CMAKE    OFF CACHE BOOL "Always update anson.cmake"    FORCE)
+set(FETCHCONTENT_UPDATES_DISCONNECTED_ANCLIENT.CMAKE OFF CACHE BOOL "Always update anclient.cmake" FORCE)
+
+cmake_policy(PUSH)
+cmake_policy(SET CMP0168 OLD)
 FetchContent_Declare(
   anson.cmake
   GIT_REPOSITORY https://github.com/odys-z/anson.cmake.git
   GIT_TAG        portfolio-0.8
 )
 
-set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(anson.cmake)
-
 FetchContent_Declare(
   anclient.cmake
   GIT_REPOSITORY https://github.com/odys-z/Anclient.cmake.git
   GIT_TAG        portfolio-0.8
 )
+cmake_policy(POP)
+
+set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(anson.cmake)
 
 set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(anclient.cmake)
