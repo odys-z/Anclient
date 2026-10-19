@@ -78,7 +78,7 @@ protected:
 
     /**
      * Replaces the fixed sleeps: a cold JVM on a CI runner can take several seconds
-     * before the agent binds wsport. Retry the websocket until it is Open.
+     * before the agent binds its port. Retry the websocket until it is Open.
      */
     static bool connect_with_retry(int timeout_ms) {
         auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout_ms);
@@ -107,10 +107,16 @@ protected:
 
         if (!start_agent()) return;
 
-        string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
+        int wait_ms = env_int("ALBUM_AGENT_WAIT_MS", 30000);
+        int wsport = agentController->wait_wsport(std::chrono::milliseconds(wait_ms));
+        if (wsport == 0) {
+            setup_error = std::format("the agent didn't report its port in {} ms, see log/ipc_agent_java.log", wait_ms);
+            return;
+        }
+
+        string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, wsport);
         wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, settings, onmsg);
 
-        int wait_ms = env_int("ALBUM_AGENT_WAIT_MS", 30000);
         agent_ready = connect_with_retry(wait_ms);
         if (!agent_ready)
             setup_error = std::format("{} not reachable in {} ms, see log/ipc_agent_java.log", wsjserv, wait_ms);

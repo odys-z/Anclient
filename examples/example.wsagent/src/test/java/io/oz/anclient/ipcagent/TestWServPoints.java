@@ -86,7 +86,7 @@ public class TestWServPoints {
     @Test
     public void testServPoint() throws Exception {
         JProtocol p = new JProtocol(T_WSAgent.ipc_path);
-        JServUrl jserv = new JServUrl(p, false, "localhost", appsettings.wsport);
+        JServUrl jserv = new JServUrl(p, false, "localhost", WSAgent.localPort(server));
 
         WSClient wsclient = new WSClient(jserv, true);
         
@@ -104,7 +104,7 @@ public class TestWServPoints {
     @Test
     public void testTaskPing() throws Exception {
         JProtocol p = new JProtocol(T_WSAgent.ipc_path);
-        JServUrl jserv = new JServUrl(p, false, "localhost", appsettings.wsport);
+        JServUrl jserv = new JServUrl(p, false, "localhost", WSAgent.localPort(server));
         
         WSClient pinger = new WSClient(jserv, true);
         pinger.connect();
@@ -184,7 +184,7 @@ public class TestWServPoints {
     	logi("======================= test upload ==========================");
 
         JProtocol p = new JProtocol(T_WSAgent.ipc_path);
-        JServUrl jserv = new JServUrl(p, false, appsettings.wshost, appsettings.wsport);
+        JServUrl jserv = new JServUrl(p, false, appsettings.wshost, WSAgent.localPort(server));
         
         WSClient pusher = new WSClient(jserv, true);
         pusher.connect();

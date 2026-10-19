@@ -26,7 +26,7 @@ inline static void open_browser(const std::string& url) {
 }
 
 inline static void open_file_explorer(std::string path) {
-    path = anson::resolveHomePath(path);
+    path = anson::EnvPath::replaceEnv(path);
 #if defined(_WIN32) || defined(_WIN64)
     // Windows: Open explorer at the specific path
     std::replace(path.begin(), path.end(), '/', '\\');

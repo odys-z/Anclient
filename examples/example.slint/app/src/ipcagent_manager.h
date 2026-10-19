@@ -4,6 +4,8 @@
 #include <vector>
 #include <optional>
 #include <filesystem>
+#include <fstream>
+#include <atomic>
 #include <system_error>
 #include <thread>
 #include <chrono>
@@ -171,7 +173,11 @@ private:
 #else
     pid_t m_agent_pid = -1;
 #endif
-    bool m_is_running = false;
+    std::atomic<bool> m_is_running = false;
+
+    /** Written by the agent: line 1, the websocket port it bound; line 2, its stop port (for StopAgent only). */
+    fs::path m_port_file;
+    std::atomic<int> m_wsport = 0;
 
     /** Settings' java_path, with the platform's executable name: java.dll / java -> java.exe on Windows. */
     static std::string java_exe_name(std::string java) {
@@ -263,14 +269,19 @@ public:
         fs::create_directories("log", ec);
         fs::path log_file = fs::absolute(fs::path("log") / "ipc_agent_java.log", ec).make_preferred();
 
-        aninfo(std::format("[***** Agent Controller *****]: {} -jar {} {} > {}",
+        // The agent binds the first free port from settings.wsport, and reports it in this file.
+        m_port_file = fs::absolute(fs::path("log") / "ipc-agent.port", ec).make_preferred();
+        fs::remove(m_port_file, ec);   // a stale file from a crashed run must not be read
+        m_wsport = 0;
+
+        aninfo(std::format("[***** Agent Controller *****]: {} -jar {} {} {} > {}",
                            path_to_u8(m_java_cmd), path_to_u8(m_agent_jar),
-                           path_to_u8(settings_file), path_to_u8(log_file)));
+                           path_to_u8(settings_file), path_to_u8(m_port_file), path_to_u8(log_file)));
 
     #ifdef _WIN32
         PROCESS_INFORMATION pi{};
         if (!spawn_logged(m_java_cmd,
-                          { L"-jar", m_agent_jar.wstring(), settings_file.wstring() },
+                          { L"-jar", m_agent_jar.wstring(), settings_file.wstring(), m_port_file.wstring() },
                           log_file, pi))
             return false;
 
@@ -297,6 +308,7 @@ public:
         std::string jar  = m_agent_jar.string();
         std::string sets = settings_file.string();
         std::string logf = log_file.string();
+        std::string portf = m_port_file.string();
 
         m_agent_pid = fork();
         if (m_agent_pid == 0) {
@@ -308,7 +320,7 @@ public:
                 dup2(log_fd, STDERR_FILENO);
                 close(log_fd);
             }
-            execl(java.c_str(), java.c_str(), "-jar", jar.c_str(), sets.c_str(), (char*)NULL);
+            execl(java.c_str(), java.c_str(), "-jar", jar.c_str(), sets.c_str(), portf.c_str(), (char*)NULL);
             std::perror("execl failed");
             _exit(127);
         } else if (m_agent_pid < 0) {
@@ -332,6 +344,21 @@ public:
     }
 
     /**
+     * Blocks until the agent reports the port it is listening at.
+     * @return the port, or 0 if the agent is not running or didn't report within timeout.
+     */
+    int wait_wsport(std::chrono::milliseconds timeout = std::chrono::seconds(30)) {
+        auto deadline = std::chrono::steady_clock::now() + timeout;
+        while (m_wsport == 0 && m_is_running && std::chrono::steady_clock::now() < deadline) {
+            std::ifstream f(m_port_file);
+            int p = 0;
+            if (f >> p && p > 0) m_wsport = p;
+            else std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+        return m_wsport;
+    }
+
+    /**
      * Executes the stop command to gracefully signal the agent to shut down.
      * Falls back to a forced process termination if it hangs.
      */
@@ -350,7 +377,8 @@ public:
 
         PROCESS_INFORMATION pi{};
         if (spawn_logged(m_java_cmd,
-                         { L"-cp", m_agent_jar.wstring(), L"io.oz.anclient.ipcagent.StopAgent" },
+                         { L"-cp", m_agent_jar.wstring(), L"io.oz.anclient.ipcagent.StopAgent",
+                           m_port_file.wstring() },
                          stop_log, pi)) {
             // Wait up to 5 seconds for the StopAgent command to successfully communicate and finish
             WaitForSingleObject(pi.hProcess, 5000);
@@ -371,13 +399,14 @@ public:
     #else
         std::string java = m_java_cmd.string();
         std::string jar  = m_agent_jar.string();
+        std::string portf = m_port_file.string();
 
         // POSIX Implementation
         pid_t stop_pid = fork();
         if (stop_pid == 0) {
             // Inside child execution context: execute stop utility class mapping
             execl(java.c_str(), java.c_str(), "-cp", jar.c_str(),
-                  "io.oz.anclient.ipcagent.StopAgent", (char*)NULL);
+                  "io.oz.anclient.ipcagent.StopAgent", portf.c_str(), (char*)NULL);
             _exit(1);
         } else if (stop_pid > 0) {
             int status;
@@ -402,6 +431,9 @@ public:
         }
     #endif
 
+        std::error_code rm;
+        fs::remove(m_port_file, rm);
+        m_wsport = 0;
         m_is_running = false;
         aninfo("[***** Agent Controller *****] Java Agent stopped successfully.");
     }
