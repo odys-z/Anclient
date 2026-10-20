@@ -26,45 +26,6 @@
 namespace fs = std::filesystem;
 
 namespace anson {
-/**
- * @brief Resolves the tilde (~) prefix in file paths across different platforms.
- * On Windows, it expands '~' to the USERPROFILE directory.
- * On Unix/Linux/macOS, it expands '~' to the HOME directory.
- */
-inline static string resolveHomePath(const std::string& inputPath) {
-    if (inputPath.empty() || inputPath[0] != '~') {
-        u8string u8_str = fs::path(inputPath).u8string();
-        std::string regular_str(u8_str.begin(), u8_str.end());
-        return regular_str;
-    }
-
-    std::string homeDir;
-
-    #ifdef _WIN32
-        // Windows conditional compilation
-        char* userProfile = std::getenv("USERPROFILE");
-        if (userProfile) {
-            homeDir = userProfile;
-        }
-    #else
-        // Linux / macOS conditional compilation
-        char* home = std::getenv("HOME");
-        if (home) {
-        homeDir = home;
-        }
-    #endif
-
-    if (homeDir.empty()) {
-        u8string u8_str = fs::path(inputPath).u8string();
-        return std::string(u8_str.begin(), u8_str.end());
-    }
-
-    size_t offset = (inputPath.size() > 1 && (inputPath[1] == '/' || inputPath[1] == '\\')) ? 2 : 1;
-
-    u8string u8_str = (fs::path(homeDir) / inputPath.substr(offset)).u8string();
-    return std::string(u8_str.begin(), u8_str.end());
-}
-
 /** UTF-8 std::string (as read from the settings json) -> fs::path, without the ANSI code page. */
 inline fs::path u8_to_path(const std::string& s) {
     return fs::path(std::u8string(s.begin(), s.end()));
@@ -108,7 +69,7 @@ inline fs::path exe_dir() {
  */
 inline std::optional<fs::path> locate_file(const std::string& setting, bool parent_fallback,
                                            std::vector<fs::path>& tried) {
-    fs::path p = u8_to_path(resolveHomePath(setting));
+    fs::path p = u8_to_path(EnvPath::replaceEnv(setting));
     std::vector<fs::path> candidates;
     if (p.is_absolute())
         candidates.push_back(p);

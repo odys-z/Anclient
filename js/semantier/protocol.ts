@@ -691,15 +691,16 @@ export class QueryReq extends AnsonBody {
     mtabl: string;
     mAlias: string;
 
+    /*
+     * Only the fields of io.odysz.semantic.jserv.R.AnQueryReq: Anson (java) refuses a request
+     * with an unknown array field, e.g. "Field not found in AnDatasetReq field: joinings".
+     * joinings, cond, order & groupings, used by nothing but commit(), are removed.
+     */
     exprs: Array<string[]>;
     joins: Array<string[]>;
-    joinings: string[] = [];
     where: Array<string[]>;
     orders: Array<string[]> = [];
     groups: string[] = [];
-    cond: Array<string[]> = [];
-    order: Array<string[]> = [];
-    groupings: Array<string[]> = [];
 
     page: number = 0;
     pgsize: number = -1;
@@ -886,10 +887,10 @@ export class QueryReq extends AnsonBody {
 				body: [{a: "R",
 						exprs: this.exprs,
 						f: this.mtabl,
-						j: this.joinings,
-						conds: this.cond,
-						orders: this.order,
-						group: this.groupings}]};
+						j: this.joins,
+						conds: this.where,
+						orders: this.orders,
+						group: this.groups}]};
 	}
 
     formatHeader() {

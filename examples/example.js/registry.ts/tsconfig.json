@@ -14,7 +14,9 @@
 		"types": ["react", "react-dom"],
 		"baseUrl": ".",
 		"paths": {
-			"@anclient/anreact": ["node_modules/@anclient/anreact/src/an-components.ts"]
+			"@anclient/anreact": ["node_modules/@anclient/anreact/src/an-components.ts"],
+			"@anclient/semantier": ["node_modules/@anclient/semantier/anclient.ts"],
+			"@anclient/semantier/*": ["node_modules/@anclient/semantier/*"]
 		}
 	},
 	"include": ["src"]
