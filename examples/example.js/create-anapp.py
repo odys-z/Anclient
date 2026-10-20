@@ -38,6 +38,11 @@ context path /jserv-sample). The app's function uri defaults to /sys/<name>,
 which jserv-sample's connects.xml maps to sys-sqlite with the prefix rule
 <uri>/sys/*</uri>.
 
+Node modules: if a parent folder already has the dependencies installed, e.g.
+example.js/node_modules, they are used from there (Node & webpack resolve upwards),
+and only the missing ones are listed in the project's package.json. Setting 12
+switches to installing all into the project.
+
 For scripts, generate() can be called with an AppConfig, without questions.
 """
 
@@ -68,7 +73,6 @@ DEPENDENCIES = {
     'jquery': '^3.6.0',
     'material-ui-audio-player': '^1.6.6',
     'mime-types-no-nodejs': '^0.9.1',
-    'pdfjs-dist': '^5.1.91',
     'qrcode': '^1.5.1',
     'react': '^17.0.2',
     'react-dom': '^17.0.2',
@@ -114,7 +118,7 @@ TSCONFIG = '''{
 		"types": ["react", "react-dom"],
 		"baseUrl": ".",
 		"paths": {
-			"@anclient/anreact": ["node_modules/@anclient/anreact/src/an-components.ts"]
+			"@anclient/anreact": ["__ANREACT_SRC__"]
 		}
 	},
 	"include": ["src"]
@@ -144,7 +148,11 @@ module.exports = {
 	plugins: [ ],
 __EXTERNALS__
 	resolve: {
-		extensions: ['.ts', '.tsx', '.js', '.jsx']
+		extensions: ['.ts', '.tsx', '.js', '.jsx'],
+		/* The project's own node_modules first, also for the packages imported by shared ones,
+		   e.g. ../node_modules/@anclient/anreact imports a package installed only here.
+		   Then node_modules of the parent folders, as usual. */
+		modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
 	},
 
 	module: {
@@ -646,6 +654,9 @@ class AppConfig:
     uri: str = ''
     menu_sk: Optional[str] = None
     '''None: a local menu tree in app.tsx; otherwise the dataset sk loaded by menu.serv'''
+    shared_modules: bool = True
+    '''Use the packages already installed in a parent folder's node_modules (e.g. example.js/node_modules),
+    as Node & webpack resolve them upwards. Only the missing ones are listed in the project's package.json.'''
     react_cdn: bool = False
     react_build: str = 'development'
     lib: str = ''
@@ -696,7 +707,54 @@ def write(root: str, rel: str, content: str):
     print(f'  + {rel}')
 
 
-def package_json(cfg: AppConfig) -> str:
+def find_modules(dest: str) -> dict:
+    """
+    Find the dependencies installed in the node_modules of dest's parent folders,
+    the way Node resolves them: the nearest one wins.
+    :return: {package: node_modules folder}
+    """
+    found = {}
+    folder = os.path.dirname(os.path.abspath(dest))
+    while True:
+        nm = os.path.join(folder, 'node_modules')
+        if os.path.isdir(nm):
+            for pkg in list(DEPENDENCIES) + list(DEV_DEPENDENCIES):
+                if pkg not in found and os.path.isfile(os.path.join(nm, pkg, 'package.json')):
+                    found[pkg] = nm
+        parent = os.path.dirname(folder)
+        if parent == folder:
+            return found
+        folder = parent
+
+
+@dataclass
+class ModulesPlan:
+    found: dict
+    '''{package: node_modules folder}, used from parent folders'''
+    missing: list
+    '''packages to be installed into the project'''
+
+    @property
+    def install_needed(self) -> bool:
+        return len(self.missing) > 0
+
+    def shared_dir(self) -> Optional[str]:
+        """the node_modules folder providing the most packages"""
+        if not self.found:
+            return None
+        dirs = list(self.found.values())
+        return max(set(dirs), key=dirs.count)
+
+
+def plan_modules(cfg: AppConfig) -> ModulesPlan:
+    all_deps = list(DEPENDENCIES) + list(DEV_DEPENDENCIES)
+    if not cfg.shared_modules:
+        return ModulesPlan(found={}, missing=all_deps)
+    found = find_modules(cfg.dest or cfg.name)
+    return ModulesPlan(found=found, missing=[d for d in all_deps if d not in found])
+
+
+def package_json(cfg: AppConfig, plan: ModulesPlan) -> str:
     pkg = {
         'name': cfg.package,
         'version': cfg.version,
@@ -711,9 +769,15 @@ def package_json(cfg: AppConfig) -> str:
         'keywords': ['Anclient', 'semantic-jserv'],
         'author': cfg.author,
         'license': cfg.license,
-        'dependencies': dict(sorted(DEPENDENCIES.items())),
-        'devDependencies': dict(sorted(DEV_DEPENDENCIES.items())),
     }
+    deps = {k: v for k, v in DEPENDENCIES.items() if k in plan.missing}
+    devs = {k: v for k, v in DEV_DEPENDENCIES.items() if k in plan.missing}
+    if deps: pkg['dependencies'] = dict(sorted(deps.items()))
+    if devs: pkg['devDependencies'] = dict(sorted(devs.items()))
+    if plan.found:
+        where = os.path.relpath(plan.shared_dir(), os.path.abspath(cfg.dest))
+        pkg['//'] = f'{"Other d" if plan.missing else "D"}ependencies are resolved from {where}.'
+
     # With react_cdn, react & react-dom stay in dependencies for type checking and
     # for anreact's peers, while webpack takes them as externals.
     return json.dumps(pkg, indent=2, ensure_ascii=False) + '\n'
@@ -726,6 +790,10 @@ def generate(cfg: AppConfig) -> str:
     """
     cfg.fill_defaults()
     dest = os.path.abspath(cfg.dest)
+    plan = plan_modules(cfg)
+    anreact_nm = plan.found.get('@anclient/anreact', os.path.join(dest, 'node_modules'))
+    anreact_src = os.path.relpath(os.path.join(anreact_nm, '@anclient', 'anreact', 'src', 'an-components.ts'),
+                                  dest).replace(os.sep, '/')
 
     menu_prop = f"menu={{'{cfg.menu_sk}'}}" if cfg.menu_sk else 'tree={this.menuTree as any}'
     react_build = 'production.min' if cfg.react_build == 'production' else 'development'
@@ -739,12 +807,13 @@ def generate(cfg: AppConfig) -> str:
         'MENU_PROP': menu_prop,
         'EXTERNALS': WEBPACK_EXTERNALS if cfg.react_cdn else '',
         'REACT_SCRIPTS': render(REACT_CDN, {'REACT_BUILD': react_build}) if cfg.react_cdn else '',
+        'ANREACT_SRC': anreact_src,
     }
 
     print(f'Creating {cfg.title} in {dest}')
     files = {
-        'package.json': package_json(cfg),
-        'tsconfig.json': TSCONFIG,
+        'package.json': package_json(cfg, plan),
+        'tsconfig.json': render(TSCONFIG, tokens),
         'webpack.config.js': render(WEBPACK, tokens),
         'README.md': render(README, tokens),
         '.gitignore': GITIGNORE,
@@ -763,13 +832,18 @@ def generate(cfg: AppConfig) -> str:
     return dest
 
 
-def run_npm(dest: str, build: bool) -> bool:
+def run_npm(dest: str, build: bool, plan: ModulesPlan) -> bool:
     npm = shutil.which('npm')
     if not npm:
         print('npm is not found. Install Node.js, then run: npm install && npm run build')
         return False
     try:
-        subprocess.check_call([npm, 'install'], cwd=dest)
+        if plan.install_needed:
+            # With shared modules, don't let npm install anreact's peers (react, @material-ui, ...)
+            # into the project again: two copies of React break the hooks & contexts.
+            cmd = [npm, 'install'] + (['--legacy-peer-deps'] if plan.found else [])
+            print(' '.join(['npm'] + cmd[1:]))
+            subprocess.check_call(cmd, cwd=dest)
         if build:
             subprocess.check_call([npm, 'run', 'build'], cwd=dest)
         return True
@@ -795,7 +869,28 @@ def is_empty_dir_or_none(path: str) -> bool:
     return not os.path.exists(path) or (os.path.isdir(path) and not os.listdir(path))
 
 
-npm_steps = {1: 'npm install & npm run build', 2: 'npm install only', 3: 'nothing, do it later'}
+def npm_steps(plan: ModulesPlan) -> dict:
+    if not plan.install_needed:
+        return {1: 'npm run build (nothing to install)', 3: 'nothing, do it later'}
+    install = 'npm install --legacy-peer-deps' if plan.found else 'npm install'
+    return {1: f'{install} & npm run build', 2: f'{install} only', 3: 'nothing, do it later'}
+
+
+def npm_commands(plan: ModulesPlan) -> str:
+    if not plan.install_needed:
+        return 'npm run build'
+    return ('npm install --legacy-peer-deps' if plan.found else 'npm install') + ' && npm run build'
+
+
+def modules_summary(plan: ModulesPlan, cfg: AppConfig) -> str:
+    if not cfg.shared_modules:
+        return 'install all into the project'
+    if not plan.found:
+        return 'none found in parent folders, install all into the project'
+    where = os.path.relpath(plan.shared_dir(), os.path.abspath(cfg.dest or cfg.name))
+    if not plan.missing:
+        return f'shared, {where} (all {len(plan.found)} found)'
+    return f'shared, {where}; install into project: {", ".join(plan.missing)}'
 
 
 def interact():
@@ -868,6 +963,9 @@ def interact():
     derive()
 
     def show():
+        plan = plan_modules(cfg)
+        steps = npm_steps(plan)
+        step = npm_step if npm_step in steps else 3
         folder = os.path.abspath(cfg.dest)
         print(f'''
 Settings (type a number to change):
@@ -881,14 +979,15 @@ Settings (type a number to change):
    8  UMD global      : {cfg.lib}   (web-dist/{cfg.name}.min.js & login.min.js)
    9  author          : {cfg.author}
   10  npm package     : {cfg.package} {cfg.version}, {cfg.license}
-  11  after creating  : {npm_steps[npm_step]}{'' if shutil.which('npm') else '   (npm is not found)'}''')
+  11  after creating  : {steps[step]}{'' if shutil.which('npm') else '   (npm is not found)'}
+  12  node modules    : {modules_summary(plan, cfg)}''')
 
     class MenuValidator(Validator):
         def validate(self, document: Document) -> None:
             t = document.text.strip().lower()
-            if t in ('', 'q') or (t.isdigit() and 1 <= int(t) <= 11):
+            if t in ('', 'q') or (t.isdigit() and 1 <= int(t) <= 12):
                 return
-            raise ValidationError(message='Type 1 - 11 to change, return to create, q to quit.')
+            raise ValidationError(message='Type 1 - 12 to change, return to create, q to quit.')
 
     while True:
         show()
@@ -945,20 +1044,30 @@ Settings (type a number to change):
         elif n == 10:
             cfg.package = edit('10. npm package name', cfg.package, v_pkg); edited.add('package')
         elif n == 11:
+            steps = npm_steps(plan_modules(cfg))
             npm_step = choice(message='11. After the project is created:',
-                              options=[(k, v) for k, v in npm_steps.items()],
-                              default=npm_step, style=style)
+                              options=[(k, v) for k, v in steps.items()],
+                              default=npm_step if npm_step in steps else 1, style=style)
+        elif n == 12:
+            cfg.shared_modules = choice(
+                message="12. Node modules (Node & webpack also resolve packages in the parent folders' node_modules):",
+                options=[(True, "Use the packages in the parent folders' node_modules, "
+                                "install only the missing ones into the project."),
+                         (False, 'Install all into the project (its own node_modules).')],
+                default=cfg.shared_modules, style=style)
 
+    plan = plan_modules(cfg)
     dest = generate(cfg)
 
-    npm_done = False
-    if npm_step != 3:
-        npm_done = run_npm(dest, build=npm_step == 1)
+    todo = npm_commands(plan)
+    if npm_step in npm_steps(plan) and npm_step != 3:
+        if run_npm(dest, build=npm_step == 1, plan=plan):
+            todo = '' if npm_step == 1 else 'npm run build'
 
     print(f'''
 Done. Next:
-    cd {os.path.relpath(dest)}{'' if npm_done else '''
-    npm install && npm run build'''}
+    cd {os.path.relpath(dest)}{f'''
+    {todo}''' if todo else ''}
     cd web-dist && python3 -m http.server 8888   # open http://localhost:8888/login.html
 
 Jserv: {cfg.jserv}  (edit web-dist/private/host.json)
