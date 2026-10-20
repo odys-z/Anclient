@@ -1,0 +1,379 @@
+#!/usr/bin/env python3
+"""
+Compare the @anclient/* packages a project builds with against their sources in this
+repository (Anclient/js/<package>), and open the differences in VS Code.
+
+Projects can use @anclient/* from different locations, and different versions:
+    album/node_modules/@anclient/*          its own npm install
+    node_modules/@anclient/*                the shared one of example.js, for north-star, ...
+    ../../js/anreact                        the sources, aliased in webpack.config.js (registry.ts)
+    a symlink to the sources                npm link / "file:" dependencies
+
+For each project, the location is found the way the build finds it: the resolve.alias of
+webpack.config.js first, then the node_modules of the project folder and its parents.
+
+Usage (in examples/example.js):
+    python3 diff-anclient.py                 list the projects and their @anclient locations, pick one
+    python3 diff-anclient.py album           compare album's @anclient/* with the sources
+    python3 diff-anclient.py album -p anreact
+    python3 diff-anclient.py --src ~/github/anclient/js
+    python3 diff-anclient.py -h
+
+Then it lists the files that differ, and asks:
+    3         open file 3 in VS Code's diff editor
+    1 4 7     several
+    a         all modified files
+    x         swap the sides of the diff editor (which file is on the right)
+    f         open the whole package pair in VS Code, with the Compare Folders extension
+    r         rescan
+    q         quit
+
+Editing in both directions, in VS Code:
+  - diff editor (3, a): the right side is the one to edit; the arrows in the gutter between
+    the sides copy a change from the left to the right. To copy the other way, x swaps the sides.
+    By default the copy used by the project is on the left, the Anclient source on the right.
+  - folder view (f): extension moshfeu.compare-folders (installed when asked), listing the
+    files that differ or exist on one side only. "Take My File / Take Compared File" and
+    "Copy to My / Compared Folder" copy whole files in both directions; clicking a file
+    opens it in the diff editor. "My folder" is the project's copy, "compared" the source.
+    Exclude noise with the user setting
+        "compareFolders.excludeFilter": ["**/node_modules", "**/dist", "**/.git"]
+
+A copy installed from npm is overwritten by the next npm install: take what is worth keeping
+into the source (and publish it). A copy that is a symlink to the source (npm link, "file:"
+dependencies, e.g. registry.ts) is the source itself; then the shadowed copy, if any, e.g.
+example.js/node_modules for the other projects, is compared instead.
+
+Files only in one side are opened with `code <file>`. Without VS Code's `code` command
+on PATH, the unified diff is printed instead. Line endings are ignored.
+"""
+
+import argparse
+import difflib
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+here = os.path.dirname(os.path.abspath(__file__))
+packages = ['anreact', 'semantier']
+
+skip_dirs = {'node_modules', '.git', 'dist', 'ts', 'test', 'tests', '.vscode', '__pycache__'}
+skip_files = {'package-lock.json', '.DS_Store'}
+
+
+# ---------------------------------------------------------------- locations
+
+def pkg_root(path: str, pkg: str):
+    """The folder with package.json of @anclient/<pkg>, at or above path (an alias can name a file)."""
+    folder = path if os.path.isdir(path) else os.path.dirname(path)
+    while True:
+        try:
+            with open(os.path.join(folder, 'package.json'), encoding='utf-8') as f:
+                if json.load(f).get('name') == f'@anclient/{pkg}':
+                    return folder
+        except (OSError, ValueError):
+            pass
+        parent = os.path.dirname(folder)
+        if parent == folder:
+            return path
+        folder = parent
+
+
+def webpack_aliases(project: str) -> dict:
+    """
+    resolve.alias of the project's webpack.config.js, by loading it with node.
+    :return: {alias: absolute path}; {'?': message} if the config can't be loaded
+    """
+    cfg = os.path.join(project, 'webpack.config.js')
+    if not os.path.isfile(cfg):
+        return {}
+    with open(cfg, encoding='utf-8') as f:
+        if '@anclient/' not in f.read():
+            return {}
+    node = shutil.which('node')
+    if not node:
+        return {'?': 'node is not found to read webpack.config.js'}
+    js = ("const c = require(process.argv[1]); const r = (Array.isArray(c) ? c[0] : c).resolve || {};"
+          "console.log(JSON.stringify(r.alias || {}))")
+    try:
+        out = subprocess.run([node, '-e', js, cfg], cwd=project, capture_output=True, text=True, timeout=20)
+        if out.returncode == 0:
+            alias = json.loads(out.stdout.strip().splitlines()[-1])
+            return {k.rstrip('$'): v for k, v in alias.items() if isinstance(v, str)}
+        return {'?': out.stderr.strip().splitlines()[-1] if out.stderr.strip() else 'failed'}
+    except (OSError, ValueError, IndexError, subprocess.SubprocessError) as e:
+        return {'?': str(e)}
+
+
+def node_chain(pkg: str, project: str) -> list:
+    """node_modules/@anclient/<pkg> in the project folder and its parents, nearest first."""
+    found, folder = [], os.path.abspath(project)
+    while True:
+        p = os.path.join(folder, 'node_modules', '@anclient', pkg)
+        if os.path.isdir(p):
+            found.append(p)
+        parent = os.path.dirname(folder)
+        if parent == folder:
+            return found
+        folder = parent
+
+
+class Location:
+    def __init__(self, pkg: str, path: str, how: str):
+        self.pkg, self.path, self.how = pkg, path, how   # how: alias | node_modules
+        self.real = os.path.realpath(path)
+
+    def is_source(self, source: str) -> bool:
+        return os.path.realpath(source) == self.real
+
+    def label(self, source: str) -> str:
+        rel = os.path.relpath(self.path)
+        if self.how == 'alias':
+            return f'{rel}  (webpack alias){"  = source" if self.is_source(source) else ""}'
+        link = f'  -> {os.path.relpath(self.real)}' if self.real != os.path.abspath(self.path) else ''
+        return f'{rel}{link}{"  = source" if self.is_source(source) else ""}'
+
+
+def locate(pkg: str, project: str):
+    """
+    :return: (the location used by the build, the shadowed ones), or (None, [], message)
+    """
+    alias = webpack_aliases(project)
+    chain = [Location(pkg, p, 'node_modules') for p in node_chain(pkg, project)]
+    if f'@anclient/{pkg}' in alias:
+        return Location(pkg, pkg_root(alias[f'@anclient/{pkg}'], pkg), 'alias'), chain, None
+    note = f'webpack.config.js not read: {alias["?"]}' if '?' in alias else None
+    return (chain[0] if chain else None), chain[1:], note
+
+
+def version(pkg_dir: str) -> str:
+    try:
+        with open(os.path.join(pkg_dir, 'package.json'), encoding='utf-8') as f:
+            return json.load(f).get('version', '?')
+    except (OSError, ValueError):
+        return '?'
+
+
+def projects_here() -> list:
+    return sorted(d for d in os.listdir(here)
+                  if not d.startswith('.') and d != 'node_modules'
+                  and os.path.isfile(os.path.join(here, d, 'package.json')))
+
+
+def overview(src_root: str):
+    names = projects_here()
+    print(f'Sources: {src_root}  ' +
+          '  '.join(f'{p} {version(os.path.join(src_root, p))}' for p in packages))
+    for i, name in enumerate(names, 1):
+        print(f'\n{i:3}  {name}')
+        for pkg in packages:
+            used, shadowed, note = locate(pkg, os.path.join(here, name))
+            source = os.path.join(src_root, pkg)
+            if used is None:
+                print(f'       {pkg:10} not found{"  (" + note + ")" if note else ""}')
+                continue
+            print(f'       {pkg:10} {version(used.path):8} {used.label(source)}')
+            for s in shadowed:
+                print(f'       {"":10} {version(s.path):8} {s.label(source)}  (shadowed)')
+    return names
+
+
+# ---------------------------------------------------------------- compare
+
+def files_under(root: str):
+    out = set()
+    for d, dirs, files in os.walk(root):
+        dirs[:] = [x for x in dirs if x not in skip_dirs]
+        for f in files:
+            if f not in skip_files:
+                out.add(os.path.relpath(os.path.join(d, f), root))
+    return out
+
+
+def same(a: str, b: str) -> bool:
+    with open(a, 'rb') as fa, open(b, 'rb') as fb:
+        return fa.read().replace(b'\r\n', b'\n') == fb.read().replace(b'\r\n', b'\n')
+
+
+def compare(installed: str, source: str):
+    """
+    :return: list of (state, rel, installed path, source path); state: M, I (installed only), S (source only)
+    """
+    inst = files_under(installed)
+    # only the source files in the folders / top-level files the published package has,
+    # e.g. src/** for anreact, *.ts for semantier
+    tops = {r.split(os.sep)[0] for r in inst if os.sep in r}
+    root_exts = {os.path.splitext(r)[1] for r in inst if os.sep not in r} - {'.json', '.md', ''}
+    src = {r for r in files_under(source)
+           if (os.sep in r and r.split(os.sep)[0] in tops)
+           or (os.sep not in r and (r in inst or os.path.splitext(r)[1] in root_exts
+                                    and not r.endswith('.d.ts')))}
+
+    rows = []
+    for r in sorted(inst | src):
+        a, b = os.path.join(installed, r), os.path.join(source, r)
+        if r in inst and r in src:
+            if not same(a, b):
+                rows.append(('M', r, a, b))
+        elif r in inst:
+            rows.append(('I', r, a, None))
+        else:
+            rows.append(('S', r, None, b))
+    return rows
+
+
+def scan(project: str, pkgs, src_root, pairs=None):
+    rows = []
+    print(f'\nProject {os.path.relpath(project)}')
+    for pkg in pkgs:
+        source = os.path.join(src_root, pkg)
+        used, shadowed, note = locate(pkg, project)
+        if not os.path.isdir(source):
+            print(f'@anclient/{pkg}: source {source} not found, use --src <Anclient/js>.')
+            continue
+        if used is None:
+            print(f'@anclient/{pkg}: not found by webpack alias or node_modules'
+                  f'{" (" + note + ")" if note else ""}.')
+            continue
+        left = used
+        if used.is_source(source):
+            # built from the sources: nothing to compare, unless an installed copy is shadowed
+            others = [s for s in shadowed if not s.is_source(source)]
+            print(f'\n@anclient/{pkg}  built from the source: {used.label(source)}')
+            if not others:
+                continue
+            left = others[0]
+            print(f'    comparing the shadowed copy instead: {left.label(source)}')
+
+        if pairs is not None:
+            pairs.append((left.real, os.path.realpath(source)))
+        r = compare(left.path, source)
+        side = 'used  ' if left is used else 'copy  '
+        print(f'\n@anclient/{pkg}  {side} {version(left.path):8} {left.label(source)}\n'
+              f'{" " * (len(pkg) + 11)}source {version(source):8} {os.path.relpath(source)}')
+        if not r:
+            print('    identical')
+        rows += [(pkg,) + x for x in r]
+
+    labels = {'M': 'modified', 'I': 'used only', 'S': 'source only'}
+    if rows:
+        print()
+    for i, (pkg, st, rel, _, _) in enumerate(rows, 1):
+        print(f'{i:4}  {labels[st]:11}  {pkg}/{rel}')
+    return rows
+
+
+compare_folders_ext = 'moshfeu.compare-folders'
+
+
+def has_extension(code: str, ext: str) -> bool:
+    try:
+        out = subprocess.run([code, '--list-extensions'], capture_output=True, text=True, timeout=60)
+        return ext.lower() in out.stdout.lower().split()
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def open_folders(code, pairs):
+    """
+    Open each (copy, source) package pair with the Compare Folders extension, in a new window.
+    """
+    if not code:
+        print("VS Code's `code` command is not on PATH.")
+        return
+    if not has_extension(code, compare_folders_ext):
+        if ask(f'VS Code extension {compare_folders_ext} (Compare Folders) is not installed. Install it? [y/N] ') != 'y':
+            return
+        subprocess.run([code, '--install-extension', compare_folders_ext])
+    for copy, source in pairs:
+        print(f'Compare Folders: my folder {os.path.relpath(copy)}  <->  compared {os.path.relpath(source)}')
+        subprocess.Popen([code, '--new-window', copy, source], env=dict(os.environ, COMPARE_FOLDERS='DIFF'))
+
+
+def open_rows(picks, code, swap=False):
+    for pkg, st, rel, a, b in picks:
+        if code:
+            left, right = (b, a) if swap else (a, b)
+            subprocess.Popen([code, '--reuse-window', '--diff', left, right] if st == 'M' else [code, '--reuse-window', a or b])
+        elif st == 'M':
+            with open(a, encoding='utf-8', errors='replace') as fa, \
+                 open(b, encoding='utf-8', errors='replace') as fb:
+                sys.stdout.writelines(difflib.unified_diff(
+                    fa.read().splitlines(True), fb.read().splitlines(True),
+                    f'used/{pkg}/{rel}', f'source/{pkg}/{rel}'))
+        else:
+            print(f'{"used" if a else "source"} only: {a or b}')
+
+
+def ask(prompt: str) -> str:
+    try:
+        return input(prompt).strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return 'q'
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        description='Diff the @anclient/* a project builds with against Anclient/js sources, in VS Code.')
+    ap.add_argument('project', nargs='?', help='project folder, e.g. album; default: list the projects here')
+    ap.add_argument('-p', '--packages', nargs='+', default=packages, choices=packages,
+                    help='packages under @anclient, default: anreact semantier')
+    ap.add_argument('--src', help='folder of the package sources, default: Anclient/js of this checkout')
+    args = ap.parse_args()
+
+    src_root = os.path.abspath(os.path.expanduser(args.src)) if args.src else \
+               os.path.normpath(os.path.join(here, '..', '..', 'js'))
+    if not os.path.isdir(src_root):
+        sys.exit(f'Cannot find {src_root}, use --src <path to Anclient/js>.')
+
+    project = args.project
+    if not project:
+        names = overview(src_root)
+        cmd = ask(f'\nProject to compare, 1 - {len(names)}, q to quit: ')
+        if not cmd.isdigit() or not 1 <= int(cmd) <= len(names):
+            return
+        project = os.path.join(here, names[int(cmd) - 1])
+    elif not os.path.isdir(project) and os.path.isdir(os.path.join(here, project)):
+        project = os.path.join(here, project)
+    project = os.path.abspath(project)
+
+    code = shutil.which('code')
+    if not code:
+        print("VS Code's `code` command is not on PATH, diffs are printed instead.\n"
+              "(VS Code: Command Palette > Shell Command: Install 'code' command in PATH)")
+
+    pairs = []
+    rows = scan(project, args.packages, src_root, pairs)
+    swap = False
+    while rows:
+        sides = 'left: source, right: copy' if swap else 'left: copy, right: source'
+        cmd = ask(f'\nNumbers to open ({sides}), a = all modified, x = swap sides, '
+                  f'f = folders, r = rescan, q = quit: ')
+        if cmd in ('q', ''):
+            break
+        if cmd == 'r':
+            pairs = []
+            rows = scan(project, args.packages, src_root, pairs)
+            continue
+        if cmd == 'x':
+            swap = not swap
+            continue
+        if cmd == 'f':
+            open_folders(code, pairs)
+            continue
+        if cmd == 'a':
+            picks = [r for r in rows if r[1] == 'M']
+        else:
+            try:
+                picks = [rows[int(n) - 1] for n in cmd.replace(',', ' ').split()]
+            except (ValueError, IndexError):
+                print(f'Type 1 - {len(rows)}, a, x, f, r or q.')
+                continue
+        open_rows(picks, code, swap)
+
+
+if __name__ == '__main__':
+    main()
