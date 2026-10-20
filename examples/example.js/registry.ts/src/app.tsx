@@ -128,7 +128,7 @@ export class App extends React.Component<AppProps> {
 		  }} >
 			{this.ssclient?.ssInf &&
 			<Sys uri={this.uri}
-				menu={'sys.menu.jsample'}
+				menu={'sys.menu.central'}
 				landingUrl={'/home'}
 				sys={L('Registry Client')} menuTitle={L('Sys Menu')}
 				onLogout={this.logout} />}

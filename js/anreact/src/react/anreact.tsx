@@ -298,7 +298,7 @@ export class AnReactExt extends AnReact {
 	 * @return this
 	 */
 	dataset(ds: DatasetOpts, onLoad: OnCommitOk): AnReactExt {
-		Semantier.dataset(ds, this.ssInf.client, onLoad, this.errCtx);
+		Semantier.dataset(ds, this.client, onLoad, this.errCtx);
 		return this;
 	}
 

@@ -1,5 +1,21 @@
 let path = require('path');
 
+/**
+ * node_modules of this folder and its parents, the way Node looks up from here.
+ * Absolute paths, so the linked sources, e.g. node_modules/@anclient/anreact -> ../../../js/anreact,
+ * resolve their imports (@material-ui, ...) here too, never in their own node_modules: one copy
+ * of each package.
+ */
+function upwardModules(dir) {
+	let dirs = [];
+	for (;;) {
+		dirs.push(path.join(dir, 'node_modules'));
+		let parent = path.dirname(dir);
+		if (parent === dir) return dirs;
+		dir = parent;
+	}
+}
+
 // "production" | "development" | "none"
 let mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
 
@@ -27,7 +43,8 @@ module.exports = {
 	},
 
 	resolve: {
-		extensions: ['.ts', '.tsx', '.js', '.jsx']
+		extensions: ['.ts', '.tsx', '.js', '.jsx'],
+		modules: upwardModules(__dirname),
 	},
 
 	module: {
