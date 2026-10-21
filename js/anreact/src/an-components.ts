@@ -21,6 +21,7 @@ export * from './react/widgets/my-icon';
 export * from './react/widgets/my-info';
 export * from './react/widgets/query-form';
 export * from './react/widgets/table-list';
+export * from './react/widgets/state-chip';
 export * from './react/widgets/tabs';
 export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';

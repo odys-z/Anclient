@@ -9,6 +9,9 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import { RegistryTsPorts } from './common/ports';
 import { Home } from './views/home';
+import { MarketOrgs } from './views/market-orgs';
+import { OrgDomains } from './views/org-domains';
+import { DomainSynodes } from './views/domain-synodes';
 
 export interface AppProps {
 	servs: ExternalHosts;
@@ -68,6 +71,9 @@ export class App extends React.Component<AppProps> {
 		// link pages to menu urls
 		SysComp.extendLinks([
 			{path: '/home', comp: Home},
+			{path: '/market/orgs',    comp: MarketOrgs},
+			{path: '/org/domains',    comp: OrgDomains},
+			{path: '/domain/synodes', comp: DomainSynodes},
 		]);
 	}
 
