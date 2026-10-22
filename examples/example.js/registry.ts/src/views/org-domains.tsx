@@ -11,7 +11,7 @@ import {
 } from '@anclient/semantier';
 
 import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTablist,
-	ClassNames, CompOpts, AnQueryst, jsample
+	ClassNames, CompOpts, AnQueryst, jsample, AnConst
 } from '@anclient/anreact';
 
 import { DomainDetails } from './domain-details';
@@ -93,8 +93,10 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 
 		let condName = { type: 'text', field: 'domname', val: '', label: L('Domain Name') } as AnlistColAttrs<JSX.Element, any>;
 		let conds = this.tier.isSuper()
-			? [ { type: 'cbb', field: 'orgId', val: undefined, label: L('Community'),
-				  sk: 'org.all', nv: {n: 'text', v: 'value'} } as TierComboField, condName ]
+			// as jsample/views/roles.tsx: a controlled Autocomplete from the first render
+			? [ { type: 'cbb', field: 'orgId', val: AnConst.cbbAllItem, label: L('Community'),
+				  sk: 'org.all', nv: {n: 'text', v: 'value'},
+				  options: [ AnConst.cbbAllItem ] } as TierComboField, condName ]
 			: [ condName ];
 
 		this.tier.loadMarket(() => this.setState({conds}, () => this.toSearch()));
