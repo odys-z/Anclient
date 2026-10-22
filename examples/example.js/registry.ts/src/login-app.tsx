@@ -79,7 +79,7 @@ export class LoginApp extends React.Component<LoginAppProps> {
 				<Typography variant='body2' color='textSecondary' gutterBottom>
 					{L('Please login')}
 				</Typography>
-				<Login uri={this.uri} onLogin={this.onLogin} config={{}} />
+				<Login uri={this.uri} onLogin={this.onLogin} config={{userid: 'admin', pswd: '123456'}} />
 			</Paper>
 
 			{this.state.hasError &&
