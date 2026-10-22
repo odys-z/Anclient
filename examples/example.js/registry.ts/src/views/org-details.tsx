@@ -97,11 +97,8 @@ class OrgDetailsComp extends DetailFormW<Comprops & {tier: MarketOrgsTier}> {
 						that.setState({ crud: CRUD.u} );
 					that.showOk(L('Data Saved!'));
 				};
-			// create: the Registry tier (regist.serv); update: u.serv
-			if (this.state.crud === CRUD.c)
-				this.tier.createOrg(onOk);
-			else
-				this.tier.saveRec({crud: this.state.crud, disableRelations: true}, onOk);
+			// create & update: the central's community.serv
+			this.tier.saveRec({crud: this.state.crud, disableRelations: true, port: MarketOrgsTier.port}, onOk);
 		}
 	}
 

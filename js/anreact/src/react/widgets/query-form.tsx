@@ -16,7 +16,7 @@ import { AnReactExt, ClassNames, CompOpts, Media } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {
-		"& :hover": {
+		"&:hover": {
 			backgroundColor: '#eef'
 		},
 	},
@@ -103,6 +103,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					onLoad: (_cols, rows) => {
 						cond.options = rows as NV[];
 						cond.loading = false;
+						cond.clean = true;
 						that.setState({});
 					}
 				});
@@ -163,7 +164,10 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		}
 	}
 
-	toSearch( _e : React.UIEvent ) {
+	toSearch( e : React.UIEvent ) {
+		// a clicked button keeps the focus style (ripple) until it loses focus
+		(e?.currentTarget as HTMLElement)?.blur();
+
 		if ( !this.props?.onSearch ) {
 			console.warn("Search handler is undefined.");
 			return;
@@ -184,7 +188,9 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		}
 	}
 
-	toClear( _e : React.UIEvent ) {
+	toClear( e : React.UIEvent ) {
+		(e?.currentTarget as HTMLElement)?.blur();
+
 		this.qFields
 			.filter ( c => !!c )
 			.forEach((cond: AnlistColAttrs<any, any>, x) => {

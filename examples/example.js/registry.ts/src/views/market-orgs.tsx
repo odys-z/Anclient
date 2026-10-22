@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	OnLoadOk, UIComponent, AnsonMsg, len, str, OnCommitOk
+	OnLoadOk, UIComponent, AnsonMsg, len, str
 } from '@anclient/semantier';
 
 import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTablist,
@@ -15,7 +15,6 @@ import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTabl
 } from '@anclient/anreact';
 
 import { OrgDetails } from './org-details';
-import { RegistReq, SynodeConfig, SynOrg } from '../common/registry';
 
 /**
  * Copied from @anclient/anreact/jsample/views/roles.tsx, for table a_orgs of the market.
@@ -127,7 +126,7 @@ class MarketOrgsComp extends CrudCompW<Comprops> {
 				ok={L('OK')} cancel={true}
 				title={L('Info')} msg={txt}
 				onOk={ () => {
-					that.tier.del({ids: that.state.selected.ids},
+					that.tier.del({ids: that.state.selected.ids, port: MarketOrgsTier.port},
 					(_resp) => {
 					  that.confirm = (
 						<ConfirmDialog open={true}
@@ -308,32 +307,11 @@ class MarketOrgsTier extends Semantier {
 	}
 
 	/**
-	 * Create a community with the Registry tier, regist.serv, a = c/org,
-	 * as synode.py/tasks.py register_org() does.
-	 * Edit is saved with u.serv (saveRec), delete with del().
+	 * Create, update (saveRec) and delete (del) go through the central's community.serv
+	 * (port community), which restricts them with the market and the user's community.
+	 * (Registry's c/org is left for synodes' submissions.)
 	 */
-	createOrg(onOk: OnCommitOk) {
-		let rec = this.rec as Tierec;
-		let org = new SynOrg({
-			orgId  : str(rec.orgId),
-			orgName: str(rec.orgName),
-			orgType: this.market,
-			sort   : rec.sort === undefined ? undefined : str(rec.sort),
-			homepage: rec.homeExt ? str(rec.homeExt) : undefined,
-			album0 : rec.album0 ? str(rec.album0) : undefined });
-
-		let req = this.client.userReq(this.uri, 'regist',
-			new RegistReq({ uri: this.uri, a: RegistReq.A.createOrg, market: str(this.market),
-							diction: new SynodeConfig({org}) }));
-
-		let that = this;
-		this.client.commit(req,
-			(resp) => {
-				that.pkval.v = org.orgId;
-				onOk(resp);
-			},
-			this.errCtx);
-	}
+	static port = 'community';
 
 	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;

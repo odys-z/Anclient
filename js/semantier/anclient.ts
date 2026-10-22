@@ -800,16 +800,17 @@ class SessionClient {
 	 * @param mtabl delete from the table
 	 * @param pkn delete from the table
 	 * @param pks delete from the table - pk values are automatically wrapped with ''.
+	 * @param port port name, default 'update'
 	 * @return anson request
 	 */
-	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>): AnsonMsg<UpdateReq> {
+	deleteMulti(uri: string, mtabl: string, pkn: string, pks: Array<any>, port?: string): AnsonMsg<UpdateReq> {
 		let upd = new UpdateReq(uri, mtabl, undefined)
 			.whereIn(pkn, pks);
 		upd.a = CRUD.d;
 		this.currentAct.cmd = 'delete';
 
 		var jmsg = this.userReq(uri,
-				'update', // Protocol.Port.update,
+				port || 'update', // Protocol.Port.update,
 				upd, this.currentAct);
 		return jmsg;
 	}

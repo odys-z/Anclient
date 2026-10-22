@@ -461,7 +461,9 @@ export class Semantier {
 					disableRelations?: boolean,
 					/** true for only clear al relations */
 					clearelation?: boolean,
-					reltabl?: string}, onOk: OnCommitOk): void {
+					reltabl?: string,
+					/** port name, default 'insert' for creating, 'update' for updating */
+					port?: string}, onOk: OnCommitOk): void {
 		if (!this.client) {
 			console.error("Saving with undefined AnClient. Ever called setContext(context) ?");
 			return;
@@ -469,7 +471,7 @@ export class Semantier {
 		let client = this.client;
 		let that = this;
 
-		let { crud, disableForm, disableRelations, reltabl } = opts;
+		let { crud, disableForm, disableRelations, reltabl, port } = opts;
 		let uri = this.uri;
 
 		if (crud === CRUD.u && !this.pkval.v)
@@ -478,7 +480,7 @@ export class Semantier {
 		let req: AnsonMsg<AnsonBody>;
 		if (!disableForm) {
 			if ( crud === CRUD.c ) {
-				req = this.client.userReq<InsertReq>(uri, 'insert',
+				req = this.client.userReq<InsertReq>(uri, port || 'insert',
 							new InsertReq( uri, this.pkval.tabl )
 							.columns(this._fields)
 							.record(this.rec) as InsertReq );
@@ -489,7 +491,7 @@ export class Semantier {
 					this.pkval.v = str(this.rec[this.pkval.pk]);
 			}
 			else {
-				req = this.client.userReq<UpdateReq>(uri, 'update',
+				req = this.client.userReq<UpdateReq>(uri, port || 'update',
 							new UpdateReq( uri, this.pkval.tabl, this.pkval)
 							.record(this.rec, this.pkval.pk) );
 			}
@@ -523,20 +525,22 @@ export class Semantier {
      * @param opts
      * @param opts.ids? record id: Set<string> | Array<string>;
      * @param opts.posts? post actions
+     * @param opts.port? port name, default 'update'
      * @param onOk: ;
      */
     del(opts: {
         ids: Map<string, Tierec>;
         posts?: Array<AnsonBody>;
+        port?: string;
     }, onOk: OnCommitOk): void {
 		if (!this.client) return;
 		let client = this.client;
-		let { ids, posts } = opts;
+		let { ids, posts, port } = opts;
 
 		if (ids && len(ids) > 0) {
 			let req = client
 				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
-				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids.keys()]);
+				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids.keys()], port);
 
 			if (posts) {
 				let d = req.Body();

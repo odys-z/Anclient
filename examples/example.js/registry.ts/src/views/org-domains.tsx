@@ -1,54 +1,380 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import { AnContext, Comprops, CrudCompW, L } from '@anclient/anreact';
+import { Theme } from "@material-ui/core/styles";
+import withStyles from "@material-ui/core/styles/withStyles";
+import withWidth from "@material-ui/core/withWidth";
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
-import { CentralTier } from '../common/central-tier';
-import { centralTier, DomainsList, Selector, SynodesList } from './central-lists';
+import {
+	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, TierComboField,
+	OnLoadOk, UIComponent, AnsonMsg, len, str
+} from '@anclient/semantier';
+
+import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTablist,
+	ClassNames, CompOpts, AnQueryst, jsample
+} from '@anclient/anreact';
+
+import { DomainDetails } from './domain-details';
+import { superRole } from '../common/central-tier';
 
 /**
- * Domains of the user's org. The super role can select any org of the market.
- * Select a domain to see its synodes.
+ * Domains of communities, table c_syndomx.
+ * Copied from ./market-orgs.tsx (from @anclient/anreact/jsample/views/roles.tsx).
+ *
+ * The super role (r00) selects the community with a combobox (dataset org.all);
+ * other users see only domains of their own community (a_users.orgId).
  *
  * Menu url: /org/domains
  */
-export class OrgDomains extends CrudCompW<Comprops> {
-	tier: CentralTier | undefined;
+const styles = (theme: Theme) => ( {
+	root: {
+		"& :hover": {
+			backgroundColor: '#777'
+		}
+	},
+	container: {
+		display: 'flex',
+		'& > *': {
+			margin: theme.spacing(0.5),
+		}
+	},
+	buttons: {
+		display: 'flex',
+		justifyContent: "flex-end",
+		'& > *': {
+			margin: theme.spacing(0.5),
+		}
+	},
+	button: {
+		height: '2.4em',
+		verticalAlign: 'middle',
+		margin: theme.spacing(1),
+	}
+} );
+
+class OrgDomainsComp extends CrudCompW<Comprops> {
 
 	state = {
-		orgs: [] as {v: string, n: string}[],
-		orgId: undefined as string | undefined,
-		domain: undefined as string | undefined,
+		/** condition fields of AnQueryst, set after the user's role is known */
+		conds: undefined as Array<AnlistColAttrs<JSX.Element, any>> | undefined,
+
+		// active buttons
+		buttons: { add: false, edit: false, del: false},
+
+		total: 0,
+		rows: [] as Tierec[],
+		pageInf: { page: 0, size: 25, total: 0 } as PageInf,
+		selected: {ids: new Map<string, Tierec>()},
 	};
 
+	tier: OrgDomainsTier;
+	confirm: JSX.Element;
+	domForm: JSX.Element;
+	props: { classes: ClassNames; };
+
+	constructor(props: Comprops) {
+		super(props);
+
+		this.closeDetails = this.closeDetails.bind(this);
+		this.toSearch = this.toSearch.bind(this);
+		this.onPageInf = this.onPageInf.bind(this);
+		this.onTableSelect = this.onTableSelect.bind(this);
+
+		this.toAdd = this.toAdd.bind(this);
+		this.toEdit = this.toEdit.bind(this);
+		this.toDel = this.toDel.bind(this);
+	}
+
 	componentDidMount() {
-		this.tier = centralTier(this);
-		if (this.tier.isSuper())
-			this.tier.orgs((_cols, rows) =>
-				this.setState({orgs: rows.map(r => ({v: r.orgId as string, n: `${r.orgName} (${r.orgId})`}))}));
-		else this.setState({});
+		if (!this.tier) {
+			this.tier = new OrgDomainsTier(this);
+			this.tier.setContext(this.context as unknown as AnContextType);
+		}
+
+		let condName = { type: 'text', field: 'domname', val: '', label: L('Domain Name') } as AnlistColAttrs<JSX.Element, any>;
+		let conds = this.tier.isSuper()
+			? [ { type: 'cbb', field: 'orgId', val: undefined, label: L('Community'),
+				  sk: 'org.all', nv: {n: 'text', v: 'value'} } as TierComboField, condName ]
+			: [ condName ];
+
+		this.tier.loadMarket(() => this.setState({conds}, () => this.toSearch()));
+	}
+
+	toSearch(pageInf: PageInf = new PageInf(0, -1)) {
+		let that = this;
+		this.tier.records( pageInf,
+			(_cols, rows) => {
+				that.state.selected.ids.clear();
+				that.setState({rows});
+				that.onTableSelect(that.state.selected.ids);
+			} );
+		this.setState({pageInf});
+	}
+
+	onPageInf(page: number, size?: number) {
+		this.state.pageInf.size = size || 0;
+		this.state.pageInf.page = page;
+
+		this.toSearch(this.state.pageInf);
+	}
+
+	onTableSelect(rowIds: Map<string, Tierec>) {
+		this.setState( {
+			buttons: {
+				// a domain is added to one community: the super role must have selected one
+				add:  !!this.tier?.orgId,
+				edit: len(rowIds) === 1,
+				del:  len(rowIds) >=  1,
+			},
+		} );
+	}
+
+	toDel(_e: React.MouseEvent<HTMLElement>) {
+		let that = this;
+		let txt = L('Totally {count} domain records will be deleted. Are you sure?',
+				{count: this.state.selected.ids.size});
+		this.confirm =
+			(<ConfirmDialog open={true}
+				ok={L('OK')} cancel={true}
+				title={L('Info')} msg={txt}
+				onOk={ () => {
+					that.tier.del({ids: that.state.selected.ids, port: OrgDomainsTier.port},
+					(_resp) => {
+					  that.confirm = (
+						<ConfirmDialog open={true}
+							ok={L('OK')} cancel={false}
+							title={L('Info')} msg={L('Data Deleted!')}
+							onOk={ () => {
+								that.confirm = undefined;
+								that.toSearch();
+							} }
+						/>);
+					  that.setState({});
+					} ); } }
+				onClose={ () => {
+					that.confirm = undefined;
+					that.setState({});
+				} }
+			/>);
+		this.setState({});
+	}
+
+	toAdd(_e: React.MouseEvent<HTMLElement>) {
+		this.tier.resetFormSession();
+		this.tier.recOrg = this.tier.orgId;
+		this.tier.rec = {market: this.tier.market, orgid: this.tier.orgId} as Tierec;
+		this.domForm = (<DomainDetails crud={CRUD.c} uri={this.uri}
+			tier={this.tier}
+			onOk={(r) => console.log(r)}
+			onClose={this.closeDetails} />);
+		this.setState({});
+	}
+
+	toEdit(_e: React.MouseEvent<HTMLElement>) {
+		let that = this;
+		let row = this.state.selected.ids.values().next().value as Tierec;
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
+		this.tier.recOrg = str(row.orgid);
+
+		this.domForm = (<DomainDetails crud={CRUD.u} uri={this.uri}
+			tier={this.tier}
+			onOk={(_r) => that.toSearch(that.state.pageInf)}
+			onClose={this.closeDetails} />);
+		this.setState({});
+	}
+
+	closeDetails() {
+		this.domForm = undefined;
+		this.tier.resetFormSession();
+		this.setState({});
+		this.onTableSelect(new Map());
+		this.toSearch(undefined);
 	}
 
 	render() {
-		let {orgId, domain} = this.state;
-		return (<>
-		  <Card style={{margin: 8}}><CardContent>
-			<Typography variant='h6'>{L('Domains of the Community')}</Typography>
-			{this.tier?.isSuper() &&
-			  <Selector label={L('Community')} value={orgId} options={this.state.orgs}
-				onChange={(v) => this.setState({orgId: v, domain: undefined})} />}
-		  </CardContent></Card>
+		const { classes } = this.props;
+		let btn = this.state.buttons;
+		return ( <>
+			{this.state.conds &&
+			  <AnQueryst uri={this.uri}
+				onSearch={this.toSearch}
+				onLoaded={this.toSearch}
+				fields={this.state.conds}
+			/>}
 
-		  {this.tier &&
-			<DomainsList uri={this.uri} tier={this.tier} orgId={orgId}
-				onSelect={(id) => this.setState({domain: id})} />}
+			<Grid container alignContent="flex-end" >
+				<Button variant="contained" disabled={!btn.add}
+					className={classes.button} onClick={this.toAdd}
+					startIcon={<jsample.JsampleIcons.Add />}
+				>{L('Add')}</Button>
+				<Button variant="contained" disabled={!btn.del}
+					className={classes.button} onClick={this.toDel}
+					startIcon={<jsample.JsampleIcons.Delete />}
+				>{L('Delete')}</Button>
+				<Button variant="contained" disabled={!btn.edit}
+					className={classes.button} onClick={this.toEdit}
+					startIcon={<jsample.JsampleIcons.Edit />}
+				>{L('Edit')}</Button>
+			</Grid>
 
-		  {this.tier && domain && <>
-			<Typography variant='subtitle1' style={{margin: 8}}>{L('Synodes of {dom}', {dom: domain})}</Typography>
-			<SynodesList uri={this.uri} tier={this.tier} orgId={orgId} domain={domain} />
-		  </>}
+			{this.tier && <AnTablist
+				className={classes.root} checkbox={true}
+				columns={this.tier.columns() as AnlistColAttrs<JSX.Element, CompOpts>[]}
+				rows={this.state.rows} pk={this.tier.pkval.pk}
+				selected={this.state.selected}
+				pageInf={this.state.pageInf}
+				onPageInf={this.onPageInf}
+				onSelectChange={this.onTableSelect}
+			/>}
+			{this.domForm}
+			{this.confirm}
 		</>);
 	}
 }
-OrgDomains.contextType = AnContext;
+OrgDomainsComp.contextType = AnContext;
+
+const OrgDomains = withStyles<any, any, Comprops>(styles)(withWidth()(OrgDomainsComp));
+
+class OrgDomainsTier extends Semantier {
+	checkbox = true;
+
+	/** The market id, i.e. a_orgs.orgType of the session user's org. */
+	market: string | undefined;
+
+	/** The session user's community, a_users.orgId. */
+	myOrg: string | undefined;
+
+	/** The community of the listed domains: the selected one (super role), or myOrg. */
+	orgId: string | undefined;
+
+	/** The community of the record in the details form. */
+	recOrg: string | undefined;
+
+	_cols = [
+		{ text: '', field: "domid" }, // first column: the check box
+		{ text: L('Domain ID'),   field: "domid", color: 'primary', className: 'bold'},
+		{ text: L('Domain Name'), field: "domname", color: 'primary' },
+		{ text: L('Community'),   field: "orgName" },
+		{ text: L('Synodes'),     field: "synodes" } ]
+
+	_fields = [
+		{ type: 'text', field: 'market',  label: 'Market', readOnly: true },
+		{ type: 'text', field: 'orgid',   label: 'Community ID', readOnly: true },
+		{ type: 'text', field: 'domid',   label: 'Domain ID',
+		  validator: {notNull: true, len: 12} },
+		{ type: 'text', field: 'domname', label: 'Domain Name',
+		  validator: {notNull: true, len: 64} },
+	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
+
+	/**
+	 * @param comp
+	 * @param {string} comp.uri the client function uri.
+	 * @constructor
+	 */
+	constructor(comp: UIComponent & {uri: string, port?: string}) {
+		super(comp);
+
+		this.pkval.tabl = 'c_syndomx';
+		this.pkval.pk = 'domid';
+	}
+
+	uid(): string {
+		return (this.client as any)?.ssInf?.uid;
+	}
+
+	/** Is the session user of the super role? (only for UI) */
+	isSuper() {
+		return (this.client as any)?.ssInf?.roleId === superRole;
+	}
+
+	/**
+	 * Load the market id, a_orgs.orgType of the session user's org, and the user's org id.
+	 */
+	loadMarket(onLoad: () => void) {
+		let that = this;
+		let req = this.client.query(this.uri, 'a_users', 'u');
+		req.Body()
+			.expr('o.orgType', 'market')
+			.expr('u.orgId', 'orgId')
+			.j('a_orgs', 'o', 'o.orgId = u.orgId')
+			.whereEq('u.userId', this.uid());
+
+		this.client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
+				let {rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.market = rows && rows[0] && str((rows[0] as Tierec).market);
+				that.myOrg  = rows && rows[0] && str((rows[0] as Tierec).orgId);
+				onLoad();
+			},
+			this.errCtx);
+	}
+
+	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
+
+		let { orgId, domname } = conds.mapCondts || {};
+		this.orgId = this.isSuper() ? (orgId ? str(orgId) : undefined) : this.myOrg;
+
+		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'd')
+		let req = queryReq.Body()
+			.expr('d.domid', 'domid').expr('d.domname', 'domname')
+			.expr('d.orgid', 'orgid').expr('o.orgName', 'orgName')
+			.expr('count(n.sid)', 'synodes')
+			.j('a_orgs', 'o', 'o.orgId = d.orgid')
+			.l('c_synodes', 'n', 'n.market = d.market and n.orgid = d.orgid and n.domx = d.domid')
+			.whereEq('d.market', str(this.market))
+			.groupby('d.orgid').groupby('d.domid')
+			.orderbys([['d.orgid', 'asc'], ['d.domid', 'asc']]);
+
+		// not the super role: only the user's community, even if it's unknown
+		if (this.orgId || !this.isSuper())
+			req.whereEq('d.orgid', str(this.orgId));
+
+		// paging, which QueryReq took from pageInf
+		if (conds.size !== undefined)
+			req.Page(conds.size, conds.page || 0);
+
+		// named conditions from AnQueryst (conds.mapCondts)
+		if (domname)
+			req.whereCond('%', 'd.domname', `'${domname}'`);
+
+		this.client.commit(queryReq,
+			(resp) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+
+	record(conds: PageInf, onLoad: OnLoadOk<Tierec>) {
+		if (!this.client) return;
+
+		let client = this.client;
+		let that = this;
+
+		let domid = conds.mapCondts[this.pkval.pk] as string;
+
+		let req = client.query(this.uri, this.pkval.tabl, 'd')
+		req.Body()
+			.col('market').col('orgid').col('domid').col('domname')
+			.whereEq('market', str(this.market))
+			.whereEq('orgid', str(this.recOrg))
+			.whereEq(this.pkval.pk, domid);
+
+		client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				that.rec = rows && rows[0];
+				that.pkval.v = that.rec && that.rec[that.pkval.pk];
+				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+
+	/**
+	 * Create, update (saveRec) and delete (del) go through the central's community.serv
+	 * (port community), which restricts them with the market and the user's community.
+	 */
+	static port = 'community';
+}
+
+export { OrgDomains, OrgDomainsComp, OrgDomainsTier }

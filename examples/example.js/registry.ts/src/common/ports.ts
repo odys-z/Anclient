@@ -15,6 +15,10 @@ export const RegistryTsPorts = {
 	/** Semantic-Network/registration/jserv, Registry, io.oz.syn.registry.Centralport.regist */
 	regist: 'regist.serv',
 
+	/** Semantic-Network/registration/jserv, Communitier, io.oz.syn.registry.Centralport.community:
+	 * create, update and delete of communities and domains (reads go through query.serv) */
+	community: 'community.serv',
+
 	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
 	centier: 'central.tier',
 };
