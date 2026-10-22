@@ -1,5 +1,0 @@
-node_modules/
-web-dist/*.min.js
-web-dist/*.min.js.map
-web-dist/*.LICENSE.txt
-web-dist/private/
