@@ -16,8 +16,8 @@ export class SynOrg {
 	parent?: string;
 	sort?: string;
 	fullpath?: string;
-	/** The landing page, a_orgs.webroot in the central.
-	 * (SynOrg.webroot is a synode's web node, not used by the central.) */
+	/** The community's landing page, saved by the central in a_orgs.homeExt.
+	 * (SynOrg.webroot, the synodes' web root, is submitted by installers / synodes, not by the web client.) */
 	homepage?: string;
 	album0?: string;
 

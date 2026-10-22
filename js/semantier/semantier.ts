@@ -536,7 +536,7 @@ export class Semantier {
 		if (ids && len(ids) > 0) {
 			let req = client
 				.usrAct(this.pkval.tabl, CRUD.d, 'delete')
-				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids]);
+				.deleteMulti(this.uri, this.pkval.tabl, this.pkval.pk, [...ids.keys()]);
 
 			if (posts) {
 				let d = req.Body();

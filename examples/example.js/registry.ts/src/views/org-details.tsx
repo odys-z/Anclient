@@ -154,7 +154,7 @@ class OrgDetailsComp extends DetailFormW<Comprops & {tier: MarketOrgsTier}> {
 					tier={this.tier}
 					mtabl='a_orgs' pk='orgId'
 					fields={this.tier.fields({
-						webroot: {grid: {sm: 12, md: 12, lg: 12}}
+						homeExt: {grid: {sm: 12, md: 12, lg: 12}}
 					}) as AnlistColAttrs<JSX.Element, Comprops>[]}
 				/>
 			</DialogContent>

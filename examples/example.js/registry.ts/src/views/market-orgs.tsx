@@ -226,7 +226,7 @@ class MarketOrgsTier extends Semantier {
 	_cols = [
 		{ text: L('Community ID'),   field: "orgId", color: 'primary', className: 'bold'},
 		{ text: L('Community Name'), field: "orgName", color: 'primary' },
-		{ text: L('Homepage'), field: "webroot" },
+		{ text: L('Homepage'), field: "homeExt" },
 		{ text: L('Album'),    field: "album0" },
 		{ text: L('Domains'),  field: "domains" } ]
 
@@ -237,7 +237,7 @@ class MarketOrgsTier extends Semantier {
 		  validator: {notNull: true, len: 50} },
 		{ type: 'text', field: 'orgType', label: 'Market', readOnly: true },
 		{ type: 'text', field: 'sort',    label: 'Sort' },
-		{ type: 'text', field: 'webroot', label: 'Homepage (landing page)' },
+		{ type: 'text', field: 'homeExt', label: 'Homepage (landing page)' },
 		{ type: 'text', field: 'album0',  label: 'Album' }
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
@@ -280,16 +280,22 @@ class MarketOrgsTier extends Semantier {
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
 
 		let { orgName } = conds.mapCondts || {};
-		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'o', conds)
+		// without conds: QueryReq takes only pageInf.arrCondts, and warns on mapCondts
+		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'o')
 		let req = queryReq.Body()
 			.expr('o.orgId', 'orgId').expr('o.orgName', 'orgName')
-			.expr('o.webroot', 'webroot').expr('o.album0', 'album0')
+			.expr('o.homeExt', 'homeExt').expr('o.album0', 'album0')
 			.expr('count(d.domid)', 'domains')
 			.l('c_syndomx', 'd', 'd.orgid = o.orgId and d.market = o.orgType')
 			.whereEq('o.orgType', str(this.market))
 			.groupby('o.orgId')
 			.orderbys([['o.sort', 'asc'], ['o.orgId', 'asc']]);
 
+		// paging, which QueryReq took from pageInf
+		if (conds.size !== undefined)
+			req.Page(conds.size, conds.page || 0);
+
+		// named conditions from AnQueryst (conds.mapCondts)
 		if (orgName)
 			req.whereCond('%', 'o.orgName', `'${orgName}'`);
 
@@ -313,7 +319,7 @@ class MarketOrgsTier extends Semantier {
 			orgName: str(rec.orgName),
 			orgType: this.market,
 			sort   : rec.sort === undefined ? undefined : str(rec.sort),
-			homepage: rec.webroot ? str(rec.webroot) : undefined,
+			homepage: rec.homeExt ? str(rec.homeExt) : undefined,
 			album0 : rec.album0 ? str(rec.album0) : undefined });
 
 		let req = this.client.userReq(this.uri, 'regist',
@@ -340,7 +346,7 @@ class MarketOrgsTier extends Semantier {
 
 		let req = client.query(this.uri, 'a_orgs', 'o')
 		req.Body()
-			.col('orgId').col('orgName').col('orgType').col('sort').col('webroot').col('album0')
+			.col('orgId').col('orgName').col('orgType').col('sort').col('homeExt').col('album0')
 			.whereEq(this.pkval.pk, orgId);
 
 		client.commit(req,

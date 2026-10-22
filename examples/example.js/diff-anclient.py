@@ -23,6 +23,9 @@ Then it lists the files that differ, and asks:
     3         open file 3 in VS Code's diff editor
     1 4 7     several
     a         all modified files
+    s 3 5     copy files 3 and 5 from the source into the project's copy (source only, modified)
+    u 4       copy file 4 from the project's copy into the source (used only, modified)
+    s a, u a  all the files that can be copied that way
     x         swap the sides of the diff editor (which file is on the right)
     f         open the whole package pair in VS Code, with the Compare Folders extension
     r         rescan
@@ -39,6 +42,7 @@ Editing in both directions, in VS Code:
     Exclude noise with the user setting
         "compareFolders.excludeFilter": ["**/node_modules", "**/dist", "**/.git"]
 
+s and u list what they will copy, and ask before writing; overwritten files are marked.
 A copy installed from npm is overwritten by the next npm install: take what is worth keeping
 into the source (and publish it). A copy that is a symlink to the source (npm link, "file:"
 dependencies, e.g. registry.ts) is the source itself; then the shadowed copy, if any, e.g.
@@ -218,9 +222,9 @@ def compare(installed: str, source: str):
             if not same(a, b):
                 rows.append(('M', r, a, b))
         elif r in inst:
-            rows.append(('I', r, a, None))
+            rows.append(('I', r, a, b))
         else:
-            rows.append(('S', r, None, b))
+            rows.append(('S', r, a, b))
     return rows
 
 
@@ -296,7 +300,8 @@ def open_rows(picks, code, swap=False):
     for pkg, st, rel, a, b in picks:
         if code:
             left, right = (b, a) if swap else (a, b)
-            subprocess.Popen([code, '--reuse-window', '--diff', left, right] if st == 'M' else [code, '--reuse-window', a or b])
+            subprocess.Popen([code, '--reuse-window', '--diff', left, right] if st == 'M'
+                             else [code, '--reuse-window', a if st == 'I' else b])
         elif st == 'M':
             with open(a, encoding='utf-8', errors='replace') as fa, \
                  open(b, encoding='utf-8', errors='replace') as fb:
@@ -304,7 +309,38 @@ def open_rows(picks, code, swap=False):
                     fa.read().splitlines(True), fb.read().splitlines(True),
                     f'used/{pkg}/{rel}', f'source/{pkg}/{rel}'))
         else:
-            print(f'{"used" if a else "source"} only: {a or b}')
+            print(f'{"used" if st == "I" else "source"} only: {a if st == "I" else b}')
+
+
+def copy_rows(rows, picks, to_source: bool) -> bool:
+    """
+    Copy the picked files: the project's copy -> source (to_source), or source -> the project's copy.
+    Only the rows that can go that way: used only / modified, or source only / modified.
+    :return: whether anything was copied
+    """
+    can = ('I', 'M') if to_source else ('S', 'M')
+    todo = [r for r in picks if r[1] in can]
+    for r in picks:
+        if r not in todo:
+            print(f'  skip {rows.index(r) + 1}: {r[0]}/{r[2]} is {"source" if r[1] == "S" else "used"} only.')
+    if not todo:
+        return False
+
+    where = 'to the source' if to_source else "into the project's copy"
+    print(f'\nCopy {where}:')
+    for pkg, st, rel, a, b in todo:
+        src, dst = (a, b) if to_source else (b, a)
+        print(f'  {rows.index((pkg, st, rel, a, b)) + 1:3}  {os.path.relpath(src)}\n'
+              f'       -> {os.path.relpath(dst)}{"   (overwrite)" if st == "M" else "   (new)"}')
+    if ask(f'Copy {len(todo)} file(s)? [y/N] ') != 'y':
+        return False
+
+    for pkg, st, rel, a, b in todo:
+        src, dst = (a, b) if to_source else (b, a)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+    print(f'Copied {len(todo)} file(s).')
+    return True
 
 
 def ask(prompt: str) -> str:
@@ -350,8 +386,8 @@ def main():
     swap = False
     while rows:
         sides = 'left: source, right: copy' if swap else 'left: copy, right: source'
-        cmd = ask(f'\nNumbers to open ({sides}), a = all modified, x = swap sides, '
-                  f'f = folders, r = rescan, q = quit: ')
+        cmd = ask(f'\nNumbers to open ({sides}), a = all modified, x = swap sides, f = folders,\n'
+                  f's <numbers|a> = source -> copy, u <numbers|a> = copy -> source, r = rescan, q = quit: ')
         if cmd in ('q', ''):
             break
         if cmd == 'r':
@@ -364,13 +400,28 @@ def main():
         if cmd == 'f':
             open_folders(code, pairs)
             continue
+        if cmd[:1] in ('s', 'u') and (len(cmd) == 1 or cmd[1] == ' '):
+            to_source, arg = cmd[0] == 'u', cmd[1:].strip()
+            try:
+                picks = rows if arg == 'a' else [rows[int(n) - 1] for n in arg.replace(',', ' ').split()]
+            except (ValueError, IndexError):
+                picks = None
+            if not picks:
+                print(f'Type e.g. "{cmd[0]} 1 3" or "{cmd[0]} a".')
+                continue
+            if copy_rows(rows, picks, to_source):
+                pairs = []
+                rows = scan(project, args.packages, src_root, pairs)
+                if not rows:
+                    print('\nNo differences left.')
+            continue
         if cmd == 'a':
             picks = [r for r in rows if r[1] == 'M']
         else:
             try:
                 picks = [rows[int(n) - 1] for n in cmd.replace(',', ' ').split()]
             except (ValueError, IndexError):
-                print(f'Type 1 - {len(rows)}, a, x, f, r or q.')
+                print(f'Type 1 - {len(rows)}, a, x, f, s <numbers>, u <numbers>, r or q.')
                 continue
         open_rows(picks, code, swap)
 
