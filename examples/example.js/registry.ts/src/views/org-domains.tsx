@@ -34,9 +34,9 @@ export class OrgDomains extends CrudCompW<Comprops> {
 		let {orgId, domain} = this.state;
 		return (<>
 		  <Card style={{margin: 8}}><CardContent>
-			<Typography variant='h6'>{L('Domains of the Org')}</Typography>
+			<Typography variant='h6'>{L('Domains of the Community')}</Typography>
 			{this.tier?.isSuper() &&
-			  <Selector label={L('Org')} value={orgId} options={this.state.orgs}
+			  <Selector label={L('Community')} value={orgId} options={this.state.orgs}
 				onChange={(v) => this.setState({orgId: v, domain: undefined})} />}
 		  </CardContent></Card>
 

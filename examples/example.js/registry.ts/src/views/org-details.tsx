@@ -92,12 +92,16 @@ class OrgDetailsComp extends DetailFormW<Comprops & {tier: MarketOrgsTier}> {
 		}
 		else {
 			let that = this;
-			this.tier.saveRec({crud: this.state.crud, disableRelations: true},
-				() => {
+			let onOk = () => {
 					if (that.state.crud === CRUD.c)
 						that.setState({ crud: CRUD.u} );
 					that.showOk(L('Data Saved!'));
-				});
+				};
+			// create: the Registry tier (regist.serv); update: u.serv
+			if (this.state.crud === CRUD.c)
+				this.tier.createOrg(onOk);
+			else
+				this.tier.saveRec({crud: this.state.crud, disableRelations: true}, onOk);
 		}
 	}
 
@@ -130,9 +134,9 @@ class OrgDetailsComp extends DetailFormW<Comprops & {tier: MarketOrgsTier}> {
 
 		let crud = this.state.crud;
 
-		let title = crud === CRUD.c ? L('Create Org')
-					: crud === CRUD.u ? L('Edit Org')
-					: L('Org Details');
+		let title = crud === CRUD.c ? L('Create Community')
+					: crud === CRUD.u ? L('Edit Community')
+					: L('Community Details');
 
 		return (<>
 		  <Dialog className={classes.root}

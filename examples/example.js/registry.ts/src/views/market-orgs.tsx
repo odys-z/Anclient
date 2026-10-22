@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	OnLoadOk, UIComponent, AnsonMsg, len, str
+	OnLoadOk, UIComponent, AnsonMsg, len, str, OnCommitOk
 } from '@anclient/semantier';
 
 import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTablist,
@@ -15,6 +15,7 @@ import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTabl
 } from '@anclient/anreact';
 
 import { OrgDetails } from './org-details';
+import { RegistReq, SynodeConfig, SynOrg } from '../common/registry';
 
 /**
  * Copied from @anclient/anreact/jsample/views/roles.tsx, for table a_orgs of the market.
@@ -50,7 +51,7 @@ const styles = (theme: Theme) => ( {
 class MarketOrgsComp extends CrudCompW<Comprops> {
 
 	state = {
-		condName: { type: 'text', field: 'orgName', val: '', label: L('Org Name')} as AnlistColAttrs<JSX.Element, any>,
+		condName: { type: 'text', field: 'orgName', val: '', label: L('Community Name')} as AnlistColAttrs<JSX.Element, any>,
 
 		// active buttons
 		buttons: { add: true, edit: false, del: false},
@@ -119,7 +120,7 @@ class MarketOrgsComp extends CrudCompW<Comprops> {
 
 	toDel(_e: React.MouseEvent<HTMLElement>) {
 		let that = this;
-		let txt = L('Totally {count} org records will be deleted. Are you sure?',
+		let txt = L('Totally {count} community records will be deleted. Are you sure?',
 				{count: this.state.selected.ids.size});
 		this.confirm =
 			(<ConfirmDialog open={true}
@@ -223,20 +224,20 @@ class MarketOrgsTier extends Semantier {
 	market: string | undefined;
 
 	_cols = [
-		{ text: L('Org ID'),   field: "orgId", color: 'primary', className: 'bold'},
-		{ text: L('Org Name'), field: "orgName", color: 'primary' },
-		{ text: L('Web Root'), field: "webroot" },
+		{ text: L('Community ID'),   field: "orgId", color: 'primary', className: 'bold'},
+		{ text: L('Community Name'), field: "orgName", color: 'primary' },
+		{ text: L('Homepage'), field: "webroot" },
 		{ text: L('Album'),    field: "album0" },
 		{ text: L('Domains'),  field: "domains" } ]
 
 	_fields = [
-		{ type: 'text', field: 'orgId',   label: 'Org ID',
+		{ type: 'text', field: 'orgId',   label: 'Community ID',
 		  validator: {notNull: true, len: 12} },
-		{ type: 'text', field: 'orgName', label: 'Org Name',
+		{ type: 'text', field: 'orgName', label: 'Community Name',
 		  validator: {notNull: true, len: 50} },
 		{ type: 'text', field: 'orgType', label: 'Market', readOnly: true },
 		{ type: 'text', field: 'sort',    label: 'Sort' },
-		{ type: 'text', field: 'webroot', label: 'Web Root (landing page)' },
+		{ type: 'text', field: 'webroot', label: 'Homepage (landing page)' },
 		{ type: 'text', field: 'album0',  label: 'Album' }
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 
@@ -296,6 +297,34 @@ class MarketOrgsTier extends Semantier {
 			(resp) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
 				onLoad(cols, rows);
+			},
+			this.errCtx);
+	}
+
+	/**
+	 * Create a community with the Registry tier, regist.serv, a = c/org,
+	 * as synode.py/tasks.py register_org() does.
+	 * Edit is saved with u.serv (saveRec), delete with del().
+	 */
+	createOrg(onOk: OnCommitOk) {
+		let rec = this.rec as Tierec;
+		let org = new SynOrg({
+			orgId  : str(rec.orgId),
+			orgName: str(rec.orgName),
+			orgType: this.market,
+			sort   : rec.sort === undefined ? undefined : str(rec.sort),
+			homepage: rec.webroot ? str(rec.webroot) : undefined,
+			album0 : rec.album0 ? str(rec.album0) : undefined });
+
+		let req = this.client.userReq(this.uri, 'regist',
+			new RegistReq({ uri: this.uri, a: RegistReq.A.createOrg, market: str(this.market),
+							diction: new SynodeConfig({org}) }));
+
+		let that = this;
+		this.client.commit(req,
+			(resp) => {
+				that.pkval.v = org.orgId;
+				onOk(resp);
 			},
 			this.errCtx);
 	}

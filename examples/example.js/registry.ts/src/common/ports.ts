@@ -12,6 +12,9 @@ export const RegistryTsPorts = {
 	/** jserv-sample/src/main/java/io/oz/jservapp/JservMenu.java */
 	menu: 'menu.serv',
 
+	/** Semantic-Network/registration/jserv, Registry, io.oz.syn.registry.Centralport.regist */
+	regist: 'regist.serv',
+
 	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
 	centier: 'central.tier',
 };

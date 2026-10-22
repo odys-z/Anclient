@@ -43,7 +43,7 @@ export class DomainSynodes extends CrudCompW<Comprops> {
 		  <Card style={{margin: 8}}><CardContent>
 			<Typography variant='h6'>{L('Synodes of a Domain')}</Typography>
 			{this.tier?.isSuper() &&
-			  <Selector label={L('Org')} value={orgId} options={this.state.orgs}
+			  <Selector label={L('Community')} value={orgId} options={this.state.orgs}
 				onChange={(v) => this.loadDomains(v)} />}
 			<Selector label={L('Domain')} value={domain} options={this.state.domains}
 				onChange={(v) => this.setState({domain: v})} />
