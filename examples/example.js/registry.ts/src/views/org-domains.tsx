@@ -429,20 +429,15 @@ class OrgDomainsTier extends Semantier {
 	}
 
 	/**
-	 * Synodes of a domain of community recOrg, hub first, through query.serv.
+	 * Synodes of a domain of community recOrg, hub first, asked to the central's domx.serv
+	 * (DomxReq.A.synodes).
 	 * Columns: sid, mode, stat, jserv, ip, optime, oper
 	 */
 	synodes(domid: string, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
-		let req = this.client.query(this.uri, 'c_synodes', 'n');
-		req.Body()
-			.expr('n.sid', 'sid').expr('n.mode', 'mode').expr('n.stat', 'stat')
-			.expr('n.jserv', 'jserv').expr('n.ip', 'ip').expr('n.optime', 'optime').expr('n.oper', 'oper')
-			.whereEq('n.market', str(this.market))
-			.whereEq('n.orgid', str(this.recOrg))
-			.whereEq('n.domx', domid)
-			.orderbys([['n.mode', 'desc'], ['n.sid', 'asc']]);
+		let req = this.client.userReq(this.uri, 'domx',
+				new DomxReq({ uri: this.uri, a: DomxReq.A.synodes, orgId: str(this.recOrg), domid }));
 
 		this.client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {

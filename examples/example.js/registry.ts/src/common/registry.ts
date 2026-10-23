@@ -93,6 +93,7 @@ Protocol.registerBody(RegistResp.__type__, (json) => new RegistResp(json));
  *
  * The market is the central's, never sent. The community, orgId, is overridden by the central
  * with the session user's, unless the user is of the super role.
+ * The client composes no sql: each read is an ask of the tier, see DomxReq.A.
  */
 export class DomxReq extends AnsonBody {
 	static __type__ = 'io.oz.syn.registry.DomxReq';
@@ -101,6 +102,10 @@ export class DomxReq extends AnsonBody {
 		/** Create a domain, with the synodes planned by the central (<domid>-hub, -1, -2),
 		 * the same as synode.py's Create / Join Domain (RegistReq.A.registDom). */
 		create: 'c/domx',
+
+		/** The synodes of a domain, hub first, with the states, jserv, etc. reported by the synodes.
+		 * Replied in DomxResp.Rs(): sid, mode, stat, jserv, ip, optime, oper. */
+		synodes: 'r/synodes',
 	};
 
 	orgId?: string;
