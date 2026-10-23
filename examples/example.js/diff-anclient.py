@@ -4,10 +4,17 @@ Compare the @anclient/* packages a project builds with against their sources in 
 repository (Anclient/js/<package>), and open the differences in VS Code.
 
 Projects can use @anclient/* from different locations, and different versions:
-    album/node_modules/@anclient/*          its own npm install
-    node_modules/@anclient/*                the shared one of example.js, for north-star, ...
-    ../../js/anreact                        the sources, aliased in webpack.config.js (registry.ts)
-    a symlink to the sources                npm link / "file:" dependencies
+    album/node_modules/@anclient/*          its own npm install (each project installs its own;
+                                            example.js/node_modules has no @anclient/* since 0.8.0)
+    a symlink to the sources                npm link / "file:" dependencies (registry.ts)
+    ../../js/anreact                        the sources, aliased in webpack.config.js
+
+Release lines: anreact 0.7.x (React 17, MUI 4, ag-grid: album, north-star, curriculum) and
+0.8.x (React 19, MUI 9: registry.ts, the sources). A copy of another release line than the
+sources is marked, and can be compared, but s / u won't copy files between them: that would
+break the receiving side. Compare it with a checkout of its own release line instead, e.g.
+    git worktree add /tmp/anclient-0.7 <commit of 0.7.x>
+    python3 diff-anclient.py album --src /tmp/anclient-0.7/js
 
 For each project, the location is found the way the build finds it: the resolve.alias of
 webpack.config.js first, then the node_modules of the project folder and its parents.
@@ -46,7 +53,7 @@ s and u list what they will copy, and ask before writing; overwritten files are 
 A copy installed from npm is overwritten by the next npm install: take what is worth keeping
 into the source (and publish it). A copy that is a symlink to the source (npm link, "file:"
 dependencies, e.g. registry.ts) is the source itself; then the shadowed copy, if any, e.g.
-example.js/node_modules for the other projects, is compared instead.
+an older install, is compared instead.
 
 Files only in one side are opened with `code <file>`. Without VS Code's `code` command
 on PATH, the unified diff is printed instead. Line endings are ignored.
@@ -152,6 +159,23 @@ def locate(pkg: str, project: str):
     return (chain[0] if chain else None), chain[1:], note
 
 
+def release_line(v: str) -> str:
+    """
+    The release line of a version: major.minor for 0.x (npm's ^0.7.2 never reaches 0.8),
+    otherwise the major, e.g. 0.7.2 -> 0.7, 1.0.6 -> 1.
+    """
+    parts = v.split('.')
+    if not parts or not parts[0].isdigit():
+        return v
+    return '.'.join(parts[:2]) if parts[0] == '0' else parts[0]
+
+
+def line_note(pkg_dir: str, source: str) -> str:
+    """:return: '' for the release line of the source, otherwise a note, e.g. '(0.7.x, source 0.8.x)'"""
+    a, b = release_line(version(pkg_dir)), release_line(version(source))
+    return '' if a == b else f'({a}.x, source {b}.x)'
+
+
 def version(pkg_dir: str) -> str:
     try:
         with open(os.path.join(pkg_dir, 'package.json'), encoding='utf-8') as f:
@@ -178,7 +202,8 @@ def overview(src_root: str):
             if used is None:
                 print(f'       {pkg:10} not found{"  (" + note + ")" if note else ""}')
                 continue
-            print(f'       {pkg:10} {version(used.path):8} {used.label(source)}')
+            note = line_note(used.path, source)
+            print(f'       {pkg:10} {version(used.path):8} {used.label(source)}{"  " + note if note else ""}')
             for s in shadowed:
                 print(f'       {"":10} {version(s.path):8} {s.label(source)}  (shadowed)')
     return names
@@ -228,8 +253,13 @@ def compare(installed: str, source: str):
     return rows
 
 
+# packages of the last scan whose copy is of another release line than the source
+other_lines = {}
+
+
 def scan(project: str, pkgs, src_root, pairs=None):
     rows = []
+    other_lines.clear()
     print(f'\nProject {os.path.relpath(project)}')
     for pkg in pkgs:
         source = os.path.join(src_root, pkg)
@@ -257,6 +287,11 @@ def scan(project: str, pkgs, src_root, pairs=None):
         side = 'used  ' if left is used else 'copy  '
         print(f'\n@anclient/{pkg}  {side} {version(left.path):8} {left.label(source)}\n'
               f'{" " * (len(pkg) + 11)}source {version(source):8} {os.path.relpath(source)}')
+        note = line_note(left.path, source)
+        if note:
+            other_lines[pkg] = note
+            print(f'    another release line {note}: differences are expected; s / u are disabled.\n'
+                  f'    Compare with a checkout of {release_line(version(left.path))}.x, see --src (-h).')
         if not r:
             print('    identical')
         rows += [(pkg,) + x for x in r]
@@ -319,9 +354,11 @@ def copy_rows(rows, picks, to_source: bool) -> bool:
     :return: whether anything was copied
     """
     can = ('I', 'M') if to_source else ('S', 'M')
-    todo = [r for r in picks if r[1] in can]
+    todo = [r for r in picks if r[1] in can and r[0] not in other_lines]
     for r in picks:
-        if r not in todo:
+        if r[0] in other_lines:
+            print(f'  skip {rows.index(r) + 1}: {r[0]}/{r[2]}, another release line {other_lines[r[0]]}.')
+        elif r not in todo:
             print(f'  skip {rows.index(r) + 1}: {r[0]}/{r[2]} is {"source" if r[1] == "S" else "used"} only.')
     if not todo:
         return False

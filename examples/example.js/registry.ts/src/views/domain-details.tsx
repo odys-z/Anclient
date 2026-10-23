@@ -1,13 +1,12 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
+import { withStyles, withWidth } from '@anclient/anreact';
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 
 import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 
@@ -16,7 +15,7 @@ import { L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, AnTabl
 import { OrgDomainsTier } from './org-domains';
 import { synodeStates } from '../common/central-tier';
 import { DomxResp, RegistResp } from '../common/registry';
-import { Theme } from '@material-ui/core';
+import { Theme } from '@mui/material/styles';
 
 /**
  * Copied from ./org-details.tsx (from @anclient/anreact/jsample/views/role-details.tsx).
@@ -222,7 +221,7 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 				<Typography variant='subtitle1' color='primary' style={{marginTop: 16}}>
 					{L('Synodes')}
 				</Typography>
-				<Typography variant='caption' color='textSecondary' display='block'>
+				<Typography variant='caption' color='textSecondary' sx={{display: 'block'}}>
 					{crud === CRUD.c
 					  ? L('Planned by the central for the new domain. Each synode runs as the hub or a peer once installed.')
 					  : L('States are what the synodes last reported to the central.')}

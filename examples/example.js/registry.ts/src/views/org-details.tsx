@@ -1,18 +1,16 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
+import { withStyles, withWidth, L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, jsample } from '@anclient/anreact';
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 
-import { L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, jsample } from '@anclient/anreact';
 import { MarketOrgsTier } from './market-orgs';
-import { Theme } from '@material-ui/core';
+import { Theme } from '@mui/material/styles';
 
 /**
  * Copied from @anclient/anreact/jsample/views/role-details.tsx, without the relation tree.

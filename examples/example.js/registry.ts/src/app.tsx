@@ -1,11 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { Protocol, AnsonMsg, AnsonResp, ErrorCtx, SessionClient } from '@anclient/semantier';
 import { L, Langstrs, Sys, SysComp, AnContext, AnError, AnReactExt,
 	AnreactAppOptions, ExternalHosts, ClientOptions, jsample
 } from '@anclient/anreact';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 
 import { RegistryTsPorts } from './common/ports';
 import { Home } from './views/home';
@@ -157,10 +157,10 @@ export class App extends React.Component<AppProps> {
 		try { Langstrs.load('res-vol/lang.json', navigator.language); } catch (e) {}
 
 		AnReactExt.loadServs(elem, opts, (elem: string, opts: AnreactAppOptions, json: ExternalHosts) => {
-			ReactDOM.render(
+			// React 19: createRoot(), ReactDOM.render() is removed
+			createRoot(document.getElementById(elem) as HTMLElement).render(
 				<App servs={json} servId={opts.serv || 'host'} iportal={portal}
-					iwindow={window} clientOpts={opts.clientOpts} />,
-				document.getElementById(elem));
+					iwindow={window} clientOpts={opts.clientOpts} />);
 		});
 	}
 }

@@ -1,9 +1,8 @@
 import React from 'react';
-import { Theme } from "@material-ui/core/styles";
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
+import { Theme } from '@mui/material/styles';
+import { withStyles, withWidth } from '@anclient/anreact';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 import {
 	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
@@ -183,7 +182,7 @@ class MarketOrgsComp extends CrudCompW<Comprops> {
 				fields={[ this.state.condName ]}
 			/>
 
-			<Grid container alignContent="flex-end" >
+			<Grid container sx={{alignContent: "flex-end"}} >
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAdd}
 					startIcon={<jsample.JsampleIcons.Add />}

@@ -1,7 +1,7 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 import { AnContext, Comprops, CrudCompW, L } from '@anclient/anreact';
 
 import { CentralTier } from '../common/central-tier';
@@ -47,7 +47,7 @@ export class DomainSynodes extends CrudCompW<Comprops> {
 				onChange={(v) => this.loadDomains(v)} />}
 			<Selector label={L('Domain')} value={domain} options={this.state.domains}
 				onChange={(v) => this.setState({domain: v})} />
-			<Typography variant='caption' color='textSecondary' display='block'>
+			<Typography variant='caption' color='textSecondary' sx={{display: 'block'}}>
 				{L('States are what the synodes last reported to the central.')}
 			</Typography>
 		  </CardContent></Card>

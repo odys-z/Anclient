@@ -15,12 +15,21 @@
   ],
   "author": "Ody",
   "license": "MIT",
-  "//": "@anclient/* are linked to the sources of this Anclient checkout (file:), whose own dependencies are not installed by npm with the links, so they are listed here: js-sha256 (semantier), and ag-grid (anreact's grid widgets, until they are replaced). The other dependencies are installed by ../package.json into ../node_modules.",
+  "//": "@anclient/* are linked to the sources of this Anclient checkout (file:), whose own dependencies are not installed by npm with the links, so they are listed here: React 19, MUI 9 (@mui/*, emotion, tss-react) for anreact 0.8, and js-sha256 (semantier). The build tools (webpack, babel, ...) are installed by ../package.json into ../node_modules. Packages here are resolved before ../node_modules, so the legacy projects' React 17 / MUI 4 are never used.",
   "dependencies": {
     "@anclient/anreact": "file:../../../js/anreact",
     "@anclient/semantier": "file:../../../js/semantier",
-    "ag-grid-community": "^33.0.4",
-    "ag-grid-react": "^33.0.4",
-    "js-sha256": "^1.0.0"
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
+    "js-sha256": "^1.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tss-react": "^4.9.21"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
   }
 }

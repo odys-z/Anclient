@@ -36,11 +36,7 @@ module.exports = {
 
 	plugins: [ ],
 
-	/** React is loaded by web-dist/*.html with <script> tags. */
-	externals: {
-		'react': 'React',
-		'react-dom' : 'ReactDOM',
-	},
+	/** React is bundled: React 19 has no UMD builds for <script> tags. */
 
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js', '.jsx'],

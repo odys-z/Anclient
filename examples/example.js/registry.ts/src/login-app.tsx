@@ -1,12 +1,12 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { AnsonMsg, AnsonResp, SessionClient, SessionInf } from '@anclient/semantier';
 import { L, Langstrs, AnContext, AnError, AnReact, Login,
 	AnreactAppOptions, ExternalHosts, JsonHosts, jsample } from '@anclient/anreact';
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 export interface LoginAppProps {
 	servs: ExternalHosts;
@@ -98,10 +98,10 @@ export class LoginApp extends React.Component<LoginAppProps> {
 		try { Langstrs.load('res-vol/lang.json', navigator.language); } catch (e) {}
 
 		AnReact.bindDom(elem, opts, (elem: string, opts: AnreactAppOptions, json: JsonHosts) => {
-			ReactDOM.render(
+			// React 19: createRoot(), ReactDOM.render() is removed
+			createRoot(document.getElementById(elem) as HTMLElement).render(
 				<LoginApp servs={json as unknown as ExternalHosts} servId={opts.serv || 'host'}
-					iparent={opts.parent} ihome={opts.home} />,
-				document.getElementById(elem));
+					iparent={opts.parent} ihome={opts.home} />);
 		});
 	}
 }
