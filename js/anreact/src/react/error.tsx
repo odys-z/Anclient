@@ -1,11 +1,12 @@
 /** This is the error page of CRUD, not the error message box (AnError). */
 import React from 'react';
-import { Theme, withStyles } from "@material-ui/core/styles";
-import Button from '@material-ui/core/Button';
+import { Theme } from '@mui/material/styles';
+import { withStyles } from './mui-compat';
+import Button from '@mui/material/Button';
 
 import { Comprops, CrudComp } from './crud';
 import { AnContext, AnContextType } from './reactext';
-import { TextField } from '@material-ui/core';
+import { TextField } from '@mui/material';
 import { L } from '../utils/langstr';
 
 const styles = (theme: Theme) => ( {

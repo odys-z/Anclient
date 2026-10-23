@@ -1,13 +1,12 @@
 import React from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
-import withWidth from "@material-ui/core/withWidth";
-import { Theme } from '@material-ui/core/styles';
+import { withStyles, gridSize, withWidth } from '../mui-compat';
+import { Theme } from '@mui/material/styles';
 
-import Grid from '@material-ui/core/Grid';
-import Box from "@material-ui/core/Box";
-import Collapse from "@material-ui/core/Collapse";
-import Checkbox from "@material-ui/core/Checkbox";
-import Typography from "@material-ui/core/Typography";
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
+import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
 
 import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, str, StreeTier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
@@ -164,7 +163,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 						className={classes.folderHead}
 				  >
 					<Grid container spacing={0}>
-					  <Grid item xs={11}>
+					  <Grid size={gridSize({xs: 11})}>
 						<Typography>
 						  { leadingIcons(level) }
 						  { node.css && node.css.icon && icon(node.css.icon) }
@@ -180,7 +179,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 						  { node.text }
 						</Typography>
 					  </Grid>
-					  <Grid item xs={1}>
+					  <Grid size={gridSize({xs: 1})}>
 						{open ? icon("expand") : icon("collapse")}
 					  </Grid>
 					</Grid>
@@ -193,7 +192,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 			else
 			  return (
 				<Grid container key={id} className={classes.row}>
-				  <Grid item xs={9} className={classes.treeItem}>
+				  <Grid className={classes.treeItem} size={gridSize({xs: 9})}>
 					<Typography >
 					  { leadingIcons(level)}
 					  { node.css && node.css.icon && icon(node.css.icon)}
@@ -207,7 +206,7 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 					  {node.text}
 					</Typography>
 				  </Grid>
-				  <Grid item xs={3} className={classes.treeItem} >
+				  <Grid className={classes.treeItem} size={gridSize({xs: 3})} >
 					<Typography className={classes.treeLabel} >
 						{itemLabel(str(node.label), level, node.css)}
 					</Typography>

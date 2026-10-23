@@ -1,5 +1,7 @@
 import React from 'react';
-import Modal from 'react-modal';
+import ReactModal from 'react-modal';
+/** react-modal's types are of the shared @types/react (17) in example.js/node_modules */
+const Modal = ReactModal as unknown as React.ComponentType<any>;
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
@@ -96,7 +98,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	componentDidMount() {
 		this.photos = this.props.photos;
 
-		this.fullcallback = this.context.onFullScreen;
+		this.fullcallback = (this.context as any).onFullScreen;
 
 		if (!this.slides || this.slides.length === 0 
 			|| this.slides.length != this.photos.length

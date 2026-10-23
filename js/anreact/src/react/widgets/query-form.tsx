@@ -1,9 +1,10 @@
 import React from 'react';
-import { Theme, withStyles } from "@material-ui/core/styles";
-import { Collapse, Grid, TextField, Switch, Button, FormControlLabel, withWidth } from '@material-ui/core';
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value } from '@material-ui/lab/useAutocomplete/useAutocomplete';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { Search, Replay } from '@material-ui/icons';
+import { Theme } from '@mui/material/styles';
+import { withStyles, gridSize, withWidth } from '../mui-compat';
+import { Collapse, Grid, TextField, Switch, Button, FormControlLabel } from '@mui/material';
+import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
+import { Search, Replay } from '@mui/icons-material';
 
 import { toBool, AnlistColAttrs, NV, TierComboField, PageInf, len } from '@anclient/semantier';
 
@@ -57,7 +58,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		checked: true,
 	};
 
-	qFields = [] as TierComboField[];
+	qFields = [] as QueryCbbField[];
 
 	constructor(props: QueryFormProps) {
 		super(props);
@@ -148,13 +149,14 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		let _ref = refcbb;
 		let _that = this;
 
-		return (e, item, reason: 'reset' | 'clear' | 'select-option' | 'input', _de) => {
+		return (e, item, reason: string, _de) => {
 			if (e) e.stopPropagation();
 
 			let x = _ref?.getAttribute('data-name');
 			if (x && reason === 'clear') 
-				_that.qFields[x].val = '';
-			else if (x && reason === 'select-option') 
+				// null: no selection; '' matches none of the options (MUI warns)
+				_that.qFields[x].val = null;
+			else if (x && reason === 'selectOption') 
 				_that.qFields[x].val = item ? item : AnConst.cbbAllItem;
 
 			_that.setState({});
@@ -213,9 +215,9 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 		  <div className={classes?.root} >
 			{!hideButtons && <Switch checked={checked} onChange={this.handleChange} />}
 			<Collapse in={checked} >
-			  <Grid container alignContent="flex-end" >
+			  <Grid container sx={{alignContent: "flex-end"}} >
 				{ conditions(this.qFields, classes, media) }
-				{ !hideButtons && <Grid item className={classes?.buttons} >
+				{ !hideButtons && <Grid className={classes?.buttons} >
 					<Button variant="contained"
 						color="primary"
 						className={classes?.button}
@@ -246,15 +248,15 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 			.map( (cond: TierComboField, x) => {
 				if (cond.type === 'cbb') {
 					return (
-					<Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
+					<Grid key={'q-' + x} className={classes?.container} size={gridSize(cond.grid)}>
 					<Autocomplete<ComboItem> key={'cbb' + x}
 						id={String(x)} data-name={String(x)} ref={(ref) => {cond.ref=ref}}
 						value={cond.val}
+						// selection changes only; typing in the input changes no condition
 						onChange={ that.onCbbRefChange(cond.ref) }
-						onInputChange={ that.onCbbRefChange(cond.ref) }
 						options={cond.options || [AnConst.cbbAllItem]}
 						getOptionLabel={ (it) => it ? it.n || '' : '' }
-						getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
+						isOptionEqualToValue={(opt, v) => opt && v && opt.v === v.v}
 						style={{ width: classes?.width || 300 }}
 						renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
 					/>
@@ -262,13 +264,13 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				}
 				else if (cond.type === 'autocbb') {
 					return (
-					  <Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
+					  <Grid key={'q-' + x} className={classes?.container} size={gridSize(cond.grid)}>
 						<Autocomplete<ComboItem> key={'cbb' + x}
-							id={String(x)} data-name={String(x)} ref={ref => cond.ref = ref}
+							id={String(x)} data-name={String(x)} ref={ref  => { cond.ref = ref; }}
 							onChange={ that.onCbbRefChange(cond.ref) }
 							options={cond.options as ComboItem[]}
 							getOptionLabel={ (it) => it && it.n ? it.n || '' : '' }
-							getOptionSelected={(opt, v) => opt && v && opt.v === v.v}
+							isOptionEqualToValue={(opt, v) => opt && v && opt.v === v.v}
 							style={{ width: classes?.width || 300 }}
 							renderInput={(params) => <TextField {...params} label={cond.label} variant="outlined" />}
 						/>
@@ -278,18 +280,18 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 					let v = cond && cond.val ? cond.val : '';
 					let label = cond && cond.label ? cond.label : "date"
 					return (
-					<Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
+					<Grid key={'q-' + x} className={classes?.container} size={gridSize(cond.grid)}>
 						<TextField key={x} value = {v} label={label}
 							type="date" style={{ width: 300 }}
 							onChange = {event => {that.onDateChange(event, x)}}
-							InputLabelProps={{ shrink: true }}/>
+							slotProps={{ inputLabel: { shrink: true } }}/>
 					</Grid>);
 				}
 				else if (cond.type === "bool") {
 					let v = toBool(cond.val);
 					return (
 					  // see also record-form.tsx/TRecordForm#getField() type === 'swithc'
-					<Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
+					<Grid key={'q-' + x} className={classes?.container} size={gridSize(cond.grid)}>
 						<FormControlLabel key={'sch' + x}
 					        control={ <Switch key={x}
 										checked={v} color='primary'
@@ -299,7 +301,7 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 				}
 				else // if (cond.type === 'text')
 					return (
-					<Grid key={'q-' + x} item className={classes?.container} {...cond.grid}>
+					<Grid key={'q-' + x} className={classes?.container} size={gridSize(cond.grid)}>
 					<TextField label={cond.label} key={'text' + x}
 						id={String(x)} value={cond.val || ''}
 						onChange={e => {that.onTxtChange(e, x)}}/>
@@ -309,6 +311,20 @@ class AnQuerystComp extends CrudCompW<QueryFormProps> {
 	}
 }
 AnQuerystComp.contextType = AnContext;
+
+/**
+ * A combobox condition of {@link AnQueryst}, with the React (MUI Autocomplete) events.
+ * @since 0.8.0
+ */
+export interface QueryCbbField extends TierComboField {
+	/**
+	 * Called after the combobox's selection is changed, e.g. selected or cleared, before searching.
+	 * @param item the selected item, null if cleared
+	 * @param reason MUI's AutocompleteChangeReason, e.g. 'selectOption', 'clear'
+	 * @param val the condition's value, i.e. this.val, null if cleared
+	 */
+	onSelectChange?: (item: ComboItem | null, reason: string, val: ComboItem | null) => void;
+}
 
 export interface QueryFormProps extends Comprops {
 	uri: string;

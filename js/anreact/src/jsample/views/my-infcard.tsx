@@ -1,7 +1,6 @@
 import React from 'react';
-import { withStyles } from "@material-ui/core/styles";
-import withWidth from "@material-ui/core/withWidth";
-import Button from '@material-ui/core/Button';
+import { withStyles, withWidth } from '../../react/mui-compat';
+import Button from '@mui/material/Button';
 
 import { Protocol, CRUD,
 	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, PageInf,

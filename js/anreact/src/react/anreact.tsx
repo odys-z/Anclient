@@ -10,7 +10,7 @@ import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
 
 import { AnConst } from '../utils/consts';
 import { Comprops, CrudComp } from './crud';
-import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
+import { CSSProperties } from 'react';
 import { ClientOptions, ExternalHosts, JsonHosts } from './reactext';
 import { MenuItem } from './sys';
 

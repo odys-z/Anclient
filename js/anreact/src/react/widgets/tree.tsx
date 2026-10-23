@@ -1,20 +1,18 @@
 import React from "react";
-import { Theme, withStyles } from "@material-ui/core/styles";
-import withWidth from "@material-ui/core/withWidth/withWidth";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import Collapse from "@material-ui/core/Collapse";
-import Checkbox from "@material-ui/core/Checkbox";
-import Typography from "@material-ui/core/Typography";
-import SvgIcon from "@material-ui/core/SvgIcon";
-import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms
-} from "@material-ui/icons";
-import PhotoLibraryOutlinedIcon from '@material-ui/icons/PhotoLibraryOutlined';
-import PinDropOutlined from '@material-ui/icons/PinDropOutlined';
-import Wallpaper from '@material-ui/icons/Wallpaper';
-import MovieRounded from '@material-ui/icons/MovieRounded';
-import FavoriteBorderOutlined from '@material-ui/icons/FavoriteBorderOutlined';
+import { Theme } from '@mui/material/styles';
+import { withStyles, gridSize, withWidth } from '../mui-compat';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
+import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
+import SvgIcon from '@mui/material/SvgIcon';
+import { Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms } from '@mui/icons-material';
+import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined';
+import PinDropOutlined from '@mui/icons-material/PinDropOutlined';
+import Wallpaper from '@mui/icons-material/Wallpaper';
+import MovieRounded from '@mui/icons-material/MovieRounded';
+import FavoriteBorderOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 
 import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentName, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
 import { Comprops, CrudCompW } from "../crud";
@@ -302,7 +300,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 					className={classes.folderHead}
 			  >
 				<Grid container spacing={0}>
-				  <Grid item xs={11}>
+				  <Grid size={gridSize({xs: 11})}>
 					<Typography>
 					  {leadingIcons(level)}
 					  {node.css && node.css.icon && icon(node.css.icon)}
@@ -317,7 +315,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 					  {node.text}
 					</Typography>
 				  </Grid>
-				  <Grid item xs={1}>
+				  <Grid size={gridSize({xs: 1})}>
 					{open ? icon("expand") : icon("collapse")}
 				  </Grid>
 				</Grid>
@@ -330,7 +328,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 		else
 		  return (
 			<Grid container key={id} className={classes.row}>
-			  <Grid item xs={9} className={classes.treeItem}>
+			  <Grid className={classes.treeItem} size={gridSize({xs: 9})}>
 				<Typography >
 				  { leadingIcons(level) }
 				  { node.css && node.css.icon && icon(node.css.icon) }
@@ -345,7 +343,7 @@ class AnTreeComp extends CrudCompW<Comprops> {
 				  {node.text}
 				</Typography>
 			  </Grid>
-			  <Grid item xs={3} className={classes.treeItem} >
+			  <Grid className={classes.treeItem} size={gridSize({xs: 3})} >
 				<Typography className={classes.treeLabel} >{itemLabel(node.label || node.text, level, node.css)}</Typography>
 			  </Grid>
 			</Grid>

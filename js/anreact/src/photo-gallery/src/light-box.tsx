@@ -329,7 +329,7 @@ export class Lightbox extends CrudCompW<Comprops & {
       }
       else if (mime === 'video') {
         items.push(<video key={i}
-          ref={(ref) => this.vidRef = ref}
+          ref={(ref) => { this.vidRef = ref; }}
           preload='false' controls
           poster={photo.poster}
           style={{
@@ -360,7 +360,7 @@ export class Lightbox extends CrudCompW<Comprops & {
         items.push(
         <AudioBox lightMode
           key={i}
-          ref={(ref) => this.audRef = ref}
+          ref={(ref) => { this.audRef = ref; }}
           poster={photo.poster}
           src={photo.src}
           width='80%'

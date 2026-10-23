@@ -1,18 +1,17 @@
 import React, {ReactNode} from "react";
 
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import Collapse from "@material-ui/core/Collapse";
-import Typography from "@material-ui/core/Typography";
+import { withStyles, gridSize, withWidth, Color, Alignment } from '../mui-compat';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import Typography from '@mui/material/Typography';
 
 import { CRUD, AnTreeNode, AnlistColAttrs,
 	toBool, IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
 import { GalleryView, lightboxFomatter as lightboxFormatter } from "./gallery-view";
-import { PropTypes, Theme } from "@material-ui/core";
+import { Theme } from '@mui/material/styles';
 import { AnTablistProps } from "./table-list";
 import { CrudCompW, DetailFormW } from "../crud";
 import { swap } from "../../utils/lang-ext";
@@ -188,7 +187,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 		let {classes, media} = props;
 		let parentId = tnode.parent;
 		return (
-		  <Grid key={`${tnode.id}.${fragKey}`} item {...col.grid} className={classes.treeCell}>
+		  <Grid key={`${tnode.id}.${fragKey}`} className={classes.treeCell} size={gridSize(col.grid)}>
 			<JsampleIcons.Up onClick={handler?.toUp} />
 			<JsampleIcons.Down onClick={handler?.toDown} />
 			{media.isMd ?
@@ -235,10 +234,10 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
 				  if (cx === 0) return (
 					hide(col.grid, media) ? undefined :
-					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.rowHead}>
+					<Grid key={`${tnode.id}.${cx}`} className={classes.rowHead} size={gridSize(col.grid)}>
 						<Typography noWrap variant='body2'>
 							{that.leadingIcons()}
-							{n[col.field]}
+							{n[col.field] as React.ReactNode}
 						</Typography>
 					</Grid> );
 				  else if (col.type === 'actions')
@@ -246,14 +245,14 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 							TreeCardComp.actionFragment(tnode, col, cx, this, this.props));
 				  else return (
 					hide(col.grid, media) ? undefined :
-					<Grid key={`${tnode.id}.${cx}`} item {...col.grid} className={classes.treeCell}>
+					<Grid key={`${tnode.id}.${cx}`} className={classes.treeCell} size={gridSize(col.grid)}>
 						{ typeof col.formatter === 'function' ?
 							col.formatter(col, tnode) :
 							<Typography noWrap variant='body2'
 								// issue: This is controlling the presentation layer by data service. Is this the right way?
 								align={align(n.css[col.field])}
 								className={classes.rowText} >
-								{n[col.field]}
+								{n[col.field] as React.ReactNode}
 							</Typography>
 						}
 					</Grid> );
@@ -262,7 +261,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 		  </Grid> );
 
 		function align(css: React.CSSProperties) {
-		  return css?.textAlign ? css.textAlign as PropTypes.Alignment : 'center';
+		  return css?.textAlign ? css.textAlign as Alignment : 'center';
 		}
 	}
 }
@@ -331,20 +330,20 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 				if (ix == 0) // row head
 				  return (
 					hide(col.grid, media) ? undefined :
-					<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.galleryHead} >
+					<Grid key={`${tnode.id}.${ix}`} className={classes.galleryHead} size={gridSize(col.grid)} >
 						<Typography noWrap variant='body2' className={expd ? classes.galleryHeadExpandIcon : ''}>
 						{levelIcons(
 							that.props.indentSettings,
 							tnode.indents as IndentName[])}
 						{expd ? icon(that.props.indentIcons, "pic-lib", 0)
 							: icon(that.props.indentIcons, "collapse", 0)}
-						{n[col.field]}
+						{n[col.field] as React.ReactNode}
 						</Typography>
 					</Grid>);
 				else if (!hide(col.grid, media)) {
 					if (col.type === 'formatter' || col.formatter)
 						return (
-							<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell} >
+							<Grid key={`${tnode.id}.${ix}`} className={classes.treeCell} size={gridSize(col.grid)} >
 								<Typography variant='body2' >
 									{col.formatter(col, tnode, {classes, media}) as ReactNode}
 								</Typography>
@@ -353,13 +352,13 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 						return ( TreeCardComp.actionFragment(tnode, col, ix, this, this.props));
 					else if (col.type === 'icon-sum')
 						return (
-							<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell}>
+							<Grid key={`${tnode.id}.${ix}`} className={classes.treeCell} size={gridSize(col.grid)}>
 								{TreeGallaryComp.formatFolderIcons(that.props.indentIcons, tnode, {grid: col.grid, media, classes})}
 							</Grid>);
 					else
 						return (
-						<Grid item key={`${tnode.id}.${ix}`} {...col.grid} className={classes.treeCell}>
-							<Typography variant='body2' > {n[col.field]} </Typography>
+						<Grid key={`${tnode.id}.${ix}`} className={classes.treeCell} size={gridSize(col.grid)}>
+							<Typography variant='body2' > {n[col.field] as React.ReactNode} </Typography>
 						</Grid>);
 				}
 			  }) }
@@ -407,7 +406,7 @@ interface AnTreeditorProps extends AnTablistProps {
 
 	reload: boolean;
 
-	nodeFormatter?: (n: AnTreeNode, parent: ReactNode, opts: CompOpts) => JSX.Element;
+	nodeFormatter?: (n: AnTreeNode, parent: AnTreeNode, opts: CompOpts) => JSX.Element;
 
 	lightbox?: lightboxFormatter;
 }
@@ -477,7 +476,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 				that.setState({forest: (resp.Body() as AnDatasetResp).forest,
 					tobeLoad: false});
 			}},
-			this.context.error);
+			(this.context as AnContextType).error);
 
 		this.editForm = undefined;
 	}
@@ -622,20 +621,20 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					if (ix == 0) // row head
 					  return (
 						hide(col.grid, media) ? undefined :
-						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
 							<Typography noWrap variant='body2' >
 							{levelIcons(
 								that.props.indentSettings,
 								treenode.indents as IndentName[])}
 							{expd ? icon(that.props.indentIcons, "expand", 0)
 								: icon(that.props.indentIcons, "collapse", 0)}
-							{n.text}
+							{n.text as React.ReactNode}
 							</Typography>
 						</Grid>);
 					else if (col.type === 'actions')
 					  return (
 						hide(col.grid, media) ? undefined :
-						<Grid item key={`${treenode.id}.${ix}`} className={classes.actions}>
+						<Grid key={`${treenode.id}.${ix}`} className={classes.actions}>
 							<Typography noWrap variant='body2' >
 								<Button onClick={that.toEditCard}
 									data-me={treenode.id}
@@ -658,7 +657,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					else if (col.type === 'formatter' || col.formatter)
 					  return (
 						hide(col.grid, media) ? undefined :
-						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
 							<Typography variant='body2' >
 							  {col.formatter(col, treenode, {classes, media}) as ReactNode}
 							</Typography>
@@ -666,7 +665,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					else
 					  return (
 						hide(col.grid, media) ? undefined :
-						<Grid item key={`${treenode.id}.${ix}`} {...col.grid} >
+						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
 							<Typography noWrap variant='body2' >
 							{formatFolderDesc(treenode, media)}
 							</Typography>

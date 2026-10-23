@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Theme, withStyles } from '@material-ui/core/styles';
-import withWidth from "@material-ui/core/withWidth";
-import Box from '@material-ui/core/Box';
+import { Theme } from '@mui/material/styles';
+import { withStyles, withWidth } from '../mui-compat';
+import Box from '@mui/material/Box';
 
 import { gCamera, gCameraViewBox } from './my-icon';
 import { dataOfurl, mimeOf } from '../../utils/file-utils';
@@ -116,9 +116,9 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 			<img
 				src={dataimg}
 				style={{ width: this.props.width || "auto", height: "100%", minHeight: 48 }}
-				ref={(ref) => this.imgPreview = ref} />
+				ref={(ref) => { this.imgPreview = ref; }} />
 			<input type='file' style={ bg } disabled={this.props.disabled}
-		 		ref={ (ref) => this.fileInput = ref } accept="image/*"
+		 		ref={(ref) => { this.fileInput = ref; }} accept="image/*"
 		 		onChange={ this.toShowImage } />
 		  </Box>);
 	}

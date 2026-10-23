@@ -1,13 +1,14 @@
 import React from 'react';
-import { Theme, withStyles } from "@material-ui/core/styles";
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import TextField from '@material-ui/core/TextField';
-import IconButton from '@material-ui/core/IconButton';
-import Close from '@material-ui/icons/Close';
+import { Theme } from '@mui/material/styles';
+import { withStyles } from '../mui-compat';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Close from '@mui/icons-material/Close';
 
 import {L} from '../../utils/langstr';
 import { AnContext, AnContextType } from '../reactext';
@@ -31,7 +32,7 @@ const styles = (_theme: Theme) => ({
     alignItems: "center",
   },
   centerbox: {
-	  "justify-content": "center"
+	  justifyContent: "center"
   }
 });
 
@@ -87,7 +88,7 @@ class MyInfoComp extends DetailFormW<MyInfoProps> {
 				fullScreen={!!this.props.fullScreen}
 				onClose={this.handleClose} >
 
-				<DialogTitle id="myinfo-title" disableTypography className={classes?.dialogTitle} >
+				<DialogTitle id="myinfo-title" component="div" className={classes?.dialogTitle} >
 					{title}
 					<IconButton onClick={this.handleClose}>
 						<Close />

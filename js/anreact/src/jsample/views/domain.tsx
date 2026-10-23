@@ -1,8 +1,7 @@
 
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
-import { Theme } from '@material-ui/core/styles';
+import { withStyles, withWidth } from '../../react/mui-compat';
+import { Theme } from '@mui/material/styles';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';

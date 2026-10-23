@@ -1,12 +1,21 @@
 import React from 'react';
-import { PropTypes, StandardProps, Theme, withStyles } from '@material-ui/core';
-import { Breakpoint } from '@material-ui/core/styles/createBreakpoints';
+import { Color, Alignment, withStyles } from './mui-compat';
+import { Theme, Breakpoint } from '@mui/material/styles';
 
 import { AnContext } from './reactext';
 import { Media, ClassNames } from './anreact';
 import { CRUD, Semantier, SessionInf, UIComponent } from '@anclient/semantier';
 
-interface Comprops extends StandardProps<any, string>, UIComponent {
+interface Comprops extends UIComponent {
+	/**
+	 * Any other props of the component.
+	 * MUI 4's StandardProps<any, ...>, which Comprops extended before 0.8.0, accepted them.
+	 */
+	[prop: string]: any;
+
+	className?: string;
+	style?: React.CSSProperties;
+
 	/**The matching url in React.Route */
 	match?: {path: string};
 
@@ -20,7 +29,7 @@ interface Comprops extends StandardProps<any, string>, UIComponent {
 	classes?: ClassNames;
 	/**MUI as default */
 	readonly width?: Breakpoint;
-	color?: PropTypes.Color;
+	color?: Color;
 }
 
 const styles = (theme: Theme) => ( {

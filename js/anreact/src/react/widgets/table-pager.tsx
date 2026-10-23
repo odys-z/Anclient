@@ -1,15 +1,15 @@
 import React, { ReactNode } from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import { Theme } from '@material-ui/core/styles';
+import { withStyles } from '../mui-compat';
+import { Theme } from '@mui/material/styles';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TablePagination, { LabelDisplayedRowsArgs } from '@material-ui/core/TablePagination';
-import Checkbox from '@material-ui/core/Checkbox';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TablePagination, { LabelDisplayedRowsArgs } from '@mui/material/TablePagination';
+import Checkbox from '@mui/material/Checkbox';
 
 import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol } from '@anclient/semantier';
 import { DetailFormW } from '../crud';
@@ -190,7 +190,7 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 							let cell = colObj.formatter && colObj.formatter(v as DbCol, x, row); // bug?
 							if (cell)
 								cell = <TableCell key={colObj.field + x}>{cell}</TableCell>;
-							return cell || <TableCell key={colObj.field + x}>{v}</TableCell>;
+							return cell || <TableCell key={colObj.field + x}>{v as React.ReactNode}</TableCell>;
 						} )}
 				</TableRow>)
 		});
@@ -204,11 +204,11 @@ class AnTablPagerComp extends DetailFormW<AnTablistProps> {
 			  <TableRow>
 				{ this.props.checkbox &&
 				  ( <TableCell padding="checkbox" >
-					<Checkbox ref={ref => (this.checkAllBox = ref)}
+					<Checkbox ref={ref  => { (this.checkAllBox = ref); }}
 						indeterminate={this.state.selected.size > 0 && this.state.selected.size < len(this.props.rows)}
 						checked={this.state.selected.size > 0 && this.state.selected.size === len(this.props.rows)}
 						color="primary"
-						inputProps={{ 'aria-label': 'checkAll' }}
+						slotProps={{ input: { 'aria-label': 'checkAll' } as any }}
 						onChange={this.toSelectAll}/>
 				  </TableCell> )
 				}

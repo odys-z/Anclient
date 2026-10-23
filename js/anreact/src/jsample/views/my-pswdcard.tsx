@@ -1,6 +1,6 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import Button from '@material-ui/core/Button';
+import { withStyles, withWidth } from '../../react/mui-compat';
+import Button from '@mui/material/Button';
 
 import { L } from '../../utils/langstr';
 import { Semantext, UIComponent } from '@anclient/semantier';
@@ -9,7 +9,7 @@ import { TRecordForm } from '../../react/widgets/record-form';
 
 import { MyInfTier } from './my-infcard';
 import { Comprops, DetailFormW } from '../../react/crud';
-import { Theme, withWidth } from '@material-ui/core';
+import { Theme } from '@mui/material/styles';
 import { invalidStyles } from '../../react/anreact';
 
 const styles = (theme: Theme) => (Object.assign(

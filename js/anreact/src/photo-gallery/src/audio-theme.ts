@@ -2,8 +2,8 @@
  * Credits to Adulik (arusikpaloyan), Audio player (forked at Code Sandbox),
  * https://codesandbox.io/s/audio-player-forked-lxuloi?file=/src/App.js
  */
-import { grey, red, green, orange, blue } from "@material-ui/core/colors";
-import { createTheme } from "@material-ui/core/styles";
+import { grey, red, green, orange, blue } from '@mui/material/colors';
+import { createTheme } from '@mui/material/styles';
 
 /*
     Palette
@@ -270,6 +270,29 @@ const overrides = {
   }
 };
 
+/** MUI 4's state rules, e.g. MuiStepIcon.completed, which are &.Mui-completed of the root since MUI 5. */
+const states = ['active', 'checked', 'completed', 'disabled', 'error', 'expanded', 'focused', 'focusVisible', 'selected'];
+
+function styleOverrides(rules: { [rule: string]: any }) {
+  const overrides: { [rule: string]: any } = {};
+  const root: { [selector: string]: any } = { ...(rules.root || {}) };
+  for (const r in rules)
+    if (states.includes(r)) root[`&.Mui-${r}`] = rules[r];
+    else if (r !== 'root') overrides[r] = rules[r];
+  return { root, ...overrides };
+}
+
+/** MUI 4's theme props and overrides, as MUI 5+ theme.components defaultProps and styleOverrides. */
+const components = Array.from(new Set([...Object.keys(props), ...Object.keys(overrides)]))
+  .reduce((comps, k) => {
+    const p = props[k as keyof typeof props], o = overrides[k as keyof typeof overrides];
+    comps[k] = {
+      ...(p ? { defaultProps: p } : {}),
+      ...(o ? { styleOverrides: styleOverrides(o) } : {}),
+    };
+    return comps;
+  }, {} as { [comp: string]: object });
+
 export default createTheme({
   // title: "Regis project theme" as any,
   palette: palette,
@@ -277,8 +300,7 @@ export default createTheme({
   shape: shape,
   spacing: 8,
   transitions: transitions,
-  props: props as any,
-  overrides: overrides as any
+  components: components as any,
 });
 
 /**

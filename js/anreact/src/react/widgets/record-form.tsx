@@ -1,15 +1,14 @@
 
 import * as CSS from 'csstype';
 import React from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
-import withWidth from "@material-ui/core/withWidth";
-import { Theme } from '@material-ui/core/styles';
+import { withStyles, gridSize, withWidth } from '../mui-compat';
+import { Theme } from '@mui/material/styles';
 import clsx from  'clsx';
 
-import Grid from '@material-ui/core/Grid';
-import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
-import Typography from '@material-ui/core/Typography';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import { AnlistColAttrs, PageInf, Semantier, TierCol, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
@@ -209,8 +208,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				type="date"
 				defaultValue={rec[f.field]}
 				className={f.readOnly ? classes.date_disable : classes.textField}
-				InputLabelProps={{ shrink: true, }}
-				InputProps={{ classes: { input: f.readOnly ? classes.date_disable : classes.textField } }}
+				slotProps={{ inputLabel: { shrink: true, },
+							 input: { classes: { input: f.readOnly ? classes.date_disable : classes.textField } } }}
 			/>);
 		}
 		else if (f.type === 'datetime') {
@@ -220,8 +219,8 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				type="datetime-local"
 				defaultValue={rec[f.field]}
 				className={classes.textField}
-				InputLabelProps={{ shrink: true, }}
-				InputProps={{ classes: { input: f.readOnly ? classes.date_disable : classes.textField } }}
+				slotProps={{ inputLabel: { shrink: true, },
+							 input: { classes: { input: f.readOnly ? classes.date_disable : classes.textField } } }}
 			/>);
 		}
 		else {
@@ -230,16 +229,20 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 				type = 'number';
 
 			let {readOnly} = f;
+			// invalid: MUI draws the outline and label in its error color (red), focused or not;
+			// only notNull keeps its class (background), the others' border would double the outline
+			let invalid = !!f.style && f.style !== 'ok';
 
 			return (
 			  <TextField key={f.field} type={f.type || type}
+				error={invalid}
 				disabled={!!f.disabled}
 				label={isSm && !that.props.dense ? L(f.label) : ''}
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={ !rec || (rec[f.field] === undefined || rec[f.field] === null) ? '' : rec[f.field] }
-				inputProps={{ readOnly } }
-				className={clsx(f.opts?.classes, classes && classes[f.style])}
+				slotProps={{ htmlInput: { readOnly } }}
+				className={clsx(f.opts?.classes, classes && (!invalid || f.style === 'notNull') && classes[f.style])}
 				onChange={ (e) => {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
@@ -257,8 +260,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 		this.props.fields.forEach( (f: AnlistColAttrs<JSX.Element, CompOpts>, i: number) => {
 		  if (!f.hide && toBool(f.visible, true)) {
 			fs.push(
-				<Grid item key={`${f.field}.${i}`}
-					{...f.grid} className={this.props.dense ? classes?.labelText_dense : classes?.labelText} >
+				<Grid key={`${f.field}.${i}`} className={this.props.dense ? classes?.labelText_dense : classes?.labelText} size={gridSize(f.grid)} >
 				  <Box className={classes?.rowBox} {...f.box} >
 					{!isSm && f.label &&
 					  <Typography className={classes?.formLabel} >

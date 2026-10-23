@@ -1,30 +1,28 @@
 import React from 'react';
-import { Theme, withStyles } from "@material-ui/core/styles";
+import { Theme } from '@mui/material/styles';
+import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';
-import Grid from '@material-ui/core/Grid';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Box from '@material-ui/core/Box';
-import Card from '@material-ui/core/Card';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import DialogActions from '@material-ui/core/DialogActions';
-import Divider from '@material-ui/core/Divider';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import Collapse from '@material-ui/core/Collapse';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import Link from '@material-ui/core/Link';
-import {
-	Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School, SettingsOutlined, BarChart,
-	GroupAdd, MoreHoriz, Description, Ballot, ScreenShareOutlined, FolderSharedOutlined, HowToRegSharp
-} from '@material-ui/icons';
+import Grid from '@mui/material/Grid';
+import Drawer from '@mui/material/Drawer';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import Divider from '@mui/material/Divider';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Collapse from '@mui/material/Collapse';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
+import { Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School, SettingsOutlined, BarChart, GroupAdd, MoreHoriz, Description, Ballot, ScreenShareOutlined, FolderSharedOutlined, HowToRegSharp } from '@mui/icons-material';
 
 import { AnContext, AnContextType } from './reactext';
 import { ConfirmDialog } from './widgets/messagebox';
@@ -37,9 +35,8 @@ import {
 } from './crud'
 import { AnReactExt, ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
-import withWidth from '@material-ui/core/withWidth';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
-import Fab from '@material-ui/core/Fab';
+import Fab from '@mui/material/Fab';
 import { contextType } from 'react-modal';
 
 export interface SysProps extends Comprops {
@@ -340,14 +337,14 @@ class SysComp extends CrudCompW<SysProps> {
 					className={classes.welcome}>
 				<IconButton onClick={this.showMenu} >
 					<Menu color='primary'/>
-					<Box component='span' display='inline' className={classes.cardText} >
+					<Box component='span' className={classes.cardText} sx={{display: 'inline'}} >
 						Please click menu to start.
 					</Box>
 				</IconButton>
 			  </Paper>
 			  <Paper elevation={4} style={{ margin: 24 }} className={classes.welcome}>
 				<School color='primary'/>
-				<Box component='span' display='inline'>Documents:
+				<Box component='span' sx={{display: 'inline'}}>Documents:
 					<Link style={{ marginLeft: 4 }} target='_blank'
 						href={this.props.hrefDoc || "https://odys-z.github.io/Anclient"} >
 						{`${this.state.sysName}`}</Link>
@@ -403,7 +400,7 @@ class SysComp extends CrudCompW<SysProps> {
 	componentDidUpdate(_: Readonly<SysProps>, _p: Readonly<{}>, _s?: any): void {
 		// reached here once the Error dialog is closed.
 		if (typeof(this.onfullscreen) === 'function')
-			this.context.onFullScreen = this.onfullscreen;
+			(this.context as AnContextType).onFullScreen = this.onfullscreen;
 
 		if (this.props.msHideAppBar > 0 && this.barAutoHidden) {
 			let that = this;
@@ -522,11 +519,11 @@ class SysComp extends CrudCompW<SysProps> {
 				if ( menu.children && menu.children.length > 0 )
 				  return (
 				  <div key={menu.funcId}>
-					<ListItem button onClick={expandItem} data-iid={menu.funcId}>
+					<ListItemButton onClick={expandItem} data-iid={menu.funcId}>
 						<ListItemIcon key={menu.funcId}>{icon(depth, menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
 						{ open ? icon(0, 'expand') : icon(0, 'collapse') }
-					</ListItem>
+					</ListItemButton>
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<List component="div" disablePadding>
 							{buildMenu(depth, menu.children)}
@@ -536,7 +533,7 @@ class SysComp extends CrudCompW<SysProps> {
 				else
 				  return (menu && menu.funcId ?
 					<div key={menu.funcId} >
-						<ListItem button className={classes.nested} onClick={
+						<ListItemButton className={classes.nested} onClick={
 							e => {
 								if (that.state.welcome)
 									that.setState( {welcome: false} );
@@ -546,7 +543,7 @@ class SysComp extends CrudCompW<SysProps> {
 							} } >
 						<ListItemIcon>{icon(depth, menu.css?.icon)}</ListItemIcon>
 						<ListItemText primary={L(menu.funcName)} />
-						</ListItem>
+						</ListItemButton>
 					</div> : '');
 			}
 		}
@@ -588,9 +585,10 @@ class SysComp extends CrudCompW<SysProps> {
 				})}
 			>
 			<Toolbar>
-			   <Grid container spacing={1} >
-				<Grid item sm={7}>
-				<Box flexWrap="nowrap" display="flex" >
+			   {/* MUI 4's Grid container was full width; in the Toolbar's flex row MUI 9's isn't */}
+			   <Grid container spacing={1} sx={{flexGrow: 1}} >
+				<Grid size={gridSize({sm: 7})}>
+				<Box sx={{flexWrap: "nowrap", display: "flex"}} >
 					<IconButton
 						color="inherit"
 						aria-label="open drawer"
@@ -605,7 +603,7 @@ class SysComp extends CrudCompW<SysProps> {
 				</Box>
 				</Grid>
 
-				<Grid item sm={5}>
+				<Grid size={gridSize({sm: 5})}>
 					<DialogActions className={claz.loginfo} >
 						<MyIcon onClick={() => { if (that.props.myInfo) that.setState({ showMine: true }); } } />
 						{ this.props.onLogout

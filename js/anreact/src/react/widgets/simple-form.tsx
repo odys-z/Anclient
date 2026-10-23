@@ -1,17 +1,16 @@
 
 import React from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
-import withWidth from "@material-ui/core/withWidth";
+import { withStyles, gridSize, withWidth } from '../mui-compat';
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Grid from '@material-ui/core/Grid';
-import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
-import Typography from '@material-ui/core/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp,
 	CRUD, NameValue, PkVal, TierCol, TierComboField, Tierec, UpdateReq, str_, toBool
@@ -296,7 +295,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 				variant='outlined' color='primary' fullWidth
 				placeholder={L(f.label)} margin='dense'
 				value={!rec || rec[f.field] === undefined ? '' : rec[f.field]}
-				inputProps={f.style ? { style: f.style } : undefined}
+				slotProps={{ htmlInput: f.style ? { style: f.style } : undefined }}
 				onChange={(e) => {
 					rec[f.field] = e.target.value;
 					this.setState({ dirty : true });
@@ -313,9 +312,7 @@ class SimpleFormComp extends DetailFormW<SimpleFormProps> {
 		this.state.fields.forEach( (f, i) => {
 		  if (f.visible === undefined || f.visible === false) {
 			fs.push(
-				<Grid item key={`${f.field}.${f.label}`}
-					sm={f.grid?.sm ? f.grid.sm : 6}
-					{...f.grid} className={opts?.classes.labelText} >
+				<Grid key={`${f.field}.${f.label}`} className={opts?.classes.labelText} size={gridSize({sm: f.grid?.sm ? f.grid.sm : 6, ...f.grid})} >
 				  <Box className={opts?.classes.rowBox} >
 					{!isSm && (
 					  <Typography className={opts?.classes.formLabel} >

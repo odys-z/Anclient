@@ -6,6 +6,7 @@ export * from './utils/file-utils';
 
 export * from './patch/react-portal-overlay';
 
+export * from './react/mui-compat';
 export * from './react/reactext';
 export * from './react/anreact';
 export * from './react/error';
@@ -25,8 +26,7 @@ export * from './react/widgets/state-chip';
 export * from './react/widgets/tabs';
 export * from './react/widgets/tree';
 export * from './react/widgets/treegrid';
-export * from './react/widgets/ag-gridsheet';
-export * from './react/widgets/spreadsheet';
+// ag-gridsheet and spreadsheet (ag-grid) are removed since 0.8.0 (still in 0.7.x); a worksheet will replace them.
 export * from './react/widgets/tree-editor';
 export * from './react/widgets/gallery-view';
 

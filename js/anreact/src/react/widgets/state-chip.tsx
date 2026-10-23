@@ -1,5 +1,5 @@
 import React from 'react';
-import Chip from '@material-ui/core/Chip';
+import Chip from '@mui/material/Chip';
 
 /**
  * Definition of a state code, e.g. {label: 'Hub', color: '#2e7d32'}.

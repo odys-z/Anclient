@@ -1,18 +1,18 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import { withStyles } from '../mui-compat';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
 
 import QRCode, { QRCodeToDataURLOptions } from 'qrcode'
 
@@ -35,7 +35,7 @@ const styles = theme => ({
 	margin: "auto"
   },
   centerbox: {
-	  "justify-content": "center"
+	  justifyContent: "center"
   },
   dlgAct: {
     borderTop: "solid 2px #f5f5ff",
@@ -137,7 +137,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
 						{L(txtOk)}
 				  </Button>
-				  <Box display={displayCancel}>
+				  <Box sx={{display: displayCancel}}>
 					<Button onClick={this.toCancel} color="primary" autoFocus >
 						{L(txtCancel)}
 					</Button>

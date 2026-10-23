@@ -1,10 +1,9 @@
 import React from "react";
-import { Theme } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Collapse from "@material-ui/core/Collapse";
-import Typography from "@material-ui/core/Typography";
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@mui/material/styles';
+import Grid from '@mui/material/Grid';
+import Collapse from '@mui/material/Collapse';
+import Typography from '@mui/material/Typography';
+import { withStyles, gridSize, withWidth, Color, Alignment } from '../mui-compat';
 
 import { AnTreeNode, StreeTier, toBool } from "@anclient/semantier";
 
@@ -13,7 +12,7 @@ import { CrudCompW } from "../crud";
 import { ClassNames, Media, hide } from "../anreact";
 import { TreeCardComp } from "./tree-editor";
 import { AnTablistProps } from "./table-list";
-import { Button, PropTypes } from "@material-ui/core";
+import { Button } from '@mui/material';
 import { JsampleIcons } from "../../jsample/styles";
 import { L } from "../../utils/langstr";
 
@@ -134,7 +133,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
           if (col.type === 'actions')
             return (
               hide(col.grid, media) ? undefined :
-              <Grid item key={ix} {...col.grid} className={classes.thCell}>
+              <Grid key={ix} className={classes.thCell} size={gridSize(col.grid)}>
                 <Button onClick={(e) => opts.onThClick(e, ix)}
                   data-me={undefined} date-parent={undefined}
                   startIcon={<JsampleIcons.ListAdd />} color="primary" >
@@ -145,7 +144,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
           else
             return (
               hide(col.grid, media) ? undefined :
-              <Grid item key={ix} {...col.grid} className={classes.thCell}>
+              <Grid key={ix} className={classes.thCell} size={gridSize(col.grid)}>
                 {col.label || col.label === undefined ? col.field : col.label}
               </Grid>);
             } )
@@ -161,7 +160,7 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 
     let m = (this.props.tier as StreeTier).forest || this.props.testData;
 
-    if (this.context.verbose)
+    if ((this.context as any).verbose)
       console.info('context.verbose', m);
 
     let expandItem = this.toExpandItem;
@@ -185,8 +184,8 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
      * @param css 
      * @returns 
      */
-    function align(css?: React.CSSProperties) : PropTypes.Alignment {
-      return css?.textAlign ? css.textAlign as PropTypes.Alignment : 'inherit'; //
+    function align(css?: React.CSSProperties) : Alignment {
+      return css?.textAlign ? css.textAlign as Alignment : 'inherit'; //
     }
 
     function folder(cols: AnTreegridCol[], n: AnTreeNode, open: boolean) {
@@ -198,13 +197,13 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
               .map( (col: AnTreegridCol, cx: number) => {
                 if (cx === 0) return (
                   // no array of p is allowed as Typography' children
-                  <Grid key={`${n.id}.${cx}`} item {...col.grid} >
+                  <Grid key={`${n.id}.${cx}`} size={gridSize(col.grid)} >
                     <Typography noWrap variant='body2'>
                       {levelIcons(that.props.indentSettings, n.indents)}
                       {open ?
                         icon(that.props.indentIcons, "expand", 0) :
                         icon(that.props.indentIcons, "collapse", 0)}
-                      {`${n.node[col.field]} ${open ? '' : `[${n.node.children?.length}]`}`}
+                      {`${n.node[col.field] as React.ReactNode} ${open ? '' : `[${n.node.children?.length}]`}`}
                     </Typography>
                   </Grid> );
                 else if (col.type === 'actions')
@@ -214,13 +213,13 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                   console.error("AnTreegridCol.formatter is replaced with colFormatter.");
                 else return (
                   hide(col.grid, media) ? undefined :
-                  <Grid key={`${n.id}.${cx}`} item {...col.grid} className={classes.treeItem}>
+                  <Grid key={`${n.id}.${cx}`} className={classes.treeItem} size={gridSize(col.grid)}>
                     { typeof col.colFormatter === 'function' ?
                       col.colFormatter(col, n, {media, classes, colx: cx}) :
                       <Typography noWrap variant='body2'
 								        // issue: This is controlling the presentation layer by data service. Is this the right way?
                         align={align(n.node.css)} >
-                        {n.node[col.field]}
+                        {n.node[col.field] as React.ReactNode}
                       </Typography>
                     }
                   </Grid> );
@@ -244,15 +243,15 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
             .filter( (v: AnTreegridCol) => toBool(v.visible, true) )
             .map( (col: AnTreegridCol, cx: number) => {
               // if (col.formatter) return (
-              //   <Grid key={`${n.id}.${cx}`} item {...col.grid} >
+              //   <Grid key={`${n.id}.${cx}`} size={gridSize(col.grid)} >
               //     {col.formatter(col, n, {classes, media, cx})}
               //   </Grid>);
               // else
               if (cx === 0) return (
-                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.rowHead} style={col.style}>
+                <Grid key={`${n.id}.${cx}`} className={classes.rowHead} style={col.style} size={gridSize(col.grid)}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
-                    {n.node[col.field]}
+                    {n.node[col.field] as React.ReactNode}
                   </Typography>
                 </Grid> );
               else if (col.type === 'actions')
@@ -262,11 +261,11 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 console.error("AnTreegridCol.formatter is replaced with colFormatter.");
               else return (
                 hide(col.grid, media) ? undefined :
-                <Grid key={`${n.id}.${cx}`} {...col.grid} item className={classes.treeItem} style={col.style}>
+                <Grid key={`${n.id}.${cx}`} className={classes.treeItem} style={col.style} size={gridSize(col.grid)}>
                   { typeof col.colFormatter === 'function' ?
                     col.colFormatter(col, n, {media, classes, colx: cx}) :
                     <Typography noWrap variant='body2' align={align(n.node.css)} >
-                      {n.node[col.field]}
+                      {n.node[col.field] as React.ReactNode}
                     </Typography>
                   }
                 </Grid> );

@@ -1,10 +1,9 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import Typography from '@material-ui/core/Typography';
+import { withStyles, withWidth } from '../../react/mui-compat';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';
 
 import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
 	OnCommitOk, AnlistColAttrs, OnLoadOk, DbRelations, PageInf, len, TierComboField
@@ -21,7 +20,7 @@ import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
 import { CompOpts } from '../../react/anreact';
-import { Theme } from '@material-ui/core/styles';
+import { Theme } from '@mui/material/styles';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -186,7 +185,7 @@ class UserstComp extends CrudCompW<Comprops> {
 			<UsersQuery uri={this.uri} pageInf={this.q} onQuery={this.toSearch} />
 
 			{this.tier && this.tier.client.ssInf && this.tier.client.ssInf.ssid && // also works in session less mode
-				<Grid container alignContent="flex-end" >
+				<Grid container sx={{alignContent: "flex-end"}} >
 					<Button variant="contained" disabled={!btn.add}
 						className={classes.button} onClick={this.toAdd}
 						startIcon={<JsampleIcons.Add />}

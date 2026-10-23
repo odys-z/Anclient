@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { Theme, withStyles } from '@material-ui/core/styles';
-import withWidth from "@material-ui/core/withWidth";
+import { Theme } from '@mui/material/styles';
+import { withStyles, withWidth } from '../../react/mui-compat';
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Button from '@material-ui/core/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 import { CRUD, TierCol } from '@anclient/semantier';
 

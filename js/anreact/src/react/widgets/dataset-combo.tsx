@@ -1,12 +1,10 @@
 
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import { Theme } from "@material-ui/core/styles";
-import withWidth from "@material-ui/core/withWidth";
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, Value
-} from '@material-ui/lab/useAutocomplete/useAutocomplete';
+import { withStyles, withWidth } from '../mui-compat';
+import { Theme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
 
 import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField, Tierec } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
@@ -147,7 +145,7 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			style={this.props.style}
 			className={classes ? classes[this.props.invalidStyle || 'ok'] : ''}
 			getOptionLabel={ (it) => it ? it.n || '' : '' }
-			getOptionSelected={ (opt, v) => opt && v && opt.v === v.v }
+			isOptionEqualToValue={ (opt, v) => opt && v && opt.v === v.v }
 			renderInput={
 				(params) => <TextField {...params}
 					label={this.props.showLable && v ? v.n : this.props.label || ''}

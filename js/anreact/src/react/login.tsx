@@ -1,27 +1,27 @@
 
 import React from 'react';
 import clsx from 'clsx';
-	import { Theme, withStyles } from '@material-ui/core/styles';
-	import Collapse from '@material-ui/core/Collapse';
-	import Button from '@material-ui/core/Button';
-	import TextField from '@material-ui/core/TextField';
-	import Box from '@material-ui/core/Box';
+	import { Theme } from '@mui/material/styles';
+	import { withStyles } from './mui-compat';
+	import Collapse from '@mui/material/Collapse';
+	import Button from '@mui/material/Button';
+	import TextField from '@mui/material/TextField';
+	import Box from '@mui/material/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol } from '@anclient/semantier';
+import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol, an, SessionClient } from '@anclient/semantier';
 
-import { an, SessionClient } from '@anclient/semantier';
 	import {AnContext, AnContextType, ExternalHosts, JsonHosts} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
 import { Comprops } from './crud';
 import { ClassNames } from './anreact';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import { VisibilityOff, Visibility } from '@material-ui/icons';
-import FormControl from '@material-ui/core/FormControl';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+import { VisibilityOff, Visibility } from '@mui/icons-material';
+import FormControl from '@mui/material/FormControl';
+import Input from '@mui/material/Input';
+import InputLabel from '@mui/material/InputLabel';
 
 const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
@@ -205,7 +205,7 @@ class LoginComp extends React.Component<LoginProps> {
 		classes = classes!;
 		const onEnter = (e: React.KeyboardEvent) => { if (e.key === 'Enter') that.toLogin(classes!); };
 		return (<div className={stacked ? classes!.stacked : classes!.root}>
-			<Box display={!this.config.show ? "flex" : "none"}>
+			<Box sx={{display: !this.config.show ? "flex" : "none"}}>
 				<Button variant="contained" color="primary"
 						style={{'whiteSpace': 'nowrap'}}
 						onClick={() => { that.setState({show: !that.config.show}) } } >
@@ -245,7 +245,7 @@ class LoginComp extends React.Component<LoginProps> {
 						}
 					/>
 				</FormControl>
-				{/* <Box display="flex" alignItems="flex-end" className={classes!.field2}>
+				{/* <Box alignItems="flex-end" className={classes!.field2} sx={{display: "flex"}}>
 				<TextField className={classes!.field2}
 					id="pswd" label={L("Password")}
 					type={this.state.showPswd ? "text" : "password"}

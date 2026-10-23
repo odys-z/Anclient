@@ -1,11 +1,10 @@
 import React, { ReactNode } from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from '@material-ui/core/withWidth';
-import { Theme } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
+import { withStyles, withWidth } from '../mui-compat';
+import { Theme } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
 
 import { L } from '../../utils/langstr';
 import { AnContext } from '../reactext';
@@ -45,7 +44,7 @@ class TabPanelComp extends CrudCompW<TabPanelProps> {
 			key={`p-${this.props.pid}`}
 			{...this.props.args}
 		>
-			<Box p={3}>
+			<Box sx={{p: 3}}>
 			  {this.props.children}
 			</Box>
 		</div>

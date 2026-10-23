@@ -14,12 +14,9 @@
  */
 import React, { Component, ReactNode, CSSProperties } from 'react';
 
-import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions,
-  Button, GridSpacing, Card } from '@material-ui/core';
-import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
-import ClosedCaption from '@material-ui/icons/ClosedCaption';
-import AudioPlayer from 'material-ui-audio-player';
-// import { AudioPlayerVariation } from 'material-ui-audio-player/dist/components/AudioPlayer';
+import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions, Button, Card } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import ClosedCaption from '@mui/icons-material/ClosedCaption';
 
 import audioTheme, { audioSVG } from './audio-theme';
 import { isEmpty } from '@anclient/semantier/helpers';
@@ -100,95 +97,38 @@ class AudioBox extends Component<AudioBoxProps> {
     // this.updateVolume(this.props.volume);
   }
 
+  /**
+   * The player: the browser's native audio controls (material-ui-audio-player, a MUI 4 widget, is replaced
+   * since anreact 0.8.0), with a transcript dialog.
+   */
   RegisPlayer = ({
-    useStyles = {},
     color = 'primary' as 'inherit' | 'primary' | 'secondary' | 'action' | 'disabled' | 'error',
-    size = "default",
+    size = "medium" as "small" | "medium" | "large",
     elevation = 1,
     transcript = "",
     src="",
-    ...rest
   }) => {
     const [openDialog, setOpenDialog] = React.useState(false);
 
-    const iconSize = { small: 20, default: 24, large: 36, inherit: "inherit" }[size];
-
-    const fontSize = {
-      small  : audioTheme.typography.body2.fontSize,
-      default: audioTheme.typography.body1.fontSize,
-      large  : audioTheme.typography.body1.fontSize
-    }[size];
-
-    const spacing = {
-      small  : { x: 1,   y: 0.5,  z: 1 },
-      default: { x: 1,   y: 0.75, z: 1 },
-      large  : { x: 1.5, y: 1.5,  z: 2 }
-    }[size];
-
-    const minWidth = { small: 180, default: 250, large: 320 }[size];
-
-    let spatial = () => {
-      try { return Number(this.props.width) > 2 * minWidth; }
-      catch (e) {}
-      return false;
-    };
-
-    let useClasses = makeStyles((theme) => ({
-      paper: {
-        minWidth: minWidth,
-        width: "100%",
-        margin: theme.spacing(0.25)
-      },
-      root: {
-        background: "none",
-        "& .MuiGrid-item": {
-          display: "flex",
-          alignItems: "center"
-        },
-        // "& div[class*='volumeControlContainer']": { display: "none" },
-        "& .MuiSvgIcon-root": { fontSize: iconSize }
-      },
-      progressTime: { fontSize: fontSize },
-      ...useStyles
-    }));
-
-    let customIcon = makeStyles((theme) => ({
-      root: {
-        cursor: "pointer",
-        "&:hover": {
-          color:
-            theme.palette[["primary", "secondary"].includes(color) ? color : "primary"].light
-        }
-      }
-    }));
-
-    let classes = useClasses();
-    let customIconClasses = customIcon();
+    const minWidth = { small: 180, medium: 250, large: 320 }[size];
 
     return (
       <React.Fragment >
-        <Paper elevation={elevation} className={classes.paper} >
-          <Box px={spacing.x} py={spacing.y} my={"16px"} style={{height: "fit-content", width: "90%"}}
-					    onClick={(e) => e.stopPropagation()}>
-            <Grid container alignItems="center">
-              <Grid item xs>
-                <AudioPlayer
-                  {...rest}
-                  src={src}
-                  displaySlider={this.props.lightMode || spatial()}
-                  // variation={color as keyof typeof AudioPlayerVariation}
-                  elevation={0}
-                  useStyles={useClasses}
-                  spacing={spacing.z as GridSpacing}
-                />
+        <Paper elevation={elevation} sx={{ minWidth, width: "100%", m: 0.25 }} >
+          <Box style={{height: "fit-content", width: "90%"}}
+              onClick={(e) => e.stopPropagation()} sx={{px: 1, py: 0.5, my: "16px"}}>
+            <Grid container wrap="nowrap" sx={{alignItems: "center"}}>
+              <Grid size="grow" sx={{ display: "flex", alignItems: "center" }}>
+                <audio ref={this.audioEl} src={src} controls preload={this.props.preload}
+                  autoPlay={this.props.autoPlay} loop={this.props.loop} muted={this.props.muted}
+                  style={{ width: "100%" }} />
               </Grid>
-              {/* {transcript !== "" && ( */}
               {!isEmpty(transcript) && (
-                <Grid item style={{ display: "flex" }}>
+                <Grid sx={{ display: "flex" }}>
                   <ClosedCaption
-                    fontSize={size as "small" | "inherit" | "default" | "large" | "medium"}
-                    className={customIconClasses.root}
+                    fontSize={size}
                     color={color}
+                    sx={{ cursor: "pointer", "&:hover": { color: (theme) => theme.palette.primary.light } }}
                     onClick={() => setOpenDialog(true)}
                   />
                 </Grid>
@@ -197,13 +137,13 @@ class AudioBox extends Component<AudioBoxProps> {
           </Box>
         </Paper>
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <DialogTitle disableTypography>
+          <DialogTitle component="div">
             <Typography variant="h3">Audio transcript</Typography>
           </DialogTitle>
           <DialogContent dividers>
             {!isEmpty(transcript) &&
               transcript.split("\n").map((item, index) => (
-                <Typography paragraph key={index}>
+                <Typography key={index} sx={{ mb: 2 }}>
                   {item}
                 </Typography>
               ))}
@@ -233,12 +173,12 @@ class AudioBox extends Component<AudioBoxProps> {
     return (
       <React.Fragment >
         <ThemeProvider theme={audioTheme}>
-          <Box width={this.props.width} height={this.props.height} 
+          <Box 
               style={{alignItems: "center", display: "flex", flexFlow: "column", justifyContent: "center",
               backgroundImage: `url(${JSON.stringify(svgImgSrc(audioSVG))}`,
               backgroundRepeat: 'no-repeat', backgroundPosition: '50% 5%', backgroundSize: audioTheme.spacing(3)
             }}
-              onClick={this.props.onClick}>
+              onClick={this.props.onClick} sx={{width: this.props.width, height: this.props.height}}>
             { this.props.lightMode ?
               lightLegend(this.props, this.props.node) :
               legend(this.props.node)
@@ -265,7 +205,7 @@ class AudioBox extends Component<AudioBoxProps> {
         <Typography variant='h5' align='center' style={{opacity: 1}}>
             {pname || ''}
         </Typography>
-        <Typography paragraph align='center' style={{opacity: 1}} >
+        <Typography sx={{ mb: 2 }} align='center' style={{opacity: 1}} >
           {`${shareby || ''} ${device}`}
         </Typography>
         </>);
@@ -285,11 +225,11 @@ class AudioBox extends Component<AudioBoxProps> {
               <img key={x} src={poster(props.poster)}
                   style={{width: "fit-content", height: audioTheme.spacing(12), margin: audioTheme.spacing(1)}}/>);
             else if (x === 1) return (
-              <Typography key={x} paragraph align='center' style={{minHeight: audioTheme.spacing(12)}}> 
+              <Typography key={x} sx={{ mb: 2 }} align='center' style={{minHeight: audioTheme.spacing(12)}}> 
                 {pname || ''}
               </Typography>);
             else if (x === 2) return (
-              <Typography key={x} paragraph align='center'>
+              <Typography key={x} sx={{ mb: 2 }} align='center'>
                 {`shared by ${shareby || ''} @ ${device || ''}`}
               </Typography>);
           })}

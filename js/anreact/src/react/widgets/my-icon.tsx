@@ -1,8 +1,8 @@
 import React, { Ref } from 'react';
-import { withStyles } from "@material-ui/core/styles";
-import Button from '@material-ui/core/Button';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import SvgIcon from "@material-ui/core/SvgIcon";
+import { withStyles } from '../mui-compat';
+import Button from '@mui/material/Button';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SvgIcon from '@mui/material/SvgIcon';
 
 import { AnContext, AnContextType } from '../reactext';
 import { Comprops } from '../crud';
