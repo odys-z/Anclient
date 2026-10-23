@@ -156,8 +156,6 @@ public class WSDoctier implements IWSPoint  {
 				sr.sendText(repmsg.toBlock());
 			},
 			(client) -> {
-				// TODO start hearbeat...
-
 				// relay the response
 				AnsonMsg<AnsonResp> repmsg = new AnsonMsg<AnsonResp>(Port.docstier, MsgCode.ok);
 				AnSessionResp rp = new AnSessionResp();

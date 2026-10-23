@@ -52,7 +52,14 @@ export interface RecordFormProps extends Comprops {
 	fields          : Array<TierCol & {readOnly?: boolean, grid?: object, fieldFormatter?: Function}>
 
 	onSwitchChange? : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean) => void,
-	onToggle?       : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean, toggleState: boolean) => void
+	onToggle?       : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, switchState: boolean, toggleState: boolean) => void,
+
+	/**
+	 * Called after a text or combobox field's value is written into the record (tier.rec),
+	 * for the parent to update widgets depending on it, which are not re-rendered by this form.
+	 * @since 0.8.0
+	 */
+	onChange?       : (r: Tierec, f: AnlistColAttrs<any, CompOpts>, v: any) => void
 };
 
 /**
@@ -143,6 +150,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 						rec[fcbb.field] = v.v;
 						fcbb.style = undefined;
 						that.setState({dirty: true});
+						that.props.onChange && that.props.onChange(rec, f, v.v);
 					} }
 				/>);
 		}
@@ -236,6 +244,7 @@ class TRecordFormComp extends CrudCompW<RecordFormProps> {
 					rec[f.field] = e.target.value;
 					f.style = undefined;
 					that.setState({dirty: true});
+					that.props.onChange && that.props.onChange(rec, f, e.target.value);
 				} }
 			  />);
 		}

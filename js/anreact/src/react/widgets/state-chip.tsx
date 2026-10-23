@@ -3,7 +3,7 @@ import Chip from '@material-ui/core/Chip';
 
 /**
  * Definition of a state code, e.g. {label: 'Hub', color: '#2e7d32'}.
- * @since 0.7.3
+ * @since 0.8.0
  */
 export interface StateDef {
 	/** Displayed text */
@@ -16,7 +16,7 @@ export interface StateDef {
 
 /**
  * Map of state codes to definitions, e.g. synode states { h: {label: 'Hub'}, p: {label: 'Peer'}, ... }.
- * @since 0.7.3
+ * @since 0.8.0
  */
 export type StateMap = { [code: string]: StateDef };
 
@@ -30,7 +30,7 @@ export interface StateChipProps {
 
 /**
  * A small chip showing a state code as a colored label.
- * @since 0.7.3
+ * @since 0.8.0
  */
 export function StateChip(props: StateChipProps) {
 	let { code, states, unknown } = props;
@@ -50,7 +50,7 @@ export function StateChip(props: StateChipProps) {
  * @example columns={[ { field: 'stat', label: L('State'), formatter: stateFormatter(synodeStates) } ]}
  * @param states
  * @param unknown label for codes not in states
- * @since 0.7.3
+ * @since 0.8.0
  */
 export function stateFormatter(states: StateMap, unknown?: string) {
 	return (v: any, _x?: any, _row?: any) =>

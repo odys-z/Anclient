@@ -225,7 +225,7 @@ class MarketOrgsTier extends Semantier {
 	_cols = [
 		{ text: L('Community ID'),   field: "orgId", color: 'primary', className: 'bold'},
 		{ text: L('Community Name'), field: "orgName", color: 'primary' },
-		{ text: L('Homepage'), field: "homeExt" },
+		{ text: L('Home Info'), field: "homeExt" },
 		{ text: L('Album'),    field: "album0" },
 		{ text: L('Domains'),  field: "domains" } ]
 
@@ -236,7 +236,7 @@ class MarketOrgsTier extends Semantier {
 		  validator: {notNull: true, len: 50} },
 		{ type: 'text', field: 'orgType', label: 'Market', readOnly: true },
 		{ type: 'text', field: 'sort',    label: 'Sort' },
-		{ type: 'text', field: 'homeExt', label: 'Homepage (landing page)' },
+		{ type: 'text', field: 'homeExt', label: 'Home Info' },
 		{ type: 'text', field: 'album0',  label: 'Album' }
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
 

@@ -15,9 +15,12 @@
   ],
   "author": "Ody",
   "license": "MIT",
-  "//": "@anclient/* are linked to the sources of this Anclient checkout (file:); the other dependencies are installed by ../package.json into ../node_modules.",
+  "//": "@anclient/* are linked to the sources of this Anclient checkout (file:), whose own dependencies are not installed by npm with the links, so they are listed here: js-sha256 (semantier), and ag-grid (anreact's grid widgets, until they are replaced). The other dependencies are installed by ../package.json into ../node_modules.",
   "dependencies": {
     "@anclient/anreact": "file:../../../js/anreact",
-    "@anclient/semantier": "file:../../../js/semantier"
+    "@anclient/semantier": "file:../../../js/semantier",
+    "ag-grid-community": "^33.0.4",
+    "ag-grid-react": "^33.0.4",
+    "js-sha256": "^1.0.0"
   }
 }

@@ -87,3 +87,52 @@ export class RegistResp extends AnsonResp {
 }
 
 Protocol.registerBody(RegistResp.__type__, (json) => new RegistResp(json));
+
+/**
+ * io.oz.syn.registry.DomxReq, request of the central's domain tier (domx.serv).
+ *
+ * The market is the central's, never sent. The community, orgId, is overridden by the central
+ * with the session user's, unless the user is of the super role.
+ */
+export class DomxReq extends AnsonBody {
+	static __type__ = 'io.oz.syn.registry.DomxReq';
+
+	static A = {
+		/** Create a domain, with the synodes planned by the central (<domid>-hub, -1, -2),
+		 * the same as synode.py's Create / Join Domain (RegistReq.A.registDom). */
+		create: 'c/domx',
+	};
+
+	orgId?: string;
+	domid: string;
+	domname?: string;
+
+	constructor(json: {uri: string, a: string, orgId?: string, domid: string, domname?: string}) {
+		super({type: DomxReq.__type__, a: json.a, uri: json.uri});
+		this.orgId   = json.orgId;
+		this.domid   = json.domid;
+		this.domname = json.domname;
+	}
+}
+
+/** io.oz.syn.registry.DomxResp */
+export class DomxResp extends AnsonResp {
+	static __type__ = 'io.oz.syn.registry.DomxResp';
+
+	/** RegistResp.R.ok: created; RegistResp.R.domexists: already exists, loaded */
+	r: string;
+	orgId: string;
+	domid: string;
+	/** synode ids, hub first */
+	synids: string[];
+
+	constructor(json: any) {
+		super(json);
+		this.r = json.r;
+		this.orgId = json.orgId;
+		this.domid = json.domid;
+		this.synids = json.synids;
+	}
+}
+
+Protocol.registerBody(DomxResp.__type__, (json) => new DomxResp(json));

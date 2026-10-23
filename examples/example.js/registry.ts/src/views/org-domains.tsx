@@ -16,6 +16,7 @@ import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTabl
 
 import { DomainDetails } from './domain-details';
 import { superRole } from '../common/central-tier';
+import { DomxReq, DomxResp } from '../common/registry';
 
 /**
  * Domains of communities, table c_syndomx.
@@ -190,7 +191,9 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		this.tier.resetFormSession();
 		this.setState({});
 		this.onTableSelect(new Map());
-		this.toSearch(undefined);
+		// keep the query conditions, e.g. the community selected by the super role,
+		// which enables Add (jsample/views/roles.tsx searches without conditions)
+		this.toSearch(this.state.pageInf);
 	}
 
 	render() {
@@ -263,7 +266,7 @@ class OrgDomainsTier extends Semantier {
 		{ type: 'text', field: 'market',  label: 'Market', readOnly: true },
 		{ type: 'text', field: 'orgid',   label: 'Community ID', readOnly: true },
 		{ type: 'text', field: 'domid',   label: 'Domain ID',
-		  validator: {notNull: true, len: 12} },
+		  validator: {notNull: true, len: OrgDomainsTier.domainMaxlen} },
 		{ type: 'text', field: 'domname', label: 'Domain Name',
 		  validator: {notNull: true, len: 64} },
 	] as Array<AnlistColAttrs<JSX.Element, CompOpts>>;
@@ -373,10 +376,81 @@ class OrgDomainsTier extends Semantier {
 	}
 
 	/**
-	 * Create, update (saveRec) and delete (del) go through the central's community.serv
+	 * Update (saveRec) and delete (del) go through the central's community.serv
 	 * (port community), which restricts them with the market and the user's community.
+	 * Domains are created with {@link createDomain}, port domx.
 	 */
 	static port = 'community';
+
+	/** A new domain's id: the synodes are named <domid>-hub, ..., within the 12 chars of a synode id.
+	 * See the central's Domxes.domainMaxlen, synode.py's validators.check_domain_id(). */
+	static domainMaxlen = 8;
+
+	/**
+	 * Check a new domain's id, the same rule as the central's Domxes.checkDomid().
+	 * @returns error message, or undefined if valid
+	 */
+	static checkDomid(domid: string | undefined): string | undefined {
+		return domid && /^[A-Za-z0-9`~!@#$%^&*_\-+=:;,./]{2,8}$/.test(domid) ? undefined
+			: L("Domain id: 2 - {max} letters, digits or `~!@#$%^&*_-+=:;,./, so that '<domain>-hub' fits a synode id.",
+				{max: OrgDomainsTier.domainMaxlen});
+	}
+
+	/**
+	 * Synodes of a new domain, planned by the central (Domxes.plan()): <domid>-hub, <domid>-1, <domid>-2.
+	 * @returns rows like the ones of {@link synodes}, in state 'c' (created)
+	 */
+	static plan(domid: string | undefined): Tierec[] {
+		if (!domid) return [];
+		return [`${domid}-hub`, `${domid}-1`, `${domid}-2`].map((sid, x) =>
+			({ sid, mode: x === 0 ? 'hub' : '', stat: 'c' } as Tierec));
+	}
+
+	/**
+	 * Create the domain in tier.rec, of community recOrg, with the central's domx.serv (DomxReq.A.create),
+	 * which also inserts the planned synodes, or loads the domain if it exists, the same as
+	 * synode.py's Create / Join Domain.
+	 */
+	createDomain(onOk: (resp: DomxResp) => void) {
+		if (!this.client) return;
+
+		let req = this.client.userReq(this.uri, 'domx',
+				new DomxReq({ uri: this.uri, a: DomxReq.A.create, orgId: str(this.recOrg),
+							  domid: str(this.rec.domid), domname: str(this.rec.domname) }));
+
+		this.client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
+				let rsp = resp.Body() as DomxResp;
+				this.pkval.v = rsp.domid;
+				this.recOrg  = rsp.orgId;
+				onOk(rsp);
+			},
+			this.errCtx);
+	}
+
+	/**
+	 * Synodes of a domain of community recOrg, hub first, through query.serv.
+	 * Columns: sid, mode, stat, jserv, ip, optime, oper
+	 */
+	synodes(domid: string, onLoad: OnLoadOk<Tierec>) {
+		if (!this.client) return;
+
+		let req = this.client.query(this.uri, 'c_synodes', 'n');
+		req.Body()
+			.expr('n.sid', 'sid').expr('n.mode', 'mode').expr('n.stat', 'stat')
+			.expr('n.jserv', 'jserv').expr('n.ip', 'ip').expr('n.optime', 'optime').expr('n.oper', 'oper')
+			.whereEq('n.market', str(this.market))
+			.whereEq('n.orgid', str(this.recOrg))
+			.whereEq('n.domx', domid)
+			.orderbys([['n.mode', 'desc'], ['n.sid', 'asc']]);
+
+		this.client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
+				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
+				onLoad(cols, rows as Tierec[]);
+			},
+			this.errCtx);
+	}
 }
 
 export { OrgDomains, OrgDomainsComp, OrgDomainsTier }

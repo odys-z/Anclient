@@ -19,6 +19,10 @@ export const RegistryTsPorts = {
 	 * create, update and delete of communities and domains (reads go through query.serv) */
 	community: 'community.serv',
 
+	/** Semantic-Network/registration/jserv, Domxier, io.oz.syn.registry.Centralport.domx:
+	 * creating domains with the synodes planned by the central, see DomxReq / DomxResp */
+	domx: 'domx.serv',
+
 	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
 	centier: 'central.tier',
 };

@@ -7,16 +7,27 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Typography from '@material-ui/core/Typography';
 
 import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 
-import { L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, jsample } from '@anclient/anreact';
+import { L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, AnTablist, stateFormatter, jsample
+} from '@anclient/anreact';
 import { OrgDomainsTier } from './org-domains';
+import { synodeStates } from '../common/central-tier';
+import { DomxResp, RegistResp } from '../common/registry';
 import { Theme } from '@material-ui/core';
 
 /**
  * Copied from ./org-details.tsx (from @anclient/anreact/jsample/views/role-details.tsx).
- * Both create and update are saved with the central's community.serv (OrgDomainsTier.port).
+ *
+ * Creating: the domain is created with the central's domx.serv (OrgDomainsTier.createDomain()),
+ * which also inserts the synodes planned by the central, <domid>-hub, <domid>-1, <domid>-2,
+ * listed below the form while the domain id is typed; or loads the domain if it exists,
+ * the same as synode.py's Create / Join Domain.
+ *
+ * Updating: saved with the central's community.serv (OrgDomainsTier.port);
+ * the domain's synodes are listed with the states, jserv, etc. reported by the synodes.
  */
 const styles = (theme: Theme) => {
 	return ({
@@ -59,6 +70,10 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 
 		pk: undefined,
 		record: undefined as Tierec,
+
+		/** synodes of the domain, or planned ones while creating */
+		synodes: [] as Tierec[],
+		selected: {ids: new Map<string, Tierec>()},
 	};
 
 	pkval: PkVal = {pk: undefined, v: undefined};
@@ -76,9 +91,22 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 		this.toCancel = this.toCancel.bind(this);
 		this.showOk = this.showOk.bind(this);
 		this.handleClose = this.handleClose.bind(this);
+		this.onFieldChange = this.onFieldChange.bind(this);
 	}
 
 	componentDidMount() {
+		if (this.state.crud !== CRUD.c && this.tier.pkval.v)
+			this.loadSynodes(this.tier.pkval.v as string);
+	}
+
+	loadSynodes(domid: string) {
+		this.tier.synodes(domid, (_cols, rows) => this.setState({synodes: rows}));
+	}
+
+	/** While creating, the planned synodes follow the domain id being typed. */
+	onFieldChange(rec: Tierec, f: {field: string}, _v: any) {
+		if (this.state.crud === CRUD.c && f.field === 'domid')
+			this.setState({synodes: OrgDomainsTier.plan(rec.domid as string)});
 	}
 
 	handleClose (event: {}, reason: "backdropClick" | "escapeKeyDown") {
@@ -90,6 +118,20 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 
 		if (!this.tier.validate()) {
 	    	this.setState({});
+		}
+		else if (this.state.crud === CRUD.c) {
+			let err = OrgDomainsTier.checkDomid(this.tier.rec.domid as string);
+			if (err)
+				return this.showMsg(err);
+
+			let that = this;
+			this.tier.createDomain((rsp: DomxResp) => {
+				that.setState({ crud: CRUD.u });
+				that.loadSynodes(rsp.domid);
+				that.showOk(rsp.r === RegistResp.R.ok
+					? L('Domain created: {domid}', {domid: rsp.domid})
+					: L('Domain already exists: {domid}', {domid: rsp.domid}));
+			});
 		}
 		else {
 			let that = this;
@@ -126,6 +168,21 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 		that.setState({dirty: false});
 	}
 
+	/** A message without saving, e.g. invalid data. */
+	showMsg(txt: string | string[]) {
+		let that = this;
+		this.ok = (
+			<ConfirmDialog ok={L('OK')} open={true}
+				title={L('Info')}
+				cancel={false} msg={txt}
+				onClose={() => {
+					that.ok = undefined;
+					that.setState({});
+				}}
+			/>);
+		this.setState({});
+	}
+
 	render () {
 		const { classes } = this.props;
 
@@ -153,6 +210,29 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 					fields={this.tier.fields({
 						domname: {grid: {sm: 12, md: 12, lg: 12}}
 					}) as AnlistColAttrs<JSX.Element, Comprops>[]}
+					onChange={this.onFieldChange}
+				/>
+				<Typography variant='subtitle1' color='primary' style={{marginTop: 16}}>
+					{L('Synodes')}
+				</Typography>
+				<Typography variant='caption' color='textSecondary' display='block'>
+					{crud === CRUD.c
+					  ? L('Planned by the central for the new domain. Each synode runs as the hub or a peer once installed.')
+					  : L('States are what the synodes last reported to the central.')}
+				</Typography>
+				{/* copied from ./central-lists.tsx, SynodesList */}
+				<AnTablist uri={this.props.uri} pk='sid' singleCheck
+					selected={this.state.selected}
+					rows={this.state.synodes}
+					columns={[
+						{ field: 'sid',    label: L('Synode'), grid: {} },
+						{ field: 'mode',   label: L('Mode'), grid: {} },
+						{ field: 'stat',   label: L('State'), formatter: stateFormatter(synodeStates), grid: {} },
+						{ field: 'jserv',  label: L('Jserv'), grid: {} },
+						{ field: 'ip',     label: L('IP (reported from)'), grid: {} },
+						{ field: 'optime', label: L('Last reported'), grid: {} },
+						{ field: 'oper',   label: L('By'), grid: {} },
+					]}
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
