@@ -103,10 +103,17 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 		this.tier.synodes(domid, (_cols, rows) => this.setState({synodes: rows}));
 	}
 
-	/** While creating, the planned synodes follow the domain id being typed. */
+	/**
+	 * While creating, the domain id is checked as it's typed (red if invalid),
+	 * and the planned synodes follow a valid one.
+	 */
 	onFieldChange(rec: Tierec, f: {field: string}, _v: any) {
-		if (this.state.crud === CRUD.c && f.field === 'domid')
-			this.setState({synodes: OrgDomainsTier.plan(rec.domid as string)});
+		if (this.state.crud === CRUD.c && f.field === 'domid') {
+			let err = OrgDomainsTier.checkDomid(rec.domid as string);
+			let fdomid = this.tier._fields.find(c => c.field === 'domid');
+			if (fdomid) fdomid.style = err ? 'anyErr' : undefined;
+			this.setState({synodes: err ? [] : OrgDomainsTier.plan(rec.domid as string)});
+		}
 	}
 
 	handleClose (event: {}, reason: "backdropClick" | "escapeKeyDown") {

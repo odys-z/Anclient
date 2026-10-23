@@ -6,12 +6,12 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 import {
-	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec, TierComboField,
+	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
 	OnLoadOk, UIComponent, AnsonMsg, len, str
 } from '@anclient/semantier';
 
 import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTablist,
-	ClassNames, CompOpts, AnQueryst, jsample, AnConst
+	ClassNames, CompOpts, AnQueryst, QueryCbbField, jsample, AnConst
 } from '@anclient/anreact';
 
 import { DomainDetails } from './domain-details';
@@ -97,7 +97,10 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 			// as jsample/views/roles.tsx: a controlled Autocomplete from the first render
 			? [ { type: 'cbb', field: 'orgId', val: AnConst.cbbAllItem, label: L('Community'),
 				  sk: 'org.all', nv: {n: 'text', v: 'value'},
-				  options: [ AnConst.cbbAllItem ] } as TierComboField, condName ]
+				  options: [ AnConst.cbbAllItem ],
+				  // Add is enabled once a community is selected, before searching
+				  onSelectChange: (_item, _reason, val) => this.onCommunity(val?.v as string)
+				} as QueryCbbField, condName ]
 			: [ condName ];
 
 		this.tier.loadMarket(() => this.setState({conds}, () => this.toSearch()));
@@ -119,6 +122,15 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		this.state.pageInf.page = page;
 
 		this.toSearch(this.state.pageInf);
+	}
+
+	/**
+	 * The community selected in the query form (super role): domains are added to it.
+	 * @param orgId '' or undefined for all communities
+	 */
+	onCommunity(orgId: string | undefined) {
+		this.tier.orgId = orgId ? orgId : undefined;
+		this.onTableSelect(this.state.selected.ids);
 	}
 
 	onTableSelect(rowIds: Map<string, Tierec>) {
@@ -317,7 +329,11 @@ class OrgDomainsTier extends Semantier {
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
 
 		let { orgId, domname } = conds.mapCondts || {};
-		this.orgId = this.isSuper() ? (orgId ? str(orgId) : undefined) : this.myOrg;
+		// super role: the community of the query conditions, or the one selected before searching
+		if (!this.isSuper())
+			this.orgId = this.myOrg;
+		else if (conds.mapCondts && 'orgId' in conds.mapCondts)
+			this.orgId = orgId ? str(orgId) : undefined;
 
 		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'd')
 		let req = queryReq.Body()
