@@ -114,6 +114,17 @@ const _comps = { }
 
 const drawerWidth = 240;
 
+/**
+ * At or above this viewport width (px, MUI's lg breakpoint) the sys menu is
+ * expanded by default and stays pinned: only the menu head's button collapses it.
+ */
+const menuPinWidth = 1200;
+
+function wideScreen() {
+	return typeof window !== 'undefined'
+		&& window.matchMedia?.(`(min-width: ${menuPinWidth}px)`)?.matches === true;
+}
+
 const styles = (theme: Theme) => ({
 	direction: theme.direction || 'ltr' as any,
 	root: {
@@ -324,6 +335,7 @@ class SysComp extends CrudCompW<SysProps> {
 		// window.addEventListener('scroll', (e: UIEvent) => { console.log(e.target); });
 
 		this.state.showAppBar = !props.hideAppBar;
+		this.state.showMenu = wideScreen();
 	}
 
 	welcomePaper(classes = {} as ClassNames) {
@@ -634,7 +646,7 @@ class SysComp extends CrudCompW<SysProps> {
 				</List>
 			</Drawer>
 
-			<main onClick={this.hideMenu} onScroll={this.showAppBar}
+			<main onClick={() => { if (!wideScreen()) this.hideMenu(); }} onScroll={this.showAppBar}
 				className={clsx(claz.content, {
 					[claz.contentShift]: showMenu,
 				})}
