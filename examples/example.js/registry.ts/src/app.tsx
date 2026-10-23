@@ -12,6 +12,7 @@ import { Home } from './views/home';
 import { MarketOrgs } from './views/market-orgs';
 import { OrgDomains } from './views/org-domains';
 import { DomainSynodes } from './views/domain-synodes';
+import { DeadDomains } from './views/dead-domains';
 
 export interface AppProps {
 	servs: ExternalHosts;
@@ -74,6 +75,7 @@ export class App extends React.Component<AppProps> {
 			{path: '/market/orgs',    comp: MarketOrgs},
 			{path: '/org/domains',    comp: OrgDomains},
 			{path: '/domain/synodes', comp: DomainSynodes},
+			{path: '/market/dead-domains', comp: DeadDomains},
 		]);
 	}
 

@@ -23,6 +23,10 @@ export const RegistryTsPorts = {
 	 * creating domains with the synodes planned by the central, see DomxReq / DomxResp */
 	domx: 'domx.serv',
 
+	/** Semantic-Network/registration/jserv, Administratier, io.oz.syn.registry.Centralport.admin:
+	 * the super role's administration, e.g. deleting dead domains, see AdminReq / AdminResp */
+	admin: 'admin.serv',
+
 	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
 	centier: 'central.tier',
 };

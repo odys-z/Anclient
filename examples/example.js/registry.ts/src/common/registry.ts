@@ -141,3 +141,47 @@ export class DomxResp extends AnsonResp {
 }
 
 Protocol.registerBody(DomxResp.__type__, (json) => new DomxResp(json));
+
+/**
+ * io.oz.syn.registry.AdminReq, request of the central's administration tier (admin.serv),
+ * for the super role only. The client composes no sql: each read is an ask of the tier.
+ */
+export class AdminReq extends AnsonBody {
+	static __type__ = 'io.oz.syn.registry.AdminReq';
+
+	static A = {
+		/** Dead domains of the market: no synode of them is in a state other than 'd'.
+		 * Replied in AdminResp.Rs(): domid, domname, orgid, orgName, synodes, optime. */
+		deadDomains: 'r/dead-domx',
+
+		/** Delete dead domains, domids: all dead synodes of a domain first, then the domain. */
+		delDead: 'd/dead-domx',
+	};
+
+	/** The community to list dead domains of; undefined for all communities of the market. */
+	orgId?: string;
+
+	/** Domains to be deleted. */
+	domids?: string[];
+
+	constructor(json: {uri: string, a: string, orgId?: string, domids?: string[]}) {
+		super({type: AdminReq.__type__, a: json.a, uri: json.uri});
+		this.orgId  = json.orgId;
+		this.domids = json.domids;
+	}
+}
+
+/** io.oz.syn.registry.AdminResp */
+export class AdminResp extends AnsonResp {
+	static __type__ = 'io.oz.syn.registry.AdminResp';
+
+	/** AdminReq.A.delDead: number of the domains deleted. */
+	deleted: number;
+
+	constructor(json: any) {
+		super(json);
+		this.deleted = json.deleted;
+	}
+}
+
+Protocol.registerBody(AdminResp.__type__, (json) => new AdminResp(json));
