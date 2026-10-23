@@ -21,8 +21,10 @@ import { DomxReq, DomxResp } from '../common/registry';
  * Domains of communities, table c_syndomx.
  * Copied from ./market-orgs.tsx (from @anclient/anreact/jsample/views/roles.tsx).
  *
- * The super role (r00) selects the community with a combobox (dataset org.all);
- * other users see only domains of their own community (a_users.orgId).
+ * The super role (r00) selects the community with a combobox (dataset org.all),
+ * and only views domains: the super user doesn't configure domains and synodes,
+ * so Add / Delete / Edit are replaced with View (the central rejects them, too).
+ * Other users see only domains of their own community (a_users.orgId).
  *
  * Menu url: /org/domains
  */
@@ -59,7 +61,7 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		conds: undefined as Array<AnlistColAttrs<JSX.Element, any>> | undefined,
 
 		// active buttons
-		buttons: { add: false, edit: false, del: false},
+		buttons: { add: false, edit: false, del: false, view: false},
 
 		total: 0,
 		rows: [] as Tierec[],
@@ -83,6 +85,7 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		this.toAdd = this.toAdd.bind(this);
 		this.toEdit = this.toEdit.bind(this);
 		this.toDel = this.toDel.bind(this);
+		this.toView = this.toView.bind(this);
 	}
 
 	componentDidMount() {
@@ -139,6 +142,7 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 				add:  !!this.tier?.orgId,
 				edit: len(rowIds) === 1,
 				del:  len(rowIds) >=  1,
+				view: len(rowIds) === 1,
 			},
 		} );
 	}
@@ -197,6 +201,18 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		this.setState({});
 	}
 
+	/** The super role: the domain details, read only. */
+	toView(_e: React.MouseEvent<HTMLElement>) {
+		let row = this.state.selected.ids.values().next().value as Tierec;
+		this.tier.pkval.v = this.getByIx(this.state.selected.ids, 0);
+		this.tier.recOrg = str(row.orgid);
+
+		this.domForm = (<DomainDetails crud={CRUD.r} uri={this.uri}
+			tier={this.tier}
+			onClose={this.closeDetails} />);
+		this.setState({});
+	}
+
 	closeDetails() {
 		this.domForm = undefined;
 		this.tier.resetFormSession();
@@ -219,6 +235,12 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 			/>}
 
 			<Grid container sx={{alignContent: "flex-end"}} >
+			  {this.tier?.isSuper()
+			  ? <Button variant="contained" disabled={!btn.view}
+					className={classes.button} onClick={this.toView}
+					startIcon={<jsample.JsampleIcons.Search />}
+				>{L('View')}</Button>
+			  : <>
 				<Button variant="contained" disabled={!btn.add}
 					className={classes.button} onClick={this.toAdd}
 					startIcon={<jsample.JsampleIcons.Add />}
@@ -231,6 +253,7 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 					className={classes.button} onClick={this.toEdit}
 					startIcon={<jsample.JsampleIcons.Edit />}
 				>{L('Edit')}</Button>
+			  </>}
 			</Grid>
 
 			{this.tier && <AnTablist

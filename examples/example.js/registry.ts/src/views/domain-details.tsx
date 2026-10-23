@@ -27,6 +27,8 @@ import { Theme } from '@mui/material/styles';
  *
  * Updating: saved with the central's community.serv (OrgDomainsTier.port);
  * the domain's synodes are listed with the states, jserv, etc. reported by the synodes.
+ *
+ * Viewing (crud = r, the super role): the fields are read only, without Save.
  */
 const styles = (theme: Theme) => {
 	return ({
@@ -193,6 +195,7 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 		const { classes } = this.props;
 
 		let crud = this.state.crud;
+		let viewing = crud === CRUD.r;
 
 		let title = crud === CRUD.c ? L('Create Domain')
 					: crud === CRUD.u ? L('Edit Domain')
@@ -213,9 +216,10 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 				<TRecordForm uri={this.props.uri}
 					tier={this.tier}
 					mtabl='c_syndomx' pk='domid'
-					fields={this.tier.fields({
+					fields={(this.tier.fields({
 						domname: {grid: {sm: 12, md: 12, lg: 12}}
-					}) as AnlistColAttrs<JSX.Element, Comprops>[]}
+					}) as AnlistColAttrs<JSX.Element, Comprops>[])
+					.map(f => viewing ? {...f, readOnly: true} : f)}
 					onChange={this.onFieldChange}
 				/>
 				<Typography variant='subtitle1' color='primary' style={{marginTop: 16}}>
@@ -242,7 +246,7 @@ class DomainDetailsComp extends DetailFormW<Comprops & {tier: OrgDomainsTier}> {
 				/>
 			</DialogContent>
 			<DialogActions className={classes.buttons}>
-			  {crud &&
+			  {crud && !viewing &&
 				<Button onClick={this.toSave} variant="contained" color="primary">
 					{L("Save")}
 				</Button>}
