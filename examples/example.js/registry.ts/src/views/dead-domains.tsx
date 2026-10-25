@@ -194,7 +194,7 @@ class DeadDomainsTier extends Semantier {
 
 	/**
 	 * Dead domains of the community in the query conditions, or of all communities,
-	 * asked to the central's admin.serv (AdminReq.A.query, with condition status = dead).
+	 * asked to the central's admin.serv (AdminReq.A.qryDomx, with condition status = dead).
 	 */
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
@@ -207,7 +207,7 @@ class DeadDomainsTier extends Semantier {
 			pageInf.addCondt(AdminReq.Condts.orgId, str(orgId));
 
 		let req = this.client.userReq(this.uri, DeadDomainsTier.port,
-				new AdminReq({ uri: this.uri, a: AdminReq.A.query, pageInf }));
+				new AdminReq({ uri: this.uri, a: AdminReq.A.qryDomx, pageInf }));
 
 		this.client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {

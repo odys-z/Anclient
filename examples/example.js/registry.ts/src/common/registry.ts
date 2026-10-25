@@ -1,4 +1,4 @@
-import { AnsonBody, AnsonResp, CRUD, PageInf, Protocol } from '@anclient/semantier';
+import { AnsonBody, AnsonResp, PageInf, Protocol } from '@anclient/semantier';
 
 /**
  * Client of the central's Registry tier (regist.serv), the TypeScript equivalent of
@@ -149,16 +149,17 @@ Protocol.registerBody(DomxResp.__type__, (json) => new DomxResp(json));
 export class AdminReq extends AnsonBody {
 	static __type__ = 'io.oz.syn.registry.AdminReq';
 
-	/** Asks, semantically equivalent to the CRUD types. */
+	/** Asks, semantically equivalent to the CRUD types: a query of each target is an ask, prefixed 'r/'
+	 * (planned: qrySynodes, synodes of domains; qryDevices, devices of a domain's users). */
 	static A = {
 		/** Domains of the market, with conditions of pageInf, see AdminReq.Condts.
 		 * Replied in AdminResp.Rs(): domid, domname, orgid, orgName, synodes, optime. */
-		query: CRUD.r,
+		qryDomx: 'r/domx',
 
 		/** Delete domains, domids, with conditions of pageInf, see AdminReq.Condts:
 		 * all the synodes of a domain first, then the domain. */
 		/** "delete" is a c++ keyword. */
-		del: CRUD.d,
+		del: 'd/d-node',
 	};
 
 	/** Names of the conditions in pageInf.mapCondts. */
@@ -167,7 +168,7 @@ export class AdminReq extends AnsonBody {
 		orgId: 'orgId',
 
 		/** The domains' status: AdminReq.dead for dead domains, none of the synodes of which is
-		 * in a state other than 'd'; blank for all domains (A.query only). A.del requires dead. */
+		 * in a state other than 'd'; blank for all domains (A.qryDomx only). A.del requires dead. */
 		status: 'status',
 	};
 
