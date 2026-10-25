@@ -27,6 +27,10 @@ export const RegistryTsPorts = {
 	 * the super role's administration, e.g. deleting dead domains, see AdminReq / AdminResp */
 	admin: 'admin.serv',
 
+	/** Semantic-Network/registration/jserv, Signupier, io.oz.syn.registry.Centralport.signup:
+	 * signing up a domain admin with a new community, without a session, see SignupReq / SignupResp */
+	signup: 'signup.serv',
+
 	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
 	centier: 'central.tier',
 };

@@ -7,6 +7,10 @@ import { L, Langstrs, AnContext, AnError, AnReact, Login,
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+
+import { Signup } from './views/signup';
+import { SignupResp } from './common/registry';
 
 export interface LoginAppProps {
 	servs: ExternalHosts;
@@ -20,6 +24,9 @@ export interface LoginAppProps {
 /**
  * Registry Client login page: logs in to jserv, persists the session into localStorage,
  * then redirects to the main page.
+ *
+ * New users sign up on the same page (views/signup.tsx, the central's signup.serv), as the
+ * domain admin of a new community, then log in.
  */
 export class LoginApp extends React.Component<LoginAppProps> {
 	/** Function uri. Must be mapped by jserv's connects.xml/conn-uri. */
@@ -27,6 +34,10 @@ export class LoginApp extends React.Component<LoginAppProps> {
 
 	state = {
 		hasError: false,
+		/** showing the sign-up form */
+		signingUp: false,
+		/** the user just signed up, filled into the login form */
+		signedUp: undefined as string | undefined,
 	};
 
 	errCtx = {
@@ -38,6 +49,11 @@ export class LoginApp extends React.Component<LoginAppProps> {
 		super(props);
 		this.onErrorClose = this.onErrorClose.bind(this);
 		this.onLogin = this.onLogin.bind(this);
+		this.onSignup = this.onSignup.bind(this);
+	}
+
+	onSignup(rsp: SignupResp) {
+		this.setState({signingUp: false, signedUp: rsp.uid});
 	}
 
 	onError(code: string, rsp: AnsonMsg<AnsonResp>) {
@@ -76,10 +92,31 @@ export class LoginApp extends React.Component<LoginAppProps> {
 		  }} >
 			<Paper elevation={3} style={{maxWidth: 560, margin: '10vh auto', padding: 24}}>
 				<Typography variant='h5'>{L('Registry Client')}</Typography>
+			  {this.state.signingUp
+			  ? <>
 				<Typography variant='body2' color='textSecondary' gutterBottom>
-					{L('Please login')}
+					{L('Sign up a new community')}
 				</Typography>
-				<Login uri={this.uri} onLogin={this.onLogin} config={{userid: 'admin', pswd: '123456'}} />
+				<Signup uri={this.uri} servs={this.props.servs} servId={this.props.servId}
+					errCtx={this.errCtx} onSignup={this.onSignup}
+					onCancel={() => this.setState({signingUp: false})} />
+				</>
+			  : <>
+				<Typography variant='body2' color='textSecondary' gutterBottom>
+					{this.state.signedUp
+					  ? L('Signed up: {uid}. Please login.', {uid: this.state.signedUp})
+					  : L('Please login')}
+				</Typography>
+				<Login uri={this.uri} onLogin={this.onLogin} key={this.state.signedUp || 'login'}
+					config={this.state.signedUp
+						? {userid: this.state.signedUp, pswd: ''}
+						: {userid: 'admin', pswd: '123456'}} />
+				<Typography variant='body2' sx={{mt: 2}}>
+					{L('New user?')}{' '}
+					<Link component='button' variant='body2'
+						onClick={() => this.setState({signingUp: true})}>{L('Sign up')}</Link>
+				</Typography>
+				</>}
 			</Paper>
 
 			{this.state.hasError &&

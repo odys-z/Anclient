@@ -202,3 +202,51 @@ export class AdminResp extends AnsonResp {
 }
 
 Protocol.registerBody(AdminResp.__type__, (json) => new AdminResp(json));
+
+/**
+ * io.oz.syn.registry.SignupReq, request of the central's sign-up tier (signup.serv),
+ * the only port serving users without a session.
+ *
+ * The user signs up as the domain admin (r01) of a new community of the central's market.
+ * The password is sent as is, so the central must be served over https.
+ */
+export class SignupReq extends AnsonBody {
+	static __type__ = 'io.oz.syn.registry.SignupReq';
+
+	static A = {
+		/** Sign up a user, with a new community. */
+		signup: 'c/user',
+	};
+
+	uid: string;
+	userName?: string;
+	pswd: string;
+	/** The new community */
+	orgId: string;
+	orgName?: string;
+
+	constructor(json: {uri: string, uid: string, userName?: string, pswd: string, orgId: string, orgName?: string}) {
+		super({type: SignupReq.__type__, a: SignupReq.A.signup, uri: json.uri});
+		this.uid      = json.uid;
+		this.userName = json.userName;
+		this.pswd     = json.pswd;
+		this.orgId    = json.orgId;
+		this.orgName  = json.orgName;
+	}
+}
+
+/** io.oz.syn.registry.SignupResp */
+export class SignupResp extends AnsonResp {
+	static __type__ = 'io.oz.syn.registry.SignupResp';
+
+	uid: string;
+	orgId: string;
+
+	constructor(json: any) {
+		super(json);
+		this.uid   = json.uid;
+		this.orgId = json.orgId;
+	}
+}
+
+Protocol.registerBody(SignupResp.__type__, (json) => new SignupResp(json));
