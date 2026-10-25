@@ -25,7 +25,12 @@ import InputLabel from '@mui/material/InputLabel';
 
 const styles = (theme: Theme) => Object.assign(jstyles(theme), {
 	root: {
-	    '& *': { margin: theme.spacing(1) }
+	    '& *': { margin: theme.spacing(1) },
+		/* the user id and password boxes (and the button) on the same bottom line:
+		 * no margins inside the inputs, e.g. the password's visibility button, which made
+		 * the password box taller than the user id's */
+		'& .MuiCollapse-wrapperInner': { display: 'flex', alignItems: 'flex-end', flexWrap: 'wrap' },
+		'& .MuiInput-root *, & .MuiInputAdornment-root': { margin: 0 },
 	},
 	container: {
 		maxWidth: "20vw",
@@ -234,7 +239,7 @@ class LoginComp extends React.Component<LoginProps> {
 						onChange={event => this.setState({pswd: event.target.value})}
 						endAdornment={
 						<InputAdornment position="end">
-							<IconButton
+							<IconButton size="small"
 							aria-label="toggle password visibility"
 							onClick={() => this.setState({ showPswd: !this.state.showPswd })}
 							onMouseDown={(e) => e.preventDefault()}
