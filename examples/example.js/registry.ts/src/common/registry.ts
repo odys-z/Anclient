@@ -1,4 +1,4 @@
-import { AnsonBody, AnsonResp, Protocol } from '@anclient/semantier';
+import { AnsonBody, AnsonResp, CRUD, PageInf, Protocol } from '@anclient/semantier';
 
 /**
  * Client of the central's Registry tier (regist.serv), the TypeScript equivalent of
@@ -149,25 +149,41 @@ Protocol.registerBody(DomxResp.__type__, (json) => new DomxResp(json));
 export class AdminReq extends AnsonBody {
 	static __type__ = 'io.oz.syn.registry.AdminReq';
 
+	/** Asks, semantically equivalent to the CRUD types. */
 	static A = {
-		/** Dead domains of the market: no synode of them is in a state other than 'd'.
+		/** Domains of the market, with conditions of pageInf, see AdminReq.Condts.
 		 * Replied in AdminResp.Rs(): domid, domname, orgid, orgName, synodes, optime. */
-		deadDomains: 'r/dead-domx',
+		query: CRUD.r,
 
-		/** Delete dead domains, domids: all dead synodes of a domain first, then the domain. */
-		delDead: 'd/dead-domx',
+		/** Delete domains, domids, with conditions of pageInf, see AdminReq.Condts:
+		 * all the synodes of a domain first, then the domain. */
+		/** "delete" is a c++ keyword. */
+		del: CRUD.d,
 	};
 
-	/** The community to list dead domains of; undefined for all communities of the market. */
-	orgId?: string;
+	/** Names of the conditions in pageInf.mapCondts. */
+	static Condts = {
+		/** The community; blank for all communities of the market. */
+		orgId: 'orgId',
+
+		/** The domains' status: AdminReq.dead for dead domains, none of the synodes of which is
+		 * in a state other than 'd'; blank for all domains (A.query only). A.del requires dead. */
+		status: 'status',
+	};
+
+	/** The dead mark, io.oz.syn.registry.CynodeStats.die */
+	static dead = 'd';
+
+	/** Paging and conditions, see AdminReq.Condts. */
+	pageInf?: PageInf;
 
 	/** Domains to be deleted. */
 	domids?: string[];
 
-	constructor(json: {uri: string, a: string, orgId?: string, domids?: string[]}) {
+	constructor(json: {uri: string, a: string, pageInf?: PageInf, domids?: string[]}) {
 		super({type: AdminReq.__type__, a: json.a, uri: json.uri});
-		this.orgId  = json.orgId;
-		this.domids = json.domids;
+		this.pageInf = json.pageInf;
+		this.domids  = json.domids;
 	}
 }
 
@@ -175,7 +191,7 @@ export class AdminReq extends AnsonBody {
 export class AdminResp extends AnsonResp {
 	static __type__ = 'io.oz.syn.registry.AdminResp';
 
-	/** AdminReq.A.delDead: number of the domains deleted. */
+	/** AdminReq.A.del: number of the domains deleted. */
 	deleted: number;
 
 	constructor(json: any) {

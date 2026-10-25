@@ -194,16 +194,20 @@ class DeadDomainsTier extends Semantier {
 
 	/**
 	 * Dead domains of the community in the query conditions, or of all communities,
-	 * asked to the central's admin.serv (AdminReq.A.deadDomains).
+	 * asked to the central's admin.serv (AdminReq.A.query, with condition status = dead).
 	 */
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
 		if (!this.client) return;
 
 		let { orgId } = conds.mapCondts || {};
 
+		let pageInf = new PageInf(conds.page, conds.size)
+				.addCondt(AdminReq.Condts.status, AdminReq.dead);
+		if (orgId)
+			pageInf.addCondt(AdminReq.Condts.orgId, str(orgId));
+
 		let req = this.client.userReq(this.uri, DeadDomainsTier.port,
-				new AdminReq({ uri: this.uri, a: AdminReq.A.deadDomains,
-							   orgId: orgId ? str(orgId) : undefined }));
+				new AdminReq({ uri: this.uri, a: AdminReq.A.query, pageInf }));
 
 		this.client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => {
@@ -214,13 +218,15 @@ class DeadDomainsTier extends Semantier {
 	}
 
 	/**
-	 * Delete dead domains with the central's admin.serv (AdminReq.A.delDead).
+	 * Delete dead domains with the central's admin.serv (AdminReq.A.del, with condition status = dead).
 	 */
 	delDead(domids: string[], onOk: (resp: AdminResp) => void) {
 		if (!this.client) return;
 
+		let pageInf = new PageInf(0, -1).addCondt(AdminReq.Condts.status, AdminReq.dead);
+
 		let req = this.client.userReq(this.uri, DeadDomainsTier.port,
-				new AdminReq({ uri: this.uri, a: AdminReq.A.delDead, domids }));
+				new AdminReq({ uri: this.uri, a: AdminReq.A.del, pageInf, domids }));
 
 		this.client.commit(req,
 			(resp: AnsonMsg<AnsonResp>) => onOk(resp.Body() as AdminResp),
