@@ -129,6 +129,8 @@ class AnClient {
 				}
 				else {
 					ssInf.jserv = an.cfg.defaultServ;
+					// client side only: the server's reply on login, persisted with the session
+					ssInf.profile = (resp.Body() as AnSessionResp | undefined)?.profile;
 
 					console.log(ssInf.ssToken);
 					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, uid);
@@ -176,6 +178,8 @@ class AnClient {
 				}
 				else {
 					ssInf.jserv = an.cfg.defaultServ;
+					// client side only: the server's reply on login, persisted with the session
+					ssInf.profile = (resp.Body() as AnSessionResp | undefined)?.profile;
 
 					console.log(ssInf.ssToken);
 					ssInf.ssToken = aes.repackSessionToken(ssInf.ssToken, pswd, usrId);
@@ -447,6 +451,13 @@ export type SessionInf = {
 
 	roleId?: string;
 	roleName?: string
+
+	/**
+	 * Since 0.8.0, client side only (never sent): AnSessionResp.profile, any type of Anson
+	 * the server replies on login (IUser.profile()), e.g. the page to land on.
+	 * Persisted with the session, see SessionClient.persistorage().
+	 */
+	profile?: any;
 }
 
 /**Client with session logged in.

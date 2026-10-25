@@ -10,6 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import Checkbox from '@mui/material/Checkbox';
+import Typography from '@mui/material/Typography';
 
 import { AnlistColAttrs, isEmpty, len, Tierec, toBool } from '@anclient/semantier';
 import { Comprops, DetailFormW } from '../crud';
@@ -41,6 +42,13 @@ interface AnTablistProps extends Comprops {
 
 	/**Page size options, Default [10, 25, 50]. */
 	sizeOptions?: Array<number>;
+
+	/**
+	 * Shown in place of the table if there are no rows, e.g. telling the user what to do.
+	 * Undefined for an empty table, e.g. before the rows are loaded.
+	 * @since 0.8.0
+	 */
+	emptyMsg?: React.ReactNode;
 }
 
 /**
@@ -204,6 +212,12 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 	}
 
 	render() {
+		if (this.props.emptyMsg !== undefined && len(this.props.rows) === 0)
+			return (
+			  <Typography variant='body1' color='textSecondary' sx={{p: 3, textAlign: 'center'}}>
+				{this.props.emptyMsg}
+			  </Typography>);
+
 		return (<>
 		<TableContainer>
 		<Table style={{width:"100%"}} aria-label="simple table">

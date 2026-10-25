@@ -69,12 +69,13 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 	}
 
 	componentDidMount() {
+		if (this.props.sk ) {
+			// binding a dataset needs the session (since 0.8.0, hard coded options don't, e.g. a login page)
 		let ctx = this.context as unknown as AnContextType;
 		let anreact = ctx?.uiHelper as AnReactExt;
 		if (!anreact)
 			throw new Error('DatasetCombo can\'t bind controls without AnContext initialized with AnReact.');
 
-		if (this.props.sk ) {
 			let that = this;
 			this.ds2cbbOptions({
 				uri: this.props.uri || '',
@@ -92,7 +93,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 				}
 			});
 		}
-		else console.warn("DatasetCombo used for null sk?", this.props.label);
+		else if (!this.props.options)
+			console.warn("DatasetCombo used for null sk and no options?", this.props.label);
 	}
 
 	onCbbRefChange( _refcbb: React.RefObject<HTMLDivElement> ) : (
@@ -136,7 +138,8 @@ class DatasetComboComp extends CrudCompW<ComboProps> {
 			ref={this.refcbb}
 			disabled={this.props.disabled || this.props.readonly || this.props.readOnly}
 			// defaultValue={this.props.val}
-			value={this.props.noAllItem ? undefined : v}
+			// noAllItem: the selected item, or none (since 0.8.0, was uncontrolled)
+			value={this.props.noAllItem ? (selectedItem || null) : v}
 			onChange={ this.onCbbRefChange(this.refcbb) }
 			// onInputChange={ this.onCbbRefChange(refcbb) }
 			fullWidth size='small'

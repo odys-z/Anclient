@@ -65,6 +65,8 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 
 		total: 0,
 		rows: [] as Tierec[],
+		/** the first search replied: an empty list is replaced with a message */
+		loaded: false,
 		pageInf: { page: 0, size: 25, total: 0 } as PageInf,
 		selected: {ids: new Map<string, Tierec>()},
 	};
@@ -113,7 +115,7 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 		this.tier.records( pageInf,
 			(_cols, rows) => {
 				that.state.selected.ids.clear();
-				that.setState({rows});
+				that.setState({rows, loaded: true});
 				that.onTableSelect(that.state.selected.ids);
 			} );
 		this.setState({pageInf});
@@ -264,6 +266,9 @@ class OrgDomainsComp extends CrudCompW<Comprops> {
 				pageInf={this.state.pageInf}
 				onPageInf={this.onPageInf}
 				onSelectChange={this.onTableSelect}
+				emptyMsg={!this.state.loaded ? undefined
+					: this.tier.isSuper() ? L('No domains found.')
+					: L('Your community has no domains yet. Click Add to create one, with its synodes planned by the central.')}
 			/>}
 			{this.domForm}
 			{this.confirm}

@@ -13,6 +13,7 @@ import { MarketOrgs } from './views/market-orgs';
 import { OrgDomains } from './views/org-domains';
 import { DomainSynodes } from './views/domain-synodes';
 import { DeadDomains } from './views/dead-domains';
+import { CentralProfile } from './common/registry';
 
 export interface AppProps {
 	servs: ExternalHosts;
@@ -137,7 +138,8 @@ export class App extends React.Component<AppProps> {
 			{this.ssclient?.ssInf &&
 			<Sys uri={this.uri}
 				menu={'sys.menu.central'}
-				landingUrl={'/home'}
+				// the page to land on, decided by the central on login, see CentralProfile
+				landingUrl={(this.ssclient?.ssInf?.profile as CentralProfile | undefined)?.home}
 				sys={L('Registry Client')} menuTitle={L('Sys Menu')}
 				onLogout={this.logout} />}
 
