@@ -508,9 +508,9 @@ export class AnsonMsg<T extends AnsonBody> {
 
 				if (a) body.A(a);
 
-				// imitate the ajax error
+				// simulate the ajax error
 				if (json.ajax)
-					body.ajax = json.ajax;
+					(body as AnsonResp).ajax = json.ajax;
 			}
 
 			this.body = [];
@@ -555,11 +555,9 @@ export class AnsonBody {
 	msg(): string {
 		throw new Error('Method not implemented.');
 	}
-	ajax: any;
 	Rs(): any {
 		throw new Error('Method not implemented.');
 	}
-	ssInf: SessionInf | undefined;
 	post(pst: AnsonBody): AnsonBody {
 		throw new Error("AnsonBody is an abstract class.");
 	}
@@ -582,12 +580,15 @@ export class AnsonBody {
 		}
 	}
 
+	/*
+	 * The same json structure as io.odysz.semantic.jprotocol.AnsonBody (Java): type, a, uri.
+	 * No fields Java AnsonBody hasn't, see ISSUE anson-body-fields, semantic-jserv/issues/anson-body-fields.md.
+	 */
     type: string | undefined;
     a!: string;
+	/** Planned to be removed, see ISSUE anson-body-fields. */
     parent: string | undefined; 
     uri!: string;
-	version?: string;
-	seq?: number;
 
     /**set A tag a.<br>
      * a() can only been called once.
@@ -1064,7 +1065,7 @@ export class UpdateReq extends AnsonBody {
 			console.warn('You really wanna an undefined post operation?');
 			return this;
 		}
-		else if (typeof pst.version === 'string' && typeof pst.seq === 'number')
+		else if ((pst as any) instanceof AnsonMsg)
 			console.warn('You pobably adding a AnsonMsg as post operation? It should only be AnsonBody(s).');
 
 		if (this.postUpds === undefined) {
@@ -1257,6 +1258,9 @@ export class InsertReq extends UpdateReq {
 }
 
 export class AnsonResp extends AnsonBody {
+	/** Client side only, the imitated ajax error, see AnClient.fromAjaxError(). */
+	ajax?: any;
+
     static hasColumn(rs: any, colname: string): boolean {
 		return rs && rs.colnames && colname && colname.toUpperCase() in rs.colnames;
 	}

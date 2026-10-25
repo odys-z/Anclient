@@ -368,11 +368,11 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 		let rp = new AnsonMsg(respSession);
         assert.equal(rp.code, 'ok', "1 ---");
         assert.equal(rp.port, 'session', "2 ---");
-        assert.equal(rp.Body()?.ssInf?.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
-        assert.equal(rp.Body()?.ssInf?.uid, "admin", "4 ---");
-        assert.equal(rp.Body()?.ssInf?.ssid, "001eysTj", "5 ---");
+        assert.equal((rp.Body() as AnSessionResp)?.ssInf?.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
+        assert.equal((rp.Body() as AnSessionResp)?.ssInf?.uid, "admin", "4 ---");
+        assert.equal((rp.Body() as AnSessionResp)?.ssInf?.ssid, "001eysTj", "5 ---");
 
-		let sessionClient = new SessionClient(rp.Body()?.ssInf, new TextEncoder().encode('iv....'), true);
+		let sessionClient = new SessionClient((rp.Body() as AnSessionResp)?.ssInf, new TextEncoder().encode('iv....'), true);
 		let ssi = sessionClient.userInfo;
         assert.equal(ssi.uid, "admin", "6 ---");
         assert.equal(ssi.ssid, "001eysTj", "7 ---");

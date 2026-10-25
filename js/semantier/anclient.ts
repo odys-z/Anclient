@@ -4,7 +4,7 @@
 import * as $ from 'jquery';
 import AES2 from './aes2';
 import {
-	Protocol, AnsonMsg, AnsonResp, DatasetierReq, AnSessionReq, QueryReq,
+	Protocol, AnsonMsg, AnsonResp, AnSessionResp, DatasetierReq, AnSessionReq, QueryReq,
 	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
 	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV, OnLoginOk
 } from './protocol';
@@ -123,7 +123,7 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body()?.ssInf;
+				let ssInf = (resp.Body() as AnSessionResp | undefined)?.ssInf;
 				if (!ssInf) {
 					console.warn("resp.ssInf is empty!");
 				}
@@ -170,7 +170,7 @@ class AnClient {
 			 * port: "session"
 			 */
 			(resp: AnsonMsg<AnsonResp>) => {
-				let ssInf = resp.Body()?.ssInf;
+				let ssInf = (resp.Body() as AnSessionResp | undefined)?.ssInf;
 				if (!ssInf) {
 					console.warn("resp.ssInf is empty!");
 				}
