@@ -49,6 +49,15 @@ interface AnTablistProps extends Comprops {
 	 * @since 0.8.0
 	 */
 	emptyMsg?: React.ReactNode;
+
+	/**
+	 * Max height of the table (css, e.g. 440 or '50vh'). When set, the rows (all the rows given,
+	 * e.g. one page sent by the server) scroll inside the table, with the header kept on top
+	 * (MUI Table stickyHeader). Paging is still done by the server (pageInf).
+	 * Undefined: the table grows with its rows.
+	 * @since 0.8.0
+	 */
+	maxHeight?: number | string;
 }
 
 /**
@@ -219,8 +228,9 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 			  </Typography>);
 
 		return (<>
-		<TableContainer>
-		<Table style={{width:"100%"}} aria-label="simple table">
+		<TableContainer sx={this.props.maxHeight !== undefined ? {maxHeight: this.props.maxHeight} : undefined}>
+		<Table stickyHeader={this.props.maxHeight !== undefined}
+			style={{width:"100%"}} aria-label="simple table">
 			<TableHead>
 				<TableRow>
 					{ this.props.checkbox &&

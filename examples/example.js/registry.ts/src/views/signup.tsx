@@ -86,7 +86,7 @@ export class Signup extends React.Component<SignupProps> {
 
 	/**
 	 * Communities of the market to join (SignupReq.A.qryOrgs), without a session.
-	 * @param name part of the name, undefined for all (at most 50 rows by the central)
+	 * @param name part of the name, undefined for all (not paged)
 	 */
 	static qryOrgs(client: AnClient, uri: string, errCtx: ErrorCtx, name: string | undefined,
 			onLoad: (rows: Tierec[]) => void) {
@@ -251,7 +251,7 @@ class OrgPicker extends React.Component<{uri: string, client: AnClient, errCtx: 
 					<Button variant='contained' startIcon={<jsample.JsampleIcons.Search />}
 						onClick={() => this.toSearch()}>{L('Search')}</Button>
 				</Box>
-				<AnTablist uri={this.props.uri} pk='orgId' checkbox singleCheck
+				<AnTablist uri={this.props.uri} pk='orgId' checkbox singleCheck maxHeight='50vh'
 					selected={this.state.selected}
 					rows={this.state.rows}
 					onSelectChange={() => this.setState({})}
