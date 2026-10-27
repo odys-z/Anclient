@@ -222,7 +222,9 @@ export interface AnResultset {
 	results: Array<Array<any>>;
 	length() : number;
     total: number;
-    colnames: {k: string, t: [number]}[];
+    /** Upper-case column name to [1-based index, column name],
+     * e.g. {"DCREATE": [8, "dcreate"], "QID": [1, "qid"]} */
+    colnames: {[COL: string]: [number, string]};
 }
 
 /** Regex helper */
@@ -400,7 +402,7 @@ export class Protocol {
 					cols.push((nvArr[ix] as NV).n);
 				}
 				else
-					cols.push(ix);
+					cols.push(String(ix));
 			}
 		}
 		return cols;
@@ -836,16 +838,17 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	orderbys (cols: any[]) {
+	orderbys (cols: Array<string[] | {tabl: string, col: string, asc: boolean}>) {
 		if (Array.isArray(cols)) {
-			for (var ix = 0; ix < cols.length; ix++) {
+			for (let ix = 0; ix < cols.length; ix++) {
 				if (Array.isArray(cols[ix])) {
 					if (this.orders === undefined)
 						this.orders = [];
-					this.orders.push(cols[ix]);
+					this.orders.push((cols as string[][])[ix]);
 				}
 				else {
-					this.orderby(cols[ix].tabl, cols[ix].col, cols[ix].asc);
+					let col = cols[ix] as {tabl: string, col: string, asc: boolean};
+					this.orderby(col.tabl, col.col, col.asc);
 				}
 			}
 		}
@@ -1118,7 +1121,7 @@ export class InsertReq extends UpdateReq {
 	 * (with field property)
 	 * @param cols
 	 */
-	columns (cols: Array<DbCol | string> | DbCol) {
+	columns (cols: Array<DbCol | string> | DbCol | string) {
 		if (this.cols === undefined)
 			this.cols = [];
 		if (Array.isArray(cols)){
@@ -1317,7 +1320,7 @@ export class AnsonResp extends AnsonBody {
 			(rs as unknown as Array<{}>)
 			.filter( r => !!r ).forEach((r, rx) => {
 				if (rx === 0) {
-					cols = r as Array<{}>; // handsontable style
+					cols = r as string[]; // handsontable style
 				}
 				else {
 					let rw = {};

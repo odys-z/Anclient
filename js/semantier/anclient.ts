@@ -366,11 +366,14 @@ class AnClient {
 		if (ix === null || ix === undefined )
 			ix = 0;
 		// colnames: {TEXT: [2, "text"], VALUE: [1, "value"]}
-		var colIx = resp !== null && resp !== undefined && resp.code === "ok"
-			? resp.body[0].rs[0].colnames : [];
+		const colIx = resp !== null && resp !== undefined && resp.code === "ok"
+			? (Array.isArray(resp.body[0].rs) 
+			? resp.body[0].rs[ix]
+			: resp.body[0].rs)?.colnames ?? {}
+			: {};
 
-		var cols = new Array(colIx.length);
-		Object.keys(colIx).forEach(function (k, ix) {
+		const cols = new Array<string>(Object.keys(colIx).length);
+		Object.keys(colIx).forEach(function (k) {
 			// Design Memo: java Resultset index start from 1.
 			cols[colIx[k][0] - 1] = colIx[k][1];
 		})
