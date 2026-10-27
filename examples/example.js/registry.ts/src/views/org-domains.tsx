@@ -14,8 +14,7 @@ import { L, Comprops, CrudCompW, AnContext, AnContextType, ConfirmDialog, AnTabl
 } from '@anclient/anreact';
 
 import { DomainDetails } from './domain-details';
-import { superRole } from '../common/central-tier';
-import { DomxReq, DomxResp } from '../common/registry';
+import { DomxReq, DomxResp, superRole } from '../common/registry';
 
 /**
  * Domains of communities, table c_syndomx.
@@ -353,7 +352,13 @@ class OrgDomainsTier extends Semantier {
 			this.errCtx);
 	}
 
+	/**
+	 * Domains of the community, asked to the central's domx.serv (DomxReq.A.domains), which
+	 * overrides the community with the session user's, unless of the super role.
+	 * Columns: domid, domname, orgid, orgName, synodes, optime
+	 */
 	records(conds = {} as PageInf, onLoad: OnLoadOk<Tierec>) {
+		if (!this.client) return;
 
 		let { orgId, domname } = conds.mapCondts || {};
 		// super role: the community of the query conditions, or the one selected before searching
@@ -362,33 +367,18 @@ class OrgDomainsTier extends Semantier {
 		else if (conds.mapCondts && 'orgId' in conds.mapCondts)
 			this.orgId = orgId ? str(orgId) : undefined;
 
-		let queryReq = this.client.query(this.uri, this.pkval.tabl, 'd')
-		let req = queryReq.Body()
-			.expr('d.domid', 'domid').expr('d.domname', 'domname')
-			.expr('d.orgid', 'orgid').expr('o.orgName', 'orgName')
-			.expr('count(n.sid)', 'synodes')
-			.j('a_orgs', 'o', 'o.orgId = d.orgid')
-			.l('c_synodes', 'n', 'n.market = d.market and n.orgid = d.orgid and n.domx = d.domid')
-			.whereEq('d.market', str(this.market))
-			.groupby('d.orgid').groupby('d.domid')
-			.orderbys([['d.orgid', 'asc'], ['d.domid', 'asc']]);
-
-		// not the super role: only the user's community, even if it's unknown
-		if (this.orgId || !this.isSuper())
-			req.whereEq('d.orgid', str(this.orgId));
-
-		// paging, which QueryReq took from pageInf
-		if (conds.size !== undefined)
-			req.Page(conds.size, conds.page || 0);
-
-		// named conditions from AnQueryst (conds.mapCondts)
+		// paging, and the named conditions from AnQueryst (conds.mapCondts)
+		let pageInf = new PageInf(conds.page, conds.size);
 		if (domname)
-			req.whereCond('%', 'd.domname', `'${domname}'`);
+			pageInf.addCondt(DomxReq.Condts.domname, str(domname));
 
-		this.client.commit(queryReq,
-			(resp) => {
+		let req = this.client.userReq(this.uri, 'domx',
+				new DomxReq({ uri: this.uri, a: DomxReq.A.domains, orgId: this.orgId, pageInf }));
+
+		this.client.commit(req,
+			(resp: AnsonMsg<AnsonResp>) => {
 				let {cols, rows} = AnsonResp.rs2arr(resp.Body().Rs());
-				onLoad(cols, rows);
+				onLoad(cols, rows as Tierec[]);
 			},
 			this.errCtx);
 	}

@@ -20,7 +20,8 @@ export const RegistryTsPorts = {
 	community: 'community.serv',
 
 	/** Semantic-Network/registration/jserv, Domxier, io.oz.syn.registry.Centralport.domx:
-	 * creating domains with the synodes planned by the central, see DomxReq / DomxResp */
+	 * creating domains with the synodes planned by the central, domains of a community,
+	 * synodes of a domain, see DomxReq / DomxResp */
 	domx: 'domx.serv',
 
 	/** Semantic-Network/registration/jserv, Administratier, io.oz.syn.registry.Centralport.admin:
@@ -30,7 +31,4 @@ export const RegistryTsPorts = {
 	/** Semantic-Network/registration/jserv, Signupier, io.oz.syn.registry.Centralport.signup:
 	 * signing up a domain admin with a new community, without a session, see SignupReq / SignupResp */
 	signup: 'signup.serv',
-
-	/** Semantic-Network/registration/jserv, io.oz.registier.central.CentralWebport.centier */
-	centier: 'central.tier',
 };

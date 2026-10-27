@@ -1,4 +1,5 @@
 import { AnsonBody, AnsonResp, PageInf, Protocol } from '@anclient/semantier';
+import { StateMap } from '@anclient/anreact';
 
 /**
  * Client of the central's Registry tier (regist.serv), the TypeScript equivalent of
@@ -6,6 +7,19 @@ import { AnsonBody, AnsonResp, PageInf, Protocol } from '@anclient/semantier';
  *
  * Only fields of the Java classes are sent: the central's Anson refuses unknown fields.
  */
+
+/** Super role, hard coded in the central, see CentralSettings.superRole. */
+export const superRole = 'r00';
+
+/**
+ * Synode states in c_synodes.stat, see io.oz.syn.registry.CynodeStats.
+ */
+export const synodeStates: StateMap = {
+	c: { label: 'Created', title: 'Registered, not reported by the synode yet' },
+	h: { label: 'Hub',     color: '#2e7d32', title: 'Running as hub' },
+	p: { label: 'Peer',    color: '#1565c0', title: 'Running as peer' },
+	d: { label: 'Died',    color: '#b71c1c', title: 'Stopped / removed' },
+};
 
 /** io.oz.syn.registry.SynOrg, a community (a_orgs) */
 export class SynOrg {
@@ -106,17 +120,31 @@ export class DomxReq extends AnsonBody {
 		/** The synodes of a domain, hub first, with the states, jserv, etc. reported by the synodes.
 		 * Replied in DomxResp.Rs(): sid, mode, stat, jserv, ip, optime, oper. */
 		synodes: 'r/synodes',
+
+		/** Domains of the community, orgId, with paging and conditions of pageInf, see DomxReq.Condts.
+		 * For the super role, a blank orgId is for all communities of the market.
+		 * Replied in DomxResp.Rs(): domid, domname, orgid, orgName, synodes, optime. */
+		domains: 'r/domains',
+	};
+
+	/** Names of the conditions in pageInf.mapCondts. */
+	static Condts = {
+		/** Part of a domain's name. */
+		domname: 'domname',
 	};
 
 	orgId?: string;
-	domid: string;
+	domid?: string;
 	domname?: string;
+	/** A.domains: paging and conditions, see Condts. */
+	pageInf?: PageInf;
 
-	constructor(json: {uri: string, a: string, orgId?: string, domid: string, domname?: string}) {
+	constructor(json: {uri: string, a: string, orgId?: string, domid?: string, domname?: string, pageInf?: PageInf}) {
 		super({type: DomxReq.__type__, a: json.a, uri: json.uri});
 		this.orgId   = json.orgId;
 		this.domid   = json.domid;
 		this.domname = json.domname;
+		this.pageInf = json.pageInf;
 	}
 }
 

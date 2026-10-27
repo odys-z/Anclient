@@ -13,8 +13,7 @@ import { AnlistColAttrs, CRUD, PkVal, Tierec } from '@anclient/semantier';
 import { L, AnContext, Comprops, DetailFormW, ConfirmDialog, TRecordForm, AnTablist, stateFormatter, jsample
 } from '@anclient/anreact';
 import { OrgDomainsTier } from './org-domains';
-import { synodeStates } from '../common/central-tier';
-import { DomxResp, RegistResp } from '../common/registry';
+import { DomxResp, RegistResp, synodeStates } from '../common/registry';
 import { Theme } from '@mui/material/styles';
 
 /**

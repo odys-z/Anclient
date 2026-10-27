@@ -4,17 +4,26 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { AnContext, Comprops, CrudCompW, L } from '@anclient/anreact';
 
-import { CentralTier } from '../common/central-tier';
-import { centralTier, Selector, SynodesList } from './central-lists';
+import { Tierec } from '@anclient/semantier';
+
+import { DomxTier } from '../common/domx-tier';
+import { domxTier, Selector, SynodesList } from './central-lists';
 
 /**
- * Synodes of a domain, with the states last reported by the synodes.
- * The super role can select any org of the market first.
+ * Synodes of a domain, with the states last reported by the synodes, asked to the
+ * central's domx.serv (DomxReq.A.domains, DomxReq.A.synodes).
+ *
+ * The domains are loaded once: the user's community's, or, for the super role, all of the
+ * market's, of which the communities are selected first (communities without domains have
+ * no synodes, and are not listed).
  *
  * Menu url: /domain/synodes
  */
 export class DomainSynodes extends CrudCompW<Comprops> {
-	tier: CentralTier | undefined;
+	tier: DomxTier | undefined;
+
+	/** domains of the community, or of the market (super role): domid, domname, orgid, orgName */
+	domxRows = [] as Tierec[];
 
 	state = {
 		orgs: [] as {v: string, n: string}[],
@@ -24,17 +33,26 @@ export class DomainSynodes extends CrudCompW<Comprops> {
 	};
 
 	componentDidMount() {
-		this.tier = centralTier(this);
-		if (this.tier.isSuper())
-			this.tier.orgs((_cols, rows) =>
-				this.setState({orgs: rows.map(r => ({v: r.orgId as string, n: `${r.orgName} (${r.orgId})`}))}));
-		else this.loadDomains(undefined);
+		this.tier = domxTier(this);
+		this.tier.domains(undefined, (_cols, rows) => {
+			this.domxRows = rows;
+			if (this.tier?.isSuper()) {
+				let orgs = new Map<string, string>();
+				rows.forEach(r => orgs.set(r.orgid as string, r.orgName as string));
+				this.setState({orgs: Array.from(orgs, ([v, n]) => ({v, n: `${n} (${v})`}))});
+			}
+			else this.selectOrg(undefined);
+		});
 	}
 
-	loadDomains(orgId: string | undefined) {
-		this.setState({orgId, domain: undefined, domains: []});
-		this.tier?.domains(orgId, (_cols, rows) =>
-			this.setState({domains: rows.map(r => ({v: r.domid as string, n: `${r.domname} (${r.domid})`}))}));
+	/**
+	 * @param orgId super role: the selected community; others: undefined, the user's own
+	 */
+	selectOrg(orgId: string | undefined) {
+		this.setState({orgId, domain: undefined,
+			domains: this.domxRows
+				.filter(r => !orgId || r.orgid === orgId)
+				.map(r => ({v: r.domid as string, n: `${r.domname} (${r.domid})`}))});
 	}
 
 	render() {
@@ -44,7 +62,7 @@ export class DomainSynodes extends CrudCompW<Comprops> {
 			<Typography variant='h6'>{L('Synodes of a Domain')}</Typography>
 			{this.tier?.isSuper() &&
 			  <Selector label={L('Community')} value={orgId} options={this.state.orgs}
-				onChange={(v) => this.loadDomains(v)} />}
+				onChange={(v) => this.selectOrg(v)} />}
 			<Selector label={L('Domain')} value={domain} options={this.state.domains}
 				onChange={(v) => this.setState({domain: v})} />
 			<Typography variant='caption' color='textSecondary' sx={{display: 'block'}}>

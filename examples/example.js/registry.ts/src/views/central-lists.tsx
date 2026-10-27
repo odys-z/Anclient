@@ -4,20 +4,21 @@ import MenuItem from '@mui/material/MenuItem';
 import { Tierec } from '@anclient/semantier';
 import { AnContext, AnContextType, AnTablist, Comprops, CrudCompW, L, stateFormatter } from '@anclient/anreact';
 
-import { CentralTier, synodeStates } from '../common/central-tier';
+import { synodeStates } from '../common/registry';
+import { DomxTier } from '../common/domx-tier';
 
 /**
- * Create (once) the central tier for a component, bound to the component's context.
+ * Create (once) the domain tier for a component, bound to the component's context.
  */
-export function centralTier(comp: CrudCompW<Comprops>): CentralTier {
-	let tier = new CentralTier(comp);
+export function domxTier(comp: CrudCompW<Comprops>): DomxTier {
+	let tier = new DomxTier(comp);
 	tier.setContext(comp.context as unknown as AnContextType);
 	return tier;
 }
 
 interface ListProps extends Comprops {
-	tier: CentralTier;
-	/** undefined for the session user's org */
+	tier: DomxTier;
+	/** super role: undefined for all communities; others: ignored */
 	orgId?: string;
 	/** called with the selected row's id, or undefined */
 	onSelect?: (id: string | undefined, row?: Tierec) => void;
@@ -63,7 +64,7 @@ export class DomainsList extends CrudCompW<ListProps> {
 DomainsList.contextType = AnContext;
 
 interface SynodesProps extends Comprops {
-	tier: CentralTier;
+	tier: DomxTier;
 	orgId?: string;
 	domain: string;
 }
