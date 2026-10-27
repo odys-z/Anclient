@@ -926,6 +926,7 @@ class Inseclient extends SessionClient {
 	}
 }
 
+export * from './common';
 export * from './helpers';
 export * from './protocol';
 export * from './semantier';

@@ -1,5 +1,6 @@
 import AES from './aes2';
 import { SessionClient, SessionInf } from './anclient';
+import { ix } from './common';
 import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
 
@@ -645,7 +646,7 @@ export class UserReq extends AnsonBody {
 		this.data = {props: data};
 	}
 
-	get(prop: string) : object {
+	get(prop: string) : any {
 		return this.data.props ? this.data.props[prop] : undefined;
 	}
 
@@ -825,7 +826,7 @@ export class QueryReq extends AnsonBody {
 		return this;
 	}
 
-	orderbys (cols) {
+	orderbys (cols: any[]) {
 		if (Array.isArray(cols)) {
 			for (var ix = 0; ix < cols.length; ix++) {
 				if (Array.isArray(cols[ix])) {
@@ -836,7 +837,6 @@ export class QueryReq extends AnsonBody {
 				else {
 					this.orderby(cols[ix].tabl, cols[ix].col, cols[ix].asc);
 				}
-
 			}
 		}
 		else if (cols) {
@@ -1389,23 +1389,35 @@ export class AnsonResp extends AnsonBody {
 			return this.data.props[prop];
     }
 
-    map: {resulved: string | {} };
-    resulved!: object;
-    resulve(tabl: any, pk: any, clientRec: any): string {
-		let resulved;
-		if (this.map && this.map.resulved)
-			resulved = this.map.resulved;
-		else if (this.resulved)
-			resulved = this.resulved;
+    map: { [k: string]: any } | undefined;
 
-		if (resulved)
-			return resulved.props
-					? resulved.props[tabl]
-						? resulved.props[tabl].props[pk]
-						: resulved.props[tabl][pk]
-					: undefined ;
-		else return clientRec[pk];
-    }
+	/**
+	 * Find resulved value in data, same as Java AnsonResp#resulvedata(tbl, autok).
+	 * @since 1.0.6
+	 * @param tbl
+	 * @param autok
+	 * @returns list of resulved auto-keys
+	 */
+	resulvedata(tbl: string, autok: string): string[] | undefined;
+	/**
+	 * Same as Java AnsonResp#resulvedata(tbl, autok, x).
+	 * @since 1.0.6
+	 * @param tbl
+	 * @param autok
+	 * @param x
+	 * @returns the auto-key
+	 */
+	resulvedata(tbl: string, autok: string, x: number): string | undefined;
+	resulvedata(tbl: string, autok: string, x?: number): string[] | string | undefined {
+		const reslv = this.map?.['resulved'];
+		if (!reslv) return undefined;
+
+		// SemanticObject is serialized as {type, props: {...}}
+		const t = reslv.props ? reslv.props[tbl] : reslv[tbl];
+		const lst: string[] | undefined = t?.props ? t.props[autok] : t?.[autok];
+
+		return x === undefined ? lst : ix(lst, x);
+	}
 }
 
 export class AnSessionResp extends AnsonResp {
