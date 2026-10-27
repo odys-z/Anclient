@@ -1,6 +1,6 @@
 import AES from './aes2';
 import { SessionClient, SessionInf } from './anclient';
-import { ix } from './common';
+import { LangExt } from './common';
 import { isEmpty, size, str } from './helpers';
 import { Tierec } from './semantier';
 
@@ -35,8 +35,8 @@ export class PageInf {
 	type: string;
 
 	page: number;
-	size?: number;
-	total?: number;
+	size: number;
+	total: number;
 
 	/** Read via {@link PageInf#condtsRec()} */
 	arrCondts?: Array<string[]>;
@@ -100,6 +100,16 @@ export type AnsonValue = string | object | string | number | boolean | undefined
  */
 export type NameValue = {name: string, value: AnsonValue};
 export type NV = {n: string, v: AnsonValue};
+
+/**
+ * Json shape of Java io.odysz.semantics.SemanticObject,
+ * a map of string keys to any value.
+ * Responses are not revived into classes, so this is an interface.
+ */
+export interface SemanticObject {
+	type?: "io.odysz.semantics.SemanticObject";
+	props?: Record<string, any>;
+}
 export function isNV (obj: any) {
 	return !!obj && (obj.name || obj.n);
 }
@@ -212,7 +222,7 @@ export interface AnResultset {
 	results: Array<Array<any>>;
 	length() : number;
     total: number;
-    colnames: {};
+    colnames: {k: string, t: [number]}[];
 }
 
 /** Regex helper */
@@ -380,7 +390,7 @@ export class Protocol {
      * @return {Array} [n1, n2, ...]
      */
     static nvs2cols(nvArr: Array<NameValue> | Array<NV> | Array<string>): Array<string> {
-		var cols = [];
+		let cols: string[] = [];
 		if (nvArr) {
 			for (var ix = 0; ix < nvArr.length; ix++) {
 				if ((nvArr[ix] as NameValue).name) {
@@ -603,20 +613,20 @@ export class AnsonBody {
 
 const aes = new AES();
 export class AnHeader {
-    constructor(ssid: string, userId: string, ssToken: string) {
+    constructor(ssid: string | undefined, userId: string | undefined, ssToken: string | undefined) {
 		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
 		this.ssid = ssid;
 		this.uid = userId;
 		this.ssToken = ssToken;
 	}
 
-    type: string;
-    ssid: string;
-    uid : string;
+    type: string | undefined;
+    ssid: string | undefined;
+    uid : string | undefined;
 
-	iv!: string;
+	iv: string | undefined;
 	/** repackec session token */
-	ssToken: string;
+	ssToken: string | undefined;
 
     /**Set user action (for DB log on DB transaction)
      * @param {object} act {funcId(tolerate func), remarks, cate, cmd}
@@ -637,9 +647,9 @@ export class UserReq extends AnsonBody {
 	type = "io.odysz.semantic.jserv.user.UserReq";
 
     tabl: string;
-    data: { props: {}; };
+    data: SemanticObject & { props: Record<string, any> };
 
-	constructor (uri: string, tabl: string, data = {}) {
+	constructor (uri: string, tabl: string, data: Record<string, any> = {}) {
 		super();
 		this.uri = uri;
 		this.tabl = tabl
@@ -647,7 +657,7 @@ export class UserReq extends AnsonBody {
 	}
 
 	get(prop: string) : any {
-		return this.data.props ? this.data.props[prop] : undefined;
+		return this.data.props?.[prop];
 	}
 
 	/** set data (SemanticObject)'s map
@@ -1278,7 +1288,7 @@ export class AnsonResp extends AnsonBody {
      * cols: array like [ col1, col2, ... ]; <br>
      * rows: array like [ {col1: val1, ...}, ... ]
      */
-    static rs2arr(rs: AnResultset): {cols: Array<Column>, rows: Array<{}>} {
+    static rs2arr(rs: AnResultset): {cols: string[], rows: Array<{}>} {
 		let cols: string[] = [];
 		let rows: {}[] = [];
 
@@ -1383,10 +1393,9 @@ export class AnsonResp extends AnsonBody {
 		return Array.isArray(this.rs) ? this.rs[rx] : this.rs;
 	}
 
-    data!: { props?: {}; };
-    getProp(prop: string): object {
-		if (this.data && this.data.props)
-			return this.data.props[prop];
+    data!: SemanticObject;
+    getProp(prop: string): any {
+		return this.data?.props?.[prop];
     }
 
     map: { [k: string]: any } | undefined;
@@ -1416,7 +1425,7 @@ export class AnsonResp extends AnsonBody {
 		const t = reslv.props ? reslv.props[tbl] : reslv[tbl];
 		const lst: string[] | undefined = t?.props ? t.props[autok] : t?.[autok];
 
-		return x === undefined ? lst : ix(lst, x);
+		return x === undefined ? lst : LangExt.ix(lst, x);
 	}
 }
 
@@ -1430,7 +1439,7 @@ export class AnSessionResp extends AnsonResp {
 	 */
 	profile: object;
 
-	constructor(ssResp) {
+	constructor(ssResp: AnSessionResp) {
 		super(ssResp);
 		this.ssInf = ssResp.ssInf;
 		this.profile = ssResp.profile;
@@ -1460,7 +1469,7 @@ Protocol.registerBody(AnDatasetResp.__type__, (json) => new AnDatasetResp(json))
 export interface DatasetOpts {
 	/** API args should ignore this */
 	port?: string;
-	/**component uri, connectiong mapping is configured at server/WEB-INF/connects.xml */
+	/**component uri, DB connection mapping is configured at server/WEB-INF/connects.xml */
 	uri?: string;
 	/**
 	 * @since 0.9.104, the connect id to synchronized dataset,
