@@ -277,9 +277,9 @@ export class Semantier {
 		return this;
 	}
 
-    client: SessionClient | Inseclient | undefined;
+    client!: SessionClient | Inseclient;
 
-    errCtx: ErrorCtx | undefined;
+    errCtx!: ErrorCtx | undefined;
 
     disableValidate: any;
 
@@ -418,8 +418,12 @@ export class Semantier {
 		Semantier.stree(
 			ds as DatasetOpts,
 			client,
-			(resp: AnsonMsg<AnDatasetResp>) => {
-				that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
+			// (resp: AnsonMsg<AnDatasetResp>) => {
+			// 	that.rels[reltabl] = resp.Body().forest as AnTreeNode[];
+			// 	onOk(resp)
+			// },
+			(resp) => {
+				that.rels[reltabl as string] = (resp.Body() as AnDatasetResp).forest as AnTreeNode[];
 				onOk(resp)
 			},
 			this.errCtx);
@@ -557,7 +561,7 @@ export class Semantier {
 		this.pkval.v = undefined;
 		this.rec = {};
 		this.rels = {};
-		this.crud = undefined;
+		this.crud = CRUD.r;
     }
 
 	/**
@@ -599,7 +603,7 @@ export class Semantier {
 
 		if (!parentpkv.v) {
 			if (req)
-				req.Body().post(insRels);
+				req.Body()?.post(insRels);
 			else
 				req = client.userReq<InsertReq>(uri, 'insert', insRels) as unknown as AnsonMsg<T>;
 		}
@@ -610,7 +614,7 @@ export class Semantier {
 				del_rf.post(insRels);
 
 			if (req)
-				req.Body().post(del_rf);
+				req.Body()?.post(del_rf);
 			else
 				req = client.userReq(uri, 'update', del_rf) as unknown as AnsonMsg<T>;
 		}
@@ -643,7 +647,7 @@ export class Semantier {
 			.A<InsertReq>(CRUD.c)
 			.columns(Object.keys(columnMap));
 
-		let rows = [];
+		let rows: NV[][] = [];
 
 		Semantier.collectTree(forest, rows, columnMap, check, reshape);
 

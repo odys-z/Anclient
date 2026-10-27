@@ -186,7 +186,6 @@ export class AdminReq extends AnsonBody {
 
 		/** Delete domains, domids, with conditions of pageInf, see AdminReq.Condts:
 		 * all the synodes of a domain first, then the domain. */
-		/** "delete" is a c++ keyword. */
 		del: 'd/d-node',
 	};
 

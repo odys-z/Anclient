@@ -5,12 +5,11 @@ import clsx from 'clsx';
 	import { withStyles } from './mui-compat';
 	import Collapse from '@mui/material/Collapse';
 	import Button from '@mui/material/Button';
-	import TextField from '@mui/material/TextField';
 	import Box from '@mui/material/Box';
 
 import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol, an, SessionClient } from '@anclient/semantier';
 
-	import {AnContext, AnContextType, ExternalHosts, JsonHosts} from './reactext';
+	import {AnContext, AnContextType} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
@@ -165,7 +164,6 @@ class LoginComp extends React.Component<LoginProps> {
 			}
 
 			an.init(hosturl);
-			// an.login( uid, pwd, reload, {onError} );
 			an.loginWithUri(this.props.uri, uid, pwd, reload, {onError});
 		}
 

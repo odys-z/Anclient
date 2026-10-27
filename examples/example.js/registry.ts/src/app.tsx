@@ -80,29 +80,38 @@ export class App extends React.Component<AppProps> {
 		]);
 	}
 
+	/**
+	 * Session timeout (exSession) or the central can't be reached (exIo):
+	 * report and go back to the login page once the dialog is closed.
+	 */
 	onError(code: string, rsp: AnsonMsg<AnsonResp> | undefined) {
 		console.error(code, rsp);
 		this.error.msg = rsp?.Body()?.msg() || code;
 		this.setState({
 			hasError: !!code,
-			nextAction: code === Protocol.MsgCode.exSession ? 're-login' : 'ignore'
+			nextAction: code === Protocol.MsgCode.exSession || code === Protocol.MsgCode.exIo
+						? 're-login' : 'ignore'
 		});
 	}
 
 	onErrorClose() {
 		if (this.state.nextAction === 're-login') {
 			this.state.nextAction = undefined;
-			this.logout();
+			// the session is invalid or the central is unreachable: no logout request
+			this.logout(false);
 		}
 		this.setState({hasError: false});
 	}
 
-	/** Logout and navigate to the portal (login) page. Also called by SysComp.onLogout. */
-	logout() {
+	/**
+	 * Logout and navigate to the portal (login) page. Also called by SysComp.onLogout.
+	 * @param remote false for only cleaning the local session (re-login)
+	 */
+	logout(remote: boolean = true) {
 		let that = this;
 		let portal = this.props.iportal || 'login.html';
 		try {
-			if (this.ssclient?.ssInf)
+			if (remote && this.ssclient?.ssInf)
 				this.ssclient.logout(
 					() => { if (that.props.iwindow) that.props.iwindow.location.href = portal; },
 					{ onError: (_c: any, _e: any) => cleanup(that) } );
