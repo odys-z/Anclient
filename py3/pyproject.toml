@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anclient.py3"
-version = "0.2.7"
+version = "0.2.8"
 description = "Semantic-jserv Python Client"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -14,8 +14,8 @@ authors = [{name = "Ody Z", email = "odys.zhou@gmail.com"}]
 keywords = ["Semantics", "AnClient", "Semantier"]
 requires-python = ">=3.9"
 dependencies = [
-    "anson.py3>=0.3.6",
-    "semantics.py3",
+    "anson.py3[crypto]>=0.6.12",
+    "semantics.py3>=0.6.18",
     "requests",
     "typing_extensions"
 ]

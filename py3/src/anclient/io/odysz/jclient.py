@@ -4,10 +4,24 @@ from typing import Protocol, Any, Optional
 
 import requests
 
+from anson.io.odysz.aes2 import AESHelper2
+from anson.io.odysz.anson import Anson
 from semanticshare.io.odysz.semantics import SessionInf
 from semanticshare.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
 from semanticshare.io.odysz.semantic.jserv.echo import EchoReq
 from semanticshare.io.odysz.semantic.jserv.signup import SingupReq
+from semanticshare.io.odysz.semantic.jsession import AnSessionReq, AnSessionResp
+
+
+class SsException(Exception):
+    """
+    Java io.odysz.semantics.x.SsException: login failed.
+    """
+    code: MsgCode
+
+    def __init__(self, code: MsgCode, msg: str):
+        super().__init__(f'{code}: {msg}')
+        self.code = code
 
 
 class OnError:
@@ -74,8 +88,43 @@ class SessionClient:
         return resp
 
     @staticmethod
-    def loginWithUri(servroot: str, uri: str, uid: str, pswdPlain: str, mac: str = None):
-        return SessionClient(servroot, SessionInf(uid, pswdPlain))
+    def loginWithUri(servroot: str, uri: str, uid: str, pswdPlain: str, mac: str = None) -> 'SessionClient':
+        """
+        Login to servroot/login.serv, the same as Java SessionClient.loginWithUri().
+
+        Only the token, encrypt(uid, pswd, iv), is sent, never the password.
+
+        :param servroot: jserv root, e.g. http://127.0.0.1:8080/jserv-sample
+        :param uri: the client's function uri
+        :param mac: device id
+        :return: the logged in client, with the server's ssToken repacked
+        :raises SsException: login failed, e.g. code exSession for a wrong password, or exIo
+        """
+        if uid is None or pswdPlain is None:
+            raise SsException(MsgCode.exSemantics, 'user id and password can not be null.')
+
+        iv = AESHelper2.getRandom()
+        req = AnSessionReq.formatLogin(uid, AESHelper2.encrypt(uid, pswdPlain, iv), AESHelper2.encode64(iv), mac)
+
+        errs = []
+        def on_err(code: MsgCode, msg: str, *args) -> None:
+            errs.append((code, msg))
+
+        client = InsecureClient(servroot)
+        resp = client.commit(client.userReq(uri, Port.session, req), OnError(on_err))
+
+        if not isinstance(resp, AnSessionResp):
+            code, msg = errs[0] if len(errs) > 0 else (MsgCode.exGeneral, f'Unexpected login reply: {resp}')
+            raise SsException(code, f'Login failed: {msg}')
+
+        ssinf = resp.ssInf
+        ssinf.ssToken = AESHelper2.repackSessionToken(ssinf.ssToken, pswdPlain, uid)
+        if mac is not None:
+            ssinf.device = mac
+
+        c = SessionClient(servroot, ssinf)
+        c.profile = resp.profile
+        return c
 
     def __init__(self, jserv: str, ssInf: SessionInf):
         self.proxies = {
@@ -89,6 +138,10 @@ class SessionClient:
         self.myservRt = jserv
         self.ssInf = ssInf
         self.header = None
+        self.profile: Optional[Anson] = None
+        '''
+        AnSessionResp.profile replied on login.
+        '''
 
     def Header(self):
         if self.header is None:
@@ -141,5 +194,5 @@ class SessionClient:
 class InsecureClient(SessionClient):
 
     def __init__(self, servRt: str):
-        super().__init__(servRt, SessionInf('uid', 'session less'))
+        super().__init__(servRt, SessionInf(uid='uid'))
 
