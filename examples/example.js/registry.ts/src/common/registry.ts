@@ -306,10 +306,17 @@ export class SignupResp extends AnsonResp {
 Protocol.registerBody(SignupResp.__type__, (json) => new SignupResp(json));
 
 /**
- * io.oz.syn.registry.CentralProfile, the central's reply on login (AnSessionResp.profile).
+ * io.odysz.semantic.jsession.JProfile (semantic.jserv 1.5.19), the common profile of a session user,
+ * replied on login (AnSessionResp.profile), replacing the central's CentralProfile.
+ *
+ * TODO move to @anclient/semantier, the same as the Java peer's package (semantic.jserv).
  */
-export interface CentralProfile {
-	type: 'io.oz.syn.registry.CentralProfile';
+export interface JProfile {
+	type: 'io.odysz.semantic.jsession.JProfile';
 	/** The page to land on: the router's path (menu url), e.g. '/home', '/org/domains'. */
 	home?: string;
+	/** The user's community; undefined for the super user (r00). */
+	orgId?: string;
+	/** A serialized Anson string, only a particular system / business understands or cares about. */
+	customExt?: string;
 }
