@@ -7,30 +7,12 @@ import requests
 from anson.io.odysz.aes2 import AESHelper2
 from anson.io.odysz.anson import Anson
 from semanticshare.io.odysz.semantics import SessionInf
-from semanticshare.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader
+from semanticshare.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader, \
+    OnError  # moved to semantics.py3 0.6.18, kept importable from here
+from semanticshare.io.odysz.semantic.jserv.crud import SsException
 from semanticshare.io.odysz.semantic.jserv.echo import EchoReq
 from semanticshare.io.odysz.semantic.jserv.signup import SingupReq
 from semanticshare.io.odysz.semantic.jsession import AnSessionReq, AnSessionResp
-
-
-class SsException(Exception):
-    """
-    Java io.odysz.semantics.x.SsException: login failed.
-    """
-    code: MsgCode
-
-    def __init__(self, code: MsgCode, msg: str):
-        super().__init__(f'{code}: {msg}')
-        self.code = code
-
-
-class OnError:
-    err : Callable = None
-    def __call__(self, code: MsgCode, msg: str, *args: str) -> None:
-        return self.err(code, msg, args)
-
-    def __init__(self, on_err: Callable[[MsgCode, str, ...], None]):
-        self.err = on_err
 
 
 class Clients:
@@ -98,10 +80,11 @@ class SessionClient:
         :param uri: the client's function uri
         :param mac: device id
         :return: the logged in client, with the server's ssToken repacked
-        :raises SsException: login failed, e.g. code exSession for a wrong password, or exIo
+        :raises SsException: login refused, e.g. a wrong password (Java SsException)
+        :raises IOError: network or http failure, MsgCode.exIo (Java IOException)
         """
         if uid is None or pswdPlain is None:
-            raise SsException(MsgCode.exSemantics, 'user id and password can not be null.')
+            raise SsException('user id and password can not be null.')
 
         iv = AESHelper2.getRandom()
         req = AnSessionReq.formatLogin(uid, AESHelper2.encrypt(uid, pswdPlain, iv), AESHelper2.encode64(iv), mac)
@@ -115,7 +98,9 @@ class SessionClient:
 
         if not isinstance(resp, AnSessionResp):
             code, msg = errs[0] if len(errs) > 0 else (MsgCode.exGeneral, f'Unexpected login reply: {resp}')
-            raise SsException(code, f'Login failed: {msg}')
+            if code in (MsgCode.exIo, MsgCode.exIo.name):
+                raise IOError(msg)
+            raise SsException('login failed\ncode: %s\nerror: %s', code, msg)
 
         ssinf = resp.ssInf
         ssinf.ssToken = AESHelper2.repackSessionToken(ssinf.ssToken, pswdPlain, uid)
