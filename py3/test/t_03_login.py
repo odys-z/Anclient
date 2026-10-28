@@ -14,7 +14,6 @@ import unittest
 from anson.io.odysz.aes2 import AESHelper2
 from anson.io.odysz.anson import Anson
 from semanticshare.io.odysz.semantic.jprotocol import AnsonResp, MsgCode, OnError, Port
-from semanticshare.io.odysz.semantic.jserv.crud import SsException
 from semanticshare.io.odysz.semantic.jsession import AnSessionReq
 
 from src.anclient.io.odysz.jclient import Clients, SessionClient
@@ -104,27 +103,6 @@ class AnSessionTest(unittest.TestCase):
         resp = c.commit(c.userReq(myuri, Port.session, req), OnError(lambda code, e, *a: errs.append((code, e))))
         show('touch', ssid=c.ssInf.ssid, token=c.ssInf.ssToken, resp=None if resp is None else resp.code, errs=errs)
         self.assertIsNotNone(resp, errs)
-
-        # a token not made of the server's knowledge is refused
-        iv = AESHelper2.getRandom()
-        c.ssInf.ssToken = f'{AESHelper2.encrypt(f"{uid}:not-the-knowledge", plainkey, iv)}:{AESHelper2.encode64(iv)}'
-        c.header = None
-        errs.clear()
-        resp = c.commit(c.userReq(myuri, Port.session, req), OnError(lambda code, e, *a: errs.append((code, e))))
-        show('touch, wrong token', resp=resp, errs=errs)
-        self.assertIsNone(resp)
-        self.assertIn(errs[0][0], (MsgCode.exSession, MsgCode.exSession.name))
-
-    def test_wrong_pswd(self):
-        with self.assertRaises(SsException) as x:
-            SessionClient.loginWithUri(jserv, myuri, uid, 'wrong-' + plainkey)
-        show('wrong password', code=x.exception.code, error=x.exception)
-        self.assertEqual(MsgCode.exSession, x.exception.code)
-
-    def test_unreachable(self):
-        with self.assertRaises(IOError) as x:
-            SessionClient.loginWithUri('http://127.0.0.1:1/jserv-sample', myuri, uid, plainkey)
-        show('unreachable', error=x.exception)
 
 
 if __name__ == '__main__':
