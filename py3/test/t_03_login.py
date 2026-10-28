@@ -2,21 +2,14 @@
 The py3 version of anclient.cmake/tests/t01_anclient_session.cpp, PING & AnSESSION,
 against the jsample test app (io.odysz.jsample.JSampleApp), with user ody, password 123456.
 
-The app is packaged into a temporary folder, started and stopped by the invoke tasks of
-semantic-jserv/jserv-sample, a sibling project of Anclient: {github}/semantic-jserv/jserv-sample.
-"invoke package" builds the jar (mvn clean package) if it's not built yet.
-
-Requires invoke, and anclient.py3 installed for jserv-sample/tasks.py (stop posts with its InsecureClient).
+The app is packaged into a temporary folder by "invoke package" of semantic-jserv/jserv-sample (which builds
+the jar if it's not built yet), then started and stopped by test/jsample.py. Requires invoke.
 
 Run in py3: python3 -m unittest test.t_03_login
 """
-import json
 import shutil
-import subprocess
 import sys
-import tempfile
 import unittest
-from pathlib import Path
 
 from anson.io.odysz.aes2 import AESHelper2
 from anson.io.odysz.anson import Anson
@@ -25,8 +18,8 @@ from semanticshare.io.odysz.semantic.jserv.crud import SsException
 from semanticshare.io.odysz.semantic.jsession import AnSessionReq
 
 from src.anclient.io.odysz.jclient import Clients, SessionClient
+from test import jsample
 
-jsample = Path(__file__).resolve().parents[3] / 'semantic-jserv' / 'jserv-sample'
 jsample_ver = '[1.5.9,)'
 '''
 jserv-sample's pom version: JsampleCtrl, JSampleApp in io.odysz.jsample, settings' port.
@@ -36,18 +29,6 @@ myuri = 'anclient.py3'
 uid, plainkey = 'ody', '123456'
 
 jserv: str = None
-
-
-def invoke(*args: str) -> None:
-    '''
-    Run "invoke <args>" in jserv-sample.
-    :raises AssertionError: the task failed (exit code != 0)
-    '''
-    cmd = [sys.executable, '-m', 'invoke', *args]
-    print('[jsample]', ' '.join(args))
-    r = subprocess.run(cmd, cwd=jsample)
-    if r.returncode != 0:
-        raise AssertionError(f'Failed: {" ".join(cmd)} (in {jsample}), exit code {r.returncode}')
 
 
 def show(case: str, **pairs):
@@ -63,28 +44,21 @@ class AnSessionTest(unittest.TestCase):
         global jserv
         Anson.java_src('semanticshare')
 
-        if not (jsample / 'tasks.py').is_file():
-            raise AssertionError(f'Cannot find jserv-sample/tasks.py: {jsample}')
-
-        cls.pkg = Path(tempfile.mkdtemp(prefix='jsample-'))
-        cls.started = False
+        cls.pkg = jsample.package(jsample_ver)
         try:
-            invoke('package', '--target', str(cls.pkg), '--require', jsample_ver)
-            invoke('start', '--target', str(cls.pkg))
-            cls.started = True
+            cls.proc = jsample.start(cls.pkg)
         except Exception:
             shutil.rmtree(cls.pkg, ignore_errors=True)
             raise
 
-        with open(cls.pkg / 'WEB-INF' / 'settings.json', 'r', encoding='utf-8') as f:
-            jserv = f'http://127.0.0.1:{json.load(f)["port"]}/jserv-sample'
+        jserv = jsample.jserv_of(cls.pkg)
         Clients.init(jserv)
 
     @classmethod
     def tearDownClass(cls):
         try:
-            if cls.started:
-                invoke('stop', '--target', str(cls.pkg))
+            code = jsample.stop(cls.pkg, cls.proc)
+            show('jsample stopped', exit=code)
         finally:
             shutil.rmtree(cls.pkg, ignore_errors=True)
 
