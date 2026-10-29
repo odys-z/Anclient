@@ -1,0 +1,51 @@
+# A reminder, not a build check: fails on every push changing py3/** (py3/test/remind_central_login.py
+# always fails), and GitHub emails the failure to the pusher (Settings > Notifications > Actions:
+# email, failed workflows only).
+#
+# The failure says to run anclient.py3's login test against the registry central, in the private
+# repository Acadynamo/Semantic-Network, with this push's commit:
+#
+#     gh workflow run py3-central-login.yml -R Acadynamo/Semantic-Network -f anclient_ref=<sha>
+#
+# push only (no pull_request), so forks' pull requests don't show the red X.
+
+name: remind-central-login-test
+
+on:
+  push:
+    paths:
+      - 'py3/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: py3/test
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Remind to run the central login test
+        working-directory: py3
+        env:
+          ANCLIENT_SHA: ${{ github.sha }}
+          ANCLIENT_REF: ${{ github.ref_name }}
+        run: |
+          cmd="gh workflow run py3-central-login.yml -R Acadynamo/Semantic-Network -f anclient_ref=$ANCLIENT_SHA"
+          {
+            echo "### Reminder: run the central login test"
+            echo "anclient.py3 changed at \`$ANCLIENT_SHA\` ($ANCLIENT_REF). This failure is on purpose."
+            echo '```bash'
+            echo "$cmd"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+          echo "::error title=Run the central login test::$cmd"
+          python -m unittest -v test.remind_central_login
