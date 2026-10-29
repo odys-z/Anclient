@@ -2,10 +2,11 @@
 # always fails), and GitHub emails the failure to the pusher (Settings > Notifications > Actions:
 # email, failed workflows only).
 #
-# The failure says to run anclient.py3's login test against the registry central, in the private
+# The failure says to run anclient.py3's tests against the registry central, in the private
 # repository Acadynamo/Semantic-Network, with this push's commit:
 #
-#     gh workflow run py3-central-login.yml -R Acadynamo/Semantic-Network -f anclient_ref=<sha>
+#     gh workflow run py3-central-login.yml  -R Acadynamo/Semantic-Network -f anclient_ref=<sha>
+#     gh workflow run py3-central-signup.yml -R Acadynamo/Semantic-Network -f anclient_ref=<sha>
 #
 # push only (no pull_request), so forks' pull requests don't show the red X.
 
@@ -33,19 +34,22 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Remind to run the central login test
+      - name: Remind to run the central tests
         working-directory: py3
         env:
           ANCLIENT_SHA: ${{ github.sha }}
           ANCLIENT_REF: ${{ github.ref_name }}
         run: |
-          cmd="gh workflow run py3-central-login.yml -R Acadynamo/Semantic-Network -f anclient_ref=$ANCLIENT_SHA"
+          cmds=()
+          for w in py3-central-login.yml py3-central-signup.yml; do
+            cmds+=("gh workflow run $w -R Acadynamo/Semantic-Network -f anclient_ref=$ANCLIENT_SHA")
+          done
           {
-            echo "### Reminder: run the central login test"
+            echo "### Reminder: run the central tests"
             echo "anclient.py3 changed at \`$ANCLIENT_SHA\` ($ANCLIENT_REF). This failure is on purpose."
             echo '```bash'
-            echo "$cmd"
+            printf '%s\n' "${cmds[@]}"
             echo '```'
           } >> $GITHUB_STEP_SUMMARY
-          echo "::error title=Run the central login test::$cmd"
+          for cmd in "${cmds[@]}"; do echo "::error title=Run the central tests::$cmd"; done
           python -m unittest -v test.remind_central_login
