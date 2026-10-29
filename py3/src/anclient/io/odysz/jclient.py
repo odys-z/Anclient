@@ -5,14 +5,13 @@ from typing import Protocol, Any, Optional
 import requests
 
 from anson.io.odysz.aes2 import AESHelper2
-from anson.io.odysz.anson import Anson
 from semanticshare.io.odysz.semantics import SessionInf
 from semanticshare.io.odysz.semantic.jprotocol import MsgCode, Port, AnsonMsg, AnsonBody, AnsonResp, AnsonHeader, \
     OnError  # moved to semantics.py3 0.6.18, kept importable from here
 from semanticshare.io.odysz.semantic.jserv.crud import SsException
 from semanticshare.io.odysz.semantic.jserv.echo import EchoReq
 from semanticshare.io.odysz.semantic.jserv.signup import SingupReq
-from semanticshare.io.odysz.semantic.jsession import AnSessionReq, AnSessionResp
+from semanticshare.io.odysz.semantic.jsession import AnSessionReq, AnSessionResp, JProfile
 
 
 class Clients:
@@ -123,9 +122,9 @@ class SessionClient:
         self.myservRt = jserv
         self.ssInf = ssInf
         self.header = None
-        self.profile: Optional[Anson] = None
+        self.profile: Optional[JProfile] = None
         '''
-        AnSessionResp.profile replied on login.
+        AnSessionResp.profile replied on login (semantic.jserv 1.5.19+), e.g. profile.orgId.
         '''
 
     def Header(self):
