@@ -20,6 +20,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
-    "@anclient/anreact": "^0.7.2"
+    "@anclient/anreact": "^0.7.2",
+    "@anclient/semantier": "~1.0.5"
   }
 }

@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 
-import { CRUD, AnTreeNode, AnlistColAttrs,
+import { CRUD, AnTreeNode, AnlistColAttrs, removeNode,
 	toBool, IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
@@ -25,7 +25,7 @@ import { photos as _photos } from "./res/temp-photos";
 import { icon, levelIcons, AnTreegridCol, TreeItemProps, AnreactreeItem, TreeNodeVisual } from "./tree";
 import { AnTreegridComp } from "./treegrid";
 
-const styles = (theme: Theme) => ({
+export const treeditorStyles = (theme: Theme) => ({
   root: { width: "100%", },
   row: {
 	width: "100%",
@@ -267,7 +267,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 }
 TreeCardComp.contextType = AnContext;
 
-const TreeCard = withStyles<any, any, TreeItemProps>(styles)(withWidth()(TreeCardComp));
+const TreeCard = withStyles<any, any, TreeItemProps>(treeditorStyles)(withWidth()(TreeCardComp));
 
 class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 	/** pic collection id */
@@ -391,18 +391,27 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 	}
 }
 
-const TreeGallary = withStyles<any, any, TreeItemProps>(styles)(withWidth()(TreeGallaryComp));
+const TreeGallary = withStyles<any, any, TreeItemProps>(treeditorStyles)(withWidth()(TreeGallaryComp));
 
-interface AnTreeditorProps extends AnTablistProps {
+export interface AnTreeditorProps extends AnTablistProps {
 	columns: Array<AnTreegridCol>;
 
 	/**
 	 * @since 0.6.0 As TreeEditor implements TreeCard or TrreeGallary that handling photos,
 	 * so TreeEditor needs this filed.
+	 * @since 0.8.0 only required when the forest has gallery nodes.
 	 */
 	docuri?: string;
 
-	tier: StreeTier;
+	/** optional since 0.8.0: no tier for a forest held by a subclass or given in {@link forest} */
+	tier?: StreeTier;
+
+	/**
+	 * A forest given by the host, e.g. loaded by its own tier (not the s-tree port).
+	 * Precedence: props.forest, tier.forest, state.forest.
+	 * @since 0.8.0
+	 */
+	forest?: AnTreeNode[];
 
 	reload: boolean;
 
@@ -411,7 +420,11 @@ interface AnTreeditorProps extends AnTablistProps {
 	lightbox?: lightboxFormatter;
 }
 
-class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
+/**
+ * Since 0.8.0, subclasses can override the hooks:
+ * {@link visualOf}, {@link renderLeaf}, {@link sectionTitle}, {@link rowActions}, {@link onMoved}, {@link removeNode}.
+ */
+class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends DetailFormW<P> {
 	state = {
 		forest: [] as AnTreeNode[],
 		tobeLoad: true
@@ -427,11 +440,8 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 	/** for debug */
 	columns: AnTreegridCol[];
 
-	constructor(props: AnTreeditorProps) {
+	constructor(props: P) {
 		super(props);
-
-		if (!props.docuri)
-			throw Error("Since 0.6.0, TreeEditor requirs doc-uri, separate to func-uri, for loading media files.");
 
 		this.columns = props.columns;
 		console.log(this.columns);
@@ -447,6 +457,9 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 		this.treeNodes  = this.treeNodes.bind(this);
 		this.toSearch   = this.toSearch.bind(this);
 		this.refresh    = this.refresh.bind(this);
+		this.toDel      = this.toDel.bind(this);
+		this.onMoved    = this.onMoved.bind(this);
+		this.buildTreegrid = this.buildTreegrid.bind(this);
 	}
 
 	componentDidMount() {
@@ -501,10 +514,51 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 
 	toDel(e: React.MouseEvent<HTMLElement>) {
 		e.stopPropagation();
-		let that = this;
-
 		let me = e.currentTarget.getAttribute("data-me");
+		if (me) this.removeNode(me);
+	}
+
+	/**
+	 * Hook: delete a node. Default: remove it (and its subtree) from the forest held in state.
+	 * @since 0.8.0
+	 */
+	removeNode(id: string) {
+		this.setState({forest: removeNode(this.state.forest, id)});
+	}
+
+	/**
+	 * Hook: a node has been moved among its siblings (by TreeCard's up / down).
+	 * Default: re-render. (Before 0.8.0, a move opened the edit form.)
+	 * @since 0.8.0
+	 */
+	onMoved(_n?: AnTreeNode, _p?: AnTreeNode, _from?: number, _to?: number) {
 		this.setState({});
+	}
+
+	/**
+	 * Hook: visual type of a node.
+	 * Default: TreeNodeVisual[node.nodetype], or card.
+	 * @since 0.8.0
+	 */
+	visualOf(tnode: AnTreeNode): TreeNodeVisual {
+		return TreeNodeVisual[tnode.node.nodetype as keyof typeof TreeNodeVisual] ?? TreeNodeVisual.card;
+	}
+
+	/**
+	 * Hook: the title shown in a folder (section) head.
+	 * Default: node.text.
+	 * @since 0.8.0
+	 */
+	sectionTitle(tnode: AnTreeNode): React.ReactNode {
+		return tnode.node.text as React.ReactNode;
+	}
+
+	/**
+	 * Hook: action buttons of a row. Default: undefined, i.e. the built-in Edit / Delete / New.
+	 * @since 0.8.0
+	 */
+	rowActions(_tnode: AnTreeNode): React.ReactNode | undefined {
+		return undefined;
 	}
 
 	toEditCard(e: React.UIEvent<HTMLElement>) {
@@ -539,64 +593,82 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 	 * @param compOts
 	 */
 	treeNodes(compOts: CompOpts) {
-		let { classes, media } = compOts;
-		let that = this;
+		let { classes } = compOts;
+		// there are different ways to load a tree
+		let m = this.props.forest || this.treetier?.forest || this.state.forest;
+		return (<div className={classes.forest}>{this.buildTreegrid(m, undefined, compOts)}</div>);
+	}
 
-		let m = this.treetier?.forest || this.state.forest; // there are two different way to load tree
+	/**
+	 * Render a node or a forest. Folders: visual type collapsable, or a card having children.
+	 * Children of a collapsed folder are not rendered.
+	 * @since 0.8.0 a method (was a closure in treeNodes)
+	 */
+	buildTreegrid(tnode: AnTreeNode | AnTreeNode[], parent: AnTreeNode | undefined, compOpts: CompOpts): React.ReactNode {
+		if (Array.isArray(tnode))
+			return tnode.map((i) => this.buildTreegrid(i, parent, compOpts));
+		if (!tnode) return undefined;
 
-		return (<div className={classes.forest}>{buildTreegrid( m, undefined, compOts )}</div>);
+		let { classes, media } = compOpts;
+		tnode.node.css = tnode.node.css || {};
 
-		function buildTreegrid(tnode: AnTreeNode | AnTreeNode[],
-				parent: AnTreeNode, compOpts: CompOpts) {
-		  if (Array.isArray(tnode)) {
-			return tnode.map((i, x) => buildTreegrid(i, parent, compOts));
-		  }
-		  else if (tnode) {
-			tnode.node.css = tnode.node.css || {};
+		let ntype = this.visualOf(tnode);
+		if (ntype === TreeNodeVisual.hide)
+			return undefined;
 
-			let ntype = TreeNodeVisual[tnode.node.nodetype] || TreeNodeVisual.card;
-			if (ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
-			  return (
-				<div key={tnode.id} className={classes.folder}>
-				  { that.folderHead(that.props.columns, tnode, classes, media) }
-				  { open &&
-					<Collapse in={tnode.node.expandChildren} timeout="auto" unmountOnExit>
-						{buildTreegrid(tnode.node.children, tnode, compOts)}
-					</Collapse>
-				  }
-				</div>
-			  );
-			}
-			else {
-			  return (
-				ntype === TreeNodeVisual.gallery ?
-				<TreeGallary {...that.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
-					docuri={that.props.docuri}
-					lightbox={that.props.lightbox}
-					key={tnode.id} tier={that.treetier as StreeTier}
-					tnode={tnode} media={media}
-					parent={parent}
-					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
-					delete={that.toDel}
-					onUpdate={that.toEditCard}
-				  />
-				: ntype === TreeNodeVisual.card ?
-				<TreeCard {...that.props}
-					key={tnode.id} tier={that.treetier as StreeTier}
-					tnode={tnode} media={media}
-					parent={parent}
-					toEdit={that.toEditCard}
-					indentSettings={Object.assign(defltIcons, that.props.indentIcons)}
-					delete={that.toDel}
-					onUpdate={that.toEditCard}
-				  />
-				: that.props.nodeFormatter
-				? that.props.nodeFormatter(tnode, parent, compOpts)
-				: <>{`Unhandled tnode, id: ${tnode.id}, visual type: ${ntype}`}</>
-			  );
-			}
-		  }
+		if (ntype === TreeNodeVisual.collapsable
+			|| ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
+			return (
+			  <div key={tnode.id} className={classes.folder}>
+				{ this.folderHead(this.props.columns, tnode, classes, media) }
+				<Collapse in={!!tnode.node.expandChildren} timeout="auto" unmountOnExit>
+					{this.buildTreegrid(tnode.node.children || [], tnode, compOpts)}
+				</Collapse>
+			  </div>
+			);
 		}
+		return this.renderLeaf(tnode, parent, compOpts);
+	}
+
+	/**
+	 * Hook: render a leaf node.
+	 * Default: TreeGallary, TreeCard, or props.nodeFormatter for other types.
+	 * @since 0.8.0
+	 */
+	renderLeaf(tnode: AnTreeNode, parent: AnTreeNode | undefined, compOpts: CompOpts): React.ReactNode {
+		let { media } = compOpts;
+		let ntype = this.visualOf(tnode);
+		let indentSettings = {...defltIcons, ...this.props.indentIcons};
+
+		if (ntype === TreeNodeVisual.gallery) {
+			if (!this.props.docuri)
+				throw Error("Since 0.6.0, gallery nodes require doc-uri, separate to func-uri, for loading media files.");
+			return (
+			  <TreeGallary {...this.props} // it should be forced to use anonymouse properties as the first one (props.tnode here is different to tnode)
+				docuri={this.props.docuri}
+				lightbox={this.props.lightbox}
+				key={tnode.id} tier={this.treetier as StreeTier}
+				tnode={tnode} media={media}
+				parent={parent}
+				indentSettings={indentSettings}
+				delete={this.toDel}
+				onUpdate={this.onMoved}
+			  />);
+		}
+		if (ntype === TreeNodeVisual.card)
+			return (
+			  <TreeCard {...this.props}
+				key={tnode.id} tier={this.treetier as StreeTier}
+				tnode={tnode} media={media}
+				parent={parent}
+				toEdit={this.toEditCard}
+				indentSettings={indentSettings}
+				delete={this.toDel}
+				onUpdate={this.onMoved}
+			  />);
+		return this.props.nodeFormatter
+			? this.props.nodeFormatter(tnode, parent, compOpts)
+			: <React.Fragment key={tnode.id}>{`Unhandled tnode, id: ${tnode.id}, visual type: ${ntype}`}</React.Fragment>;
 	}
 
 	folderHead( columns=[] as AnTreegridCol[], treenode: AnTreeNode, classes: ClassNames, media: Media) {
@@ -622,20 +694,22 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 					  return (
 						hide(col.grid, media) ? undefined :
 						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
-							<Typography noWrap variant='body2' >
+							{/* div: sectionTitle() may render blocks */}
+							<Typography noWrap variant='body2' component='div' >
 							{levelIcons(
 								that.props.indentSettings,
 								treenode.indents as IndentName[])}
 							{expd ? icon(that.props.indentIcons, "expand", 0)
 								: icon(that.props.indentIcons, "collapse", 0)}
-							{n.text as React.ReactNode}
+							{that.sectionTitle(treenode)}
 							</Typography>
 						</Grid>);
 					else if (col.type === 'actions')
 					  return (
 						hide(col.grid, media) ? undefined :
 						<Grid key={`${treenode.id}.${ix}`} className={classes.actions}>
-							<Typography noWrap variant='body2' >
+							<Typography noWrap variant='body2' onClick={(e) => e.stopPropagation()}>
+							  {that.rowActions(treenode) ?? <>
 								<Button onClick={that.toEditCard}
 									data-me={treenode.id}
 									startIcon={<JsampleIcons.Edit />} color="primary" >
@@ -651,6 +725,7 @@ class AnTreeditorComp extends DetailFormW<AnTreeditorProps> {
 										startIcon={<JsampleIcons.ListAdd />} color="primary" >
 										{media.isMd && L('New')}
 									</Button>}
+							  </>}
 							</Typography>
 						</Grid>
 						);
@@ -712,6 +787,6 @@ AnTreeditorComp.contextType = AnContext;
  *
  * Supported node type: {@link TreeNodeVisual.card} & {@link TreeNodeVisual.gallery}.
  */
-const AnTreeditor = withStyles<any, any, TreeItemProps>(styles)(withWidth()(AnTreeditorComp));
+const AnTreeditor = withStyles<any, any, TreeItemProps>(treeditorStyles)(withWidth()(AnTreeditorComp));
 
 export { TreeCard, TreeCardComp, TreeGallary, TreeGallaryComp, AnTreeditor, AnTreeditorComp }

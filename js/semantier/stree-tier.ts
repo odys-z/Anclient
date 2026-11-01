@@ -51,7 +51,7 @@ export const defltIcons: IndentIcons = {
 
 /** Tree data node */
 export class AnTreeNode implements Tierec {
-    [f: string]: string | number | boolean | object;
+	[f: string]: string | number | boolean | object | undefined | null;
 
 	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
 
@@ -63,7 +63,8 @@ export class AnTreeNode implements Tierec {
 	 * */
 	node!: {
 		checked?: boolean | '0' | '1' | 0 | 1 | 'true' | 'false' | 'True' | 'False' | 'TRUE' | 'FALSE';
-		nodetype?: 'p' | 'card' | 'gallery' | undefined; // string;
+		/** visual type name, see anreact TreeNodeVisual; any string since 1.0.6, e.g. doc tree kinds */
+		nodetype?: string;
 		children?: Array<AnTreeNode>;
 		expandChildren?: boolean;
 
@@ -210,3 +211,46 @@ StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
 // 	}
 // }
 
+
+/**
+ * Find the node with id in a forest (depth first).
+ * @since 1.1.0
+ */
+export function findNode(forest: AnTreeNode[] | undefined, id: string): AnTreeNode | undefined {
+	for (const n of forest || []) {
+		if (n.id === id) return n;
+		const found = findNode(n.node?.children, id);
+		if (found) return found;
+	}
+	return undefined;
+}
+
+/**
+ * Replace the node having sub.id with sub, e.g. a subtree returned by the server after a change.
+ * Ancestors' children arrays are copied, so React sees the change.
+ * @returns a new top-level array; the same content if sub.id is not found
+ * @since 1.1.0
+ */
+export function replaceNode(forest: AnTreeNode[], sub: AnTreeNode): AnTreeNode[] {
+	return forest.map((n) => {
+		if (n.id === sub.id) return sub;
+		const kids = n.node?.children;
+		if (!kids?.length || !findNode(kids, sub.id)) return n;
+		return Object.assign(new AnTreeNode(), n, { node: { ...n.node, children: replaceNode(kids, sub) } });
+	});
+}
+
+/**
+ * Remove the node with id (and its subtree).
+ * @returns a new top-level array
+ * @since 1.1.0
+ */
+export function removeNode(forest: AnTreeNode[], id: string): AnTreeNode[] {
+	return forest
+		.filter((n) => n.id !== id)
+		.map((n) => {
+			const kids = n.node?.children;
+			if (!kids?.length || !findNode(kids, id)) return n;
+			return Object.assign(new AnTreeNode(), n, { node: { ...n.node, children: removeNode(kids, id) } });
+		});
+}

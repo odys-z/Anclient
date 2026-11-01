@@ -15,7 +15,7 @@
   "//": "Legacy: @anclient/anreact 0.7.x (with ag-grid 33), installed in this folder; not upgraded to anreact 0.8.",
   "dependencies": {
     "@anclient/anreact": "^0.7.2",
-    "@anclient/semantier": "^1.0.5",
+    "@anclient/semantier": "~1.0.5",
     "ag-grid-community": "^33.0.4",
     "ag-grid-react": "^33.0.4"
   }

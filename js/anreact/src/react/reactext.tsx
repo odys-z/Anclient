@@ -1,7 +1,7 @@
 import { AnsonMsg, AnsonResp, ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
 import React from 'react';
 
-import { AnReact } from './anreact';
+import type { AnReact } from './anreact'; // type only: a value import makes a cycle (anreact -> crud -> AnContext)
 
 /**
  * The configuration data object used by user App to setup jserv root URL.
