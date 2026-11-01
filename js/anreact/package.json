@@ -3,7 +3,7 @@
   "version": "0.8.0",
   "description": "Anclient built on React.js.",
   "main": "./src/an-components.ts",
-  "types": "./ts/src/an-components.d.ts",
+  "types": "./src/an-components.ts",
   "files": [
     "src"
   ],

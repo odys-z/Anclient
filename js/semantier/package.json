@@ -8,13 +8,7 @@
     "debug": "webpack-cli --config mocha.config.js && mocha -- --inspect inspect dist/testBundle.js ",
     "test": "webpack-cli --config mocha.config.js && mocha dist/testBundle.js "
   },
-  "types": {
-    "name": "@anclient/semantier",
-    "author": "ody-zhou",
-    "version": "3.0.0",
-    "main": "./anclient.ts",
-    "types": "./anclient.ts"
-  },
+  "types": "./anclient.ts",
   "keywords": [
     "anclient",
     "semantier"
