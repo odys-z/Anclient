@@ -415,7 +415,7 @@ export interface AnTreeditorProps extends AnTablistProps {
 
 	reload: boolean;
 
-	nodeFormatter?: (n: AnTreeNode, parent: AnTreeNode, opts: CompOpts) => JSX.Element;
+	nodeFormatter?: (n: AnTreeNode, parent: AnTreeNode | undefined, opts: CompOpts) => React.ReactElement;
 
 	lightbox?: lightboxFormatter;
 }
@@ -434,7 +434,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
     window: Window;
 
     anReact: AnReactExt | undefined;
-    editForm: JSX.Element | undefined;
+	editForm: React.ReactElement | undefined;
 	treetier: StreeTier;
 
 	/** for debug */
@@ -594,9 +594,11 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 	 */
 	treeNodes(compOts: CompOpts) {
 		let { classes } = compOts;
+
 		// there are different ways to load a tree
-		let m = this.props.forest || this.treetier?.forest || this.state.forest;
-		return (<div className={classes.forest}>{this.buildTreegrid(m, undefined, compOts)}</div>);
+		let f = this.props.forest || this.treetier?.forest || this.state.forest;
+
+		return (<div className={classes?.forest}>{this.buildTreegrid(f, undefined, compOts)}</div>);
 	}
 
 	/**
@@ -610,6 +612,9 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 		if (!tnode) return undefined;
 
 		let { classes, media } = compOpts;
+		classes = classes || {};
+		media = media || {isMd: true};
+
 		tnode.node.css = tnode.node.css || {};
 
 		let ntype = this.visualOf(tnode);
@@ -617,7 +622,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 			return undefined;
 
 		if (ntype === TreeNodeVisual.collapsable
-			|| ntype === TreeNodeVisual.card && tnode.node.children?.length > 0) {
+			|| ntype === TreeNodeVisual.card && tnode.node.children?.length || 0 > 0) {
 			return (
 			  <div key={tnode.id} className={classes.folder}>
 				{ this.folderHead(this.props.columns, tnode, classes, media) }
@@ -734,7 +739,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 						hide(col.grid, media) ? undefined :
 						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
 							<Typography variant='body2' >
-							  {col.formatter(col, treenode, {classes, media}) as ReactNode}
+							  {col?.formatter?.(col, treenode, {classes, media}) as ReactNode}
 							</Typography>
 						</Grid>);
 					else
@@ -762,7 +767,8 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 	}
 
 	render() {
-		const { classes, width } = this.props;
+		let { classes, width } = this.props;
+		classes = classes || ({} as ClassNames);
 
 		let media = CrudCompW.getMedia(width);
 
@@ -774,7 +780,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 		return (
 			<div className={classes.root}>
         		{AnTreegridComp.th(this.props.columns, classes, media, {onThClick: this.toAddChild})}
-				{this.treeNodes({classes, media})}
+				{this.treeNodes({classes: classes, media})}
 				{this.editForm}
 			</div>
 		);
