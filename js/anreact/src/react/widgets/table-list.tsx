@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,9 +12,9 @@ import TablePagination from '@mui/material/TablePagination';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 
-import { AnlistColAttrs, isEmpty, len, Tierec, toBool } from '@anclient/semantier';
-import { Comprops, DetailFormW } from '../crud';
-import { CompOpts } from '../anreact';
+import { type AnlistColAttrs, isEmpty, len, type Tierec, toBool } from '@anclient/semantier';
+import { type Comprops, DetailFormW } from '../crud';
+import type { CompOpts } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {
@@ -266,4 +266,4 @@ class AnTablistComp extends DetailFormW<AnTablistProps> {
 }
 
 const AnTablist = withStyles<any, any, AnTablistProps>(styles)(AnTablistComp);
-export { AnTablist, AnTablistComp, AnTablistProps }
+export { AnTablist, AnTablistComp, type AnTablistProps }

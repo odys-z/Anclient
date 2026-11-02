@@ -1,5 +1,5 @@
 import React from 'react';
-import { Comprops, CrudCompW } from '../crud';
+import { type Comprops, CrudCompW } from '../crud';
 import { CSSTransform } from '../../utils/css-transform';
 
 // Using legacy. To do: install types

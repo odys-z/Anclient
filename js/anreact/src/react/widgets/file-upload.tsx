@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, withWidth } from '../mui-compat';
 import PropTypes from "prop-types";
 import Box from '@mui/material/Box';
@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import { invalidStyles } from '../anreact';
 import { gCamera, gCameraViewBox } from './my-icon';
 import { mimeOf } from '../../utils/file-utils';
-import { Comprops, DetailFormW } from '../crud';
+import { type Comprops, DetailFormW } from '../crud';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {

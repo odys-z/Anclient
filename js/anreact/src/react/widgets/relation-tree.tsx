@@ -1,6 +1,6 @@
 import React from 'react';
 import { withStyles, gridSize, withWidth } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -8,12 +8,12 @@ import Collapse from '@mui/material/Collapse';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 
-import { AnDatasetResp, AnsonMsg, AnTreeNode, DbRelations, str, StreeTier, toBool } from '@anclient/semantier';
+import { AnDatasetResp, AnsonMsg, AnTreeNode, type DbRelations, str, StreeTier, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-import { Comprops, CrudCompW } from '../crud';
+import { type Comprops, CrudCompW } from '../crud';
 import { AnTreeIcons } from "./tree";
-import { ClassNames } from '../anreact';
-import { AnContextType } from '../reactext';
+import type { ClassNames } from '../anreact';
+import type { AnContextType } from '../reactext';
 
 const styles = (theme: Theme) => ({
   root: {
@@ -260,4 +260,4 @@ class AnRelationTreeComp extends CrudCompW<RelationTreeProps> {
 }
 
 const AnRelationTree = withStyles<any, any, RelationTreeProps>(styles)(withWidth()(AnRelationTreeComp));
-export { AnRelationTree, AnRelationTreeComp, RelationTreeProps }
+export { AnRelationTree, AnRelationTreeComp, type RelationTreeProps }

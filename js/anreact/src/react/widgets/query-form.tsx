@@ -1,19 +1,19 @@
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from '../mui-compat';
 import { Collapse, Grid, TextField, Switch, Button, FormControlLabel } from '@mui/material';
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
+import type { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Search, Replay } from '@mui/icons-material';
 
-import { toBool, AnlistColAttrs, NV, TierComboField, PageInf, len } from '@anclient/semantier';
+import { toBool, type AnlistColAttrs, type NV, type TierComboField, PageInf, len } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
-import { AnContext, AnContextType } from '../reactext';
-import { Comprops, CrudCompW } from '../crud'
-import { ComboItem } from './dataset-combo';
-import { AnReactExt, ClassNames, CompOpts, Media } from '../anreact';
+import { AnContext, type AnContextType } from '../reactext';
+import { type Comprops, CrudCompW } from '../crud'
+import type { ComboItem } from './dataset-combo';
+import { AnReactExt, type ClassNames, type CompOpts, type Media } from '../anreact';
 
 const styles = (theme: Theme) => ( {
 	root: {

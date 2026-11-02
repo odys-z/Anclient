@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';
 import Grid from '@mui/material/Grid';
@@ -24,16 +24,16 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import { Drafts, Inbox, Send, ExpandLess, ExpandMore, Sms, Menu, School, SettingsOutlined, BarChart, GroupAdd, MoreHoriz, Description, Ballot, ScreenShareOutlined, FolderSharedOutlined, HowToRegSharp } from '@mui/icons-material';
 
-import { AnContext, AnContextType } from './reactext';
+import { AnContext, type AnContextType } from './reactext';
 import { ConfirmDialog } from './widgets/messagebox';
 import { MyIcon } from './widgets/my-icon';
 import { MyInfo } from './widgets/my-info';
 import { L } from '../utils/langstr';
 
 import {
-	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, Comprops, CrudComp, CrudCompW
+	Home, ErrorPage, Domain, Roles, Orgs, Users, CheapFlow, type Comprops, CrudComp, CrudCompW
 } from './crud'
-import { AnReactExt, ClassNames } from './anreact';
+import { AnReactExt, type ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@mui/material/Fab';

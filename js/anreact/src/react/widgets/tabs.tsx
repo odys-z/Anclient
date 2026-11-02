@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { withStyles, withWidth } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -8,8 +8,8 @@ import Box from '@mui/material/Box';
 
 import { L } from '../../utils/langstr';
 import { AnContext } from '../reactext';
-import { invalidStyles, ClassNames } from '../anreact';
-import { Comprops, CrudCompW } from '../crud';
+import { invalidStyles, type ClassNames } from '../anreact';
+import { type Comprops, CrudCompW } from '../crud';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles, {
@@ -122,4 +122,4 @@ class TabsComp extends CrudCompW<TabsProps> {
 TabsComp.contextType = AnContext;
 
 const AnTabs = withStyles<any, any, TabsProps>(styles)(withWidth()(TabsComp));
-export {AnTabs, TabsComp, TabsProps, TabPanelComp as TabPanel, TabPanelProps};
+export {AnTabs, TabsComp, type TabsProps, TabPanelComp as TabPanel, type TabPanelProps};

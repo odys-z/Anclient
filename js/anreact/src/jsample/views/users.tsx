@@ -5,22 +5,22 @@ import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 
-import { toBool, Protocol, CRUD, AnsonResp , UserReq, Tierec,
-	OnCommitOk, AnlistColAttrs, OnLoadOk, DbRelations, PageInf, len, TierComboField
+import { toBool, Protocol, CRUD, AnsonResp , UserReq, type Tierec,
+	type OnCommitOk, type AnlistColAttrs, type OnLoadOk, type DbRelations, PageInf, len, type TierComboField
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { Semantier } from '@anclient/semantier';
-import { Comprops, CrudCompW } from '../../react/crud';
-import { AnContext, AnContextType } from '../../react/reactext';
+import { type Comprops, CrudCompW } from '../../react/crud';
+import { AnContext, type AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablPager } from '../../react/widgets/table-pager';
 import { AnQueryst } from '../../react/widgets/query-form';
 import { JsampleIcons } from '../styles';
 
 import { UserDetailst } from './user-details';
-import { CompOpts } from '../../react/anreact';
-import { Theme } from '@mui/material/styles';
+import type { CompOpts } from '../../react/anreact';
+import type { Theme } from '@mui/material/styles';
 
 const styles = (theme: Theme) => ( {
 	root: {

@@ -2,8 +2,8 @@ import { SessionClient, Inseclient, AnTreeNode } from "./anclient";
 import { toBool, isEmpty, str, len } from "./helpers";
 import { stree_t, CRUD,
 	AnDatasetResp, AnsonBody, AnsonMsg, AnsonResp,
-	DeleteReq, InsertReq, UpdateReq, OnCommitOk, OnLoadOk,
-	DbCol, DbRelations, NV, PageInf, PkVal, NameValue, DatasetOpts, DatasetReq, DatasetierReq
+	DeleteReq, InsertReq, UpdateReq, type OnCommitOk, type OnLoadOk,
+	type DbCol, type DbRelations, type NV, PageInf, type PkVal, type NameValue, type DatasetOpts, DatasetReq, DatasetierReq
 } from "./protocol";
 
 export { toBool, isEmpty };

@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { withStyles, withWidth } from '../../react/mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
-import { Comprops, CrudCompW } from '../../react/crud'
-import { AnContext, AnContextType } from '../../react/reactext'
+import { type Comprops, CrudCompW } from '../../react/crud'
+import { AnContext, type AnContextType } from '../../react/reactext'
 import { AnTablist } from '../../react/widgets/table-list'
-import { AnsonResp, PageInf, Semantier, TierComboField } from '@anclient/semantier';
+import { AnsonResp, PageInf, Semantier, type TierComboField } from '@anclient/semantier';
 import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {

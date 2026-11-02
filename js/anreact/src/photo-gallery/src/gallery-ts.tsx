@@ -4,7 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import { computeColumnLayout } from './layouts/columns';
 import { computeRowLayout } from './layouts/justified';
 import { findIdealNodeSearch } from './utils/findIdealNodeSearch';
-import Photo, { PhotoProps, PhotoPropType } from './photo-ts';
+import Photo, { type PhotoProps, PhotoPropType } from './photo-ts';
 
 export type PhotoClickHandler = (
   event: React.MouseEvent,

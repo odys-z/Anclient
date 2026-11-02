@@ -25,7 +25,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 import FormatLineSpacingIcon from '@mui/icons-material/FormatLineSpacing';
 import GridOnIcon from '@mui/icons-material/GridOn';
-import { DefaultComponentProps } from '@mui/material/OverridableComponent';
+import type { DefaultComponentProps } from '@mui/material/OverridableComponent';
 
 export const JsampleIcons = {
   Add   : forwardRef<SVGSVGElement, {onClick?: any} & DefaultComponentProps<any>>((props, ref) => <AddBox {...props} ref={ref} />),

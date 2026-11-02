@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, withWidth } from '../../react/mui-compat';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography';
 import { PageInf, StreeTier, AnDatasetResp, AnTreeNode } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { Comprops, CrudCompW } from '../../react/crud'
-import { AnContext, AnContextType } from '../../react/reactext'
+import { type Comprops, CrudCompW } from '../../react/crud'
+import { AnContext, type AnContextType } from '../../react/reactext'
 import { AnTreegrid } from '../../react/widgets/treegrid'
 
 const styles = (_theme: Theme) => ( {

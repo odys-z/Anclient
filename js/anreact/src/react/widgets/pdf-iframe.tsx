@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Comprops, CrudCompW } from '../crud';
+import { type Comprops, CrudCompW } from '../crud';
 import Iframe from './iframe';
 
 export interface PdfIframeProps {

@@ -1,16 +1,16 @@
 
 import React from 'react';
 import { withStyles, withWidth } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
+import type { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteValue as Value } from '@mui/material/useAutocomplete';
 
-import { AnsonMsg, AnsonResp, NV, OnLoadOk, TierComboField, Tierec } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, type NV, type OnLoadOk, type TierComboField, type Tierec } from '@anclient/semantier';
 import { AnConst } from '../../utils/consts';
-import { AnContext, AnContextType } from '../reactext';
-import { Comprops, CrudCompW } from '../crud';
-import { AnReactExt, CompOpts, invalidStyles } from '../anreact';
+import { AnContext, type AnContextType } from '../reactext';
+import { type Comprops, CrudCompW } from '../crud';
+import { AnReactExt, type CompOpts, invalidStyles } from '../anreact';
 
 export interface ComboItem extends NV {};
 

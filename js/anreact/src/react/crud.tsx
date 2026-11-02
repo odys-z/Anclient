@@ -1,10 +1,10 @@
 import React from 'react';
-import { Color, Alignment, withStyles } from './mui-compat';
-import { Theme, Breakpoint } from '@mui/material/styles';
+import { type Color, type Alignment, withStyles } from './mui-compat';
+import type { Theme, Breakpoint } from '@mui/material/styles';
 
 import { AnContext } from './reactext';
-import { Media, ClassNames } from './anreact';
-import { CRUD, Semantier, SessionInf, UIComponent } from '@anclient/semantier';
+import type { Media, ClassNames } from './anreact';
+import { CRUD, Semantier, type SessionInf, type UIComponent } from '@anclient/semantier';
 
 interface Comprops extends UIComponent {
 	/**
@@ -206,7 +206,7 @@ class DetailFormW<T extends Comprops> extends CrudCompW<T> {
 DetailFormW.contextType = AnContext;
 
 export {
-	Comprops, CrudComp,
+	type Comprops, CrudComp,
 	CrudCompW, DetailFormW,
 	Home, HomeComp,
 	ErrorPage, ErrorPageComp,

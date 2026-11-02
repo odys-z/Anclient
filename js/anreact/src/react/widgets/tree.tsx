@@ -1,5 +1,5 @@
 import React from "react";
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from '../mui-compat';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -14,10 +14,10 @@ import Wallpaper from '@mui/icons-material/Wallpaper';
 import MovieRounded from '@mui/icons-material/MovieRounded';
 import FavoriteBorderOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 
-import { AnTreeIconsType, AnTreeNode, AnlistColAttrs, IndentName, IndentIcons, defltIcons, toBool } from '@anclient/semantier';
-import { Comprops, CrudCompW } from "../crud";
-import { ClassNames, CompOpts, Media } from "../anreact";
-import { AnTablistProps } from "./table-list";
+import { type AnTreeIconsType, AnTreeNode, type AnlistColAttrs, type IndentName, type IndentIcons, defltIcons, toBool } from '@anclient/semantier';
+import { type Comprops, CrudCompW } from "../crud";
+import type { ClassNames, CompOpts, Media } from "../anreact";
+import type { AnTablistProps } from "./table-list";
 
 export const AnTreeIcons = {
 	expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
@@ -376,5 +376,5 @@ class AnTreeComp extends CrudCompW<Comprops> {
 }
 
 const AnTree = withStyles<any, any, Comprops>(styles)(withWidth()(AnTreeComp));
-export { levelIcons, icon, TreeNodeVisual, AnTreegridCol,
-		TreegridProps as TreeItemProps, AnreactreeItem, AnTree, AnTreeComp }
+export { levelIcons, icon, TreeNodeVisual, type AnTreegridCol,
+		type TreegridProps as TreeItemProps, type AnreactreeItem, AnTree, AnTreeComp }

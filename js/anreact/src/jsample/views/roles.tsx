@@ -1,24 +1,24 @@
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, withWidth } from '../../react/mui-compat';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
 import {
-	AnsonResp, Semantier, CRUD, AnlistColAttrs, PageInf, Tierec,
-	OnLoadOk, UIComponent, AnsonMsg, DbRelations, relStree, TierComboField, len, str, StreeTier
+	AnsonResp, Semantier, CRUD, type AnlistColAttrs, PageInf, type Tierec,
+	type OnLoadOk, type UIComponent, AnsonMsg, type DbRelations, type relStree, type TierComboField, len, str, StreeTier
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
 import { AnConst } from '../../utils/consts';
-import { Comprops, CrudCompW } from '../../react/crud';
-import { AnContext, AnContextType } from '../../react/reactext';
+import { type Comprops, CrudCompW } from '../../react/crud';
+import { AnContext, type AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { AnTablist } from '../../react/widgets/table-list';
 
 import { JsampleIcons } from '../styles';
 import { RoleDetails } from './role-details';
-import { ClassNames, CompOpts } from '../../react/anreact';
+import type { ClassNames, CompOpts } from '../../react/anreact';
 import { AnQueryst } from '../../react/widgets/query-form';
 
 const styles = (theme: Theme) => ( {

@@ -1,18 +1,18 @@
 
 import $ from 'jquery';
 
-import * as CSS from 'csstype';
-import { stree_t, SessionClient, AnsonResp, AnDatasetResp, ErrorCtx,
-	AnsonMsg, OnCommitOk, DatasetOpts, AnsonBody, AnResultset, InvalidClassNames,
-	NV, OnLoadOk, Semantier, PageInf, AnlistColAttrs,
-	Tierec,	an
+import type * as CSS from 'csstype';
+import { stree_t, SessionClient, AnsonResp, AnDatasetResp, type ErrorCtx,
+	AnsonMsg, type OnCommitOk, type DatasetOpts, AnsonBody, type AnResultset, type InvalidClassNames,
+	type NV, type OnLoadOk, Semantier, PageInf, type AnlistColAttrs,
+	type Tierec,	an
 } from '@anclient/semantier';
 
 import { AnConst } from '../utils/consts';
-import { Comprops, CrudComp } from './crud';
-import { CSSProperties } from 'react';
-import { ClientOptions, ExternalHosts, JsonHosts } from './reactext';
-import { MenuItem } from './sys';
+import { type Comprops, CrudComp } from './crud';
+import type { CSSProperties } from 'react';
+import { type ClientOptions, ExternalHosts, type JsonHosts } from './reactext';
+import type { MenuItem } from './sys';
 
 export interface ClassNames {[c: string]: string};
 

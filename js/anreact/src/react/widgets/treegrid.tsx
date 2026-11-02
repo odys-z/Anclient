@@ -1,17 +1,17 @@
 import React from "react";
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import { withStyles, gridSize, withWidth, Color, Alignment } from '../mui-compat';
+import { withStyles, gridSize, withWidth, type Color, type Alignment } from '../mui-compat';
 
 import { AnTreeNode, StreeTier, toBool } from "@anclient/semantier";
 
-import { AnTreegridCol, TreeItemProps, icon, levelIcons } from "./tree";
+import { type AnTreegridCol, type TreeItemProps, icon, levelIcons } from "./tree";
 import { CrudCompW } from "../crud";
-import { ClassNames, Media, hide } from "../anreact";
+import { type ClassNames, type Media, hide } from "../anreact";
 import { TreeCardComp } from "./tree-editor";
-import { AnTablistProps } from "./table-list";
+import type { AnTablistProps } from "./table-list";
 import { Button } from '@mui/material';
 import { JsampleIcons } from "../../jsample/styles";
 import { L } from "../../utils/langstr";

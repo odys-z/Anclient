@@ -1,7 +1,7 @@
 
-import { NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, Tierec, DatasetOpts
+import { type NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, type Tierec, type DatasetOpts
 } from '@anclient/semantier';
-import { PhotoProps } from '../photo-ts';
+import type { PhotoProps } from '../photo-ts';
 
 // export class PhotoCSS {
 // 	type: string = 'io.oz.album.peer.PhotoCSS';

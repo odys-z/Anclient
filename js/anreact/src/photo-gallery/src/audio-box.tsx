@@ -12,7 +12,7 @@
  * 
  * Modified by Ody Z.
  */
-import React, { Component, ReactNode, CSSProperties } from 'react';
+import React, { Component, type ReactNode, type CSSProperties } from 'react';
 
 import { Paper, Box, Grid, Dialog, DialogTitle, Typography, DialogContent, DialogActions, Button, Card } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
@@ -264,4 +264,4 @@ AudioBox.defaultProps = {
   height: "9wh"
 };
 
-export { AudioBox, AudioBoxProps };
+export { AudioBox, type AudioBoxProps };

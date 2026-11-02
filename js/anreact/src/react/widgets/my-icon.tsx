@@ -1,11 +1,11 @@
-import React, { Ref } from 'react';
+import React, { type Ref } from 'react';
 import { withStyles } from '../mui-compat';
 import Button from '@mui/material/Button';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SvgIcon from '@mui/material/SvgIcon';
 
-import { AnContext, AnContextType } from '../reactext';
-import { Comprops } from '../crud';
+import { AnContext, type AnContextType } from '../reactext';
+import type { Comprops } from '../crud';
 import { SessionClient } from '@anclient/semantier/anclient';
 
 const styles = theme => ({

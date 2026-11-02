@@ -1,11 +1,11 @@
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { AnsonValue, Protocol, DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
-	LogAct, PageInf, AnsonBody, OnCommitOk, DbRelations } from './protocol';
+import { type AnsonValue, Protocol, type DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
+	type LogAct, PageInf, AnsonBody, type OnCommitOk, type DbRelations } from './protocol';
 
-import { Semantier, Tierec, UIComponent, ErrorCtx } from './semantier';
+import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './semantier';
 
 
 /**

@@ -1,20 +1,20 @@
 
 import React from 'react';
 import clsx from 'clsx';
-	import { Theme } from '@mui/material/styles';
+	import type { Theme } from '@mui/material/styles';
 	import { withStyles } from './mui-compat';
 	import Collapse from '@mui/material/Collapse';
 	import Button from '@mui/material/Button';
 	import Box from '@mui/material/Box';
 
-import { AnClient, AnsonMsg, AnsonResp, OnLoginOk, Protocol, an, SessionClient } from '@anclient/semantier';
+import { AnClient, AnsonMsg, AnsonResp, type OnLoginOk, Protocol, an, SessionClient } from '@anclient/semantier';
 
-	import {AnContext, AnContextType} from './reactext';
+	import {AnContext, type AnContextType} from './reactext';
 	import {ConfirmDialog} from './widgets/messagebox'
 	import {L} from '../utils/langstr'
 	import {jstyles} from '../jsample/styles'
-import { Comprops } from './crud';
-import { ClassNames } from './anreact';
+import type { Comprops } from './crud';
+import type { ClassNames } from './anreact';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import { VisibilityOff, Visibility } from '@mui/icons-material';
@@ -279,4 +279,4 @@ class LoginComp extends React.Component<LoginProps> {
 LoginComp.contextType = AnContext;
 
 const Login = withStyles(styles)(LoginComp);
-export { Login, LoginComp, LoginProps };
+export { Login, LoginComp, type LoginProps };

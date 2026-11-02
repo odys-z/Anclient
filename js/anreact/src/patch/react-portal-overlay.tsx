@@ -11,9 +11,9 @@
 
 import { css } from '@emotion/react';
 import React, {
-  CSSProperties,
-  HTMLProps,
-  ReactNode,
+  type CSSProperties,
+  type HTMLProps,
+  type ReactNode,
   useRef,
   useEffect
 } from 'react';

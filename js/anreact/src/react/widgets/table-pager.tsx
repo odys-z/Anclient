@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { withStyles } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,13 +8,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TablePagination, { LabelDisplayedRowsArgs } from '@mui/material/TablePagination';
+import TablePagination, { type LabelDisplayedRowsArgs } from '@mui/material/TablePagination';
 import Checkbox from '@mui/material/Checkbox';
 
-import { AnlistColAttrs, Tierec, isEmpty, PageInf, toBool, len, DbCol } from '@anclient/semantier';
+import { type AnlistColAttrs, type Tierec, isEmpty, PageInf, toBool, len, type DbCol } from '@anclient/semantier';
 import { DetailFormW } from '../crud';
-import { CompOpts } from '../anreact';
-import { AnTablistProps } from './table-list';
+import type { CompOpts } from '../anreact';
+import type { AnTablistProps } from './table-list';
 import { L } from '../../utils/langstr';
 
 const styles = (theme: Theme) => ( {

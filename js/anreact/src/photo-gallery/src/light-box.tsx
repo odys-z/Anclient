@@ -5,9 +5,9 @@
  * Modified by Ody Zhou
  */
 import * as React from 'react';
-import {TouchEvent, Touch} from 'react';
+import type {TouchEvent, Touch} from 'react';
 import { AnTreeNode, StreeTier } from '@anclient/semantier';
-import { Comprops, CrudCompW } from '../../react/crud';
+import { type Comprops, CrudCompW } from '../../react/crud';
 import { GalleryView } from '../../react/widgets/gallery-view';
 import { regex } from '../../utils/regex';
 import { AudioBox } from './audio-box';

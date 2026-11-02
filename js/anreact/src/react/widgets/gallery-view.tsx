@@ -7,11 +7,11 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
+import { AnTreeNode, type AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
-import { Comprops, CrudCompW } from '../crud';
-import { ForcedStyle } from '../../photo-gallery/src/photo-ts';
+import { type Comprops, CrudCompW } from '../crud';
+import type { ForcedStyle } from '../../photo-gallery/src/photo-ts';
 import { AlbumReq, MediaCss, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
 
 // const _photos = [];

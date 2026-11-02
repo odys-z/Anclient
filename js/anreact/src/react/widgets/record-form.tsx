@@ -1,8 +1,8 @@
 
-import * as CSS from 'csstype';
+import type * as CSS from 'csstype';
 import React from 'react';
 import { withStyles, gridSize, withWidth } from '../mui-compat';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import clsx from  'clsx';
 
 import Grid from '@mui/material/Grid';
@@ -10,11 +10,11 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import { AnlistColAttrs, PageInf, Semantier, TierCol, TierComboField, Tierec, str_, toBool } from '@anclient/semantier';
+import { type AnlistColAttrs, PageInf, Semantier, type TierCol, type TierComboField, type Tierec, str_, toBool } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
-import { Comprops, CrudCompW } from '../crud';
+import { type Comprops, CrudCompW } from '../crud';
 import { DatasetCombo } from './dataset-combo';
-import { ClassNames, CompOpts, invalidStyles, Media, toReactStyles } from '../anreact';
+import { type ClassNames, type CompOpts, invalidStyles, type Media, toReactStyles } from '../anreact';
 
 const styles = (theme: Theme) => (Object.assign(
 	invalidStyles,

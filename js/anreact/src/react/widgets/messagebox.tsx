@@ -14,10 +14,10 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 
-import QRCode, { QRCodeToDataURLOptions } from 'qrcode'
+import QRCode, { type QRCodeToDataURLOptions } from 'qrcode'
 
 import { L, copyToClipboard } from '../../utils/langstr';
-import { Comprops, CrudComp, CrudCompW } from '../crud';
+import { type Comprops, CrudComp, CrudCompW } from '../crud';
 import { AnContext } from '../reactext';
 
 const styles = theme => ({

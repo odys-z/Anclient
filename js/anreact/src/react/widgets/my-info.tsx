@@ -1,5 +1,5 @@
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles } from '../mui-compat';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -11,10 +11,10 @@ import IconButton from '@mui/material/IconButton';
 import Close from '@mui/icons-material/Close';
 
 import {L} from '../../utils/langstr';
-import { AnContext, AnContextType } from '../reactext';
+import { AnContext, type AnContextType } from '../reactext';
 import { AnTabs, TabPanel } from './tabs';
-import { Comprops, DetailFormW } from '../crud';
-import { DialogProps } from './messagebox';
+import { type Comprops, DetailFormW } from '../crud';
+import type { DialogProps } from './messagebox';
 
 const styles = (_theme: Theme) => ({
   root: {

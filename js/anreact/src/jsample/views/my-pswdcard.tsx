@@ -3,13 +3,13 @@ import { withStyles, withWidth } from '../../react/mui-compat';
 import Button from '@mui/material/Button';
 
 import { L } from '../../utils/langstr';
-import { Semantext, UIComponent } from '@anclient/semantier';
+import type { Semantext, UIComponent } from '@anclient/semantier';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { TRecordForm } from '../../react/widgets/record-form';
 
 import { MyInfTier } from './my-infcard';
-import { Comprops, DetailFormW } from '../../react/crud';
-import { Theme } from '@mui/material/styles';
+import { type Comprops, DetailFormW } from '../../react/crud';
+import type { Theme } from '@mui/material/styles';
 import { invalidStyles } from '../../react/anreact';
 
 const styles = (theme: Theme) => (Object.assign(

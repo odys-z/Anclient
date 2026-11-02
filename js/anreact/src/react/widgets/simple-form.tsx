@@ -12,17 +12,17 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import { AnFieldValidation, AnlistColAttrs, AnsonMsg, AnsonResp,
-	CRUD, NameValue, PkVal, TierCol, TierComboField, Tierec, UpdateReq, str_, toBool
+import { type AnFieldValidation, type AnlistColAttrs, AnsonMsg, AnsonResp,
+	CRUD, type NameValue, type PkVal, type TierCol, type TierComboField, type Tierec, UpdateReq, str_, toBool
 } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-	import { AnContext, AnContextType } from '../reactext';
-	import { Comprops, CrudCompW, DetailFormW } from '../crud';
+	import { AnContext, type AnContextType } from '../reactext';
+	import { type Comprops, CrudCompW, DetailFormW } from '../crud';
 	import { DatasetCombo } from './dataset-combo'
 	import { ConfirmDialog } from './messagebox';
 	import { JsampleIcons } from '../../jsample/styles';
-	import { ClassNames, CompOpts, Media } from '../../react/anreact';
+	import type { ClassNames, CompOpts, Media } from '../../react/anreact';
 
 const styles = (theme) => ({
   root: {

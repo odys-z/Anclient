@@ -1,8 +1,8 @@
 import AES from './aes2';
-import { SessionClient, SessionInf } from './anclient';
+import { SessionClient, type SessionInf } from './anclient';
 import { LangExt } from './common';
 import { isEmpty, size, str } from './helpers';
-import { Tierec } from './semantier';
+import type { Tierec } from './semantier';
 
 /**Callback of CRUD.c/u/d */
 export type OnCommitOk = (resp: AnsonMsg<AnsonResp>) => void

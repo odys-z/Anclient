@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, withWidth } from '../../react/mui-compat';
 
 import Dialog from '@mui/material/Dialog';
@@ -9,10 +9,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 
-import { CRUD, TierCol } from '@anclient/semantier';
+import { CRUD, type TierCol } from '@anclient/semantier';
 
 import { L } from '../../utils/langstr';
-import { Comprops, CrudCompW, DetailFormW } from '../../react/crud';
+import { type Comprops, CrudCompW, DetailFormW } from '../../react/crud';
 import { ConfirmDialog } from '../../react/widgets/messagebox';
 import { TRecordForm } from '../../react/widgets/record-form';
 import { UsersTier } from './users';

@@ -1,4 +1,4 @@
-import { AnsonMsg, AnsonResp, ErrorCtx, Semantext, SessionInf } from '@anclient/semantier';
+import { AnsonMsg, AnsonResp, type ErrorCtx, type Semantext, type SessionInf } from '@anclient/semantier';
 import React from 'react';
 
 import type { AnReact } from './anreact'; // type only: a value import makes a cycle (anreact -> crud -> AnContext)

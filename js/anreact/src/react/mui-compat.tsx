@@ -9,7 +9,7 @@
  * @since 0.8.0
  */
 import React from 'react';
-import { Theme, useTheme, Breakpoint } from '@mui/material/styles';
+import { type Theme, useTheme, type Breakpoint } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { withStyles as tssWithStyles } from 'tss-react/mui';
 

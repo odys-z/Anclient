@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Theme } from '@mui/material/styles';
+import type { Theme } from '@mui/material/styles';
 import { withStyles, withWidth } from '../mui-compat';
 import Box from '@mui/material/Box';
 
 import { gCamera, gCameraViewBox } from './my-icon';
 import { dataOfurl, mimeOf } from '../../utils/file-utils';
-import { DetailFormW, Comprops } from '../crud';
+import { DetailFormW, type Comprops } from '../crud';
 import { invalidStyles } from '../anreact';
 
 const styles = (theme: Theme) => (Object.assign(
@@ -125,4 +125,4 @@ class ImageUploadComp extends DetailFormW<ImageUploadProps> {
 }
 
 const ImageUpload = withWidth()(withStyles(styles)(ImageUploadComp));
-export { ImageUpload, ImageUploadComp, ImageUploadProps };
+export { ImageUpload, ImageUploadComp, type ImageUploadProps };

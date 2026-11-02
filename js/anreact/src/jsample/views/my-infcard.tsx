@@ -3,17 +3,17 @@ import { withStyles, withWidth } from '../../react/mui-compat';
 import Button from '@mui/material/Button';
 
 import { Protocol, CRUD,
-	InsertReq, DeleteReq, AnsonResp, Semantier, Tierec, AnlistColAttrs, PageInf,
-	OnCommitOk, OnLoadOk, SessionInf, UIComponent, str
+	InsertReq, DeleteReq, AnsonResp, Semantier, type Tierec, type AnlistColAttrs, PageInf,
+	type OnCommitOk, type OnLoadOk, type SessionInf, type UIComponent, str
 } from '@anclient/semantier';
 import { L } from '../../utils/langstr';
 import { dataOfurl, urlOfdata } from '../../utils/file-utils';
-import { AnContext, AnContextType } from '../../react/reactext';
+import { AnContext, type AnContextType } from '../../react/reactext';
 import { ConfirmDialog } from '../../react/widgets/messagebox'
 import { TRecordForm } from '../../react/widgets/record-form';
 import { ImageUpload } from '../../react/widgets/image-upload';
-import { Comprops, DetailFormW } from '../../react/crud';
-import { CompOpts } from '../../an-components';
+import { type Comprops, DetailFormW } from '../../react/crud';
+import type { CompOpts } from '../../an-components';
 
 const styles = theme => ({
 	actionButton: { marginTop: theme.spacing(2) }
@@ -261,4 +261,4 @@ export class MyInfTier extends Semantier {
 	}
 }
 
-export { MyInfCard, MyInfCardComp, MyInfProps };
+export { MyInfCard, MyInfCardComp, type MyInfProps };

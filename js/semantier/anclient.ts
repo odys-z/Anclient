@@ -1,14 +1,14 @@
 
 /**The lower API of jclient/js */
 
-import * as $ from 'jquery';
+import $ from 'jquery';
 import AES2 from './aes2';
 import {
 	Protocol, AnsonMsg, AnsonResp, AnSessionResp, DatasetierReq, AnSessionReq, QueryReq,
-	UpdateReq, InsertReq, AnsonBody, DatasetierResp, JsonOptions, LogAct, PageInf,
-	OnCommitOk, OnLoadOk, CRUD, PkVal, NV, NameValue, isNV, OnLoginOk
+	UpdateReq, InsertReq, AnsonBody, DatasetierResp, type JsonOptions, type LogAct, PageInf,
+	type OnCommitOk, type OnLoadOk, CRUD, type PkVal, type NV, type NameValue, isNV, type OnLoginOk
 } from './protocol';
-import { ErrorCtx, Tierec, isEmpty, len } from './semantier';
+import { type ErrorCtx, type Tierec, isEmpty, len } from './semantier';
 
 export * from './stree-tier';
 

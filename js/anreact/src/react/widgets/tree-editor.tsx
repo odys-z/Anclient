@@ -1,28 +1,28 @@
-import React, {ReactNode} from "react";
+import React, {type ReactNode} from "react";
 
-import { withStyles, gridSize, withWidth, Color, Alignment } from '../mui-compat';
+import { withStyles, gridSize, withWidth, type Color, type Alignment } from '../mui-compat';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 
-import { CRUD, AnTreeNode, AnlistColAttrs, removeNode,
-	toBool, IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, IndentIcons, AnsonResp
+import { CRUD, AnTreeNode, type AnlistColAttrs, removeNode,
+	toBool, type IndentName, defltIcons, StreeTier, AnsonMsg, AnDatasetResp, type IndentIcons, AnsonResp
 } from "@anclient/semantier";
 
-import { GalleryView, lightboxFomatter as lightboxFormatter } from "./gallery-view";
-import { Theme } from '@mui/material/styles';
-import { AnTablistProps } from "./table-list";
+import { GalleryView, type lightboxFomatter as lightboxFormatter } from "./gallery-view";
+import type { Theme } from '@mui/material/styles';
+import type { AnTablistProps } from "./table-list";
 import { CrudCompW, DetailFormW } from "../crud";
 import { swap } from "../../utils/lang-ext";
-import { AnReactExt, ClassNames, CompOpts, Media, hide } from "../anreact";
+import { AnReactExt, type ClassNames, type CompOpts, type Media, hide } from "../anreact";
 import { JsampleIcons } from "../../jsample/styles";
-import { AnContext, AnContextType } from "../reactext";
+import { AnContext, type AnContextType } from "../reactext";
 import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
-import { icon, levelIcons, AnTreegridCol, TreeItemProps, AnreactreeItem, TreeNodeVisual } from "./tree";
+import { icon, levelIcons, type AnTreegridCol, type TreeItemProps, type AnreactreeItem, TreeNodeVisual } from "./tree";
 import { AnTreegridComp } from "./treegrid";
 
 export const treeditorStyles = (theme: Theme) => ({
