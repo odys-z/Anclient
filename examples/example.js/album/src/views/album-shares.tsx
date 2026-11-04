@@ -7,7 +7,11 @@ import { AnReactExt,
 	Comprops,
 	ExternalHosts} from '@anclient/anreact';
 import QRCode from 'react-qr-code';
-import { Card, CardActionArea, Typography, Grid, Paper } from '@material-ui/core';
+import Card from '@mui/material/Card';
+import CardActionArea from '@mui/material/CardActionArea';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import { IcoDownloadApk, IcoLoginAlbum } from '../icons/android';
 import { formatJservQr } from '../tiers/synode-utils';
 
@@ -124,8 +128,8 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
 	render() {
 	  return (
-	  <Grid container alignContent="flex-end" alignItems='stretch' style={{"marginTop": "5em"}} >
-		<Grid item md={4} xs={12} sm={12} >
+	  <Grid container sx={{alignContent: "flex-end", alignItems: "stretch"}} style={{"marginTop": "5em"}} >
+		<Grid size={{xs: 12, sm: 12, md: 4}} >
 		<Paper style={{"height": 200}}>
 	  	<Typography variant="h6" color='primary' gutterBottom>Download APK</Typography>
 		{ this.apk_web &&
@@ -138,7 +142,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 		</Paper>
 		</Grid>
 
-		<Grid item md={4} xs={12} sm={12} >
+		<Grid size={{xs: 12, sm: 12, md: 4}} >
 		<Paper style={{"height": 200}}>
 		<Typography variant='h6' color='primary' gutterBottom>Login on Android.</Typography>
 		<Card style={{'position': 'absolute'}}>

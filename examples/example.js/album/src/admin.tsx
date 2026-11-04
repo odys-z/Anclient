@@ -1,9 +1,8 @@
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { createRoot } from 'react-dom/client';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 
-import { StandardProps } from '@material-ui/core';
 
 import { Protocol, SessionClient, ErrorCtx, 
 	AnsonMsg, AnsonResp, an} from '@anclient/semantier';
@@ -19,7 +18,9 @@ import { AlbumDocview } from './views/album-docview';
 
 const {Roles} = jsample;
 
-interface Approps extends StandardProps<any, string> {
+/** MUI 4's StandardProps, removed since MUI 5 */
+interface Approps {
+	[p: string]: any;
 	iwindow: Window;
 	servs: JsonHosts;
 	servId?: string;
@@ -193,9 +194,9 @@ class Admin extends React.Component<Approps> {
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions & {client: SessionClient}, json: JsonHosts) {
 			let portal = opts.portal || 'index.html';
-			let dom = document.getElementById(elem);
-			ReactDOM.render(<Admin client={opts.client} servs={json} servId={opts.serv}
-								   iportal={portal} iwindow={window}/>, dom);
+			createRoot(document.getElementById(elem) as HTMLElement).render(
+				<Admin client={opts.client} servs={json} servId={opts.serv}
+					   iportal={portal} iwindow={window}/>);
 		}
 		
 		function login(elem: string, opts: AnreactAppOptions, json: JsonHosts) {

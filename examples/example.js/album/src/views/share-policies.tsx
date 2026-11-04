@@ -1,14 +1,15 @@
 import React, { ReactNode } from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 
 import { Protocol, Inseclient, PageInf, Tierec, AnTreeNode, size } from '@anclient/semantier';
 import { AnContext, CrudCompW, 
     JsonHosts, AnTablistProps, AnTreeditor, AnError, L, AnContextType, 
-    CompOpts, AnTreegridCol, AnTreegrid, jsample
+    CompOpts, AnTreegridCol, AnTreegrid, jsample, withStyles, withWidth, gridSize
 } from '@anclient/anreact';
 
-import { Button, Grid, Theme, withWidth } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import type { Theme } from '@mui/material/styles';
 import { AlbumEditier } from '../tiers/album-tier';
 import { DocIcon } from '../icons/doc-ico';
 import { SharePolicyDetails } from './share-policy-details';
@@ -95,7 +96,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
                     grid: {xs: false, sm: 3, md: 2} },
                   { type: 'text', field: 'filesize', label: L('size'), 
                     grid: {xs: false, sm: 2, md: 2},
-                      colFormatter: (_col, n, opts) => {return (
+                      colFormatter: (_col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts & {colx: number}) => {return (
                         <Button key={`${n.id}.${opts?.colx}`}
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -164,7 +165,7 @@ class SharePoliciesComp extends CrudCompW<SharePolicyProps> {
 		let media = CrudCompW.getMedia(width);
 
 		return (
-          <Grid key={`th-${colx}`} item {...col.grid} className={classes?.treeCell}>
+          <Grid key={`th-${colx}`} size={gridSize(col.grid)} className={classes?.treeCell}>
             { this.state.preview ?
 			  <Button onClick={this.toggle}
 				startIcon={<JsampleIcons.Search />} color="primary" >

@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { Protocol, SessionClient, AnsonResp, AnsonMsg, ErrorCtx } from '@anclient/semantier';
 
@@ -8,7 +8,7 @@ import { L, Langstrs,
 	AnTreeditor, Comprops, CrudCompW, ConfirmDialog
 } from '@anclient/anreact';
 import { AlbumEditier } from './tiers/album-tier';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 
 type AlbumProps = {
 	servs: JsonHosts;
@@ -145,14 +145,13 @@ export class Admin extends CrudCompW<AlbumProps & Comprops> {
 		AnReactExt.bindDom(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: JsonHosts) {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(
+			createRoot(document.getElementById(elem) as HTMLElement).render(
 			  <Admin
 				servs={json} servId={opts.serv || 'host'}
 				orgId={org}
 				ihome='index.html'
 				iportal={portal} iwindow={window}
-			  />, dom);
+			  />);
 		}
 	}
 }

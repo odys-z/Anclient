@@ -1,6 +1,6 @@
 import React from 'react';
-import FlipCameraIosIcon from '@material-ui/icons/FlipCameraIos';
-import FolderSharedIcon from '@material-ui/icons/FolderShared';
+import FlipCameraIosIcon from '@mui/icons-material/FlipCameraIos';
+import FolderSharedIcon from '@mui/icons-material/FolderShared';
 
 import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
@@ -8,14 +8,15 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 import { L, AnError, AnReactExt, Lightbox, PdfIframe,
 	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops,
-	PdfView
+	PdfView, gridSize
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
-import { Button, Grid } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 import { DocIcon } from '../icons/doc-ico';
 import { ConnectionDetails } from './album-doconn-details';
-import Alert from '@material-ui/lab/Alert';
-import AlertTitle from '@material-ui/lab/AlertTitle';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 interface AlbumDocProps extends Comprops {
 	synuri: string
@@ -36,6 +37,9 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	albumsk = 'tree-album-family-folder';
 	doctreesk = 'tree-docs-folder';
 	synuri = '/album/syn';
+
+	/** React 19's types have Component.context: unknown */
+	get ctx() { return this.context as AnContextType; }
 
 	/**
 	 * The entity table name updated each time loaded a tree.
@@ -107,13 +111,13 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 					that.setState({showingSynode: false});
 				});
 			}},
-			this.context.error);
+			this.ctx.error);
 	}
 
 	switchDocMedias (col: AnTreegridCol, ix: number, opts: {classes?: ClassNames, media?: Media} | undefined) {
 		let that = this;
 		return (
-		  <Grid item key={ix as number} {...col.grid}>
+		  <Grid key={ix as number} size={gridSize(col.grid)}>
 			<Button onClick={toToggleView}
 				className={opts?.classes?.toggle}
 				startIcon={that.state.showingDocs ? <FolderSharedIcon style={{ fontSize: 30 }}/> : <FlipCameraIosIcon style={{ fontSize: 30 }}/>}
@@ -159,20 +163,20 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 					let pdfsrc = GalleryView.imgSrcReq(file?.id, this.docTabl, {...this.tier, docuri: () => synuri });
 					let close = (_e: any) => {
 								this.pdfview = undefined;
-								this.context.onFullScreen(false);
+								this.ctx.onFullScreen?.(false);
 								this.setState({});
 							} 
-					this.pdfview = ( this.context && this.context.clientOpts && this.context.clientOpts.legacyPDF
+					this.pdfview = ( this.ctx && this.ctx.clientOpts && this.ctx.clientOpts.legacyPDF
 						? <PdfView src={pdfsrc} close={close}
 							pdfjs='pdfjs-legacy/pdf.mjs'
 							worksrc='pdfjs-legacy/pdf.worker.mjs'
 							cMapUrl='pdfjs-legacy/cmaps/'/>
 						: <PdfIframe src={pdfsrc} close={close} />);
-					this.context.onFullScreen(true);
+					this.ctx.onFullScreen?.(true);
 				}
 				else {
 					this.pdfview = undefined;
-					this.context.error.onError( L('Type {t} is not supported yet.', {t}), undefined);
+					this.ctx.error.onError( L('Type {t} is not supported yet.', {t}), undefined as any);
 				}
 			}
 		}
@@ -188,7 +192,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 	  return (<>
 	  	{ this.state.showingSynode &&
 	  	  <Alert severity="success" onClose={() => {that.setState({showingSynode: false});}}>
-			<AlertTitle>{`Service ID: ${that?.context.servId}`}</AlertTitle>
+			<AlertTitle>{`Service ID: ${that?.ctx.servId}`}</AlertTitle>
 		  </Alert>}
 
 		{ this.tier && (
@@ -206,7 +210,7 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				  style: {textAlign: 'center', paddingRight: '1em'} },
 				{ type: 'text',    field: 'filesize',label: L('size'),        grid: {xs: 1, sm: 2, md: 2},
 				  style: {textAlign: 'right', paddingRight: '1em'}, thFormatter: this.switchDocMedias,
-				  colFormatter: (col, n, opts) => opts?.media?.isMd ? <span>{n.node.filesize}</span> : <></>}
+				  colFormatter: (_col: AnTreegridCol, n: AnTreeNode, opts?: CompOpts) => opts?.media?.isMd ? <span>{n.node.filesize as React.ReactNode}</span> : <></>}
 			]}
 			onSelectChange={this.viewFile}
 		  /> :

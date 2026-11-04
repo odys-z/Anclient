@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { Protocol, AnsonResp, AnsonMsg, 
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
@@ -12,6 +12,7 @@ import { Langstrs, AnContext, AnContextType, AnReactExt,
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
+import { AlbumDoctree } from './views/album-doctree';
 
 type AlbumProps = {
 	servs: ExternalHosts;
@@ -95,6 +96,7 @@ export class App extends CrudCompW<AlbumProps> {
 		SysComp.extendLinks( [
 			{path: '/home', comp: AlbumDocview},
 			{path: '/share', comp: AlbumShares},
+			{path: '/doctree', comp: AlbumDoctree},
 		] );
 	}
 
@@ -224,12 +226,12 @@ export class App extends CrudCompW<AlbumProps> {
 			cleanup (that);
 		}
 		finally {
-			this.context.anClient = undefined;
+			(this.context as AnContextType).anClient = undefined as any;
 			this.ssclient = undefined;
 		}
 
 		function cleanup(app: App) {
-			if (app.context.anClient)
+			if ((app.context as AnContextType).anClient)
 				localStorage.setItem(SessionClient.ssInfo, null as any);
 			if (app.props.iwindow)
 				app.props.iwindow.location = that.props.iportal || "#";
@@ -259,12 +261,12 @@ export class App extends CrudCompW<AlbumProps> {
 		AnReactExt.loadServs(elem, opts, onJsonServ);
 
 		function onJsonServ(elem: string, opts: AnreactAppOptions, json: ExternalHosts) {
-			let dom = document.getElementById(elem);
-			ReactDOM.render(
+			// React 19: createRoot(), ReactDOM.render() is removed
+			createRoot(document.getElementById(elem) as HTMLElement).render(
 			  <App servs={json} servId={opts.serv || 'album'} clientOpts={clientOpts}
 				aid={aid} iportal={portal} login={login} iwindow={window}
 				userid={uid} passwd={pswd}
-			  />, dom);
+			  />);
 		}
 	}
 }

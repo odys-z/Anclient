@@ -1,10 +1,24 @@
 let path = require('path')
-let webpack = require('webpack')
+
+/**
+ * node_modules of this folder and its parents, the way Node looks up from here (as registry.ts).
+ * Absolute paths, so the linked sources, @anclient/*, resolve their imports here too, never in
+ * their own node_modules: one copy of each package, e.g. React.
+ */
+function upwardModules(dir) {
+	let dirs = [];
+	for (;;) {
+		dirs.push(path.join(dir, 'node_modules'));
+		let parent = path.dirname(dir);
+		if (parent === dir) return dirs;
+		dir = parent;
+	}
+}
 
 // v is used in js code?
 let v = 'development'; // "production" | "development" | "none"
 
-let version = "0.4.3";
+let version = "0.5.0";
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -25,46 +39,44 @@ module.exports = {
 	},
 
 	plugins: [
-		new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()
+		new BundleAnalyzerPlugin({analyzerMode: 'static', openAnalyzer: false}), new CompressionPlugin()
 	],
 
 	watch: false,
 
-	externals: {
-		'react': 'React',
-		'react-dom' : 'ReactDOM',
-
-		/**
-		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.min.css">
-		 * <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.min.css">
-		 * <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
-		 * <!-- If using ag-Grid Enterprise: -->
-		 * <script src="https://cdn.jsdelivr.net/npm/ag-grid-enterprise/dist/ag-grid-enterprise.min.js"></script>
-		 */
-		'ag-grid-community': 'agGrid',
-	},
+	/** React is bundled: React 19 has no UMD builds for <script> tags. */
 
 	resolve: {
-		extensions: ['.*', '.ts', '.js', '.jsx', '.tsx']
+		extensions: ['.*', '.ts', '.js', '.jsx', '.tsx'],
+		modules: upwardModules(__dirname),
 	},
 
 	module: {
 		rules: [
 		{   test: /\.jsx?$/,
+			exclude: /node_modules/,
 			loader: 'babel-loader',
 			options: {
 			  presets: ['@babel/preset-react', '@babel/preset-env'] }
 		},
+		// no exclude: compiles the TS sources of @anclient/* and semantic-doc (from its tarball)
 		{ test: /\.tsx?$/,
 		  loader : 'babel-loader',
+		  // presets run last to first: TypeScript strips semantic-doc's `declare` fields
+		  // before preset-env transforms class fields
 		  options: { presets: [
+				'@babel/preset-env',
 				'@babel/preset-react',
-				'@babel/preset-typescript',
 				'@emotion/babel-preset-css-prop',
-				'@babel/preset-env' ] }
+				['@babel/preset-typescript', { allowDeclareFields: true }] ] }
 		},
 		{   test: /\.css$/,
 			use : ["style-loader", "css-loader"]
+		},
+		// KaTeX fonts, for the doc-tree editor's formulas
+		{   test: /\.(woff2?|ttf)$/,
+			type: 'asset/resource',
+			generator: { filename: 'fonts/[name][ext]' }
 		},
 		{   test: /\.svg$/,
 			use : [ { loader: "babel-loader" },

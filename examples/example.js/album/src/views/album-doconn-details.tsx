@@ -1,18 +1,16 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import { Theme } from '@material-ui/core';
+import type { Theme } from '@mui/material/styles';
 
 import { CRUD, Protocol } from '@anclient/semantier';
 
-import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree } from '@anclient/anreact'
+import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree, withStyles, withWidth } from '@anclient/anreact'
 import { AlbumEditier } from '../tiers/album-tier';
 const {JsampleIcons} = jsample;
 

@@ -1,21 +1,19 @@
 import React from 'react';
-import withStyles from "@material-ui/core/styles/withStyles";
-import withWidth from "@material-ui/core/withWidth";
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import ViewQuiltIcon from '@material-ui/icons/ViewQuilt'
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import ViewQuiltIcon from '@mui/icons-material/ViewQuilt'
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
-import { Theme } from '@material-ui/core';
+import type { Theme } from '@mui/material/styles';
 
 import { CRUD, Protocol, Tierec, AnlistColAttrs, DbCol } from '@anclient/semantier';
 
-import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree,
+import { L, AnContext, jsample, Comprops, DetailFormW, ConfirmDialog, AnRelationTree, withStyles, withWidth,
 	TRecordForm, Media, ClassNames } from '@anclient/anreact'
 import { AlbumEditier, Share } from '../tiers/album-tier';
 const {JsampleIcons} = jsample;

@@ -3,14 +3,18 @@
 Compare the @anclient/* packages a project builds with against their sources in this
 repository (Anclient/js/<package>), and open the differences in VS Code.
 
+Temporarily also semantic-doc, the doc-tree editor, until it moves into anreact: album installs
+it from its tarball (album/node_modules/semantic-doc, a copy), compared with its sources,
+github/semantic-doc/src (--sdoc-src). It is listed only for the projects that install it.
+
 Projects can use @anclient/* from different locations, and different versions:
-    album/node_modules/@anclient/*          its own npm install (each project installs its own;
+    <project>/node_modules/@anclient/*      its own npm install, a copy (each project installs its own;
                                             example.js/node_modules has no @anclient/* since 0.8.0)
-    a symlink to the sources                npm link / "file:" dependencies (registry.ts)
+    a symlink to the sources                npm link / "file:" dependencies (album, registry.ts)
     ../../js/anreact                        the sources, aliased in webpack.config.js
 
-Release lines: anreact 0.7.x (React 17, MUI 4, ag-grid: album, north-star, curriculum) and
-0.8.x (React 19, MUI 9: registry.ts, the sources). A copy of another release line than the
+Release lines: anreact 0.7.x (React 17, MUI 4, ag-grid: north-star, curriculum) and
+0.8.x (React 19, MUI 9: album, registry.ts, the sources). A copy of another release line than the
 sources is marked, and can be compared, but s / u won't copy files between them: that would
 break the receiving side. Compare it with a checkout of its own release line instead, e.g.
     git worktree add /tmp/anclient-0.7 <commit of 0.7.x>
@@ -23,6 +27,8 @@ Usage (in examples/example.js):
     python3 diff-anclient.py                 list the projects and their @anclient locations, pick one
     python3 diff-anclient.py album           compare album's @anclient/* with the sources
     python3 diff-anclient.py album -p anreact
+    python3 diff-anclient.py album -p semantic-doc
+    python3 diff-anclient.py album --sdoc-src ~/github/semantic-doc/src
     python3 diff-anclient.py --src ~/github/anclient/js
     python3 diff-anclient.py -h
 
@@ -55,6 +61,13 @@ into the source (and publish it). A copy that is a symlink to the source (npm li
 dependencies, e.g. registry.ts) is the source itself; then the shadowed copy, if any, e.g.
 an older install, is compared instead.
 
+Versions: a copy (not a link to the source) older than its source, of the same release line, is
+marked "source is newer", with the bash commands to pack the source and install the tarball, e.g.
+    (cd ../../../semantic-doc/src && npm run pack)
+    (cd album && npm install ../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.1.tgz)
+For semantic-doc the commands are also printed when the version is the same but files differ:
+the tarball is out of date (repack, then reinstall: npm checks the tarball's integrity).
+
 Files only in one side are opened with `code <file>`. Without VS Code's `code` command
 on PATH, the unified diff is printed instead. Line endings are ignored.
 """
@@ -68,7 +81,14 @@ import subprocess
 import sys
 
 here = os.path.dirname(os.path.abspath(__file__))
-packages = ['anreact', 'semantier']
+packages = ['anreact', 'semantier', 'semantic-doc']
+
+# npm names; semantic-doc: TEMP, until the doc-tree editor moves into anreact
+npm_names = {'anreact': '@anclient/anreact', 'semantier': '@anclient/semantier', 'semantic-doc': 'semantic-doc'}
+# listed only for the projects that install them
+optional = {'semantic-doc'}
+# package -> its source folder, set by main()
+sources = {}
 
 skip_dirs = {'node_modules', '.git', 'dist', 'ts', 'test', 'tests', '.vscode', '__pycache__'}
 skip_files = {'package-lock.json', '.DS_Store'}
@@ -77,12 +97,12 @@ skip_files = {'package-lock.json', '.DS_Store'}
 # ---------------------------------------------------------------- locations
 
 def pkg_root(path: str, pkg: str):
-    """The folder with package.json of @anclient/<pkg>, at or above path (an alias can name a file)."""
+    """The folder with package.json of the package, at or above path (an alias can name a file)."""
     folder = path if os.path.isdir(path) else os.path.dirname(path)
     while True:
         try:
             with open(os.path.join(folder, 'package.json'), encoding='utf-8') as f:
-                if json.load(f).get('name') == f'@anclient/{pkg}':
+                if json.load(f).get('name') == npm_names[pkg]:
                     return folder
         except (OSError, ValueError):
             pass
@@ -101,7 +121,8 @@ def webpack_aliases(project: str) -> dict:
     if not os.path.isfile(cfg):
         return {}
     with open(cfg, encoding='utf-8') as f:
-        if '@anclient/' not in f.read():
+        cfg_js = f.read()
+        if '@anclient/' not in cfg_js and 'semantic-doc' not in cfg_js:
             return {}
     node = shutil.which('node')
     if not node:
@@ -119,10 +140,10 @@ def webpack_aliases(project: str) -> dict:
 
 
 def node_chain(pkg: str, project: str) -> list:
-    """node_modules/@anclient/<pkg> in the project folder and its parents, nearest first."""
+    """node_modules/<npm name> in the project folder and its parents, nearest first."""
     found, folder = [], os.path.abspath(project)
     while True:
-        p = os.path.join(folder, 'node_modules', '@anclient', pkg)
+        p = os.path.join(folder, 'node_modules', *npm_names[pkg].split('/'))
         if os.path.isdir(p):
             found.append(p)
         parent = os.path.dirname(folder)
@@ -153,8 +174,8 @@ def locate(pkg: str, project: str):
     """
     alias = webpack_aliases(project)
     chain = [Location(pkg, p, 'node_modules') for p in node_chain(pkg, project)]
-    if f'@anclient/{pkg}' in alias:
-        return Location(pkg, pkg_root(alias[f'@anclient/{pkg}'], pkg), 'alias'), chain, None
+    if npm_names[pkg] in alias:
+        return Location(pkg, pkg_root(alias[npm_names[pkg]], pkg), 'alias'), chain, None
     note = f'webpack.config.js not read: {alias["?"]}' if '?' in alias else None
     return (chain[0] if chain else None), chain[1:], note
 
@@ -176,6 +197,65 @@ def line_note(pkg_dir: str, source: str) -> str:
     return '' if a == b else f'({a}.x, source {b}.x)'
 
 
+def semver(v: str) -> tuple:
+    """Comparable version: 0.8.0 -> (0, 8, 0, 1); a pre-release, 0.8.0-beta.1 -> (0, 8, 0, 0)."""
+    core, _, pre = v.partition('-')
+    nums = []
+    for x in core.split('.')[:3]:
+        nums.append(int(x) if x.isdigit() else 0)
+    return tuple(nums + [0] * (3 - len(nums))) + (0 if pre else 1,)
+
+
+def source_newer(copy_dir: str, source: str) -> bool:
+    """The source's version is newer than the copy's."""
+    a, b = version(copy_dir), version(source)
+    return '?' not in (a, b) and semver(b) > semver(a)
+
+
+def tarball(pkg: str, source: str) -> str:
+    """Path of the tarball npm pack makes for the source's version."""
+    if pkg == 'semantic-doc':
+        # npm run pack in semantic-doc/src: npm pack --pack-destination dist-pack
+        return os.path.join(source, 'dist-pack', f'semantic-doc-{version(source)}.tgz')
+    # npm pack of a scoped package: @anclient/anreact -> anclient-anreact-<version>.tgz
+    return os.path.join(source, f'{npm_names[pkg][1:].replace("/", "-")}-{version(source)}.tgz')
+
+
+def update_commands(pkg: str, copy: 'Location', source: str, project: str, files_differ=False) -> list:
+    """
+    Bash commands bringing the project's copy up to the source: pack the source, install the tarball.
+    :return: [] if the copy is a link to the source, of another release line, or not older
+             (for semantic-doc: also when the same version has differing files)
+    """
+    if copy.is_source(source) or line_note(copy.path, source):
+        return []
+    if not source_newer(copy.path, source) and not (pkg == 'semantic-doc' and files_differ):
+        return []
+    tgz = os.path.relpath(tarball(pkg, source), project)
+    pack = 'npm run pack' if pkg == 'semantic-doc' else 'npm pack'
+    cmds = [f'(cd {os.path.relpath(source)} && {pack})',
+            f'(cd {os.path.relpath(project)} && npm install {tgz})']
+    if pkg == 'semantic-doc' and source_newer(copy.path, source):
+        cmds.append(f'# then in {os.path.relpath(project)}/package.json, scripts.install-sdoc: '
+                    f'npm install {tgz}')
+    elif pkg != 'semantic-doc':
+        cmds.append(f'# or, once published: (cd {os.path.relpath(project)} && '
+                    f'npm install {npm_names[pkg]}@{version(source)})')
+    return cmds
+
+
+def print_commands(pkg: str, copy: 'Location', source: str, project: str, files_differ=False, indent=4):
+    cmds = update_commands(pkg, copy, source, project, files_differ)
+    if not cmds:
+        return
+    pad = ' ' * indent
+    why = (f'source is newer, {version(copy.path)} -> {version(source)}' if source_newer(copy.path, source)
+           else 'same version, files differ: the tarball is out of date')
+    print(f'{pad}{why}; to update the copy:')
+    for c in cmds:
+        print(f'{pad}    {c}')
+
+
 def version(pkg_dir: str) -> str:
     try:
         with open(os.path.join(pkg_dir, 'package.json'), encoding='utf-8') as f:
@@ -193,19 +273,27 @@ def projects_here() -> list:
 def overview(src_root: str):
     names = projects_here()
     print(f'Sources: {src_root}  ' +
-          '  '.join(f'{p} {version(os.path.join(src_root, p))}' for p in packages))
+          '  '.join(f'{p} {version(sources[p])}' for p in packages if p not in optional))
+    for p in optional:
+        print(f'         {p} {version(sources[p])}  {sources[p]}')
     for i, name in enumerate(names, 1):
         print(f'\n{i:3}  {name}')
         for pkg in packages:
             used, shadowed, note = locate(pkg, os.path.join(here, name))
-            source = os.path.join(src_root, pkg)
+            source = sources[pkg]
+            if used is None and pkg in optional:
+                continue
             if used is None:
-                print(f'       {pkg:10} not found{"  (" + note + ")" if note else ""}')
+                print(f'       {pkg:12} not found{"  (" + note + ")" if note else ""}')
                 continue
             note = line_note(used.path, source)
-            print(f'       {pkg:10} {version(used.path):8} {used.label(source)}{"  " + note if note else ""}')
+            if not note and not used.is_source(source) and source_newer(used.path, source):
+                note = f'(source is newer: {version(source)})'
+            print(f'       {pkg:12} {version(used.path):8} {used.label(source)}{"  " + note if note else ""}')
+            if not used.is_source(source):
+                print_commands(pkg, used, source, os.path.join(here, name), indent=20)
             for s in shadowed:
-                print(f'       {"":10} {version(s.path):8} {s.label(source)}  (shadowed)')
+                print(f'       {"":12} {version(s.path):8} {s.label(source)}  (shadowed)')
     return names
 
 
@@ -262,20 +350,23 @@ def scan(project: str, pkgs, src_root, pairs=None):
     other_lines.clear()
     print(f'\nProject {os.path.relpath(project)}')
     for pkg in pkgs:
-        source = os.path.join(src_root, pkg)
+        source = sources[pkg]
         used, shadowed, note = locate(pkg, project)
+        if used is None and pkg in optional:
+            continue
         if not os.path.isdir(source):
-            print(f'@anclient/{pkg}: source {source} not found, use --src <Anclient/js>.')
+            print(f'{npm_names[pkg]}: source {source} not found, use '
+                  f'{"--sdoc-src <semantic-doc/src>" if pkg == "semantic-doc" else "--src <Anclient/js>"}.')
             continue
         if used is None:
-            print(f'@anclient/{pkg}: not found by webpack alias or node_modules'
+            print(f'{npm_names[pkg]}: not found by webpack alias or node_modules'
                   f'{" (" + note + ")" if note else ""}.')
             continue
         left = used
         if used.is_source(source):
             # built from the sources: nothing to compare, unless an installed copy is shadowed
             others = [s for s in shadowed if not s.is_source(source)]
-            print(f'\n@anclient/{pkg}  built from the source: {used.label(source)}')
+            print(f'\n{npm_names[pkg]}  built from the source: {used.label(source)}')
             if not others:
                 continue
             left = others[0]
@@ -285,8 +376,8 @@ def scan(project: str, pkgs, src_root, pairs=None):
             pairs.append((left.real, os.path.realpath(source)))
         r = compare(left.path, source)
         side = 'used  ' if left is used else 'copy  '
-        print(f'\n@anclient/{pkg}  {side} {version(left.path):8} {left.label(source)}\n'
-              f'{" " * (len(pkg) + 11)}source {version(source):8} {os.path.relpath(source)}')
+        print(f'\n{npm_names[pkg]}  {side} {version(left.path):8} {left.label(source)}\n'
+              f'{" " * (len(npm_names[pkg]) + 2)}source {version(source):8} {os.path.relpath(source)}')
         note = line_note(left.path, source)
         if note:
             other_lines[pkg] = note
@@ -294,6 +385,7 @@ def scan(project: str, pkgs, src_root, pairs=None):
                   f'    Compare with a checkout of {release_line(version(left.path))}.x, see --src (-h).')
         if not r:
             print('    identical')
+        print_commands(pkg, left, source, project, files_differ=bool(r))
         rows += [(pkg,) + x for x in r]
 
     labels = {'M': 'modified', 'I': 'used only', 'S': 'source only'}
@@ -393,7 +485,8 @@ def main():
         description='Diff the @anclient/* a project builds with against Anclient/js sources, in VS Code.')
     ap.add_argument('project', nargs='?', help='project folder, e.g. album; default: list the projects here')
     ap.add_argument('-p', '--packages', nargs='+', default=packages, choices=packages,
-                    help='packages under @anclient, default: anreact semantier')
+                    help='packages, default: anreact semantier, and semantic-doc where installed')
+    ap.add_argument('--sdoc-src', help='semantic-doc package sources, default: github/semantic-doc/src next to Anclient')
     ap.add_argument('--src', help='folder of the package sources, default: Anclient/js of this checkout')
     args = ap.parse_args()
 
@@ -401,6 +494,10 @@ def main():
                os.path.normpath(os.path.join(here, '..', '..', 'js'))
     if not os.path.isdir(src_root):
         sys.exit(f'Cannot find {src_root}, use --src <path to Anclient/js>.')
+    for p in packages:
+        sources[p] = os.path.join(src_root, p)
+    sources['semantic-doc'] = os.path.abspath(os.path.expanduser(args.sdoc_src)) if args.sdoc_src else \
+                              os.path.normpath(os.path.join(here, '..', '..', '..', 'semantic-doc', 'src'))
 
     project = args.project
     if not project:
