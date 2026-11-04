@@ -67,7 +67,8 @@ export class App extends CrudCompW<AlbumProps> {
 
 	portfolioMenu = [
 		{node: {funcId: 'home-list', id: 'home-list', funcName: "Welcome", text: '', url: '/home', css: {icon: 'home'}, sort: 0}},
-		{node: {funcId: 'shares', id: 'shares', funcName: "Share Resource", text: '', url: '/share', css: {icon: 'share'}, sort: 1}} ];
+		{node: {funcId: 'shares', id: 'shares', funcName: "Share Resource", text: '', url: '/share', css: {icon: 'share'}, sort: 1}},
+		{node: {funcId: 'doctree', id: 'doctree', funcName: "Doc Tree", text: '', url: '/doctree', css: {icon: 'paper'}, sort: 2}} ];
 
 	/**
 	 * Restore session from window.localStorage

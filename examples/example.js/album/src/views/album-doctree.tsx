@@ -1,72 +1,94 @@
 import React from 'react';
 import 'katex/dist/katex.min.css'; // the host provides KaTeX CSS for the editor's formulas
 
-import { AnDoctreeditor, DocKind, type DocCols, type DoctreeResp, type DoctreeTier,
-	type DocTreeNode, type OnErr, type OnOk, type TreeModify } from 'semantic-doc/doctree';
+import { AnDoctreeditor, locate, type DocCols, type DoctreeResp, type DoctreeTier,
+	type OnErr, type OnOk, type TreeModify } from 'semantic-doc/doctree';
 import { Comprops } from '@anclient/anreact';
 
 /**
- * Stands in for the synode's doc-tree tier (port doctree, doctree.jserv) until the doc json
- * is wired up: one empty doc, held in this page. Text edits are kept here; structure changes
- * and commits are refused.
+ * Urls of the test docs, copied from semantic-doc/src/demo/jsons into web-dist/res-vol/doctree.
+ * Relative to the page, like res-vol/lang.json in app.tsx.
  */
-class PlaceholderDoctier implements DoctreeTier {
-	static readonly docId = 'new-doc';
-
-	private resp: DoctreeResp = {
-		doc: { docId: PlaceholderDoctier.docId, title: 'Untitled', creator: '' },
-		root: null,
-		forest: [ node(PlaceholderDoctier.docId, undefined, DocKind.doc, '01', [
-				node('p-1', PlaceholderDoctier.docId, DocKind.p, '01.01') ]) ],
-	};
-
-	tree(_docId: string, ok: OnOk, _err?: OnErr) {
-		ok(clone(this.resp));
-	}
-
-	update(_docId: string, n: DocCols, ok: OnOk, _err?: OnErr) {
-		let t = find(this.resp.forest || [], n.nid);
-		if (t) Object.assign(t.node, { json: n.json, rst: n.rst, rstver: n.rstver });
-		ok({ doc: this.resp.doc });
-	}
-
-	modify(_docId: string, req: TreeModify, _ok: OnOk, err?: OnErr) {
-		err?.(`${req.a}: the synode doesn't serve doc trees yet.`);
-	}
-
-	commit(_docId: string, _ok: OnOk, err?: OnErr) {
-		err?.('Commit: the synode doesn\'t serve doc trees yet.');
-	}
-}
-
-/** a tree node as the server would send it */
-function node(nid: string, parentId: string | undefined, kind: DocKind, fullpath: string,
-			  children?: DocTreeNode[]): DocTreeNode {
-	return {
-		type: 'io.odysz.semantic.DA.DatasetCfg$AnTreeNode',
-		id: nid, parentId, level: fullpath.split('.').length - 1,
-		indents: [],
-		node: { nid, docId: PlaceholderDoctier.docId, parentId, sort: '1', fullpath, kind,
-				rstver: '0', text: kind === DocKind.doc ? 'Untitled' : '', children },
-	} as unknown as DocTreeNode;
-}
-
-function find(forest: DocTreeNode[], id: string): DocTreeNode | undefined {
-	for (let t of forest) {
-		if (t.id === id) return t;
-		let found = find(t.node.children || [], id);
-		if (found) return found;
-	}
-	return undefined;
-}
+const testDocs: Record<string, string> = {
+	'doc-a': 'res-vol/doctree/doc-a.json',
+	'doc-b': 'res-vol/doctree/doc-b.json',
+};
 
 const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 
+/** a request as one line, e.g. "u/move a2.3 → a2[0]" */
+const describe = (q: TreeModify) =>
+	q.a === 'd' ? `d ${q.rootId}`
+	: `${q.a} ${q.rootId ?? q.nvs?.find((nv) => nv[0] === 'kind')?.[1] ?? ''} → ${q.toParent ?? '(top)'}[${q.toIndex}]`;
+
+/**
+ * Stands in for the synode's doc-tree tier (port doctree, doctree.jserv) until DoctreeTier
+ * serves doc trees: plays the server over the test docs in res-vol/doctree.
+ * Copied from semantic-doc's demo/stub-tier.ts (StubDoctreeTier).
+ *
+ * Text saves and commits work on an in-memory copy. Structure changes need the
+ * server's reshaping, so they are answered with an error naming the request.
+ */
+class TestDoctier implements DoctreeTier {
+	/** the "server's" copy of each doc */
+	docs = new Map<string, Promise<DoctreeResp>>();
+	/** answer delay, ms */
+	delay = 120;
+
+	private doc(docId: string) {
+		if (!this.docs.has(docId)) {
+			const url = testDocs[docId];
+			this.docs.set(docId, url
+				? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(`${r.status} ${url}`)))
+				: Promise.reject(`no such doc: ${docId}`));
+		}
+		return this.docs.get(docId)!;
+	}
+
+	/** answer like a server: later, a copy */
+	private answer(docId: string, ok: OnOk, err: OnErr | undefined, f: (d: DoctreeResp) => DoctreeResp) {
+		this.doc(docId)
+			.then((d) => setTimeout(() => ok(clone(f(d))), this.delay))
+			.catch((e) => err?.(String(e)));
+	}
+
+	tree(docId: string, ok: OnOk, err?: OnErr) {
+		this.answer(docId, ok, err, (d) => ({ doc: d.doc, root: null, forest: d.forest }));
+	}
+
+	update(docId: string, node: DocCols, ok: OnOk, err?: OnErr) {
+		this.answer(docId, ok, err, (d) => {
+			const n = locate(d.forest ?? [], node.nid)?.t.node;
+			if (n) Object.assign(n, { json: node.json, rst: node.rst, rstver: node.rstver });
+			d.doc!.dirty = true;
+			return { doc: d.doc };
+		});
+	}
+
+	modify(_docId: string, req: TreeModify, _ok: OnOk, err?: OnErr) {
+		setTimeout(() => err?.(`${describe(req)}: the synode doesn't serve doc trees yet.`), this.delay);
+	}
+
+	commit(docId: string, ok: OnOk, err?: OnErr) {
+		this.answer(docId, ok, err, (d) => {
+			d.doc!.dirty = false;
+			d.doc!.committedAt = new Date().toLocaleString();
+			return { doc: d.doc };
+		});
+	}
+}
+
 /**
  * Function page of the doc-tree editor, route /doctree (SysComp.extendLinks() in app.tsx).
+ * The doc selector is copied from semantic-doc's demo/doctree.tsx.
  */
 export function AlbumDoctree(_props: Comprops) {
-	const [tier] = React.useState(() => new PlaceholderDoctier());
-	return (
-		<AnDoctreeditor docId={PlaceholderDoctier.docId} doctier={tier} height='calc(100vh - 80px)' />);
+	const [tier] = React.useState(() => new TestDoctier());
+	const [docId, setDocId] = React.useState('doc-a');
+	return (<>
+		<select value={docId} onChange={(e) => setDocId(e.target.value)}>
+			{Object.keys(testDocs).map((d) => <option key={d}>{d}</option>)}
+		</select>
+		<AnDoctreeditor key={docId} docId={docId} doctier={tier} height='calc(100vh - 110px)' />
+	</>);
 }
