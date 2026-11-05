@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
 import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';
@@ -37,7 +37,6 @@ import { AnReactExt, type ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@mui/material/Fab';
-import { contextType } from 'react-modal';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -110,7 +109,7 @@ const _icons = {
  *
  * If key-uri !== arg-uri, jserv won't find the correct connId
  */
-const _comps = { }
+const _comps: { [uri: string]: React.ComponentType<any> } = { };
 
 const drawerWidth = 240;
 
@@ -302,13 +301,13 @@ class SysComp extends CrudCompW<SysProps> {
 		currentPage: undefined as MenuItem
 	};
 
-	anreact: AnReactExt;
+	anreact!: AnReactExt;
 
 	confirmLogout: any;
 	onfullscreen: (isfull: any) => void;
 
-	static extendLinks(links) {
-		links.forEach( (l: { path: string ; comp: CrudComp<Comprops>; }, _x: number) => {
+	static extendLinks(links: { path: string; comp: React.ComponentType<any>; }[]) {
+		links.forEach( (l: { path: string ; comp: React.ComponentType<any>; }, _x: number) => {
 			_comps[l.path] = l.comp; // uri(l.comp, l.path);
 		});
 	}
@@ -520,7 +519,7 @@ class SysComp extends CrudCompW<SysProps> {
 		let mtree = buildMenu(-1, m);
 		return mtree;
 
-		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) {
+		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) : ReactElement | ReactElement[] {
 			if (Array.isArray(menu)) {
 				return menu.map( (i, x) => {
 						return buildMenu( depth + 1, i );
