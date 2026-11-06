@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react';
+import React, { ReactElement } from 'react';
 import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';

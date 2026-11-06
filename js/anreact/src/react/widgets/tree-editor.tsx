@@ -344,7 +344,8 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 					if (col.type === 'formatter' || col.formatter)
 						return (
 							<Grid key={`${tnode.id}.${ix}`} className={classes.treeCell} size={gridSize(col.grid)} >
-								<Typography variant='body2' >
+								{/* a div: a formatter may return blocks, which a <p> can't hold */}
+								<Typography variant='body2' component='div' >
 									{col.formatter(col, tnode, {classes, media}) as ReactNode}
 								</Typography>
 							</Grid>);
@@ -738,7 +739,8 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 					  return (
 						hide(col.grid, media) ? undefined :
 						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
-							<Typography variant='body2' >
+							{/* a div: a formatter may return blocks, which a <p> can't hold */}
+							<Typography variant='body2' component='div' >
 							  {col?.formatter?.(col, treenode, {classes, media}) as ReactNode}
 							</Typography>
 						</Grid>);
