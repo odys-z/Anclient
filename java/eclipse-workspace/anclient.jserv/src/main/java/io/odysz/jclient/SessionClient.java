@@ -40,7 +40,7 @@ import io.odysz.transact.x.TransException;
 /**
  * AnClient.java with session managed.
  * 
- * @author odys-z@github.com
+ * @author ody
  *
  */
 @SuppressWarnings("deprecation")

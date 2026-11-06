@@ -32,7 +32,7 @@ import io.odysz.transact.x.TransException;
 /**
  * A robot for background pushing.
  * 
- * @author odys-z@github.com
+ * @author ody
  */
 public class ExpDocRobot implements IUser {
 
