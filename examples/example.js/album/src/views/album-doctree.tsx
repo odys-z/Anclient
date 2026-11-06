@@ -1,7 +1,7 @@
 import React from 'react';
 import 'katex/dist/katex.min.css'; // the host provides KaTeX CSS for the editor's formulas
 
-import { AnDoctreeditor, locate, type DocCols, type DoctreeResp, type DoctreeTier,
+import { AnDoctreeditor, DoctreeReq, locate, type DocCols, type DoctreeResp, type DoctreeTier,
 	type OnErr, type OnOk, type TreeModify } from 'semantic-doc/doctree';
 import { Comprops } from '@anclient/anreact';
 
@@ -18,7 +18,7 @@ const clone = <T,>(o: T): T => JSON.parse(JSON.stringify(o));
 
 /** a request as one line, e.g. "u/move a2.3 → a2[0]" */
 const describe = (q: TreeModify) =>
-	q.a === 'd' ? `d ${q.rootId}`
+	q.a === DoctreeReq.A.del ? `d ${q.rootId}`
 	: `${q.a} ${q.rootId ?? q.nvs?.find((nv) => nv[0] === 'kind')?.[1] ?? ''} → ${q.toParent ?? '(top)'}[${q.toIndex}]`;
 
 /**
