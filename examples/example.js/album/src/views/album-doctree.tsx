@@ -89,6 +89,8 @@ export function AlbumDoctree(_props: Comprops) {
 		<select value={docId} onChange={(e) => setDocId(e.target.value)}>
 			{Object.keys(testDocs).map((d) => <option key={d}>{d}</option>)}
 		</select>
-		<AnDoctreeditor key={docId} docId={docId} doctier={tier} height='calc(100vh - 110px)' />
+		{/* preview: the Sphinx template at web-dist/sdoc-template/ (jserv-album's sdoc-template-0.8) */}
+		<AnDoctreeditor key={docId} docId={docId} doctier={tier} height='calc(100vh - 110px)'
+			preview='sdoc-template/' />
 	</>);
 }
