@@ -10,5 +10,7 @@ export const SynDocollPort = {
 	editor: "editor.less",
 	docoll: "docoll.syn",
 	menu: "menu.serv",
-	settings: "settings.less"
+	settings: "settings.less",
+	/** semantic-doc's doc-tree tier (doctree.jserv DoctreeTier) */
+	doctree: "doctree.less"
 };
