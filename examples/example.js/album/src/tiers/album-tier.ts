@@ -1,7 +1,8 @@
 import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg, Semantier, NV, relStree,
 	SessionClient, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumReq, AlbumPage, AlbumResp
+import { Comprops, CrudComp, GalleryView, PhotoProps, PhotoRec
 } from '@anclient/anreact';
+import { PhotoCollect, AlbumReq, AlbumPage, AlbumResp } from './album-req';
 import { SynDocollPort } from './syn-docoll-port';
 
 const debug = true;
@@ -11,6 +12,9 @@ export const Share = {
 	priv: 'priv',
 }
 
+/**
+ * @deprecated This tier needs to be overhauled, with the same architecture to AlbumDocview.
+ */
 export class AlbumEditier extends StreeTier {
 	comp: CrudComp<Comprops>;
 	// port: string = "album";
@@ -19,14 +23,21 @@ export class AlbumEditier extends StreeTier {
 	page: PageInf;
 	collects?: PhotoCollect[];
 
+	/** Doc table of the photos, the docTabl of download requests. See AlbumResp.docTabl. */
+	docTabl = 'h_photos';
+
+	/** Doc (synchronizing) uri, the docuri() of download requests. Default: this.uri, as record() uses. */
+	synuri: string;
+
 	_fields = [{field: 'shareFlag', label: 'Public'}];
 
 	/**
 	 * @param props
 	 */
-	constructor(props: {uri: string, client: SessionClient, album?: string, comp: CrudComp<Comprops>}) {
+	constructor(props: {uri: string, synuri?: string, client: SessionClient, album?: string, comp: CrudComp<Comprops>}) {
 		super(props);
 		console.log(this.uri);
+		this.synuri = props.synuri || this.uri;
 		this.comp = props.comp;
 		this.client = props.client;
 
@@ -105,7 +116,12 @@ export class AlbumEditier extends StreeTier {
 	 * @returns 
 	 */
 	imgSrc(recId: string) : string {
-		return GalleryView.imgSrcReq(recId, { uri: this.uri, port: this.port, client: this.client});
+		if (!this.client) {
+			console.error("Anclient is not ready yet.");
+			return '';
+		}
+		let {uri, port, client, synuri} = this;
+		return GalleryView.imgSrcReq(recId, this.docTabl, { uri, port, client, docuri: () => synuri });
 	}
 
 	loadSharePolicy(pageInf: PageInf, onLoad: ((collects?: PhotoCollect[]) => void)) : void {
@@ -180,7 +196,10 @@ export class AlbumEditier extends StreeTier {
 
 	collectRels() {
 		let columnMap: {[k: string]: any} = {};
-		let rel = this.relMeta["h_photo_org"].stree as relStree;
+		let rel = this.relMeta?.["h_photo_org"]?.stree as relStree | undefined;
+		if (!rel)
+			throw Error("AlbumEditier.collectRels(): relMeta.h_photo_org.stree is not set. Can't save the folder's sharing relations.");
+
 		let forest: AnTreeNode[] = this.rels["h_photo_org"];
 
 		columnMap[rel.col] = rel.colProp || rel.col;           // columnMap[rel.col] = 'nodeId';

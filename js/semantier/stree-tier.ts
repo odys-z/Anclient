@@ -97,8 +97,13 @@ export class AnTreeNode extends Anson implements Tierec {
 export class StreeTier extends Semantier {
     static reqFactories: {[t: string]: (v: DatasetOpts & {sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody} = {};
 
+    /**
+     * Register the request factory of a port.
+     * @since semantier 1.1.0, factories are keyed by the port's url value, the same as a tier's port,
+     * e.g. Protocol.Port.stree ('s-tree.serv'), SynDocollPort.docoll ('docoll.syn'), not the name, 'docoll'.
+     */
     static registTierequest(port: string,
-			factory: (v: DatasetOpts & {synrui?: string, sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody,
+			factory: (v: DatasetOpts & {synuri?: string, sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody,
 			initFields = {uri: '', synuri: '', sk: ''}) {
         if (this.reqFactories[port])
             console.warn("Replacing new facotry of ", port, factory);
@@ -119,7 +124,7 @@ export class StreeTier extends Semantier {
      */
     constructor(opts: UIComponent & {uri: string, port?: string}) {
         super(opts);
-        this.port = opts.port || 'stree';
+        this.port = opts.port || Protocol.Port.stree;
     }
 
     /**
@@ -141,7 +146,7 @@ export class StreeTier extends Semantier {
             console.warn("StreeTier.stree(): Loading s-tree without result handling?", opts);
         if (!opts.port)
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
-        else if (opts.port !== 'stree' && !StreeTier.reqFactories[opts.port])
+        else if (!StreeTier.reqFactories[opts.port])
 		 	throw Error("To handle tree with StreeTier, user request's factory must registered. Need factory for port: " + opts.port);
         
         if (!(this.client instanceof SessionClient))
@@ -188,7 +193,7 @@ export class StreeTier extends Semantier {
 			this.errCtx);
     }
 }
-StreeTier.registTierequest('stree', (opts) => new AnDatasetReq(opts));
+StreeTier.registTierequest(Protocol.Port.stree, (opts) => new AnDatasetReq(opts));
 
 /**
  * Find the node with id in a forest (depth first).

@@ -2001,6 +2001,9 @@ export class DocsReq extends AnsonBody {
 
 	synuri?: string;
 
+	/** Doc table, e.g. h_photos. The same as Java DocsReq.docTabl. */
+	docTabl?: string;
+
 	doc?: SyncDoc;
 
 	pageInf?: PageInf;

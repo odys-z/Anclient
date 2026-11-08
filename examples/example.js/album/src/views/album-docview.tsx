@@ -6,11 +6,12 @@ import { Protocol, Inseclient, AnsonResp, AnsonMsg,
 	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
 
 import { L, AnError, AnReactExt, Lightbox, PdfIframe,
-	AnTreeditor, CrudCompW, AnContextType, AlbumResp,
+	AnTreeditor, CrudCompW, AnContextType,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops,
 	PdfView, gridSize
 } from '@anclient/anreact';
 import { GalleryTier } from '../tiers/gallerytier';
+import { AlbumResp } from '../tiers/album-req';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { DocIcon } from '../icons/doc-ico';

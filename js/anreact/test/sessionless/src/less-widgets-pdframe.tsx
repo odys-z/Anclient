@@ -7,7 +7,7 @@ import { Protocol, AnsonResp, AnsonMsg, ErrorCtx, AnTreeNode,
 import { L, Langstrs, AnContext, AnError, AnReactExt,
 	jsample, JsonHosts, Login, CrudComp, AnTreegrid, AnTreegridCol,
 	Comprops, regex, GalleryView, PdfIframe } from '../../../src/an-components';
-import { AlbumTier } from './tiers/album-tier';
+import { AlbumTier, TestDocollPort } from './tiers/album-tier';
 
 const { JsampleTheme } = jsample;
 
@@ -388,7 +388,7 @@ class TestreeTier extends AlbumTier {
 
 	constructor(tree: CrudComp<any>, client?: SessionClient) {
 		super({uri: '/album/sys', synuri: '/album/syn',
-			port: 'docoll', // override and compitiable for both 0.7.0 and 0.6.5, supposed to be a key issue for Antson 2.0.
+			port: TestDocollPort, // the url value, the key of the registered request factory (since semantier 1.1.0)
 			client, comp: tree,
 		});
 		this.client = client;

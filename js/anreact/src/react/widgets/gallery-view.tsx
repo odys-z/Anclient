@@ -7,12 +7,12 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, type AnsonValue, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
+import { AnTreeNode, type AnsonValue, DocsReq, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
 import { type Comprops, CrudCompW } from '../crud';
 import type { ForcedStyle } from '../../photo-gallery/src/photo-ts';
-import { AlbumReq, MediaCss, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
+import { MediaCss, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
 
 // const _photos = [];
 
@@ -171,7 +171,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			if (reqMsgs[msgId] === undefined) {
 				let req = StreeTier
 					.reqFactories[port]({uri, sk: ''})
-					.A(AlbumReq.A.download) as AlbumReq;
+					.A(DocsReq.A.download) as DocsReq;
 
 				req.doc = new SyncDoc({ recId: pid, type: PhotoRec.__type__ });
 				req.docTabl = doctable;

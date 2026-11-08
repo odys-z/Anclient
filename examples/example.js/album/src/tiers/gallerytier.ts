@@ -1,4 +1,5 @@
-import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { Comprops, CrudComp } from '@anclient/anreact';
+import { AlbumPage, AlbumReq, AlbumResp, PhotoCollect } from './album-req';
 import { Protocol, AnsonBody, PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
 import { SynDocollPort } from './syn-docoll-port';
 

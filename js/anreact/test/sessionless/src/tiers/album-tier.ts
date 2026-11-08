@@ -1,6 +1,50 @@
-import { PageInf, SessionClient, StreeTier } from '@anclient/semantier';
-import { Comprops, CrudComp, PhotoCollect, GalleryView, AlbumReq, AlbumResp
+import { AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, SessionClient, StreeTier, SyncDoc, type Tierec
+} from '@anclient/semantier';
+import { Comprops, CrudComp, GalleryView, type PhotoProps
 } from '../../../../src/an-components';
+
+/**
+ * Port of the album jserv for the sessionless tests, i. e. SynDocollPort.docoll of the album.
+ * Register it to the client with extendPorts({docoll: TestDocollPort}).
+ */
+export const TestDocollPort = 'docoll.syn';
+
+/** A collect of photos, the album's (deprecated) PhotoCollect. */
+type PhotoCollect = Tierec & { photos: Array<PhotoProps<SyncDoc>> };
+
+/**
+ * The album's AlbumReq, io.oz.album.peer.AlbumReq, with only what the sessionless tests send to docoll.syn,
+ * the tree (sk) and download (docTabl, doc). AlbumReq is in example.js/album, which anreact can't import.
+ */
+class TestAlbumReq extends DocsReq {
+	static __type__ = 'io.oz.album.peer.AlbumReq';
+
+	sk?: string;
+
+	constructor(opts: {uri?: string, synuri: string, sk?: string, page?: PageInf}) {
+		super(opts.uri as string, {synuri: opts.synuri, docFieldType: SyncDoc.__type0__}, TestAlbumReq.__type__);
+		this.sk = opts.sk;
+		this.pageInf = opts.page;
+	}
+}
+StreeTier.registTierequest(TestDocollPort,
+	(opts) => new TestAlbumReq(opts as {uri?: string, synuri: string, sk?: string}),
+	{uri: '-', synuri: '-', sk: '-'});
+
+/** The album's AlbumResp, io.oz.album.peer.AlbumResp, with only what the tests read. */
+class TestAlbumResp extends AnDatasetResp {
+	static __type__ = 'io.oz.album.peer.AlbumResp';
+
+	collects?: Array<PhotoCollect>;
+	docTabl?: string;
+
+	constructor(resp: {forest: AnTreeNode[], collects?: Array<PhotoCollect>, docTabl?: string}) {
+		super({forest: resp.forest, type: TestAlbumResp.__type__});
+		this.collects = resp.collects;
+		this.docTabl = resp.docTabl;
+	}
+}
+Protocol.registerBody(TestAlbumResp.__type__, (jsonBd) => new TestAlbumResp(jsonBd));
 
 export class AlbumTier extends StreeTier {
 	comp: CrudComp<Comprops>;
@@ -10,7 +54,7 @@ export class AlbumTier extends StreeTier {
 	 * 
 	 * (This doc will be deprecated once sandbox is ported to Jetty.)
 	 */
-	port: string = "docoll";
+	port: string = TestDocollPort;
 
 	page: PageInf;
 	collects?: PhotoCollect[];
@@ -51,12 +95,12 @@ export class AlbumTier extends StreeTier {
 		let client = this.client;
 
 		let req = client.userReq( this.uri, this.port,
-					new AlbumReq( {uri: this.uri, synuri: this.synuri, page: conds} )
-					.A(AlbumReq.A.stree) );
+					new TestAlbumReq( {uri: this.uri, synuri: this.synuri, page: conds} )
+					.A(DatasetierReq.A.stree) );
 
 		client.commit(req,
 			(resp) => {
-				let body = resp.Body() as AlbumResp;
+				let body = resp.Body() as TestAlbumResp;
 				if (body) {
 					this.collects = body.collects;
 					onLoad(this.collects);
