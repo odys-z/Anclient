@@ -142,7 +142,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
     it('SessionReq formating / instantiation', () => {
 		let ssReq = Protocol.formatSessionLogin('user 1', 'passweord cipher', 'iv64 ... ...');
         assert.equal(ssReq.code, null, "1 ---");
-        assert.equal(ssReq.port, 'session', "2 ---");
+        assert.equal(ssReq.port, Protocol.urlOf('session'), "2 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(ssReq)).port, 'session', "2 --- name"); // on the wire, its name
         assert.equal(ssReq.type, "io.odysz.semantic.jprotocol.AnsonMsg", "3 ---");
         assert.equal(ssReq.Body()?.type, "io.odysz.semantic.jsession.AnSessionReq", "4 ---");
         assert.equal(ssReq.Body()?.uid, "user 1", "5 ---");
@@ -179,7 +180,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 					body: [qr]
 				});
 
-        assert.equal(jreq.port, 'query', "10 ---");
+        assert.equal(jreq.port, Protocol.urlOf('query'), "10 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(jreq)).port, 'query', "10 --- name"); // on the wire, its name
 
 		let an = new AnClient(undefined);
 		an.init("localhost");
@@ -211,7 +213,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 					body: [ur]
 				});
 
-        assert.equal(jreq.port, 'test1', "8 ---");
+        assert.equal(jreq.port, Protocol.urlOf('test1'), "8 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(jreq)).port, 'test1', "8 --- name"); // on the wire, its name
 
 		let an = new AnClient(undefined);
 		an.init("localhost");
@@ -235,7 +238,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		let port = 'test1';
 		let jreq = new AnsonMsg({ port, header: null, body: [ur] });
 
-        assert.equal(jreq.port, 'test1', "8 ---");
+        assert.equal(jreq.port, Protocol.urlOf('test1'), "8 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(jreq)).port, 'test1', "8 --- name"); // on the wire, its name
 
 		let nvss : Array<NameValue[]> = [
 			[{name: 'roleId', value: 'r01'}, {name: 'funcId', value: 'f01'}],
@@ -285,7 +289,8 @@ describe('TS: [01.2 Protocol/AnsonReq]', () => {
 		let port = 'test1';
 		let jreq = new AnsonMsg({ port, header: null, body: [ur] });
 
-		assert.equal(jreq.port, 'test1', "8 ---");
+		assert.equal(jreq.port, Protocol.urlOf('test1'), "8 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(jreq)).port, 'test1', "8 --- name"); // on the wire, its name
 
 		let nvss : Array<NV[]> = [
 			[{n: 'roleId', v: 'r01'}, {n: 'funcId', v: 'f01'}],
@@ -355,7 +360,8 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 		assert.equal(AnsonResp.hasColumn(rp.Body()?.Rs(), 'person'), true, "0 000");
 		assert.equal(AnsonResp.hasColumn(rp.Body()?.Rs(), 'age'), true, "0 001");
         assert.equal(rp.code, 'ok', "1 ---");
-        assert.equal(rp.port, 'query', "2 ---");
+        assert.equal(rp.port, Protocol.urlOf('query'), "2 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(rp)).port, 'query', "2 --- name"); // on the wire, its name
         assert.equal(rp.Body()?.msg(), null, "3 ---");
 
 		rp = new AnsonMsg(respErr);
@@ -367,7 +373,8 @@ describe('TS: [01.3 Protocol/AnsonResp]', () => {
 
 		let rp = new AnsonMsg(respSession);
         assert.equal(rp.code, 'ok', "1 ---");
-        assert.equal(rp.port, 'session', "2 ---");
+        assert.equal(rp.port, Protocol.urlOf('session'), "2 ---"); // in memory, the port's value
+        assert.equal(JSON.parse(JSON.stringify(rp)).port, 'session', "2 --- name"); // on the wire, its name
         assert.equal((rp.Body() as AnSessionResp)?.ssInf?.type, "io.odysz.semantic.jsession.SessionInf", "3 ---");
         assert.equal((rp.Body() as AnSessionResp)?.ssInf?.uid, "admin", "4 ---");
         assert.equal((rp.Body() as AnSessionResp)?.ssInf?.ssid, "001eysTj", "5 ---");

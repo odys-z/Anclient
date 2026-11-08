@@ -5,7 +5,7 @@
 import { assert } from 'chai'
 
 import { AnDatasetReq, AnDatasetResp, AnHeader, AnSessionReq, AnsonMsg, DatasetierReq,
-	DeleteReq, InsertReq, PageInf, QueryReq, TreeModify, UpdateReq, UserReq } from '../protocol'
+	DeleteReq, InsertReq, PageInf, Protocol, QueryReq, TreeModify, UpdateReq, UserReq } from '../protocol'
 
 describe('case: [06 Anson types]', () => {
 	it('type of each class, by constructor', () => {
@@ -50,5 +50,26 @@ describe('case: [06 Anson types]', () => {
 
 		const no = new AnDatasetResp({ forest: [], rejected: 'holder' });
 		assert.equal(no.rejected, TreeModify.Rejected.holder);
+	});
+
+	it('port: the value in memory, the name on the wire', () => {
+		Protocol.extend({ doctree: 'doctree.serv' });
+		assert.equal(Protocol.nameOf('doctree.serv'), 'doctree');
+		assert.equal(Protocol.urlOf('doctree'), 'doctree.serv');
+		assert.equal(Protocol.nameOf('no-such.serv'), 'no-such.serv', 'unregistered, as is');
+
+		const req = new AnsonMsg({ port: 'doctree.serv', header: new AnHeader('ss', 'u', 'tk'),
+					body: [new AnDatasetReq({ uri: '/sdoc', a: AnDatasetReq.A.stree })] });
+		assert.equal(req.port, 'doctree.serv', 'for the url');
+		assert.equal(JSON.parse(JSON.stringify(req)).port, 'doctree', 'as Java reads it');
+
+		const resp = new AnsonMsg({ type: 'io.odysz.semantic.jprotocol.AnsonMsg', code: 'ok', port: 'doctree',
+					body: [{ type: 'io.odysz.semantic.ext.AnDatasetResp', forest: [] }] });
+		assert.equal(resp.port, 'doctree.serv', 'the server\'s name, back to the value');
+
+		const q = new AnsonMsg({ port: 'query', header: new AnHeader('ss', 'u', 'tk'),
+					body: [new QueryReq({uri: '/q', mtabl: 't', mAlias: 'a', pageInf: new PageInf(0, 10)})] });
+		assert.equal(q.port, 'r.serv');
+		assert.equal(JSON.parse(JSON.stringify(q)).port, 'query', 'a built-in name round trips');
 	});
 });

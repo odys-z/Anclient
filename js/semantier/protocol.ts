@@ -314,6 +314,27 @@ export class Protocol {
 		Object.assign(Protocol.Port, newPorts);
 	};
 
+	/**
+	 * The url pattern (value) of a port, e.g. "doctree" → "doctree.serv", if registered with
+	 * {@link Protocol.extend} (AnClient.understandPorts(), AnReactExt.ExtendPort());
+	 * a value or an unknown string stays as is.
+	 */
+	static urlOf(port: string): string {
+		const ports = Protocol.Port as {[p: string]: string};
+		return port in ports ? ports[port] : port;
+	}
+
+	/**
+	 * The name of a port, e.g. "doctree.serv" → "doctree", if registered with
+	 * {@link Protocol.extend}; a name or an unknown string stays as is.
+	 * If two names have the same url, the first registered one.
+	 */
+	static nameOf(port: string): string {
+		const ports = Protocol.Port as {[p: string]: string};
+		if (port in ports) return port;
+		return Object.keys(ports).find((k) => ports[k] === port) ?? port;
+	}
+
 	static ansonTypes: {[type: string]: (json: any) => AnsonBody} = {};
 
 	/**Extend new protocol - register new body type creater.
@@ -444,11 +465,24 @@ export class AnsonMsg<T extends AnsonBody> extends Anson {
     code: string;
     version: string;
     seq: number;
+    /**
+     * The port's value (url pattern), e.g. "doctree.serv", whether given to userReq() or
+     * parsed from the server's name, "doctree"; AnClient.servUrl() uses it as the url.
+     * On the wire it's the name, see {@link toJSON}.
+     */
     port: keyof typeof Protocol.Port;
 	/**Json string options, like no-null: true for asking server replace null with ''.  */
     opts: {};
     header: AnHeader;
     body: T[];
+
+	/**
+	 * Serialized with the port's name, which is how Java's IPort reads it
+	 * (by enum name, e.g. SynDocollPort.valof("doctree")), see {@link Protocol.nameOf}.
+	 */
+	toJSON() {
+		return { ...this, port: this.port && Protocol.nameOf(this.port) };
+	}
 
 
 	/**
@@ -549,7 +583,7 @@ export class AnsonMsg<T extends AnsonBody> extends Anson {
 		this.code = json.code;
 		this.version = json.version ? json.version : "1.0";
 		this.seq = json.seq;
-		this.port = json.port;
+		this.port = (json.port === undefined || json.port === null) ? json.port : Protocol.urlOf(json.port) as keyof typeof Protocol.Port;
 
 		if (!this.seq)
 			this.seq = Math.round(Math.random() * 1000);
@@ -1710,8 +1744,12 @@ export class DatasetReq extends QueryReq {
 export class AnDatasetReq extends QueryReq {
 	static __type__ = "io.odysz.semantic.ext.AnDatasetReq";
 
-	/** io.odysz.semantic.ext.AnDatasetReq.A */
-	static A = {
+	/**
+	 * io.odysz.semantic.ext.AnDatasetReq.A.
+	 * Typed as a plain map, so a subclass can have its own A, as a Java subclass does,
+	 * e.g. semantic-doc's DoctreeReq.A.
+	 */
+	static A: { readonly [a: string]: string } = {
 		reforest: 'reforest',
 		retree: 'retree',
 		tagtree: 'tagtree',
@@ -1720,7 +1758,7 @@ export class AnDatasetReq extends QueryReq {
 		ds: 'sqltree',
 		/** modify a tree as {@link AnDatasetReq#mod} says */
 		stree: 'u/stree',
-	} as const;
+	};
 
 	/** For {@link AnDatasetReq.A.stree}: what to do to the tree; the server works out where nodes go. */
 	mod?: TreeModify;
