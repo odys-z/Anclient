@@ -3,6 +3,7 @@ import type { Theme } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
+import Checkbox from '@mui/material/Checkbox';
 import { withStyles, gridSize, withWidth, type Color, type Alignment } from '../mui-compat';
 
 import { AnTreeNode, StreeTier, toBool } from "@anclient/semantier";
@@ -103,6 +104,9 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
 	}
 
 	handleClick(e: React.UIEvent, nid: string, node: AnTreeNode) {
+		if (this.props.checkable && !this.props.checkable(node))
+			return;
+
 		let selected = this.state.selected;
 		if (this.props.singleCheck) {
 			selected.clear();
@@ -251,6 +255,10 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
                 <Grid key={`${n.id}.${cx}`} className={classes.rowHead} style={col.style} size={gridSize(col.grid)}>
                   <Typography noWrap variant='body2'>
                     {levelIcons(that.props.indentSettings, n.indents)}
+                    {that.props.checkable && (that.props.checkable(n)
+                      ? <Checkbox color="primary" size="small" sx={{padding: 0, marginRight: 0.5}}
+                          checked={that.isSelected(n.id)} />
+                      : <span style={{display: 'inline-block', width: 24}} />)}
                     {n.node[col.field] as React.ReactNode}
                   </Typography>
                 </Grid> );

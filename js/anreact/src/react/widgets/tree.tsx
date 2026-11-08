@@ -225,6 +225,13 @@ interface TreegridProps extends AnTablistProps {
 
 	onThClick?: (col: AnTreegridCol, cx: number) => void;
 
+	/**
+	 * AnTreegrid: if provided, leaves for which this returns true are shown with a checkbox, and only
+	 * they can be selected (clicked) - others have no checkbox and ignore clicks.
+	 * @since 0.8.0
+	 */
+	checkable?: (n: AnTreeNode) => boolean;
+
 	testData?: Array<AnTreeNode>;
 };
 
