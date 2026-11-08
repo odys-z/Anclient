@@ -233,7 +233,7 @@ export class Semantier {
     _fields: TierCol[] = [];
 
     /** current crud */
-    crud: CRUD = undefined;
+    crud?: CRUD = undefined;
     /** current list's data */
     rows: Tierec[] = [];
     /** current pk value */
@@ -279,7 +279,7 @@ export class Semantier {
 
     client!: SessionClient | Inseclient;
 
-    errCtx!: ErrorCtx | undefined;
+    errCtx!: ErrorCtx;
 
     disableValidate: any;
 
@@ -296,7 +296,7 @@ export class Semantier {
 	 * @param fields
 	 * @returns
 	 */
-    validate(rec?: {}, fields?: Array<TierCol>): boolean {
+    validate(rec?: Tierec, fields?: Array<TierCol>): boolean {
 		if (!rec) rec = this.rec;
 		// if (!fields) fields = this.columns ? this.columns() : this.recFields;
 		if (!fields) fields = this._fields || this.fields(undefined);
@@ -306,7 +306,7 @@ export class Semantier {
 
 		let valid = true;
 		fields.forEach( (f, _x) => {
-			f.style = validField(rec, f);
+			f.style = validField(rec || {}, f);
 			valid &&= f.style === 'ok';
 		} );
 		return valid;
@@ -481,23 +481,23 @@ export class Semantier {
 		if (crud === CRUD.u && !this.pkval.v)
 			throw Error("Can't update with null ID.");
 
-		let req: AnsonMsg<AnsonBody>;
+		let req = undefined as unknown as AnsonMsg<AnsonBody>;
 		if (!disableForm) {
 			if ( crud === CRUD.c ) {
 				req = this.client.userReq<InsertReq>(uri, port || 'insert',
-							new InsertReq( uri, this.pkval.tabl )
+							new InsertReq( uri, this.pkval.tabl! )
 							.columns(this._fields)
-							.record(this.rec) as InsertReq );
+							.record(this.rec || {}) as InsertReq );
 
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
 				if (isEmpty(this.pkval.v))
-					this.pkval.v = str(this.rec[this.pkval.pk]);
+					this.pkval.v = str(this.rec?[this.pkval.pk!]);
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, port || 'update',
-							new UpdateReq( uri, this.pkval.tabl, this.pkval)
-							.record(this.rec, this.pkval.pk) );
+							new UpdateReq( uri, this.pkval.tabl!, this.pkval)
+							.record(this.rec || {}, this.pkval.pk) );
 			}
 		}
 

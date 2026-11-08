@@ -22,6 +22,10 @@ export interface JsonOptions {
     noBoolean: boolean | string;
 }
 
+export class Anson {
+	constructor(readonly type: string) { }
+}
+
 /** An abstract object for query condition
  *
  * What's this experimening:
@@ -30,9 +34,9 @@ export interface JsonOptions {
  * Tier pattern handling query condition at server side.
  * So use this to send by query form status.
  *  */
-export class PageInf {
+export class PageInf extends Anson {
 	/** Don't set directly, use constructor to set this. */
-	type: string;
+	// type: string;
 
 	page: number;
 	size: number;
@@ -49,7 +53,7 @@ export class PageInf {
 	mapCondts?: {[p: string]: AnsonValue};
 
 	constructor(page?: number | PageInf, size?: number, total?: number, arrCondts?: Array<string[]>, mapCondts?: {[p: string]: AnsonValue}) {
-		this.type = 'io.odysz.transact.sql.PageInf';
+		super('io.odysz.transact.sql.PageInf');
 		if (typeof page === 'number') {
 			this.page = page || 0;
 			this.size = size || -1;
@@ -564,7 +568,7 @@ export class AnsonMsg<T extends AnsonBody> {
 	}
 }
 
-export class AnsonBody {
+export class AnsonBody extends Anson {
 	msg(): string {
 		throw new Error('Method not implemented.');
 	}
@@ -584,9 +588,10 @@ export class AnsonBody {
 	 * @param body.uri function uri.
 	 * @see {@link https://odys-z.github.io/Anclient/guide/func-uri.html#func-uri-datasource-mapping Anclient doc}
 	 */
-	constructor(body?: {type: string, a: string, parent?: string, uri: string}) {
+	constructor(body?: {type: string, a?: string, parent?: string, uri: string}) {
+		super(body?.type || 'io.odysz.semantic.jprotocol.AnsonBody');
 		if (body) {
-			this.type = body.type;
+			// this.type = body.type;
 			this.a = body.a
 			this.parent = body.parent;
 			this.uri = body.uri;
@@ -596,9 +601,10 @@ export class AnsonBody {
 	/*
 	 * The same json structure as io.odysz.semantic.jprotocol.AnsonBody (Java): type, a, uri.
 	 * No fields Java AnsonBody hasn't, see ISSUE anson-body-fields, semantic-jserv/issues/anson-body-fields.md.
-	 */
     type: string | undefined;
-    a!: string;
+	 */
+	/** @since 1.1.1, Some request, such as Ping or Echo, do not need a. */
+    a?: string;
 	/** Planned to be removed, see ISSUE anson-body-fields. */
     parent: string | undefined; 
     uri!: string;
@@ -1831,7 +1837,7 @@ export class SyncDoc implements Tierec {
 	type?: string;
 
 	/** pid */
-	// docId?: string;
+	recId?: string;
 
 	/** card title */
 	pname?: string;

@@ -124,14 +124,6 @@ export class AlbumDocview extends CrudCompW<AlbumDocProps> {
 				color="primary" >
 				{opts?.media?.isMd && L(`${this.state.showingDocs ? L('Docs') : L('Medias')}`)}
 			</Button>
-			{/* TODO Let's filter connection later
-			<Button onClick={this.toFilterOrgs}
-				className={opts?.classes?.toggle}
-				startIcon={<LibraryAddCheckIcon/>}
-				color="primary" >
-				{opts?.media?.isMd && L('Groups')}
-			</Button>
-			*/}
 		  </Grid> );
 
 		function toToggleView(_e: React.UIEvent) {

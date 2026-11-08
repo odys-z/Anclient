@@ -2,6 +2,7 @@ import { Protocol, AnsonBody, PageInf, AnsonResp, AnsonMsg, Semantier, NV, relSt
 	SessionClient, AnTreeNode, StreeTier, Tierec, OnLoadOk} from '@anclient/semantier';
 import { Comprops, CrudComp, PhotoCollect, GalleryView, PhotoProps, PhotoRec, AlbumReq, AlbumPage, AlbumResp
 } from '@anclient/anreact';
+import { SynDocollPort } from './syn-docoll-port';
 
 const debug = true;
 
@@ -12,7 +13,8 @@ export const Share = {
 
 export class AlbumEditier extends StreeTier {
 	comp: CrudComp<Comprops>;
-	port: string = "album";
+	// port: string = "album";
+	port = SynDocollPort.docoll;
 
 	page: PageInf;
 	collects?: PhotoCollect[];
@@ -76,7 +78,7 @@ export class AlbumEditier extends StreeTier {
 				console.log(p);
 				if (!p.recId) return;
 
-				let src = that.imgSrc(p.docId || 'missing');
+				let src = that.imgSrc(p.recId || 'missing');
 				let srcSet = [src] as any;
 
 				let css = JSON.parse(p.css as string);
@@ -196,7 +198,7 @@ class Profiles extends AnsonBody {
 	servtype: number;
 
 	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
-		super( { type: 'io.oz.album.tier.Profiles' } );
+		super( { type: 'io.oz.album.tier.Profiles', uri: '' } );
 		this.home = obj.home;
 		this.maxUsers = obj.maxUsers;
 		this.servtype = obj.servtype;

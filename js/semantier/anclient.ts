@@ -62,14 +62,18 @@ class AnClient {
 		}
 
 		let ulr: string;
-		if (Protocol.Port[port] !== undefined)
-			ulr = this.cfg.defaultServ + '/'
-				+ Protocol.Port[port];
-		else {
+		if (Protocol.Port[port] !== undefined) {
+			// ulr = this.cfg.defaultServ + '/' + Protocol.Port[port];
+			ulr = `${this.cfg.defaultServ}/${Protocol.Port[port]}`;
+			console.warn("Since @anclient/semantier 1.1.0, the port name is not resolved by a string. Must use the value directly, with type checking");
+		}
+		else if (typeof(port) === 'string') {
 			ulr = `${this.cfg.defaultServ}/${port}`;
+		}
+		else {
 			console.error("The url for the named port is probably not resolved.\nCall Anclient.understandPorts() or AnReactExt.extendPorts().",
-					`\nFor AnReact, set context.anReact = new AnReactExt(client, err_ctx).extendPorts({ ${port}: "url-pattern" })`,
-					"\nprot: ", port, "\nurl", ulr);
+					`\nFor AnReact, set context.anReact = new AnReactExt(client, err_ctx).extendPorts({ ${port}: "url-pattern" })`);
+			ulr = `${this.cfg.defaultServ}/${port}`;
 		}
 
 		return ulr;

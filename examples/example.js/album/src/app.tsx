@@ -5,14 +5,14 @@ import { Protocol, AnsonResp, AnsonMsg,
 	ErrorCtx, an, SessionClient} from '@anclient/semantier';
 
 import { Langstrs, AnContext, AnContextType, AnReactExt, 
-	ClientOptions, AnreactAppOptions, CrudCompW, SynDocollPort, Sys, SysComp, L,
+	ClientOptions, AnreactAppOptions, CrudCompW, Sys, SysComp, L,
 	ExternalHosts,
 	AnError,
-	jsample
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
 import { AlbumDoctree } from './views/album-doctree';
+import { SynDocollPort } from './tiers/syn-docoll-port';
 
 type AlbumProps = {
 	servs: ExternalHosts;

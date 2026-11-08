@@ -1,6 +1,5 @@
-import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect, SynDocollPort } from '@anclient/anreact';
-import { Protocol, AnsonMsg, AnsonBody, 
-	PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
+import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
+import { Protocol, AnsonBody, PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
 
 const debug = true;
 
@@ -86,7 +85,7 @@ class Profiles extends AnsonBody {
 	servtype: number;
 
 	constructor (obj: { servtype: number; maxUsers: number; home: string }) {
-		super( { type: 'io.oz.album.tier.Profiles' } );
+		super( { type: 'io.oz.album.tier.Profiles', uri: '' } );
 		this.home = obj.home;
 		this.maxUsers = obj.maxUsers;
 		this.servtype = obj.servtype;
