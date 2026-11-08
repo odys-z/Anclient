@@ -1,9 +1,10 @@
 import React from 'react';
 import 'katex/dist/katex.min.css'; // the host provides KaTeX CSS for the editor's formulas
 
-import { AnDoctreeditor, JservDoctier, type DocInf } from 'semantic-doc/doctree';
+import { AnDoctreeditor, StreeDoctier, type DocInf } from 'semantic-doc/doctree';
 import { AnContext, type AnContextType, type Comprops } from '@anclient/anreact';
 import type { SessionClient } from '@anclient/semantier';
+import { SynDocollPort } from '../tiers/syn-docoll-port';
 
 /** function uri of the page; the doc-tree tier doesn't check sessions yet */
 const uri = '/album/sys';
@@ -36,13 +37,13 @@ function selectDocx(): Promise<DocxPick[]> {
 
 /**
  * Function page of the doc-tree editor, route /doctree (SysComp.extendLinks() in app.tsx),
- * on the synode's doc-tree tier (port doctree): the docs of the working copy, and importing
+ * on the synode's doc-tree tier (port SynDocollPort.doctree): the docs of the working copy, and importing
  * a docx of the album.
  */
 export function AlbumDoctree(_props: Comprops) {
 	const ctx = React.useContext(AnContext) as AnContextType;
 	const tier = React.useMemo(() => ctx.anClient
-		? new JservDoctier(ctx.anClient as unknown as SessionClient, uri) : undefined, [ctx.anClient]);
+		? new StreeDoctier(ctx.anClient as unknown as SessionClient, uri, SynDocollPort.doctree) : undefined, [ctx.anClient]);
 
 	const [docs, setDocs] = React.useState<DocInf[]>([]);
 	const [docId, setDocId] = React.useState<string>();
@@ -68,7 +69,8 @@ export function AlbumDoctree(_props: Comprops) {
 		if (!pick || !tier) return;
 		setMsg(`Importing ${pick.pname} …`);
 		tier.importDocx(pick.synuid, undefined, (resp) => {
-			const id = resp.doc!.docId;
+			const id = resp.doc?.docId;
+			if (!id) return setMsg(`Importing ${pick.pname}: no doc id in the answer.`);
 			tier.whenParsed(id, () => { setMsg(undefined); reload(id); }, setMsg);
 		}, setMsg);
 	};
