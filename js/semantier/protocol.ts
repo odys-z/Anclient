@@ -22,8 +22,16 @@ export interface JsonOptions {
     noBoolean: boolean | string;
 }
 
+/**
+ * The base of all types serialized as io.odysz.anson.Anson (Java):
+ * type is the Java class name, set once by the constructor.
+ * Subclasses pass their type up, e.g. super(QueryReq.__type__), and never assign it later.
+ */
 export class Anson {
-	constructor(readonly type: string) { }
+	readonly type: string;
+	constructor(type: string) {
+		this.type = type;
+	}
 }
 
 /** An abstract object for query condition
@@ -430,8 +438,8 @@ export class Protocol {
 
 export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
 
-export class AnsonMsg<T extends AnsonBody> {
-	type = "io.odysz.semantic.jprotocol.AnsonMsg";
+export class AnsonMsg<T extends AnsonBody> extends Anson {
+	static __type__ = "io.odysz.semantic.jprotocol.AnsonMsg";
 
     code: string;
     version: string;
@@ -441,7 +449,6 @@ export class AnsonMsg<T extends AnsonBody> {
     opts: {};
     header: AnHeader;
     body: T[];
-    static __type__ = '';
 
 
 	/**
@@ -473,6 +480,7 @@ export class AnsonMsg<T extends AnsonBody> {
 	 * from globe, the window.</p>
 	 */
     constructor(json: any) {
+		super(AnsonMsg.__type__);
 		if (typeof json !== 'object')
 			throw new Error("AnClient is upgraded, takes only one arg, the json obj.");
 
@@ -588,13 +596,14 @@ export class AnsonBody extends Anson {
 	 * @param body.uri function uri.
 	 * @see {@link https://odys-z.github.io/Anclient/guide/func-uri.html#func-uri-datasource-mapping Anclient doc}
 	 */
-	constructor(body?: {type: string, a?: string, parent?: string, uri: string}) {
+	constructor(body?: {type: string, a?: string, parent?: string, uri?: string}) {
 		super(body?.type || 'io.odysz.semantic.jprotocol.AnsonBody');
 		if (body) {
 			// this.type = body.type;
 			this.a = body.a
 			this.parent = body.parent;
-			this.uri = body.uri;
+			if (body.uri !== undefined)
+				this.uri = body.uri;
 		}
 	}
 
@@ -620,15 +629,16 @@ export class AnsonBody extends Anson {
 }
 
 const aes = new AES();
-export class AnHeader {
+export class AnHeader extends Anson {
+	static __type__ = "io.odysz.semantic.jprotocol.AnsonHeader";
+
     constructor(ssid: string | undefined, userId: string | undefined, ssToken: string | undefined) {
-		this.type = "io.odysz.semantic.jprotocol.AnsonHeader";
+		super(AnHeader.__type__);
 		this.ssid = ssid;
 		this.uid = userId;
 		this.ssToken = ssToken;
 	}
 
-    type: string | undefined;
     ssid: string | undefined;
     uid : string | undefined;
 
@@ -652,14 +662,13 @@ export class AnHeader {
 }
 
 export class UserReq extends AnsonBody {
-	type = "io.odysz.semantic.jserv.user.UserReq";
+	static __type__ = "io.odysz.semantic.jserv.user.UserReq";
 
     tabl: string;
     data: SemanticObject & { props: Record<string, any> };
 
-	constructor (uri: string, tabl: string, data: Record<string, any> = {}) {
-		super();
-		this.uri = uri;
+	constructor (uri: string, tabl: string, data: Record<string, any> = {}, type = UserReq.__type__) {
+		super({type, uri});
 		this.tabl = tabl
 		this.data = {props: data};
 	}
@@ -680,9 +689,10 @@ export class UserReq extends AnsonBody {
 }
 
 export class AnSessionReq extends AnsonBody {
+	static __type__ = "io.odysz.semantic.jsession.AnSessionReq";
+
     constructor(uid: any, token: any, iv: any) {
-		super();
-		this.type = "io.odysz.semantic.jsession.AnSessionReq";
+		super({type: AnSessionReq.__type__});
 		this.uid = uid;
 		this.token = token;
 		this.iv = iv;
@@ -728,15 +738,15 @@ export class QueryReq extends AnsonBody {
 
 	// constructor (uri: string, tabl: string, alias: string, pageInf?: PageInf) {
 	// 	body = new QueryReq(body.uri, body.mtabl, body.mAlias);
-	constructor(json: {uri: string, mtabl: string, mAlias: string, pageInf: PageInf}) {
+	/**
+	 * @param json.type for subclasses, their Java type; default {@link QueryReq.__type__}
+	 */
+	constructor(json: {uri: string, mtabl: string, mAlias: string, pageInf: PageInf, type?: string}) {
 
-		super();
+		let {uri, mtabl, mAlias, pageInf, type} = json;
 
-		this.type = QueryReq.__type__; // "io.odysz.semantic.jserv.R.AnQueryReq";
-		
-		let {uri, mtabl, mAlias, pageInf} = json;
+		super({type: type || QueryReq.__type__, uri});
 
-		this.uri = uri;
 		this.mtabl = mtabl;
 		this.mAlias = mAlias;
 		this.exprs = [];
@@ -920,16 +930,15 @@ export class QueryReq extends AnsonBody {
 Protocol.registerBody(QueryReq.__type__, (json) => new QueryReq(json));
 
 export class UpdateReq extends AnsonBody {
+	static __type__ = "io.odysz.semantic.jserv.U.AnUpdateReq";
     /**Create an update / insert request.
      * @param uri component id
      * @param tabl table
      * @param pkv conditions for pk.<br>
      * If pk is null, use this object's where_() | whereEq() | whereCond().
      */
-    constructor(uri: string, tabl: string, pkv?: string[] | PkVal) {
-		super();
-		this.type = "io.odysz.semantic.jserv.U.AnUpdateReq";
-		this.uri = uri;
+    constructor(uri: string, tabl: string, pkv?: string[] | PkVal, type = UpdateReq.__type__) {
+		super({type, uri});
 		this.a = CRUD.u;
 		this.mtabl = tabl;
 		this.nvs = [];
@@ -1114,9 +1123,8 @@ export class InsertReq extends UpdateReq {
     cols: Array<string>;
 
 	constructor (uri: string, tabl: string) {
-		super (uri, tabl, undefined);
+		super (uri, tabl, undefined, InsertReq.__type__);
 		this.a = CRUD.c;
-		this.type = InsertReq.__type__;
 		this.cols = [];
 		delete this.where;
 	}
@@ -1460,13 +1468,81 @@ Protocol.registerBody(AnSessionResp.__type__, (json) => new AnSessionResp(json))
  * type: io.odysz.semantic.ext.AnDatasetResp,
  * planned to be replaced by DatasetierResp
  */
+/**
+ * io.odysz.semantic.ext.TreeModify: a modification of a tree as the user means it.
+ * The server works out where nodes go (SemanticTree.onModifyTree()) and answers the
+ * affected subtree, see {@link AnDatasetResp}.
+ *
+ * Op, At and Rejected are Java enums, serialized by name.
+ */
+export class TreeModify extends Anson {
+	static __type__ = 'io.odysz.semantic.ext.TreeModify';
+
+	/** swap with the previous / next sibling; indent: become the last child of the previous sibling;
+	 * outdent: become the next sibling of the parent; remove: with the subtree; insert: see {@link At} */
+	static Op = { up: 'up', down: 'down', indent: 'indent', outdent: 'outdent', remove: 'remove', insert: 'insert' } as const;
+	/** where an insert goes, relative to nid: the next sibling, the first / last child */
+	static At = { after: 'after', first: 'first', last: 'last' } as const;
+	/** why a modification is refused, the tree unchanged */
+	static Rejected = { noop: 'noop', cycle: 'cycle', holder: 'holder', fixed: 'fixed' } as const;
+
+	op: TreeModify_Op;
+	/** the node acted on; for an insert, the node the new one goes after / under */
+	nid: string;
+	/** insert only */
+	at?: TreeModify_At;
+	/** insert only: the new node's other columns, [name, value] */
+	nvs?: [string, string | null][];
+
+	constructor(op: TreeModify_Op, nid: string) {
+		super(TreeModify.__type__);
+		this.op = op;
+		this.nid = nid;
+	}
+
+	static up(nid: string)      { return new TreeModify('up', nid); }
+	static down(nid: string)    { return new TreeModify('down', nid); }
+	static indent(nid: string)  { return new TreeModify('indent', nid); }
+	static outdent(nid: string) { return new TreeModify('outdent', nid); }
+	static remove(nid: string)  { return new TreeModify('remove', nid); }
+
+	/**
+	 * @param nid the node the new one goes after / under
+	 * @param nvs the new node's other columns: name, value, name, value, ...
+	 */
+	static insert(nid: string, at: TreeModify_At, ...nvs: (string | null)[]) {
+		const m = new TreeModify('insert', nid);
+		m.at = at;
+		m.nvs = [];
+		for (let x = 0; x + 1 < nvs.length; x += 2)
+			m.nvs.push([nvs[x] as string, nvs[x + 1]]);
+		return m;
+	}
+}
+export type TreeModify_Op = (typeof TreeModify.Op)[keyof typeof TreeModify.Op];
+export type TreeModify_At = (typeof TreeModify.At)[keyof typeof TreeModify.At];
+export type TreeModify_Rejected = (typeof TreeModify.Rejected)[keyof typeof TreeModify.Rejected];
+
 export class AnDatasetResp extends AnsonResp {
 	forest: Array<Tierec>;
 	static __type__ = "io.odysz.semantic.ext.AnDatasetResp";
 
-	constructor(dsJson: { forest: Tierec[]; }) {
-		super(Object.assign(dsJson, {type: AnDatasetResp.__type__}));
+	/** tree modification: the root of the reloaded subtree in forest; null (absent) for the whole forest */
+	root?: string;
+	/** tree modification: absent if accepted, otherwise the reason */
+	rejected?: TreeModify_Rejected;
+	/** tree modification, insert: the new node's id */
+	newId?: string;
+
+	/**
+	 * @param dsJson.type for subclasses, their Java type; default {@link AnDatasetResp.__type__}
+	 */
+	constructor(dsJson: { forest: Tierec[]; type?: string; root?: string; rejected?: TreeModify_Rejected; newId?: string }) {
+		super({...dsJson, type: dsJson.type || AnDatasetResp.__type__});
 		this.forest = dsJson.forest;
+		this.root = dsJson.root;
+		this.rejected = dsJson.rejected;
+		this.newId = dsJson.newId;
 	}
 
 	Rs(rx = 0) {
@@ -1485,8 +1561,8 @@ export interface DatasetOpts {
 	 * which is intended to be different from registration's connection
 	 */
 	synuri?: string;
-	/** semantic key configured in WEB-INF/dataset.xml */
-	sk: string;
+	/** semantic key configured in WEB-INF/dataset.xml; none for a subclass not using one, e.g. DoctreeReq */
+	sk?: string;
 	/** Can be only one of stree_t.sqltree, stree_t.retree, stree_t.reforest, stree_t.query*/
 	// t?: /** load dataset configured and format into tree with semantics defined by sk. */
 	// 	"sqltree" |
@@ -1512,6 +1588,9 @@ export interface DatasetOpts {
 	args?: object;
 
 	onOk?: OnCommitOk;
+
+	/** for subclasses of AnDatasetReq, their Java type */
+	type?: string;
 }
 
 /**
@@ -1523,17 +1602,16 @@ export class DatasetReq extends QueryReq {
      */
     constructor(opts?: DatasetOpts ) {
 
-		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, type, ...args} = opts || {} as DatasetOpts;
 
-		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
-		this.type = "io.odysz.semantic.ext.AnDatasetReq";
+		super({uri: uri as string, mtabl: (Jregex.isblank(t) ? mtabl : sk) as string, mAlias: mAlias as string,
+				pageInf: pageInf as PageInf, type: type || AnDatasetReq.__type__});
 
-		this.uri = uri;
 		this.sk = sk;
 		this.sqlArgs = sqlArgs;
 		this.rootId = rootId;
 
-		this.TA(t || a);
+		this.TA((t || a) as string);
 		// this.checkt((t || a) as unknown as string);
 	}
 
@@ -1541,8 +1619,8 @@ export class DatasetReq extends QueryReq {
     alias!: string;
     pageInf!: object;
 
-    sk: string;
-    sqlArgs: any[];
+    sk?: string;
+    sqlArgs?: any[];
     rootId: any;
 
 	get geTreeSemtcs() { return this.trSmtcs; }
@@ -1632,22 +1710,42 @@ export class DatasetReq extends QueryReq {
 export class AnDatasetReq extends QueryReq {
 	static __type__ = "io.odysz.semantic.ext.AnDatasetReq";
 
+	/** io.odysz.semantic.ext.AnDatasetReq.A */
+	static A = {
+		reforest: 'reforest',
+		retree: 'retree',
+		tagtree: 'tagtree',
+		tagtrees: 'tagtrees',
+		untagtree: 'untagtree',
+		ds: 'sqltree',
+		/** modify a tree as {@link AnDatasetReq#mod} says */
+		stree: 'u/stree',
+	} as const;
+
+	/** For {@link AnDatasetReq.A.stree}: what to do to the tree; the server works out where nodes go. */
+	mod?: TreeModify;
+
+	/** set {@link mod}, as this codebase's capitalized setters, e.g. A(), SqlArgs() */
+	Mod(m: TreeModify): this {
+		this.mod = m;
+		return this;
+	}
+
     /**
      * @param opts this parameter should be refactored
      */
     constructor(opts?: DatasetOpts ) {
 
-		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, ...args} = opts;
+		let {uri, sk, t, a, mtabl, mAlias, pageInf, rootId, sqlArgs, type, ...args} = opts || {} as DatasetOpts;
 
-		super({uri, mtabl: Jregex.isblank(t) ? mtabl : sk, mAlias, pageInf});
-		this.type = "io.odysz.semantic.ext.AnDatasetReq";
+		super({uri: uri as string, mtabl: (Jregex.isblank(t) ? mtabl : sk) as string, mAlias: mAlias as string,
+				pageInf: pageInf as PageInf, type: type || AnDatasetReq.__type__});
 
-		this.uri = uri;
 		this.sk = sk;
 		this.sqlArgs = sqlArgs;
 		this.rootId = rootId;
 
-		this.TA(t || a);
+		this.TA((t || a) as string);
 		// this.checkt((t || a) as unknown as string);
 	}
 
@@ -1655,8 +1753,8 @@ export class AnDatasetReq extends QueryReq {
     alias!: string;
     pageInf!: object;
 
-    sk: string;
-    sqlArgs: any[];
+    sk?: string;
+    sqlArgs?: any[];
     rootId: any;
 
 	get geTreeSemtcs() { return this.trSmtcs; }
@@ -1687,6 +1785,11 @@ export class AnDatasetReq extends QueryReq {
 			/** Query with client provided QueryReq object, and format the result into tree. */
 			query: string;
 		}) {
+
+		if (ask === AnDatasetReq.A.stree) { // a tree modification, not loading by sk
+			this.a = ask;
+			return this;
+		}
 
 		if (typeof ask === 'string' && ask.length > 0 && ask === stree_t.sqltree) {
 			console.info('Since @anclient/semantier 0.9.98, A = stree_t.sqltree is deprecated and replaced with DatasetierREq.A.stree, ', DatasetierReq.A.stree);
@@ -1781,8 +1884,7 @@ export class DatasetierReq extends AnsonBody {
     };
 
     constructor(opts: any) {
-		super(opts);
-		this.type = DatasetierReq.__type__;
+		super({...opts, type: DatasetierReq.__type__});
 	}
 }
 Protocol.registerBody(DatasetierReq.__type__, (json) => new DatasetierReq(json));
@@ -1795,8 +1897,7 @@ export class DatasetierResp extends AnsonResp {
 	sks: string[];
 
 	constructor(dsJson: any) {
-		super(dsJson);
-		this.type = DatasetierResp.__type__;
+		super({...dsJson, type: DatasetierResp.__type__});
 		this.sks = dsJson.sks;
 	}
 }
@@ -1810,8 +1911,7 @@ export class DocsResp extends AnsonResp {
 	device: string;
 
 	constructor(dsJson: any) {
-		super(dsJson);
-		this.type      = DocsResp.__type__;
+		super({...dsJson, type: DocsResp.__type__});
 		this.collectId = dsJson.collectId;
 		this.doc       = dsJson.doc;
 		this.device    = dsJson.device;
@@ -1820,21 +1920,13 @@ export class DocsResp extends AnsonResp {
 Protocol.registerBody(DocsResp.__type__, (json) => new DocsResp(json));
 
 /**
- * SyncDoc is currently an abstract class for __type__ is absent,
- * which makes this class can not be deserialized.
- * 
- * Java: ExpSyncDoc
+ * Java: io.odysz.semantic.tier.docs.ExpSyncDoc; subclasses pass their own type, e.g. PhotoRec.
  */
-export class SyncDoc implements Tierec {
-	/**
-	 * 'io.odysz.semantic.tier.docs.ExpSynDoc'
-	 * As this is an anbstract class (in Java), subclass must provide the static "type" field. 
-	 */
-	static __type0__: 'io.odysz.semantic.tier.docs.ExpSynDoc';
+export class SyncDoc extends Anson implements Tierec {
+	/** the default type, when a subclass doesn't give one */
+	static __type0__ = 'io.odysz.semantic.tier.docs.ExpSyncDoc';
 
     [f: string]: AnsonValue;
-
-	type?: string;
 
 	/** pid */
 	recId?: string;
@@ -1850,7 +1942,7 @@ export class SyncDoc implements Tierec {
 	mime?: string;
 
 	constructor (opt: { recId: any; src?: any; device?: string, type: string }) {
-		this.type = opt.type || SyncDoc.__type0__;
+		super(opt.type || SyncDoc.__type0__);
 		this.src = opt.src
 		this.recId = opt.recId;
 		this.device = opt.device;
@@ -1892,8 +1984,9 @@ export class DocsReq extends AnsonBody {
 	 * @param args.reqtype: type for deserilizing user's tierec, e. g. type of PhotoRec.
 	 * @param args.deletings: old docId to be deleted
 	 */
-	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]}) {
-		super({uri, type: DocsReq.__type__});
+	constructor(uri: string, args? : {synuri: string, docFieldType: string, docId?: string, docName?: string, mime?: string, uri64?: string, deletings?: string[]},
+			type = DocsReq.__type__) {
+		super({uri, type});
 
 		if (!args || !args.synuri) {
 			console.warn("Since 1.0.1, Synuri for doc operation is required.");

@@ -429,9 +429,7 @@ export class UserstReq extends UserReq {
 	page: PageInf;
 
 	constructor (uri: string, query: PageInf | any) {
-		super(uri, "a_users");
-		this.type = UserstReq.__type__;
-		this.uri = uri;
+		super(uri, "a_users", {}, UserstReq.__type__);
 
 		/// case r
 		if (query.page === undefined && typeof query.condtsRec === 'function')

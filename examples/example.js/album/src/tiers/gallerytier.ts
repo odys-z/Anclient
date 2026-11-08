@@ -1,5 +1,6 @@
 import { AlbumPage, AlbumReq, AlbumResp, Comprops, CrudComp, PhotoCollect } from '@anclient/anreact';
 import { Protocol, AnsonBody, PageInf, SessionClient, StreeTier, AnTreeNode} from '@anclient/semantier';
+import { SynDocollPort } from './syn-docoll-port';
 
 const debug = true;
 
@@ -27,7 +28,7 @@ export class GalleryTier extends StreeTier {
 
 		this.page = new AlbumPage({});
 
-		this.port = "docoll"; // SynDocollPort.docoll;
+		this.port = SynDocollPort.docoll;
 	}
 
 	/**

@@ -2,7 +2,7 @@ import type * as CSS from 'csstype';
 
 import { SessionClient } from './anclient';
 
-import { type AnsonValue, Protocol, type DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
+import { Anson, type AnsonValue, Protocol, type DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
 	type LogAct, PageInf, AnsonBody, type OnCommitOk, type DbRelations } from './protocol';
 
 import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './semantier';
@@ -50,10 +50,14 @@ export const defltIcons: IndentIcons = {
 };
 
 /** Tree data node */
-export class AnTreeNode implements Tierec {
+export class AnTreeNode extends Anson implements Tierec {
+	static __type__ = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
+
 	[f: string]: string | number | boolean | object | undefined | null;
 
-	type = "io.odysz.semantic.DA.DatasetCfg.AnTreeNode";
+	constructor() {
+		super(AnTreeNode.__type__);
+	}
 
 	/**
 	 * Json data node, for ui node composition
@@ -143,7 +147,8 @@ export class StreeTier extends Semantier {
         if (!(this.client instanceof SessionClient))
             throw Error('Needing a intance of AnClient.');
 
-		let reqbody = StreeTier.reqFactories[opts.port](opts).A(opts.A || DatasetierReq.A.stree);
+		// a tree of dataset.xml, by semantic key sk
+		let reqbody = StreeTier.reqFactories[opts.port](opts as DatasetOpts & {sk: string}).A(opts.A || DatasetierReq.A.stree);
 
 		let jreq = this.client.userReq(this.uri, opts.port, reqbody, opts.act);
 

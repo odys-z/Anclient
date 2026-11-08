@@ -492,7 +492,7 @@ export class Semantier {
 				// TODO to be verified
 				// Try figure out pk value - auto-key shouldn't have user fill in the value in a form
 				if (isEmpty(this.pkval.v))
-					this.pkval.v = str(this.rec?[this.pkval.pk!]);
+					this.pkval.v = str(this.rec?.[this.pkval.pk!]);
 			}
 			else {
 				req = this.client.userReq<UpdateReq>(uri, port || 'update',

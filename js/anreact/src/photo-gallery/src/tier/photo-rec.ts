@@ -1,5 +1,5 @@
 
-import { type NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, type Tierec, type DatasetOpts
+import { Anson, type NV, AnDatasetResp, AnTreeNode, DatasetierReq, DocsReq, PageInf, Protocol, StreeTier, SyncDoc, type Tierec, type DatasetOpts
 } from '@anclient/semantier';
 import type { PhotoProps } from '../photo-ts';
 
@@ -10,7 +10,7 @@ import type { PhotoProps } from '../photo-ts';
 
 export class PhotoRec extends SyncDoc {
 
-	static __type__: 'io.oz.album.peer.PhotoRec';
+	static __type__ = 'io.oz.album.peer.PhotoRec';
 
 	// type: string = PhotoRec.__type0__;
 
@@ -37,8 +37,6 @@ export class PhotoRec extends SyncDoc {
             wh: number[] }) {
 		super(Object.assign(opt, {type: PhotoRec.__type__}));
 
-		this.type = PhotoRec.__type__;
-
         this.css = opt.css;
         this.wh = opt.wh;
         this.width = opt.wh[0];
@@ -46,8 +44,13 @@ export class PhotoRec extends SyncDoc {
 	}
 };
 
-export class MediaCss {
-	type: string = 'io.oz.album.peer.PhotoRec$MediaCss';
+export class MediaCss extends Anson {
+	static __type__ = 'io.oz.album.peer.PhotoRec$MediaCss';
+
+	constructor() {
+		super(MediaCss.__type__);
+	}
+
 	wh: number[] = [4, 3];
 	widthHeight: number[] = [4, 3];
 	rotation: number = 0;
@@ -136,8 +139,7 @@ export class AlbumReq extends DocsReq {
 	docTabl   : string;
 
 	constructor (opt: {uri?: string, synuri: string, page?: AlbumPage, sk?: string}) {
-		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__});
-		this.type = AlbumReq.__type__;
+		super(opt.uri, {docId: '', synuri: opt.synuri, docFieldType: SyncDoc.__type0__}, AlbumReq.__type__);
 
 		let {page, sk} = opt;
 		this.pageInf = opt.page;
