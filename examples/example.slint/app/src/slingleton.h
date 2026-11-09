@@ -71,7 +71,7 @@ namespace anson {
         register_langstringAst(&opts);
 
         // settings, and validate as some fields is enforced for going on
-        aninfo("Loading settings from: "s + resolveHomePath(settings_path));
+        aninfo("Loading settings from: "s + EnvPath::replaceEnv(settings_path));
         instance->load_settings(settings_path, opts);
         instance->validsettings();
 
@@ -111,7 +111,7 @@ namespace anson {
 
     bool has_synode_vol() {
       return !LangExt::isblank(appsettings.synode_id)
-           && std::filesystem::exists(resolveHomePath(appsettings.synode_vol));
+           && std::filesystem::exists(EnvPath::replaceEnv(appsettings.synode_vol));
     }
 
     bool open_volume() {

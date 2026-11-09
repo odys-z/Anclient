@@ -77,11 +77,26 @@ if(WIN32)
     add_compile_definitions(WIN32_LEAN_AND_MEAN _AMD64_)
 endif()
 
+# Speed up git clone with local copy
+# Local Slint source tree (unzipped from GitHub). Must contain api/cpp/.
+# Override at configure time: -DSLINT_LOCAL_DIR=/path/to/slint-1.x.y
+# FETCHCONTENT_SOURCE_DIR_ plus the name in upper case is CMake’s built-in override for a dependency named Slint
+set(SLINT_LOCAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/slint-1.18.1"
+    CACHE PATH "Unzipped Slint source tree")
+
+if(EXISTS "${SLINT_LOCAL_DIR}/api/cpp/CMakeLists.txt")
+    message(STATUS "Using local Slint source: ${SLINT_LOCAL_DIR}")
+    set(FETCHCONTENT_SOURCE_DIR_SLINT "${SLINT_LOCAL_DIR}" CACHE PATH "" FORCE)
+else()
+    message(WARNING "Local Slint not found at ${SLINT_LOCAL_DIR}; falling back to GitHub")
+endif()
+# End speeding
+
 FetchContent_Declare(
     Slint
     GIT_REPOSITORY https://github.com/slint-ui/slint.git
-    GIT_TAG release/1
-    SOURCE_SUBDIR api/cpp
+    GIT_SHALLOW    TRUE         # latest commit only, no history
+    SOURCE_SUBDIR  api/cpp
 )
 FetchContent_MakeAvailable(Slint)
 

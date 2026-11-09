@@ -35,8 +35,8 @@ requir_pkg("deprecated")
 # ---------------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent
 BUILD_DIR = ROOT_DIR / "qt-build"
-requir_cmake_fetchcontent(BUILD_DIR, "anson.cmake", "0.1.4")
-requir_cmake_fetchcontent(BUILD_DIR, "anclient.cmake", "0.1.1")
+requir_cmake_fetchcontent(BUILD_DIR, "anson.cmake", "0.1.5")
+requir_cmake_fetchcontent(BUILD_DIR, "anclient.cmake", "0.1.2")
 
 from anson.io.odysz.common import passwd_allow_ext, LangExt, Utils, requir_executable
 from deprecated import deprecated
