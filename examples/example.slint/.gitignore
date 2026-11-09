@@ -48,3 +48,4 @@ CMakeLists.txt.user
 *-temp.json
 ws-agent-*.jar
 slint-*
+webview-*
