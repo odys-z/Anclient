@@ -27,6 +27,7 @@
             android:key="@string/pswd_key"
             android:inputType="textPassword"
             android:defaultValue=""
+            android:dialogLayout="@layout/pref_dialog_pswd"
             android:title="@string/pswd_title" />
 <!--        <Preference-->
 <!--            android:key="@string/key_login_summery"-->
