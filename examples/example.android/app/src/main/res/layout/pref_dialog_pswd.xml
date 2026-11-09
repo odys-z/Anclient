@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dialog layout for the password EditTextPreference (pswd_key in xml/prefv.xml).
+     Adds an eye icon (TextInputLayout password_toggle) to show / hide the password. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="8dp">
+
+    <!-- Optional; EditTextPreferenceDialogFragmentCompat fills it if a dialog message is set. -->
+    <TextView
+        android:id="@android:id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <!-- AppTheme is AppCompat-based; the Bridge theme lets this Material view inflate. -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/Theme.MaterialComponents.Light.Bridge"
+        app:endIconMode="password_toggle">
+
+        <!-- The id must be @android:id/edit: the preference dialog looks the EditText up by it. -->
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@android:id/edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>
