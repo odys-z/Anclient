@@ -13,12 +13,13 @@ const uri = '/album/sys';
 /**
  * Function page of the doc-tree editor, route /doctree (SysComp.extendLinks() in app.tsx),
  * on the synode's doc-tree tier (port SynDocollPort.doctree): the docs of the working copy, and importing
- * a docx of the album.
+ * a docx of the album. The docs' pictures are GETs of SynDocollPort.doctree206 (Doctree206Serv).
  */
 export function AlbumDoctree(_props: Comprops) {
 	const ctx = React.useContext(AnContext) as AnContextType;
 	const tier = React.useMemo(() => ctx.anClient
-		? new StreeDoctier(ctx.anClient as unknown as SessionClient, uri, SynDocollPort.doctree) : undefined, [ctx.anClient]);
+		? new StreeDoctier(ctx.anClient as unknown as SessionClient, uri, SynDocollPort.doctree, SynDocollPort.doctree206)
+		: undefined, [ctx.anClient]);
 
 	const [docs, setDocs] = React.useState<DocInf[]>([]);
 	const [docId, setDocId] = React.useState<string>();

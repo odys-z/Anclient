@@ -37,7 +37,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-qr-code": "^2.0.18",
-    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.2.tgz",
+    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.4.tgz",
     "tss-react": "^4.9.21"
   }
 }

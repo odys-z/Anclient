@@ -11,5 +11,7 @@ export const SynDocollPort = {
 	docoll: "docoll.syn",
 	menu: "menu.serv",
 	settings: "settings.less",
-	doctree: "doctree.serv"
+	doctree: "doctree.serv",
+	/** the docs' resources (pictures) for the doc-tree editor, doctree.jserv's Doctree206Serv */
+	doctree206: "doctree206.serv"
 };
