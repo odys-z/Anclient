@@ -2,7 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 var v = 'development';
-var version = "1.1.0";
+var version = require('./package.json').version;
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');

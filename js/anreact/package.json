@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Anclient built on React.js.",
   "main": "./src/an-components.ts",
   "types": "./src/an-components.ts",
@@ -39,6 +39,7 @@
   "dependencies": {
     "@anclient/semantier": "^1.0.5",
     "acorn": "^8.4.1",
+    "clsx": "^2.1.1",
     "core-js": "^3.17.1",
     "resize-observer-polyfill": "^1.5.1"
   },
