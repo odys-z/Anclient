@@ -47,13 +47,13 @@ public class AndroidFile extends ExpSyncDoc implements Parcelable {
                 ? createDate
                 : template != null
                 ? template.cdate()
-                : DateFormat.formatime(new Date());
+                : DateFormat.formatime_utc(new Date());
 
         String shared = !isblank(this.sharedate)
                 ? sharedate
                 : template != null
                 ? template.sharedate
-                : DateFormat.formatime(new Date());
+                : DateFormat.formatime_utc(new Date());
 
         if (template != null) {
             mustnonull(template.shareby, "Forcing template's sharer cannot be empty.");

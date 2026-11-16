@@ -26,7 +26,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
-    "@anclient/anreact": "file:../../../js/anreact",
+    "@anclient/anreact": "file:../../../js/anreact/anclient-anreact-0.8.1.tgz",
     "@anclient/semantier": "file:../../../js/semantier",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -37,7 +37,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-qr-code": "^2.0.18",
-    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.4.tgz",
+    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.5.tgz",
     "tss-react": "^4.9.21"
   }
 }

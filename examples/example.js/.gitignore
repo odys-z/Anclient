@@ -23,6 +23,7 @@ node_modules
 !**/web-dist/*.json
 !**/web-dist/*.css
 !**/web-dist/res-vol
+!**/web-dist/sdoc-template
 !**/web-dist/pdfjs-legacy
 **/web-dist/pdfjs-legacy/*
 !**/web-dist/pdfjs-*/*.md

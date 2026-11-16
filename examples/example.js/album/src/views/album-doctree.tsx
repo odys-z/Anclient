@@ -73,8 +73,9 @@ export function AlbumDoctree(_props: Comprops) {
 		{selecting &&
 			<DocxSelectDialog uri={uri} onPick={importDocx} onCancel={() => setSelecting(false)} />}
 		{docId &&
-			// preview: the Sphinx template at web-dist/sdoc-template/ (jserv-album's sdoc-template-0.8)
+			// preview: the Sphinx template at web-dist/sdoc-template/<template id>/, the template the synode
+			// builds html with (settings.json sdocTemplateRoot, sdocTemplateId; jserv-album's sdoc-template-0.8)
 			<AnDoctreeditor key={docId} docId={docId} doctier={tier} height='calc(100vh - 140px)'
-				preview='sdoc-template/' />}
+				preview='sdoc-template/rtd-0.8/' />}
 	</>);
 }
