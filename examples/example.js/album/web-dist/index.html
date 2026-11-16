@@ -16,6 +16,9 @@
       <p>Currently the only option is to wait for a while. We are sorry about that!</p>
   </div>
   <noscript>You need to enable JavaScript to run this app.</noscript>
+  <!-- the development build; React and MUI are shared with login.html, see webpack.config.js -->
+  <script src="./vendor-react.min.js" type="text/javascript"></script>
+  <script src="./vendor-mui.min.js" type="text/javascript"></script>
   <script src="./portfolio.min.js" type="text/javascript"></script>
   <script>
     let searchParams = new URLSearchParams(window.location.search)

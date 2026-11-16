@@ -11,6 +11,9 @@
 <body>
 	<div id="login"></div>
 	<noscript>You need to enable JavaScript to run this app.</noscript>
+	<!-- the development build; React and MUI are shared with index.html, see webpack.config.js -->
+	<script src="vendor-react.min.js"></script>
+	<script src="vendor-mui.min.js"></script>
 	<script src="login.min.js"></script>
 	<script>
 		let searchParams = new URLSearchParams(window.location.search)

@@ -8,11 +8,24 @@ import { Langstrs, AnContext, AnContextType, AnReactExt,
 	ClientOptions, AnreactAppOptions, CrudCompW, Sys, SysComp, L,
 	ExternalHosts,
 	AnError,
+	type Comprops,
 } from '@anclient/anreact';
 import { AlbumDocview } from './views/album-docview';
 import { AlbumShares } from './views/album-shares';
-import { AlbumDoctree } from './views/album-doctree';
 import { SynDocollPort } from './tiers/syn-docoll-port';
+
+/**
+ * The doc-tree function page, loaded when it is opened: the editor (semantic-doc, Tiptap, KaTeX) is not
+ * in portfolio.min.js, see webpack.config.js, chunk doctree.
+ */
+const LazyDoctree = React.lazy(() => import(/* webpackChunkName: "doctree" */ './views/album-doctree')
+	.then((m) => ({default: m.AlbumDoctree})));
+
+function AlbumDoctree(props: Comprops) {
+	return (<React.Suspense fallback={<div>Loading the doc tree ...</div>}>
+		<LazyDoctree {...props} />
+	</React.Suspense>);
+}
 
 type AlbumProps = {
 	servs: ExternalHosts;
