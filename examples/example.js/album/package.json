@@ -32,6 +32,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
+    "@tiptap/extension-table": "^3.33.1",
     "js-sha256": "^1.0.0",
     "katex": "^0.18.10",
     "react": "^19.3.1",

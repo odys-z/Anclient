@@ -174,6 +174,70 @@ function levelIcons(iconNames: IndentIcons, lvls: IndentName[]) {
         </React.Fragment>);
 }
 
+/**
+ * y of a branch to its row's head: the middle of the head's first line, as the 2em icons of {@link AnTreeIcons}
+ * @since 0.8.2
+ */
+const indentHeadY = '1em';
+
+/**
+ * The indent icons drawn as lines of an svg as high as the row, {@link indentLines}: [x1, y1, x2, y2].
+ * The vertical lines reach the row's bottom however high the row is, e.g. a paragraph of a doc.
+ * @since 0.8.2
+ */
+const IndentLines: Partial<Record<AnTreeIconsType, Array<[string, string, string, string]>>> = {
+	'|' : [['50%', '0', '50%', '100%']],
+	'|-': [['50%', '0', '50%', '100%'], ['50%', indentHeadY, '100%', indentHeadY]],
+	'E' : [['50%', '0', '50%', '100%'], ['50%', indentHeadY, '100%', indentHeadY]],
+	'L' : [['50%', '0', '50%', indentHeadY], ['50%', indentHeadY, '100%', indentHeadY]],
+	'T' : [['0', indentHeadY, '100%', indentHeadY], ['50%', indentHeadY, '50%', '100%']],
+	'F' : [['50%', indentHeadY, '100%', indentHeadY], ['50%', indentHeadY, '50%', '100%']],
+	'-' : [['0', indentHeadY, '100%', indentHeadY]],
+	'.' : [],
+};
+
+/**
+ * An indent of {@link indentLines}: the lines, or the icon if it isn't a line, e.g. '+', at the row's head.
+ */
+function indentLine(iconNames: IndentIcons | undefined, name: AnTreeIconsType | IndentName, k: string | number) {
+	let type = ((iconNames || defltIcons)[name as IndentName] || name) as AnTreeIconsType;
+	let lines = IndentLines[type];
+	if (!lines)
+		return (<Box key={k} component='span' sx={{flex: 'none', alignSelf: 'flex-start'}}>
+					{icon(iconNames || defltIcons, name, k)}
+				</Box>);
+
+	return (
+	  <Box key={k} component='span' sx={{flex: 'none', position: 'relative', width: '2em', minHeight: '2em', color: 'primary.main'}}>
+		<svg width='100%' height='100%' style={{position: 'absolute', left: 0, top: 0, overflow: 'visible'}}
+			 stroke='currentColor' strokeWidth={1} shapeRendering='crispEdges' aria-hidden='true'>
+		  {lines.map(([x1, y1, x2, y2], x) => <line key={x} x1={x1} y1={y1} x2={x2} y2={y2} />)}
+		  {type === 'F' && <rect x='50%' y={indentHeadY} width={8} height={8} transform='translate(-4 -4)' fill='currentColor' />}
+		</svg>
+	  </Box>);
+}
+
+/**
+ * A row's head: the indents as lines as high as the row, so the tree's links are not broken by a high
+ * row, e.g. a paragraph or a picture; then the head's content, at the top. The row head (a grid cell)
+ * should be as high as the row, which a cell of a Grid container is.
+ * 
+ * @param iconNames indent names to icons, default {@link defltIcons}
+ * @param lvls the indents, e.g. AnTreeNode.indents, and the node's toggle, 'expand' or 'collapse'
+ * @param children the head's content, e.g. the node's title
+ * @since 0.8.2
+ */
+function indentLines(iconNames: IndentIcons | undefined, lvls: Array<IndentName | AnTreeIconsType> | undefined, children?: React.ReactNode) {
+	return (
+	  <Box component='span' sx={{display: 'flex', alignItems: 'stretch', height: '100%', minHeight: '2em'}}>
+		{lvls && lvls.map((i, x) => indentLine(iconNames, i, x))}
+		<Box component='span' sx={{alignSelf: 'flex-start', minWidth: 0, lineHeight: '2em',
+					overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+			{children}
+		</Box>
+	  </Box>);
+}
+
 function icon(iconNames: IndentIcons, name: AnTreeIconsType | IndentName, k: string | number, classes?: string) {
     let icon = AnTreeIcons[(iconNames || defltIcons)[name || 'deflt']]
             || AnTreeIcons[name]; // extend to all supported icons
@@ -383,5 +447,5 @@ class AnTreeComp extends CrudCompW<Comprops> {
 }
 
 const AnTree = withStyles<any, any, Comprops>(styles)(withWidth()(AnTreeComp));
-export { levelIcons, icon, TreeNodeVisual, type AnTreegridCol,
+export { levelIcons, indentLines, IndentLines, icon, TreeNodeVisual, type AnTreegridCol,
 		type TreegridProps as TreeItemProps, type AnreactreeItem, AnTree, AnTreeComp }

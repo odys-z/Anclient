@@ -21,6 +21,7 @@ node_modules
 !**/web-dist/*.html
 **/web-dist/report.html
 !**/web-dist/*.json
+**/web-dist/webpack-assets.json
 !**/web-dist/*.css
 !**/web-dist/res-vol
 !**/web-dist/sdoc-template

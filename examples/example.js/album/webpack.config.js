@@ -51,10 +51,37 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const CompressionPlugin = require('compression-webpack-plugin');
 
 /**
+ * Writes the list of the files a build emits, web-dist/webpack-assets.json, one list for each build:
+ *
+ * { "type": "io.oz.srv.WebAssets", "development": ["login.min.js", "login.min.js.gz", ...], "production": [...] }
+ *
+ * The names are the build's own (entries, split chunks, .gz, .map, fonts), so nothing else repeats them:
+ * jserv-album's tasks.py packs a listed file with a listed .gz as the .gz only, and html-service
+ * (io.oz.srv.WebAssets, the type) unzips these when it starts. report.html isn't an emitted file.
+ */
+class AssetsListPlugin {
+	apply(compiler) {
+		compiler.hooks.done.tap('AssetsListPlugin', (stats) => {
+			if (stats.hasErrors()) return;
+
+			let file = path.join(compiler.options.output.path, 'webpack-assets.json');
+			let list = {};
+			try { list = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { /* the first build */ }
+
+			list.type = 'io.oz.srv.WebAssets';
+			list[compiler.options.mode] = stats.compilation.getAssets().map((a) => a.name).sort();
+			fs.writeFileSync(file, JSON.stringify(list, null, 2) + '\n');
+		});
+	}
+}
+
+/**
  * Two builds of the same sources, into web-dist:
  *
  * development: [name].min.js, for index.html and login.html;
  * production : [name].prod.min.js, for webview.html (Android), with the size report, report.html.
+ *
+ * The files of each build are listed in web-dist/webpack-assets.json, see AssetsListPlugin.
  *
  * Each build is split, for a smaller first download:
  *
@@ -87,8 +114,8 @@ function config(mode) {
 	},
 
 	plugins: prod
-		? [new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin()]
-		: [new CompressionPlugin()],
+		? [new BundleAnalyzerPlugin({analyzerMode: 'static'}), new CompressionPlugin(), new AssetsListPlugin()]
+		: [new CompressionPlugin(), new AssetsListPlugin()],
 
 	optimization: {
 		splitChunks: { cacheGroups: {

@@ -22,7 +22,7 @@ import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
-import { icon, levelIcons, type AnTreegridCol, type TreeItemProps, type AnreactreeItem, TreeNodeVisual } from "./tree";
+import { icon, levelIcons, indentLines, type AnTreegridCol, type TreeItemProps, type AnreactreeItem, TreeNodeVisual } from "./tree";
 import { AnTreegridComp } from "./treegrid";
 
 export const treeditorStyles = (theme: Theme) => ({
@@ -235,9 +235,10 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 				  if (cx === 0) return (
 					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode.id}.${cx}`} className={classes.rowHead} size={gridSize(col.grid)}>
-						<Typography noWrap variant='body2'>
-							{that.leadingIcons()}
-							{n[col.field] as React.ReactNode}
+						{/* the indent lines are as high as the row, see indentLines() */}
+						<Typography noWrap variant='body2' component='div' sx={{height: '100%'}}>
+							{indentLines(this.props.indentSettings, tnode?.indents as IndentName[],
+								n[col.field] as React.ReactNode)}
 						</Typography>
 					</Grid> );
 				  else if (col.type === 'actions')
@@ -700,14 +701,12 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 					  return (
 						hide(col.grid, media) ? undefined :
 						<Grid key={`${treenode.id}.${ix}`} size={gridSize(col.grid)} >
-							{/* div: sectionTitle() may render blocks */}
-							<Typography noWrap variant='body2' component='div' >
-							{levelIcons(
-								that.props.indentSettings,
-								treenode.indents as IndentName[])}
-							{expd ? icon(that.props.indentIcons, "expand", 0)
-								: icon(that.props.indentIcons, "collapse", 0)}
-							{that.sectionTitle(treenode)}
+							{/* div: sectionTitle() may render blocks; the indent lines, and the toggle's, are as high as the row */}
+							<Typography noWrap variant='body2' component='div' sx={{height: '100%'}}>
+							{indentLines(
+								{...defltIcons, ...that.props.indentSettings, ...that.props.indentIcons},
+								[...(treenode.indents as IndentName[] ?? []), expd ? 'expand' : 'collapse'],
+								that.sectionTitle(treenode))}
 							</Typography>
 						</Grid>);
 					else if (col.type === 'actions')

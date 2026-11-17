@@ -56,6 +56,12 @@ export interface DialogProps extends Comprops {
 	/**dialog message */
 	msg: string;
 
+	/**
+	 * Optional content below the message, e.g. a link: <ConfirmDialog msg='Published'><Link href={url}>{url}</Link></ConfirmDialog>
+	 * @since 0.8.2
+	 */
+	children?: React.ReactNode;
+
 	fullScreen?: boolean;
 	fullWidth?: boolean;
 
@@ -132,6 +138,7 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 				</DialogTitle>
 				<DialogContent>
 					{txtLines}
+					{props.children}
 				</DialogContent>
 				<DialogActions className={classes?.dlgAct}>
 				  <Button onClick={this.toOk} color="primary" autoFocus={displayCancel === 'none'} >
