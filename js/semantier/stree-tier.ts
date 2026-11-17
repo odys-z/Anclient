@@ -9,13 +9,13 @@ import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './seman
 
 
 /**
- * expand: 'T'; collpase: e.g. '+', ...,
+ * expand: '[-]', a box with a minus over the lines of 'T' (anreact 0.8.2; was 'T'); collpase: e.g. '+', ...,
  * 
  * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
  */
 export type IndentName = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
 export type AnTreeIconsType =
-        'deflt' | '+' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
+        'deflt' | '+' | '[-]' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
 
 /**
@@ -36,7 +36,7 @@ export type IndentIcons = {
 /**
  * defaults icons:
  * 
- * expand: 'T';
+ * expand: '[-]', a box with a minus over the lines of 'T' (anreact 0.8.2; was 'T');
  * collapse: "+";
  * hlink: '-';
  * spacex: '.';
@@ -45,7 +45,7 @@ export type IndentIcons = {
  * childx: 'L', last child;
  */
 export const defltIcons: IndentIcons = {
-    expand: 'T', collapse: '+', childi: '|-', childx: 'L',
+    expand: '[-]', collapse: '+', childi: '|-', childx: 'L',
     vlink : '|', spacex  : '.', hlink : '-',  deflt: '.'
 };
 

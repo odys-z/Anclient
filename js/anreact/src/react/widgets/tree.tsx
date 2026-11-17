@@ -35,6 +35,7 @@ export const AnTreeIcons = {
 	"|-": <EIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 	"E": <EIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 	"+": <XIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
+	"[-]": <MIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 	".": <NIcon color="primary" style={{verticalAlign: 'middle', width: '2em', height: '2em'}} />,
 
 	"pic-lib": <PhotoLibraryOutlinedIcon color="primary" style={{verticalAlign: 'middle', height: '1.5em', fontSize: '1.333333em'}} />,
@@ -101,6 +102,35 @@ function XIcon(props) {
   return (
 	<SvgIcon fontSize="inherit" {...props} viewBox="-6 -6 36 36">
 	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z m -2 10 h -4 v 4 h -2 v -4 H 7 v -2 h 4 V 7 h 2 v 4 h 4 v 2 Z" />
+	</SvgIcon>
+  );
+}
+
+/**
+ * The box of {@link XIcon}, '+' (collapsed), with a minus: an expanded node, '[-]'.
+ * The minus is of the background colour, so the lines under the box (see {@link indentLine}) don't show through.
+ * @since 0.8.2
+ */
+function MinusBoxIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" {...props} viewBox="-6 -6 36 36">
+	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z" />
+	  <path d="M 7 11 h 10 v 2 H 7 Z" fill="#fff" />
+	</SvgIcon>
+  );
+}
+
+/**
+ * '[-]', an expanded node: {@link MinusBoxIcon} at the T junction, the line from the left,
+ * on to the title and down to the children, as 'T' (in this icon's 36 units: 1.5 is 'T''s 1).
+ * @since 0.8.2
+ */
+function MIcon(props) {
+  return (
+	<SvgIcon fontSize="inherit" {...props} viewBox="-6 -6 36 36">
+	  <path d="M -6 11.25 h 36 v 1.5 h -36 Z M 11.25 12 h 1.5 v 18 h -1.5 Z" />
+	  <path d="M 19 3 H 5 c -1.11 0 -2 0.9 -2 2 v 14 c 0 1.1 0.89 2 2 2 h 14 c 1.1 0 2 -0.9 2 -2 V 5 c 0 -1.1 -0.9 -2 -2 -2 Z" />
+	  <path d="M 7 11 h 10 v 2 H 7 Z" fill="#fff" />
 	</SvgIcon>
   );
 }
@@ -191,6 +221,8 @@ const IndentLines: Partial<Record<AnTreeIconsType, Array<[string, string, string
 	'E' : [['50%', '0', '50%', '100%'], ['50%', indentHeadY, '100%', indentHeadY]],
 	'L' : [['50%', '0', '50%', indentHeadY], ['50%', indentHeadY, '100%', indentHeadY]],
 	'T' : [['0', indentHeadY, '100%', indentHeadY], ['50%', indentHeadY, '50%', '100%']],
+	// expanded: the lines of 'T', the box of '[-]' over them (indentLine)
+	'[-]': [['0', indentHeadY, '100%', indentHeadY], ['50%', indentHeadY, '50%', '100%']],
 	'F' : [['50%', indentHeadY, '100%', indentHeadY], ['50%', indentHeadY, '50%', '100%']],
 	'-' : [['0', indentHeadY, '100%', indentHeadY]],
 	'.' : [],
@@ -214,6 +246,9 @@ function indentLine(iconNames: IndentIcons | undefined, name: AnTreeIconsType | 
 		  {lines.map(([x1, y1, x2, y2], x) => <line key={x} x1={x1} y1={y1} x2={x2} y2={y2} />)}
 		  {type === 'F' && <rect x='50%' y={indentHeadY} width={8} height={8} transform='translate(-4 -4)' fill='currentColor' />}
 		</svg>
+		{/* the toggle's box, 2em as the icons: centred on the junction (50%, indentHeadY) */}
+		{type === '[-]' && <MinusBoxIcon color='primary'
+				style={{position: 'absolute', left: 0, top: 0, width: '2em', height: '2em'}} />}
 	  </Box>);
 }
 
