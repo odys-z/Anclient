@@ -109,6 +109,15 @@ namespace anson {
       return *instance;
     }
 
+    /**
+     * The port the IPC agent is listening at, found from appsettings.wsport upwards.
+     * Blocks until the agent reports it.
+     * @return 0 if the agent is not running or didn't report it in time.
+     */
+    static int ipc_port() {
+      return instance && instance->agentController ? instance->agentController->wait_wsport() : 0;
+    }
+
     bool has_synode_vol() {
       return !LangExt::isblank(appsettings.synode_id)
            && std::filesystem::exists(EnvPath::replaceEnv(appsettings.synode_vol));
@@ -481,7 +490,7 @@ namespace anson {
         LangExt::mustnonull(appsettings.java_path, "Java-path must not be empty!");
         LangExt::mustnonull(appsettings.wsagent_jar, "IPC-agent jar must not be empty!");
         LangExt::mustnonull(appsettings.wshost, "IPC host must not be empty!");
-        LangExt::mustin(appsettings.wsport, 1024, 65536, "Port must in range [0, 65535]!");
+        LangExt::mustin(appsettings.wsport, 1024, 65536, "Starting port wsport must be in [1024, 65535]!");
         LangExt::mustnonull(appsettings.regiserv, "Registry-jserv must not be empty!");
 
         return !appsettings.synode_jserv.empty()

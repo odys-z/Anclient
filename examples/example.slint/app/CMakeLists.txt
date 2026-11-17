@@ -138,7 +138,8 @@ endif()
 # App assets -> dist/
 # ---------------------------------------------------------------------------
 # Ensure assets copying only when building the main target (filter out test res also)
-file(GLOB IPC_JAR "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
+# CONFIGURE_DEPENDS: re-glob on every build, so a new ws-agent version in tests/res is picked up
+file(GLOB IPC_JAR CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/tests/res/ws-agent-*.jar")
 message(STATUS "====== IPC-JAR ========= [${IPC_JAR}]")
 add_custom_target(copy_album_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory

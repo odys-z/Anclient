@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <ixwebsocket/IXNetSystem.h>
 #include <ixwebsocket/IXWebSocket.h>
 
@@ -14,7 +15,10 @@ namespace anson {
 void AsynClienter::reconnect_ipc() {
     if (!wsclient || wsclient->ipconn_state() == WSClient::Closed) {
         anlog("Re-connect IPC Agent...");
-        JServUrl wsjserv{std::format("ws://{}:{}", appsettings.wshost, appsettings.wsport), JProtocol{"ipc", &Slingleton::opts}};
+        int wsport = Slingleton::ipc_port();
+        if (wsport == 0)
+            throw std::runtime_error("IPC Agent did not report its port, see log/ipc_agent_java.log");
+        JServUrl wsjserv{std::format("ws://{}:{}", appsettings.wshost, wsport), JProtocol{"ipc", &Slingleton::opts}};
         WSClient* _wsclient = new WSClient(wsjserv, appsettings, onmsg);
         try {
             _wsclient->connect();

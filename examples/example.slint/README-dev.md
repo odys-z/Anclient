@@ -41,17 +41,24 @@ FYI, the .vscode/c_cpp_properties.json example
 
 Tip:
 
-1. Start Eclipse ipc-agent for bind first at 8700
-
-   File build/app/log/ipc_agent_java.log should report:
+1. The ipc-agent binds the first free port from "wsport" in app-settings.json (up to wsport + 1000),
+   and writes it into build/app/log/ipc-agent.port:
 
    ```
-     [main] INFO org.eclipse.jetty.server.Server - jetty-12.0.21; built: 2025-05-09T00:32:00.688Z; 
-     Exception in thread "main" java.io.IOException: Failed to bind to 0.0.0.0/0.0.0.0:8700
-	 at org.eclipse.jetty.server.ServerConnector.openAcceptChannel(ServerConnector.java:349)
-	 at org.eclipse.jetty.server.ServerConnector.open(ServerConnector.java:313)
-	 at org.eclipse.jetty.server.Server.lambda$doStart$0(Server.java:571)
-     ...
+     8700     <- websocket port, read by the desktop app
+     8701     <- jetty stop port, read by StopAgent
+   ```
+
+   If no port is free, build/app/log/ipc_agent_java.log reports:
+
+   ```
+     Exception in thread "main" java.io.IOException: No free port in [8700, 9700]
+   ```
+
+   To stop an agent started by hand:
+
+   ```
+     java -cp ws-agent-#.#.#.jar io.oz.anclient.ipcagent.StopAgent build/app/log/ipc-agent.port
    ```
 
 # Build

@@ -69,7 +69,8 @@ protected:
         agentController = new JavaAgentController(settings);
 
         if (!agentController->start_agent(settings_json)) {
-            setup_error = "failed to launch the Java IPC agent process.";
+            setup_error = "failed to launch the Java IPC agent process. log/ipc_agent_java.log:"
+                        + log_tail("log/ipc_agent_java.log");
             return false;
         }
         anlog(std::format("Synode Volume: {}", settings.synode_vol));
@@ -78,7 +79,7 @@ protected:
 
     /**
      * Replaces the fixed sleeps: a cold JVM on a CI runner can take several seconds
-     * before the agent binds wsport. Retry the websocket until it is Open.
+     * before the agent binds its port. Retry the websocket until it is Open.
      */
     static bool connect_with_retry(int timeout_ms) {
         auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout_ms);
@@ -107,10 +108,18 @@ protected:
 
         if (!start_agent()) return;
 
-        string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, settings.wsport);
+        int wait_ms = env_int("ALBUM_AGENT_WAIT_MS", 30000);
+        int wsport = agentController->wait_wsport(std::chrono::milliseconds(wait_ms));
+        if (wsport == 0) {
+            // An agent jar built before the port-file change never writes it.
+            setup_error = std::format("the agent didn't write log/ipc-agent.port in {} ms, is res/ws-agent-*.jar rebuilt? "
+                                      "log/ipc_agent_java.log:{}", wait_ms, log_tail("log/ipc_agent_java.log"));
+            return;
+        }
+
+        string wsjserv = std::format("ws://{}:{}/ipc", settings.wshost, wsport);
         wsclient = new WSClient({wsjserv, JProtocol{"ipc", &opts}}, settings, onmsg);
 
-        int wait_ms = env_int("ALBUM_AGENT_WAIT_MS", 30000);
         agent_ready = connect_with_retry(wait_ms);
         if (!agent_ready)
             setup_error = std::format("{} not reachable in {} ms, see log/ipc_agent_java.log", wsjserv, wait_ms);
