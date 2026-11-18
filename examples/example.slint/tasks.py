@@ -26,7 +26,7 @@ from typing import Optional, cast
 
 from anson.io.odysz.common import requir_pkg, requir_cmake_fetchcontent
 requir_pkg("anson.py3", "0.6.10")
-requir_pkg("semantics.py3", "0.6.11")
+requir_pkg("semantics.py3", "0.6.22")
 requir_pkg("jre-mirror", "0.1.2")
 requir_pkg("deprecated")
 
@@ -431,6 +431,49 @@ def deploy_settings(ctx, deploy: str = "tasks.json"):
     Utils.copy_anyway(new_sets, dist_dir / 'settings' / 'app-settings.json')
 
 
+SETUP_DIR = ROOT_DIR / "app" / "setup"
+'''
+The shortcut scripts' templates, generated into dist/ by gen_shortcut_scripts().
+'''
+
+
+def gen_shortcut_scripts(taskcfg: SynodeTask, dist_dir: Path, target: str = TARGET_NAME):
+    '''
+    Generate the shortcut scripts into dist_dir from app/setup/*.templ, with the names resolved
+    from taskcfg.shortcuts (SynodeTask.shortcuts, literals or {prj}<path>#<key> references, the
+    current project being this one):
+        Windows: create-shortcut.bat, remove-shortcut.bat (UTF-8 without BOM, CRLF);
+        POSIX:   create-shortcut.sh,  remove-shortcut.sh (LF, executable).
+    The scripts start the desktop in their own folder: the unzipped folder of the stand alone
+    package, or <synode installation>/desktop, where synode.py3's setup-cli/gui call them.
+    '''
+    nt = os.name == 'nt'
+    sc = taskcfg.shortcuts
+    names = {'@@ROOT@@'   : sc.name(taskcfg, 'root', 'Portfolio', ROOT_DIR),
+             '@@DESKTOP@@': sc.name(taskcfg, 'desktop', target, ROOT_DIR),
+             '@@SETUP@@'  : sc.name(taskcfg, 'setup', 'setup-gui', ROOT_DIR)}
+
+    def quote(v: str) -> str:
+        # inside a single-quoted string, PowerShell or sh
+        return v.replace("'", "''") if nt else v.replace("'", "'\\''")
+
+    values = {k: quote(v) for k, v in names.items()}
+    values['@@EXE@@'] = target
+    values['@@SETUP_EXE@@'] = 'setup-gui.exe'
+
+    for script in ('create-shortcut', 'remove-shortcut'):
+        templ = SETUP_DIR / f'{script}.{"bat" if nt else "sh"}.templ'
+        out = dist_dir / f'{script}.{"bat" if nt else "sh"}'
+        text = templ.read_text(encoding='utf-8')
+        for k, v in values.items():
+            text = text.replace(k, v)
+        with open(out, 'w', encoding='utf-8', newline='\r\n' if nt else '\n') as f:
+            f.write(text)
+        if not nt:
+            out.chmod(0o755)
+        print(f'{out}: {names}')
+
+
 @task(name="shallow-pack")
 def shallow_pack(ctx, deploy: str = 'tasks.json',
                  config="Debug", target=TARGET_NAME, generator="Ninja"):
@@ -442,6 +485,7 @@ def shallow_pack(ctx, deploy: str = 'tasks.json',
 
     The app-settings.json for packaging must be generated and is ready for distribution.
     """
+    global taskcfg
 
     exe_path = DIST_DIR / ((target + ".exe") if os.name == "nt" else target)
 
@@ -456,6 +500,11 @@ def shallow_pack(ctx, deploy: str = 'tasks.json',
         copy_dlls(ctx, config=config)
 
     deploy_settings(ctx, deploy)
+
+    if taskcfg is None:
+        taskcfg = cast(SynodeTask, Anson.from_file(deploy))
+    gen_shortcut_scripts(taskcfg, DIST_DIR, target)
+
     print(f"\nDone. Run: {exe_path}")
 
 app_name: str = 'album-desktop'

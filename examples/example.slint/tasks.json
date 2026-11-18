@@ -13,6 +13,15 @@
   "desktop_dist_dir": "qt-build/dist",
   "central_dir"  : "../../Semantic-Network/registration/jserv",
   "package_dir"  : "build-0.8.0",
+  "shortcuts": {
+    "type": "io.oz.invoke.ShortcutConfig",
+    "root": "Portfolio",
+    "res": {
+      "type": "io.oz.anclient.app.UIResources",
+      "lang": "en",
+      "langs": {
+        "en": { "desktop": "{}/app/res/shortcuts.json#desktop",
+                "setup"  : "{}/app/res/shortcuts.json#setup" } } } },
   "deploy": {
     "mirror_path"   : { },
     "central_iport" : "localhost:1991",

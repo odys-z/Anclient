@@ -81,7 +81,27 @@ if(WIN32)
     )
 endif()
 
-# Discover tests at build time instead of deferring to test runtime
+# ---------------------------------------------------------------------------
+# MinGW runtime: TARGET_RUNTIME_DLLS doesn't include it, and relying on PATH
+# can load an older libstdc++ from another app (e.g. Meld).
+# ---------------------------------------------------------------------------
+if(MINGW)
+    get_filename_component(ALBUM_TESTS_MINGW_BIN "${CMAKE_CXX_COMPILER}" DIRECTORY)
+    foreach(_dll IN ITEMS libgcc_s_seh-1.dll libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll)
+        if(EXISTS "${ALBUM_TESTS_MINGW_BIN}/${_dll}")
+            add_custom_command(TARGET album_tests POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${ALBUM_TESTS_MINGW_BIN}/${_dll}"
+                    "$<TARGET_FILE_DIR:album_tests>"
+            )
+        endif()
+    endforeach()
+endif()
+
+# Discover tests at build time instead of deferring to test runtime.
+# The default 5 s timeout is too short for a cold start of a debug exe that
+# loads large debug DLLs (slint_cpp, curl, boost) while Defender scans them.
 gtest_discover_tests(album_tests
     DISCOVERY_MODE POST_BUILD
+    DISCOVERY_TIMEOUT 60
 )

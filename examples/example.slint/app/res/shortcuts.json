@@ -1,0 +1,7 @@
+{ "type": "io.oz.anclient.app.UIResources",
+  "lang": "en",
+  "langs": {
+    "en": { "desktop": "Portfolio Desktop",
+            "setup"  : "Portfolio Setup" }
+  }
+}

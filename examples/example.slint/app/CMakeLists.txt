@@ -97,19 +97,18 @@ endif()
 # Catch DLLs that TARGET_RUNTIME_DLLS misses on MinGW: the compiler runtime
 # and (on Windows) the WebView2 loader.
 # ---------------------------------------------------------------------------
-if (WIN32 AND MINGW)
-    find_file(ALBUM_LIBGCC_DLL       NAMES libgcc_s_seh-1.dll libgcc_s_dw2-1.dll)
-    find_file(ALBUM_LIBSTDCPP_DLL    NAMES libstdc++-6.dll)
-    find_file(ALBUM_LIBWINPTHREAD_DLL NAMES libwinpthread-1.dll)
+if (MINGW)
+    # Take the runtime from the compiler's own bin dir only, instead of depending on PATH's order.
+    get_filename_component(ALBUM_MINGW_BIN "${CMAKE_CXX_COMPILER}" DIRECTORY)
 
-    foreach(_dll IN ITEMS ALBUM_LIBGCC_DLL ALBUM_LIBSTDCPP_DLL ALBUM_LIBWINPTHREAD_DLL)
-        if(${_dll})
+    foreach(_dll IN ITEMS libgcc_s_seh-1.dll libgcc_s_dw2-1.dll libstdc++-6.dll libwinpthread-1.dll)
+        if(EXISTS "${ALBUM_MINGW_BIN}/${_dll}")
             add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${${_dll}}" "${ALBUM_DIST_DIR}"
+                    "${ALBUM_MINGW_BIN}/${_dll}" "${ALBUM_DIST_DIR}"
             )
-        else()
-            message(WARNING "album_gui: could not locate ${_dll} — copy it into dist/ manually if the exe fails to start")
+        elseif(NOT _dll STREQUAL "libgcc_s_dw2-1.dll" AND NOT _dll STREQUAL "libgcc_s_seh-1.dll")
+            message(WARNING "album_gui: ${_dll} not found in ${ALBUM_MINGW_BIN} — copy it into dist/ manually if the exe fails to start")
         endif()
     endforeach()
 endif()
