@@ -18,12 +18,9 @@ export class ExternalHosts implements JsonHosts {
 	host: string | undefined;
 	localip?: string;
 	syndomx?: { [key: string]: string };
-	synodesetups?: { [key: string]: string[] };
-
 
 	constructor(json: {host: string, localip?: string,
-				syndomx?: { [key: string]: string },
-				synodesetups?: { [key: string]: string[] }}) {
+				syndomx?: { [key: string]: string }}) {
 
 		Object.assign(this, json);
 
@@ -46,27 +43,6 @@ export class ExternalHosts implements JsonHosts {
 			.filter(([x, v]) => x !== 'domain')
 			.map(([k, v]) => {return {n: k, v}});
 		return this;
-	}
-
-	static
-	to_arch_os_readable(zip_name: string): string {
-		let arc, os: string;
-		if (zip_name.indexOf('x64') >= 0)
-			arc = '64-bit';
-		else if (zip_name.indexOf('x86') >= 0)
-			arc = '32-bit';
-		else
-			arc = 'AMD';
-		if (zip_name.indexOf('win') >= 0)
-			os = 'Windows';
-		else if (zip_name.indexOf('linux') >= 0)
-			os = 'Linux';
-		else if (zip_name.indexOf('mac') >= 0)
-			os = 'MacOS';
-		else
-			os = 'OS';
-		
-		return `${os} ${arc}`;
 	}
 }
 
