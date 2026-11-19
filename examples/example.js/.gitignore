@@ -38,3 +38,4 @@ album/products
 package-lock.json
 
 **/.npmrc
+!album/.npmrc
