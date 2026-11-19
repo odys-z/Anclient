@@ -409,16 +409,29 @@ int main(int argc, char **argv) {
                 // Capture temp_doclientier in the lambda to keep it alive until the network callback executes
                 temp_doclientier->asy_register_dev(s,
                     [ui_weak, s, commit_settings, temp_doclientier](const AnsonResp& r) {
+                        // The synode replies DocsResp{device: {id, synode0, devname}}.
+                        // Persist the id it allocated, not the name typed in the UI.
+                        const auto* dr = dynamic_cast<const DocsResp*>(&r);
+                        string devid   = dr ? dr->device.id : ""s;
+                        string devname = dr ? dr->device.devname : ""s;
                         string m = r.m;
                         // network thread -> UI thread
-                        slint::invoke_from_event_loop([ui_weak, s, m, commit_settings]() {
-                            commit_settings(s, m);
+                        slint::invoke_from_event_loop([ui_weak, s, m, devid, devname, commit_settings]() {
+                            if (devid.empty()) {
+                                insert_status(ui_weak, "Device registered, but the synode returned no device id. Settings are not saved.");
+                                return;
+                            }
+                            DesktopSettings s2 {s};
+                            s2.device = devid;
+                            commit_settings(s2, m);
                             show_dlg(ui_weak, "Saved",
-                                     std::format("User: {}\n Device {}\n Domain: {}\n{}",
-                                                 s.admin, s.device, s.domain, m));
+                                     std::format("User: {}\n Device: {} [{}]\n Domain: {}\n{}",
+                                                 s2.admin, devname, devid, s2.domain, m));
                         });
-                    }, [temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
+                    }, [ui_weak, temp_doclientier](MsgCode::Code c, const string& e, const vector<string> &a) {
                         AsynClienter::onErr(c, e, a);
+                        // e.g. "Device, xxx, already exists in org." - was only logged before
+                        insert_status(ui_weak, "Failed to register device: "s + e);
                     });
             }
             else {

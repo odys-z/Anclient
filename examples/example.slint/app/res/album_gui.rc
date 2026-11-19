@@ -1,0 +1,3 @@
+// The exe icon, Windows (Explorer, the shortcuts, the taskbar). album.ico is found in this
+// folder, the source file's INCLUDE_DIRECTORIES (app/CMakeLists.txt).
+IDI_APP ICON "album.ico"

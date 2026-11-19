@@ -26,6 +26,14 @@ add_executable(${PROJECT_NAME}
     src/webview-ext.h
 )
 
+# The exe icon (Explorer, the Start Menu shortcuts, the taskbar), from the Portfolio album icon.
+if (WIN32)
+    enable_language(RC)
+    target_sources(${PROJECT_NAME} PRIVATE res/album_gui.rc)
+    set_property(SOURCE res/album_gui.rc APPEND PROPERTY
+        INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/res")
+endif()
+
 # ---------------------------------------------------------------------------
 # All build output (exe + dlls + assets) lands in <build>/dist, and the exe
 # is expected to be launched from within that folder.
@@ -155,6 +163,10 @@ add_custom_target(copy_album_assets
         "${ALBUM_DIST_DIR}/res"
     COMMAND ${CMAKE_COMMAND} -E copy
         "${IPC_JAR}"
+        "${ALBUM_DIST_DIR}/res/"
+    # the Linux launchers' Icon= (app/setup/create-shortcut.sh.templ)
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/res/album.png"
         "${ALBUM_DIST_DIR}/res/"
 
     COMMENT "Syncing assets to dist folder..."

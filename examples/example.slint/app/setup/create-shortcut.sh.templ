@@ -13,6 +13,7 @@ deskname='@@DESKTOP@@'
 setupname='@@SETUP@@'
 here=$(cd "$(dirname "$0")" && pwd) || exit 1
 exe="$here/@@EXE@@"
+icon="$here/res/album.png"
 
 # The general escape of string values (Name, Path), .desktop specification.
 desk_str() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' | tr '\n\r\t' '   '; }
@@ -23,7 +24,7 @@ file_part() { printf '%s' "$1" | tr '/ \t\n' '____'; }
 # Single-quoted for sh.
 sh_quote() { printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"; }
 
-# write_entry <file> <name> <path> <exec> <terminal>
+# write_entry <file> <name> <path> <exec> <terminal> [<icon>]
 write_entry() {
     cat > "$1" <<ENTRY || return 1
 [Desktop Entry]
@@ -34,6 +35,7 @@ Exec=$4
 Terminal=$5
 Categories=Utility;
 ENTRY
+    if [ -n "$6" ]; then echo "Icon=$(desk_str "$6")" >> "$1" || return 1; fi
     chmod +x "$1" && echo "Shortcut created: $1"
 }
 
@@ -47,7 +49,7 @@ if [ -z "$PORTFOLIO_SYNODE" ]; then
     [ -n "$desk" ] || desk="$HOME/Desktop"
     mkdir -p "$desk" || exit 1
     f="$desk/portfolio-desktop.desktop"
-    write_entry "$f" "$deskname" "$here" "$(desk_arg "$exe")" false || exit 1
+    write_entry "$f" "$deskname" "$here" "$(desk_arg "$exe")" false "$icon" || exit 1
     # GNOME: let the Desktop icon launch without the "untrusted launcher" prompt
     gio set "$f" metadata::trusted true 2>/dev/null || true
 else
@@ -56,7 +58,7 @@ else
     mkdir -p "$apps" || exit 1
     id=$(file_part "$PORTFOLIO_SYNODE")
     write_entry "$apps/portfolio-$id-desktop.desktop" "$deskname ($PORTFOLIO_SYNODE)" "$here" \
-                "$(desk_arg "$exe")" false || exit 1
+                "$(desk_arg "$exe")" false "$icon" || exit 1
 
     act=''
     if [ -n "$PORTFOLIO_VENV" ] && [ -f "$PORTFOLIO_VENV/bin/activate" ]; then
@@ -64,6 +66,6 @@ else
     fi
     cli="${act}if [ -x ./synode-cli ]; then ./synode-cli; else synode-cli; fi; exec \"\${SHELL:-sh}\""
     write_entry "$apps/portfolio-$id-setup.desktop" "$setupname ($PORTFOLIO_SYNODE)" "$install" \
-                "sh -c $(desk_arg "$cli")" true || exit 1
+                "sh -c $(desk_arg "$cli")" true utilities-terminal || exit 1
 fi
 exit 0

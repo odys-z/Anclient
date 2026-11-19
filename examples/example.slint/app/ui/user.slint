@@ -267,9 +267,8 @@ export component User {
                             horizontal-stretch: 1;
                             placeholder-text: @tr("User ID");
                             text: UserProfile.model.user_id_text;
-                            // edited(text) => {
-                            //     UserProfile.model.user_id_text = text;
-                            // }
+                            // save_userinfo() reads the model, not this widget
+                            edited(text) => { UserProfile.model.user_id_text = text; }
                         }
 
                         // spacer to visually separate uid from the pswd/pswd-2 pair
@@ -282,10 +281,7 @@ export component User {
                             placeholder-text: @tr("Password");
                             input-type: password;
                             text: UserProfile.model.password_text;
-                            // edited(text) => {
-                            //     UserProfile.model.password_text = text;
-                            //     root.notify-changed();
-                            // }
+                            edited(text) => { UserProfile.model.password_text = text; }
                         }
 
                         confirm-password-edit := LineEdit {
@@ -293,10 +289,7 @@ export component User {
                             placeholder-text: @tr("Confirm");
                             input-type: password;
                             text: UserProfile.model.confirm_password_text;
-                            // edited(text) => {
-                            //     UserProfile.model.confirm_password_text = text;
-                            //     root.notify-changed();
-                            // }
+                            edited(text) => { UserProfile.model.confirm_password_text = text; }
                         }
                     }
 
