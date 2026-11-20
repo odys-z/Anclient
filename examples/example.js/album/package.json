@@ -15,7 +15,7 @@
   ],
   "author": "Ody Zhou",
   "license": "MIT",
-  "//": "As registry.ts: @anclient/* are linked to the sources of this Anclient checkout (anreact 0.8, React 19, MUI 9). npm doesn't install the dependencies of linked sources, so they are listed here: React, MUI, emotion and tss-react for anreact, js-sha256 for semantier. semantic-doc (the doc-tree editor, until it moves into anreact) is installed from its tarball, packed by `npm run pack` (or build) in github/semantic-doc/src; npm installs its dependencies (Tiptap). After packing a new one, run `npm run install-sdoc` here. KaTeX is listed for the page's katex.min.css. Build tools (babel, ...) come from ../node_modules.",
+  "//": "@anclient/* are installed from the npm registry, as if there were no local sources (anreact 0.8, React 19, MUI 9). To build with unpublished changes of the sources (../../../js/*), copy them into node_modules/@anclient/* with ../diff-anclient.py (s a); jserv-album's tasks.py stops the deploy while a copy differs from its source (diff-anclient.py album --check). React, MUI, emotion and tss-react are listed here as peers of anreact, js-sha256 for semantier. semantic-doc (the doc-tree editor, until it moves into anreact) is installed from its tarball, packed by `npm run pack` (or build) in github/semantic-doc/src; npm installs its dependencies (Tiptap). After packing a new one, run `npm run install-sdoc` here. KaTeX is listed for the page's katex.min.css. Build tools (babel, ...) come from ../node_modules.",
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -26,8 +26,8 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
-    "@anclient/anreact": "file:../../../js/anreact/anclient-anreact-0.8.1.tgz",
-    "@anclient/semantier": "file:../../../js/semantier",
+    "@anclient/anreact": "^0.8.2",
+    "@anclient/semantier": "^1.1.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",

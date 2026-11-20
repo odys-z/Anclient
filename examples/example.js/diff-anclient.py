@@ -30,6 +30,8 @@ Usage (in examples/example.js):
     python3 diff-anclient.py album -p semantic-doc
     python3 diff-anclient.py album --sdoc-src ~/github/semantic-doc/src
     python3 diff-anclient.py --src ~/github/anclient/js
+    python3 diff-anclient.py album --check   report only, exit 1 if what album builds with differs
+                                             from the sources (jserv-album's tasks.py stops building)
     python3 diff-anclient.py -h
 
 Then it lists the files that differ, and asks:
@@ -343,11 +345,17 @@ def compare(installed: str, source: str):
 
 # packages of the last scan whose copy is of another release line than the source
 other_lines = {}
+# packages of the last scan not found, or without their sources
+missing = []
 
 
-def scan(project: str, pkgs, src_root, pairs=None):
+def scan(project: str, pkgs, src_root, pairs=None, used_only=False):
+    '''
+    :param used_only: compare only what the build uses: no shadowed copies of a package built from its source
+    '''
     rows = []
     other_lines.clear()
+    missing.clear()
     print(f'\nProject {os.path.relpath(project)}')
     for pkg in pkgs:
         source = sources[pkg]
@@ -357,17 +365,19 @@ def scan(project: str, pkgs, src_root, pairs=None):
         if not os.path.isdir(source):
             print(f'{npm_names[pkg]}: source {source} not found, use '
                   f'{"--sdoc-src <semantic-doc/src>" if pkg == "semantic-doc" else "--src <Anclient/js>"}.')
+            missing.append(pkg)
             continue
         if used is None:
             print(f'{npm_names[pkg]}: not found by webpack alias or node_modules'
                   f'{" (" + note + ")" if note else ""}.')
+            missing.append(pkg)
             continue
         left = used
         if used.is_source(source):
             # built from the sources: nothing to compare, unless an installed copy is shadowed
             others = [s for s in shadowed if not s.is_source(source)]
             print(f'\n{npm_names[pkg]}  built from the source: {used.label(source)}')
-            if not others:
+            if not others or used_only:
                 continue
             left = others[0]
             print(f'    comparing the shadowed copy instead: {left.label(source)}')
@@ -488,6 +498,8 @@ def main():
                     help='packages, default: anreact semantier, and semantic-doc where installed')
     ap.add_argument('--sdoc-src', help='semantic-doc package sources, default: github/semantic-doc/src next to Anclient')
     ap.add_argument('--src', help='folder of the package sources, default: Anclient/js of this checkout')
+    ap.add_argument('--check', action='store_true',
+                    help='report only, no prompts; exit 1 if what the build uses differs from the sources, or is not found')
     args = ap.parse_args()
 
     src_root = os.path.abspath(os.path.expanduser(args.src)) if args.src else \
@@ -500,6 +512,8 @@ def main():
                               os.path.normpath(os.path.join(here, '..', '..', '..', 'semantic-doc', 'src'))
 
     project = args.project
+    if args.check and not project:
+        sys.exit('--check needs a project, e.g. album.')
     if not project:
         names = overview(src_root)
         cmd = ask(f'\nProject to compare, 1 - {len(names)}, q to quit: ')
@@ -509,6 +523,17 @@ def main():
     elif not os.path.isdir(project) and os.path.isdir(os.path.join(here, project)):
         project = os.path.join(here, project)
     project = os.path.abspath(project)
+
+    if args.check:
+        rows = scan(project, args.packages, src_root, used_only=True)
+        if rows or missing:
+            sys.exit(f'\n{os.path.relpath(project)}: '
+                     + (f'{len(rows)} file(s) differ from the sources' if rows else '')
+                     + (', ' if rows and missing else '')
+                     + (f'not found: {" ".join(missing)}' if missing else '')
+                     + '. Update the copies (or the sources), see the commands above.')
+        print(f'\n{os.path.relpath(project)}: the packages used are the sources, or identical to them.')
+        return
 
     code = shutil.which('code')
     if not code:
