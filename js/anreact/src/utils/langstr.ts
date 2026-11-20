@@ -110,20 +110,32 @@ export function L(t: string | undefined, vals?: {[name: string]: string | number
  * @param textToCopy text to be copied
  * https://stackoverflow.com/a/65996386/7362888
  */
-export function copyToClipboard(textToCopy: string) {
-	if (navigator.clipboard && window.isSecureContext) {
-	    return navigator.clipboard.writeText(textToCopy);
-	} else {
-	    let textArea = document.createElement("textarea");
-	    textArea.value = textToCopy;
+export function copyToClipboard(textToCopy: string): Promise<void> {
+	if (navigator.clipboard && window.isSecureContext)
+		return navigator.clipboard.writeText(textToCopy);
 
-		textArea.style.display = "none";
-	    document.body.appendChild(textArea);
-	    textArea.focus();
-	    textArea.select();
-	    return new Promise<void>((res, rej) => {
-	        document.execCommand('copy') ? res() : rej();
-	        textArea.remove();
-	    });
+	// Not a secure context, e.g. a synode served by http at its ip: execCommand('copy') copies the
+	// selection, of a textarea that is rendered (one of display: none can't be focused or selected)
+	// and keeps the focus. In a modal, e.g. MUI's Dialog, its focus trap takes the focus back from
+	// an element outside it, so the textarea goes into the open dialog, if any.
+	const active = document.activeElement as HTMLElement | null;
+	const host = (active?.closest('[role="dialog"]') as HTMLElement | null) ?? document.body;
+
+	const textArea = document.createElement("textarea");
+	textArea.value = textToCopy;
+	textArea.setAttribute('readonly', '');	// no keyboard on mobiles
+	Object.assign(textArea.style, { position: 'fixed', top: '0', left: '-9999px', opacity: '0' });
+	host.appendChild(textArea);
+	textArea.focus();
+	textArea.select();
+	textArea.setSelectionRange(0, textToCopy.length);	// iOS
+
+	let copied = false;
+	try { copied = document.execCommand('copy'); }
+	catch (e) { copied = false; }
+	finally {
+		textArea.remove();
+		active?.focus?.();
 	}
+	return copied ? Promise.resolve() : Promise.reject(new Error('Not copied (no clipboard access)'));
 }

@@ -43,7 +43,12 @@ const styles = theme => ({
 });
 
 export interface DialogProps extends Comprops {
-	onOk?: (sender: React.ReactNode | HTMLElement) => void;
+	/**
+	 * The ok button is clicked; the dialog then closes (onClose), unless this returns false, e.g.
+	 * to show the result of an action in the dialog, and close it later.
+	 * @since 0.8.2, returning false keeps the dialog open
+	 */
+	onOk?: (sender: React.ReactNode | HTMLElement) => void | boolean;
 	onCancel?: (sender: React.ReactNode | HTMLElement) => void;
 	onClose?: () => void;
 
@@ -81,9 +86,10 @@ class ConfirmDialogComp extends React.Component<DialogProps, any, any> {
 	}
 
 	toOk(e: React.MouseEvent<HTMLElement>) {
+		if (typeof this.props.onOk === 'function'
+			&& this.props.onOk(e.currentTarget) === false)
+			return;	// kept open
 		this.setState({closed: true});
-		if (typeof this.props.onOk === 'function')
-			this.props.onOk(e.currentTarget);
 		if (typeof this.props.onClose === 'function')
 			this.props.onClose();
 	}
