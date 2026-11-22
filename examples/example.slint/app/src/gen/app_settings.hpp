@@ -24,8 +24,8 @@ public:
     string synode_jserv;
     string album_web;
     string wshost;
-    int wsport;
-    int wstimeout;
+    int wsport{};
+    int wstimeout{};
 
     DesktopSettings() : AnclientSettings() {
         Type(_type_);

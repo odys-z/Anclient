@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
                                 vector<LangExt::VarType>{ShareFlag::pushing});
             }
 
-            slingle.doclientier->query_syncflags(pthpage, [ui_weak, &slingle](AnsonResp& resp) {
+            slingle.doclientier->query_syncflags(pthpage, [ui_weak, &slingle, root](AnsonResp& resp) {
                 // slingle.enqueue_synode(std::make_shared<DocsResp>(resp));
                 if (auto* docs = dynamic_cast<DocsResp*>(&resp)) {
                     slingle.enqueue_synode(std::make_shared<DocsResp>(std::move(*docs)));
@@ -198,8 +198,17 @@ int main(int argc, char **argv) {
                     anwarn("query_syncflags: unexpected response type, dropping");
                     return;
                 }
-                slint::invoke_from_event_loop([ui_weak]() {
+                // The user may have left this folder while the query was running. Only one
+                // query is in flight (AsynClienter::query_syncflags), so the queue holds just
+                // this response: drop it, the follow-up query for the new folder is pending.
+                slint::invoke_from_event_loop([ui_weak, &slingle, qried = root.string()]() {
                     if (auto handle = ui_weak.lock()) {
+                        fs::path now = fs::absolute(fs::path{string{(*handle)->global<AppState>().get_model().current_pth}});
+                        if (now.string() != qried) {
+                            anlog("Dropping sync-flags of a folder already left: " + qried);
+                            slingle.dequeue_synode();
+                            return;
+                        }
                         anlog("querying page ...");
                         (*handle)->invoke_update_syncflags();
                     }

@@ -158,13 +158,13 @@ inline static void insert_status(const slint::ComponentHandle<App>& ui, std::str
     insert_status(ui_weak, s);
 }
 
+/**
+ * Pops up the modal message box (App.msg-dlg). Safe to call from any thread.
+ */
 inline static void show_dlg(slint::ComponentWeakHandle<App> weak_ui, const string& title, const string& inform) {
     slint::invoke_from_event_loop([weak_ui, title, inform]() {
         if (auto ui = weak_ui.lock()) {
-            auto data = (*ui)->global<AppState>().get_model();
-            auto status_model = data.syncing_status;
-
-            auto dlg_model = (*ui)->global<UserDialogState>().get_model();
+            (*ui)->invoke_show_message(slint::SharedString(title), slint::SharedString(inform));
         }
     });
 }

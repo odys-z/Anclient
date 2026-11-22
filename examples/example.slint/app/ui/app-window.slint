@@ -77,6 +77,15 @@ min-width: 600px;
       AppState.model-changed(AppState.model);
   }
 
+  // Modal message box, opened by show_dlg() (src/helper.h) via invoke_show_message().
+  in-out property <string> msg-title;
+  in-out property <string> msg-text;
+  public function show-message(title: string, text: string) {
+      root.msg-title = title;
+      root.msg-text = text;
+      msg-dlg.show();
+  }
+
   init => { }
 
   HorizontalLayout {
@@ -221,6 +230,45 @@ min-width: 600px;
             text: AppState.model.syncing-status[i];
             font-size: 14px;
             color: #ff0;
+        }
+      }
+    }
+  }
+
+  msg-dlg := PopupWindow {
+    close-policy: no-auto-close;
+    width: min(480px, root.width - 40px);
+    x: (root.width - self.width) / 2;
+    y: (root.height - self.preferred-height) / 3;
+
+    Rectangle {
+      background: #222;
+      border-color: #ff0;
+      border-width: 1px;
+      border-radius: 6px;
+
+      VerticalLayout {
+        padding: 16px;
+        spacing: 12px;
+
+        Text {
+          text: root.msg-title;
+          font-size: 16px;
+          font-weight: 700;
+          color: #ff0;
+        }
+        Text {
+          text: root.msg-text;
+          font-size: 14px;
+          color: #eee;
+          wrap: word-wrap;
+        }
+        HorizontalLayout {
+          alignment: end;
+          StandardButton {
+            kind: ok;
+            clicked => { msg-dlg.close(); }
+          }
         }
       }
     }

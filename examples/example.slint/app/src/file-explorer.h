@@ -27,7 +27,7 @@ public:
     }
 
 private:
-    AppWindow* ui;
+    AppWindow* ui = nullptr;
     std::unordered_map<std::string, std::string> backend_records;
 
     void bind_ui_events() {

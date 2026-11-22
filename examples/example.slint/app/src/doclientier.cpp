@@ -87,7 +87,28 @@ void AsynClienter::query_syncflags(const map<string, vector<LangExt::VarType>>& 
         return;
     }
     
+    // Every IPC message triggers a query. Without this, a burst of messages starts a burst of
+    // threads sharing one SessionClient (header, ssInf), which is a data race.
+    // Keep one query in flight; a request arriving meanwhile re-queries once it finishes,
+    // on the UI thread, so that the current folder is read again.
+    if (querying.exchange(true)) {
+        query_pending = true;
+        return;
+    }
+
     std::thread query_thread([this, syncing_paths, ok]() {
+        struct Done {
+            AsynClienter* self;
+            ~Done() {
+                self->querying = false;
+                if (self->query_pending.exchange(false)) {
+                    slint::invoke_from_event_loop([w = self->window_weak]() {
+                        if (auto ui = w.lock()) (*ui)->invoke_query_syncflags();
+                    });
+                }
+            }
+        } done{this};
+
         if (!bringup_synlink()) return;
         
         client.header.Act(appsettings.synuri, Port::docstier, DocsReq::A::selectSyncs, "query sync");

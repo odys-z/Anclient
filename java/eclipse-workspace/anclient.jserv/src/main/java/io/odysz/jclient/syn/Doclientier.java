@@ -381,6 +381,9 @@ public class Doclientier extends Semantier {
 					b64 = AESHelper2.encode64(ifs, blocksize);
 				}
 				req = new DocsReq(tbl, uri).blockEnd(respi == null ? resp0 : respi, ssinf);
+				// The chain is keyed by the client path this client started with, never
+				// trust the echoed one (it was mangled by a charset mismatch before).
+				if (req.doc != null) req.doc.clientpath = p.clientpath;
 
 				q = client.<DocsReq>userReq(uri, Port.docstier, req)
 							.header(header);
@@ -400,11 +403,17 @@ public class Doclientier extends Semantier {
 				Utils.warn(exmsg);
 				
 				if (resp0 != null) {
-					req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
-					req.a(DocsReq.A.blockAbort);
-					q = client.<DocsReq>userReq(uri, Port.docstier, req)
-								.header(header);
-					respi = client.commit(q, errHandler);
+					try {
+						req = new DocsReq(tbl, uri).blockAbort(resp0, ssinf);
+						req.a(DocsReq.A.blockAbort);
+						if (req.doc != null) req.doc.clientpath = p.clientpath;
+						q = client.<DocsReq>userReq(uri, Port.docstier, req)
+									.header(header);
+						respi = client.commit(q, errHandler);
+					} catch (Exception abx) {
+						// keep reporting the original error
+						Utils.warn("Aborting block chain failed: %s", abx.getMessage());
+					}
 				}
 
 				if (ex instanceof IOException)

@@ -69,7 +69,7 @@ private:
      * handle 2 sets of protocol
      */
     JServUrl jserv_;
-    bool verbose_;
+    bool verbose_ = false;
     ix::WebSocket websocket;
     static constexpr int TIMEOUT_SECS = 120;
 

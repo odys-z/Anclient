@@ -11,7 +11,10 @@
 #include <io/odysz/semantic/tier/docs.h>
 #include <gen/app_settings.hpp>
 
+#include <atomic>
+
 #include "app-window.h"
+#include "helper.h"
 #include "wsclients.h"
 
 namespace anson {
@@ -33,7 +36,7 @@ protected:
             anlog(rep.Body().m);
             string proc_report = format_proc_report(rep.Body());
             anlog(proc_report);
-            inv_insert_status(window_weak, proc_report);
+            insert_status(window_weak, proc_report);
         }
         else if (rep.code == MsgCode::Code::_sentinel_) {
             // show be the ws connection reports
@@ -43,7 +46,9 @@ protected:
             string clientpath_state = map2str(rep.Body().syncingPage.clientPaths, *client.jserv.jprotocol.ctx);
             string status_txt = std::format("on DocsResp, msg: {}\n    {}", rep.Body().m, clientpath_state);
             anlog(status_txt);
-            inv_insert_status(window_weak, status_txt);
+            insert_status(window_weak, status_txt);
+            // Don't leave it in the status list only, where it is covered by the next message.
+            show_dlg(window_weak, "Upload failed", upload_err_text(rep.Body()));
         }
 
         // ui_query_synchings();
@@ -135,25 +140,21 @@ public:
         client.stopbeat();
     }
 
-    /// helper
-    static void inv_insert_status(const slint::ComponentWeakHandle<App>& appwin, const string& txt) {
-        slint::SharedString slint_text(txt);
-        slint::invoke_from_event_loop([&appwin, slint_text]() {
-            if (auto app = appwin.lock()) {
-                anlog("[onmsg] Updating statues report: "s + string{slint_text});
-                auto data = (*app)->global<AppState>().get_model();
-                // data.syncing_status = slint_text;
-                auto status_model = data.syncing_status;
-                auto vec_model = std::dynamic_pointer_cast<slint::VectorModel<slint::SharedString>>(status_model);
-                if (vec_model) {
-                    vec_model->insert(0, slint_text);
-                }
-                (*app)->global<AppState>().set_model(data);
-            }
-        });
+private:
+    /** Single flight for query_syncflags(), see doclientier.cpp. */
+    std::atomic<bool> querying{false};
+    std::atomic<bool> query_pending{false};
+
+    /** "Code: exSemantic, mesage:\nWhy started again?" -> "Why started again?" + file */
+    static string upload_err_text(const DocsResp& resp) {
+        string m = resp.m;
+        if (auto nl = m.find('\n'); nl != string::npos && m.starts_with("Code: "))
+            m = m.substr(nl + 1);
+        if (!resp.xdoc.clientpath.empty())
+            m += "\n\n" + resp.xdoc.clientpath;
+        return m.empty() ? "Unknown error, see the log for details." : m;
     }
 
-private:
     string format_proc_report(const DocsResp& resp) {
         std::vector<std::string_view> report = LangExt::split(resp.m, ',');
         if (report.size() >= 4) {
@@ -163,7 +164,8 @@ private:
             int total_blocks  = std::stoi(std::string(report[3]));
 
             if (total_blocks > 0) {
-                float percentage = (static_cast<float>(current_block + 1) / total_blocks) * 100.0f;
+                // reports: start (block 0), after each block (1..n), end (n)
+                float percentage = std::min(100.0f, static_cast<float>(current_block) / total_blocks * 100.0f);
                 return std::format("File {}/{}, {:.0f}% [{}]", current_row + 1, total_rows, percentage, resp.xdoc.clientpath);
             }
         }

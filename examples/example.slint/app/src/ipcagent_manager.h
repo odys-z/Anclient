@@ -287,14 +287,16 @@ public:
         fs::remove(m_port_file, ec);   // a stale file from a crashed run must not be read
         m_wsport = 0;
 
-        aninfo(std::format("[***** Agent Controller *****]: {} -jar {} {} {} > {}",
+        // JRE 17 defaults file.encoding to the ANSI code page (GBK on Chinese Windows), and antson
+        // before 1.2.1 serialized strings with it, mangling non-Latin paths on the wire to the synode.
+        aninfo(std::format("[***** Agent Controller *****]: {} -Dfile.encoding=UTF-8 -jar {} {} {} > {}",
                            path_to_u8(m_java_cmd), path_to_u8(m_agent_jar),
                            path_to_u8(settings_file), path_to_u8(m_port_file), path_to_u8(log_file)));
 
     #ifdef _WIN32
         PROCESS_INFORMATION pi{};
         if (!spawn_logged(m_java_cmd,
-                          { L"-jar", m_agent_jar.wstring(), settings_file.wstring(), m_port_file.wstring() },
+                          { L"-Dfile.encoding=UTF-8", L"-jar", m_agent_jar.wstring(), settings_file.wstring(), m_port_file.wstring() },
                           log_file, pi))
             return false;
 
@@ -333,7 +335,7 @@ public:
                 dup2(log_fd, STDERR_FILENO);
                 close(log_fd);
             }
-            execl(java.c_str(), java.c_str(), "-jar", jar.c_str(), sets.c_str(), portf.c_str(), (char*)NULL);
+            execl(java.c_str(), java.c_str(), "-Dfile.encoding=UTF-8", "-jar", jar.c_str(), sets.c_str(), portf.c_str(), (char*)NULL);
             std::perror("execl failed");
             _exit(127);
         } else if (m_agent_pid < 0) {
@@ -422,7 +424,7 @@ public:
                   "io.oz.anclient.ipcagent.StopAgent", portf.c_str(), (char*)NULL);
             _exit(1);
         } else if (stop_pid > 0) {
-            int status;
+            int status = 0;
             // Wait up to 5 seconds for normal execution cycle tracking
             std::this_thread::sleep_for(std::chrono::seconds(5));
             pid_t return_pid = waitpid(stop_pid, &status, WNOHANG);
@@ -438,7 +440,7 @@ public:
             kill(m_agent_pid, SIGTERM); // Ask nicely
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             kill(m_agent_pid, SIGKILL); // Ensure dead
-            int status;
+            int status = 0;
             waitpid(m_agent_pid, &status, 0);
             m_agent_pid = -1;
         }
