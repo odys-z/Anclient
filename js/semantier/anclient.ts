@@ -1,7 +1,6 @@
 
 /**The lower API of jclient/js */
 
-import $ from 'jquery';
 import AES2 from './aes2';
 import {
 	Protocol, AnsonMsg, AnsonResp, AnSessionResp, DatasetierReq, AnSessionReq, QueryReq,
@@ -12,6 +11,11 @@ import { type ErrorCtx, type Tierec, isEmpty, len } from './semantier';
 
 export * from './stree-tier';
 
+/**
+ * Options of {@link AnClient.post}.
+ * async: false is ignored since jquery is dropped (fetch can't post synchronously);
+ * timeout, ms, default 18000.
+ */
 export interface AjaxOptions {async?: boolean; timeout?: number}
 
 interface AjaxReport {
@@ -256,94 +260,72 @@ class AnClient {
 		}
 		var url = this.servUrl(jreq.port);
 
-		var async = true;
-		if (ajaxOpts !== undefined && ajaxOpts !== null) {
-			async = ajaxOpts.async !== false;
-		}
+		if (ajaxOpts?.async === false)
+			console.warn('[AnClient.post] Synchronous posting is not supported since jquery is dropped; posted asynchronously.');
 
-		var self = this;
-		$.ajax({type: 'POST',
-			// url: this.cfg.defaultServ + "/query.serv?page=" + pgIx + "&size=" + pgsize,
-			url: url,
-			contentType: "application/json; charset=utf-8",
-			crossDomain: true,
-            async: async,
-			data: JSON.stringify(jreq),
-			timeout: ajaxOpts?.timeout || 18000,
-			success: function (resp: AnsonMsg<AnsonResp>) {
-				// response Content-Type = application/json;charset=UTF-8
-				if (typeof resp === 'string') {
-					resp = JSON.parse(resp);
-				}
-				resp = new AnsonMsg(resp);
-
-				// code != ok
-				if (Protocol.verbose >= 5){
-					console.debug(Protocol.MsgCode);
-				}
-
-				if (resp.code !== Protocol.MsgCode.ok)
-					if (onErr && typeof onErr.onError === "function"){
-						// a special case of AnContext.error
-						onErr.msg = resp.Body().msg();
-						onErr.onError(resp.code, resp);
-					}
-					else console.error(resp);
-				// code == ok
-				else {
-					if (typeof onOk === "function")
-						onOk(resp);
-					else console.error("A successful response ignored for no handler is provided.", resp);
-				}
-			},
-			error: function (resp: any) {
-				if (typeof onErr === "function" || onErr && typeof onErr.onError === 'function') {
-					if (resp.statusText) {
-						if (/Parse.*|parse.*/.test(resp.statusText)) {
-							console.error("Parse error (check network results for escaped characters):", resp.responseText);
-							resp.code = Protocol.MsgCode.exGeneral;
-							resp.body = [ {
-									type: 'io.odysz.semantic.jprotocol.AnsonResp',
-									m: `Json block parsing error: ${resp.statusText}`
-								} ];
-						}
-						else {
-							resp.code = Protocol.MsgCode.exIo;
-							resp.body = [ {
-									type: 'io.odysz.semantic.jprotocol.AnsonResp',
-									m: `Network failed: ${url}`
-								} ];
-						}
-						let ansonResp = new AnsonMsg<AnsonResp>(resp);
-						if (typeof onErr.onError === 'function') {
-							onErr.msg = ansonResp.Body().msg();
-							onErr.onError(Protocol.MsgCode.exIo, ansonResp);
-						}
-						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
-					}
-					else {
-						if (resp.code || resp.port || !resp.status)
-							resp = new AnsonMsg({
-								port: resp.port,
-								header: resp.header,
-								body: [{type: 'io.odysz.semantic.jprotocol.AnsonResp',
-										m: `Network failed: ${url}` } ]
-							});
-						else resp = AnClient.fromAjaxError(resp);
-
-						if (typeof onErr.onError === 'function') {
-							onErr.msg = resp.Body().msg();
-							onErr.onError(Protocol.MsgCode.exIo, resp);
-						}
-						else throw Error("In anreact for typescript, onErr must be an ErrorCtx.")
-					}
-				}
-				else {
-					console.error("ajax error:", url);
-					console.error("req", jreq);
-					console.error("response", resp);
-				}
+		/** report a failed request to onErr, as an AnsonMsg of exIo, with message m */
+		const fail = (m: string, cause?: unknown) => {
+			if (onErr && typeof onErr.onError === 'function') {
+				const resp = new AnsonMsg<AnsonResp>({
+					code: Protocol.MsgCode.exIo, port: jreq.port,
+					body: [ {type: 'io.odysz.semantic.jprotocol.AnsonResp', m} ] });
+				onErr.msg = resp.Body()?.msg();
+				onErr.onError(Protocol.MsgCode.exIo, resp);
 			}
+			else {
+				console.error("ajax error:", url);
+				console.error("req", jreq);
+				console.error("cause", cause);
+			}
+		};
+
+		// AbortController + setTimeout, not AbortSignal.timeout(): Chrome / WebView 66+, iOS 12.2+
+		const ctrl = new AbortController();
+		const timer = setTimeout(() => ctrl.abort(), ajaxOpts?.timeout || 18000);
+
+		fetch(url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json; charset=utf-8' },
+			body: JSON.stringify(jreq),
+			signal: ctrl.signal,
+		})
+		.then((res) => res.text().then((text) => ({ res, text })))
+		// two-argument then: exceptions of onOk / onErr are not reported as network failures
+		.then(({ res, text }) => {
+			clearTimeout(timer);
+			if (!res.ok)
+				return fail(`Network failed: ${url}`, `${res.status} ${res.statusText}`);
+
+			let json: any;
+			try { json = JSON.parse(text); }
+			catch (e) {
+				console.error("Parse error (check network results for escaped characters):", text);
+				return fail(`Json block parsing error: ${(e as Error).message}`, e);
+			}
+			const resp = new AnsonMsg<AnsonResp>(json);
+
+			if (Protocol.verbose >= 5)
+				console.debug(Protocol.MsgCode);
+
+			// code != ok
+			if (resp.code !== Protocol.MsgCode.ok)
+				if (onErr && typeof onErr.onError === "function"){
+					// a special case of AnContext.error
+					onErr.msg = resp.Body()?.msg();
+					onErr.onError(resp.code, resp);
+				}
+				else console.error(resp);
+			// code == ok
+			else {
+				if (typeof onOk === "function")
+					onOk(resp);
+				else console.error("A successful response ignored for no handler is provided.", resp);
+			}
+		},
+		// network failure, or aborted by the timeout
+		(e) => {
+			clearTimeout(timer);
+			fail(`Network failed: ${url}`, e);
 		});
 	}
 
@@ -666,6 +648,9 @@ class SessionClient {
 	}
 
 	/**
+	 * @deprecated since jquery is dropped, posted asynchronously, the same as {@link commit}
+	 * (fetch can't post synchronously).
+	 *
 	 * Post the request message (AnsonMsg with body of subclass of AnsonBody) synchronously.
 	 * onOk, onError will be called after request finished.
 	 * @param jmsg request message

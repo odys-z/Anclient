@@ -1,5 +1,4 @@
 
-import $ from 'jquery';
 
 import type * as CSS from 'csstype';
 import { stree_t, SessionClient, AnsonResp, AnDatasetResp, type ErrorCtx,
@@ -189,19 +188,18 @@ export class AnReact {
 		if (!opts.home) opts.home = 'main.html';
 
 		if (typeof elem === 'string') {
-			$.ajax({
-				dataType: "json",
-				url: (opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`,
-			})
-			.done( (json: ExternalHosts) => onJsonServ(elem, opts, new ExternalHosts(json)) )
-			.fail( (_e: any) => {
-				$.ajax({
-					dataType: "json",
-					url: `github.json?q=${Date.now()}`,
-				})
-				.done((json: ExternalHosts) => onJsonServ(elem, opts, json))
-				.fail( (e: { responseText: any; }) => { $(e.responseText).appendTo($('#' + elem)) } )
-			} )
+			/** the json at url; rejected with the response if not 2xx */
+			const getJson = (url: string) => fetch(url)
+				.then((r) => r.ok ? r.json() : Promise.reject(r));
+
+			// two-argument then: exceptions of onJsonServ (rendering) are not taken as a failed loading
+			getJson((opts.jsonPath || 'private/host.json') + `?q=${Date.now()}`)
+			.then( (json: ExternalHosts) => onJsonServ(elem, opts, new ExternalHosts(json)),
+				(_e: any) => getJson(`github.json?q=${Date.now()}`)
+				.then( (json: ExternalHosts) => onJsonServ(elem, opts, json),
+					// show the server's error page, or the error, in elem
+					(e: any) => (e instanceof Response ? e.text() : Promise.resolve(String(e)))
+						.then((html) => document.getElementById(elem)?.insertAdjacentHTML('beforeend', html)) ) );
 		}
 	}
 

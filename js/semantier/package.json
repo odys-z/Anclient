@@ -22,7 +22,6 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-typescript": "^7.21.0",
     "@types/chai": "^4.3.5",
-    "@types/jquery": "^3.5.16",
     "@types/mocha": "^10.0.1",
     "babel": "^6.23.0",
     "babel-loader": "^9.1.2",
@@ -34,7 +33,6 @@
   },
   "dependencies": {
     "csstype": "^3.1.2",
-    "jquery": "^3.7.0",
     "js-sha256": "^1.0.0"
   }
 }

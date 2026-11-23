@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 /**
  * 
  */
@@ -26,17 +24,15 @@ export const Langstrs = {
 	 * @param url relative json path
 	 */
 	load: function(url: string, usingLang?: string) {
-		$.ajax({
-			dataType: "json",
-			url,
-		})
-		.done( (json) => {
+		fetch(url)
+		.then((r) => r.ok ? r.json() : Promise.reject(r))
+		.then( (json) => {
 			Object.assign(Langstrs.s, json);
 			Langstrs.using(usingLang || json.using);
-		} )
-		.fail( (_e) => {
+		},
+		(_e) => {
 			console.error("Loading language resource failed. Url: " + url);
-		} )
+		} );
 	},
 
 	/**
