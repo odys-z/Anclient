@@ -1,6 +1,6 @@
 {
   "name": "@anclient/anreact",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Anclient built on React.js.",
   "main": "./src/an-components.ts",
   "types": "./src/an-components.ts",
@@ -24,16 +24,16 @@
   "license": "MIT",
   "peerDependencies": {
     "@emotion/react": "^11.14.0",
-    "mime-types-no-nodejs": "^0.9.1",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
+    "mime-types-no-nodejs": "^1.0.0",
     "qrcode": "^1.5.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-modal": "^3.16.1",
     "react-portal": "^4.2.2",
     "react-responsive-carousel": "^3.2.23",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.5.0",
-    "@mui/material": "^9.5.0",
     "tss-react": "^4.9.21"
   },
   "dependencies": {
@@ -51,6 +51,9 @@
     "@babel/preset-typescript": "^7.15.0",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
     "@types/babel__core": "^7.20.0",
     "@types/babel__preset-env": "^7.9.2",
     "@types/babel-plugin-syntax-jsx": "^6.18.0",
@@ -79,13 +82,10 @@
     "react-dom": "^19.3.1",
     "react-svg-loader": "^3.0.0",
     "style-loader": "^0.23.1",
+    "tss-react": "^4.9.21",
     "webpack": "^5.88.1",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.5.0",
-    "@mui/material": "^9.5.0",
-    "tss-react": "^4.9.21"
+    "webpack-cli": "^5.1.4"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

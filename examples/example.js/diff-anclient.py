@@ -238,7 +238,7 @@ def update_commands(pkg: str, copy: 'Location', source: str, project: str, files
     cmds = [f'(cd {os.path.relpath(source)} && {pack})',
             f'(cd {os.path.relpath(project)} && npm install {tgz})']
     if pkg == 'semantic-doc' and source_newer(copy.path, source):
-        cmds.append(f'# then in {os.path.relpath(project)}/package.json, scripts.install-sdoc: '
+        cmds.append(f'# then in {os.path.relpath(project)}/package.json, scripts.install-semantic-doc: '
                     f'npm install {tgz}')
     elif pkg != 'semantic-doc':
         cmds.append(f'# or, once published: (cd {os.path.relpath(project)} && '
