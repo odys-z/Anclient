@@ -29,7 +29,6 @@ export * from './react/widgets/treegrid';
 // ag-gridsheet and spreadsheet (ag-grid) are removed since 0.8.0 (still in 0.7.x); a worksheet will replace them.
 export * from './react/widgets/tree-editor';
 export * from './react/widgets/gallery-view';
-export * from './react/widgets/tree-drag';
 
 export * from './react/widgets/simple-form';
 export * from './react/widgets/record-form';

@@ -18,7 +18,6 @@ import { type AnTreeIconsType, AnTreeNode, type AnlistColAttrs, type IndentName,
 import { type Comprops, CrudCompW } from "../crud";
 import type { ClassNames, CompOpts, Media } from "../anreact";
 import type { AnTablistProps } from "./table-list";
-import type { TreeDragPayload } from "./tree-drag";
 
 export const AnTreeIcons = {
 	expand: <ExpandMore style={{verticalAlign: 'middle'}} />,
@@ -333,12 +332,14 @@ interface TreegridProps extends AnTablistProps {
 	checkable?: (n: AnTreeNode) => boolean;
 
 	/**
-	 * STUB (media story, WP1): nodes for which this returns a payload can be dragged out of the
-	 * tree, e.g. treeDragPayload() (tree-drag.ts) for the album tree into the story editor.
+	 * Nodes for which this returns true can be dragged out of the tree, e.g. the album tree's
+	 * 'p' and 'gallery' nodes into the story editor of semantic-doc. The drag's data is the
+	 * AnTreeNode itself, a folder ('gallery') with its children.
 	 * TODO WP1: AnTreegrid / TreeCard / TreeGallary render a drag handle; the drag engine is
 	 * decided by the prototype (WP0).
+	 * @since media story
 	 */
-	dragPayload?: (n: AnTreeNode) => TreeDragPayload | undefined;
+	draggable?: (n: AnTreeNode) => boolean;
 
 	testData?: Array<AnTreeNode>;
 };

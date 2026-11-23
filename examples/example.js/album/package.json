@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack-cli",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-sdoc": "node -e \"const v = require('../../../../semantic-doc/src/package.json').version; require('child_process').execSync('npm install ../../../../semantic-doc/src/dist-pack/semantic-doc-' + v + '.tgz', {stdio: 'inherit'})\""
+    "install-semantic-doc": "node -e \"const v = require('../../../../semantic-doc/src/package.json').version; require('child_process').execSync('npm install ../../../../semantic-doc/src/dist-pack/semantic-doc-' + v + '.tgz', {stdio: 'inherit'})\""
   },
   "keywords": [
     "Anclient",
@@ -32,7 +32,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
-    "@tiptap/extension-table": "^3.33.1",
+    "@tiptap/extension-table": "^3.35.0",
     "js-sha256": "^1.0.0",
     "katex": "^0.18.10",
     "react": "^19.3.1",

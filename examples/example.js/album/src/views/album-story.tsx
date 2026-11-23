@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AnStoryEditor } from 'semantic-doc/story';
+import { AnStoryEditor } from 'semantic-doc/storytree';
 import { StreeDoctier } from 'semantic-doc/doctree';
 import { AnContext, type AnContextType, type Comprops } from '@anclient/anreact';
 import type { SessionClient } from '@anclient/semantier';

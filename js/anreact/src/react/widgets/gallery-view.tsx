@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, type AnsonValue, DocsReq, Protocol, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
+import { AnTreeNode, type AnsonValue, DocsReq, Protocol, type PortType, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len, PortName
 } from "@anclient/semantier";
 
 import { type Comprops, CrudCompW } from '../crud';
@@ -102,7 +102,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 		if (!this.slides || this.slides.length === 0 
 			|| this.slides.length != this.photos?.length
-			|| this.slides[0].node.id != this.photos[0].node.id
+			|| this.slides[0].node?.id != this.photos?.[0]?.node.id
 		)
 			this.parse(this.photos).then((slides: ImageSlide[]) => {
 				this.slides = slides;
@@ -132,8 +132,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					index: x,
 					node: { ...p.node, shareby: p.node.shareby as string },
 					width: wh[0], height: wh[1],
-					// TODO WP1 (media story): p.node.src ?? imgSrcReq(...): a node may carry its src, a session
-					// link in the story editor or html-service's m/<uid> in a published story (no tier there)
 					src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
 					imgstyl,
 					mime: p.node.mime as string
@@ -155,13 +153,13 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 */
 	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {
 		docuri(): string;
-		uri: string, client: SessionClient, port: keyof typeof Protocol.Port
+		uri: string, client: SessionClient, port: PortType
 	}) : string {
 
 		let {client, port} = opts;
 
 		let msg = getDownloadReq();//pid as string, opts);
-		let jserv = client.an.servUrl(port);
+		let jserv = client.an.servUrl(port as PortName);
 
 		return `${jserv}?anson64=${window.btoa(JSON.stringify(msg))}`;
 
@@ -229,8 +227,6 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			/>
 
 			{this.showCarousel && this.props.lightbox && (
-				// TODO WP1 (media story): this.props.photos, the nodes the gallery shows (with their src);
-				// a published story has no tnode
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,
