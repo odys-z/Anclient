@@ -3,7 +3,8 @@ import type * as CSS from 'csstype';
 import { SessionClient } from './anclient';
 
 import { Anson, type AnsonValue, Protocol, type DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
-	type LogAct, PageInf, AnsonBody, type OnCommitOk, type DbRelations } from './protocol';
+	type LogAct, PageInf, AnsonBody, type OnCommitOk, type DbRelations, 
+	PortType} from './protocol';
 
 import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './semantier';
 
@@ -102,7 +103,7 @@ export class StreeTier extends Semantier {
      * @since semantier 1.1.0, factories are keyed by the port's url value, the same as a tier's port,
      * e.g. Protocol.Port.stree ('s-tree.serv'), SynDocollPort.docoll ('docoll.syn'), not the name, 'docoll'.
      */
-    static registTierequest(port: string,
+    static registTierequest(port: PortType,
 			factory: (v: DatasetOpts & {synuri?: string, sk: string, sqlArgs?: string[], page?: PageInf}) => AnsonBody,
 			initFields = {uri: '', synuri: '', sk: ''}) {
         if (this.reqFactories[port])
@@ -114,7 +115,7 @@ export class StreeTier extends Semantier {
     }
 
     /** DESIGN MEMO: Once semantier can be generated, port will be force to be required. */
-    port: string;
+    port: PortType;
 
 	forest!: AnTreeNode[];
 
@@ -122,7 +123,7 @@ export class StreeTier extends Semantier {
      * @param opts uri: client id; port: jserv port
      * DESIGN MEMO: Once semantier can be generated, port will be force to be required.
      */
-    constructor(opts: UIComponent & {uri: string, port?: string}) {
+    constructor(opts: UIComponent & {uri: string, port?: PortType}) {
         super(opts);
         this.port = opts.port || Protocol.Port.stree;
     }
@@ -146,7 +147,7 @@ export class StreeTier extends Semantier {
             console.warn("StreeTier.stree(): Loading s-tree without result handling?", opts);
         if (!opts.port)
 		 	throw Error('Decision since @anclient/anreact 0.4.25, port name is needed to load a tree.');
-        else if (!StreeTier.reqFactories[opts.port])
+        else if (opts.port !== Protocol.Port.stree && !StreeTier.reqFactories[opts.port])
 		 	throw Error("To handle tree with StreeTier, user request's factory must registered. Need factory for port: " + opts.port);
         
         if (!(this.client instanceof SessionClient))

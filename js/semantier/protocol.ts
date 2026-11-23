@@ -457,6 +457,9 @@ export class Protocol {
 	}
 }
 
+export type PortName = keyof typeof Protocol.Port | (string & {});
+export type PortType  = (typeof Protocol.Port)[keyof typeof Protocol.Port] | (string & {});
+
 export enum CRUD { c = 'I', r = 'R', u = 'U', d = 'D' };
 
 export class AnsonMsg<T extends AnsonBody> extends Anson {
@@ -1587,7 +1590,7 @@ Protocol.registerBody(AnDatasetResp.__type__, (json) => new AnDatasetResp(json))
 
 export interface DatasetOpts {
 	/** API args should ignore this */
-	port?: string;
+	port?: PortType;
 	/**component uri, DB connection mapping is configured at server/WEB-INF/connects.xml */
 	uri?: string;
 	/**

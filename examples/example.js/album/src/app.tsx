@@ -27,6 +27,20 @@ function AlbumDoctree(props: Comprops) {
 	</React.Suspense>);
 }
 
+/**
+ * STUB (media story, WP6): the story editor's function page, loaded when it is opened, as the
+ * doc tree: the editor (semantic-doc/story, Puck) is not in portfolio.min.js.
+ * TODO WP6: webpack.config.js, a cache group for Puck (vendor-puck) beside vendor-tiptap.
+ */
+const LazyStory = React.lazy(() => import(/* webpackChunkName: "story" */ './views/album-story')
+	.then((m) => ({default: m.AlbumStory})));
+
+function AlbumStory(props: Comprops) {
+	return (<React.Suspense fallback={<div>Loading the story editor ...</div>}>
+		<LazyStory {...props} />
+	</React.Suspense>);
+}
+
 type AlbumProps = {
 	servs: ExternalHosts;
 	servId: string;
@@ -81,7 +95,9 @@ export class App extends CrudCompW<AlbumProps> {
 	portfolioMenu = [
 		{node: {funcId: 'home-list', id: 'home-list', funcName: "Welcome", text: '', url: '/home', css: {icon: 'home'}, sort: 0}},
 		{node: {funcId: 'shares', id: 'shares', funcName: "Share Resource", text: '', url: '/share', css: {icon: 'share'}, sort: 1}},
-		{node: {funcId: 'doctree', id: 'doctree', funcName: "Doc Tree", text: '', url: '/doctree', css: {icon: 'paper'}, sort: 2}} ];
+		{node: {funcId: 'doctree', id: 'doctree', funcName: "Doc Tree", text: '', url: '/doctree', css: {icon: 'paper'}, sort: 2}},
+		// STUB (media story, WP6)
+		{node: {funcId: 'story', id: 'story', funcName: "Media Story", text: '', url: '/story', css: {icon: 'paper'}, sort: 3}} ];
 
 	/**
 	 * Restore session from window.localStorage
@@ -111,6 +127,7 @@ export class App extends CrudCompW<AlbumProps> {
 			{path: '/home', comp: AlbumDocview},
 			{path: '/share', comp: AlbumShares},
 			{path: '/doctree', comp: AlbumDoctree},
+			{path: '/story', comp: AlbumStory},
 		] );
 	}
 

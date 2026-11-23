@@ -293,6 +293,7 @@ export class Lightbox extends CrudCompW<Comprops & {
       slids.push({
         altTag: p.title,
         poster: p.preview,
+        // TODO WP1 (media story): p.node.src ?? imgSrcReq(...), as GalleryView.parse()
         src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.tier, docuri: ()=> this.props.synuri}),
         mime: p.node.mime,
         node: p.node

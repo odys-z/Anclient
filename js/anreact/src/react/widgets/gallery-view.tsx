@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import ReactModal from 'react-modal';
 /** react-modal's types are of the shared @types/react (17) in example.js/node_modules */
 const Modal = ReactModal as unknown as React.ComponentType<any>;
@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, type AnsonValue, DocsReq, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
+import { AnTreeNode, type AnsonValue, DocsReq, Protocol, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len
 } from "@anclient/semantier";
 
 import { type Comprops, CrudCompW } from '../crud';
@@ -72,8 +72,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	showCarousel: boolean = false;
 
 	cid: string;
-	photos: AnTreeNode[]; //PhotoCollect | undefined; 
-	slides: ImageSlide[];
+	photos: AnTreeNode[] | undefined; //PhotoCollect | undefined; 
+	slides: ImageSlide[] | undefined;
 	albumtier: StreeTier;
 
 	fullcallback?: (isfull: boolean) => void;
@@ -82,7 +82,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		super(props);
 
 		this.classes = props.classes;
-		this.uri = props.uri;
+		this.uri = props.uri as string;
 		this.cid = props.cid;
 
 		this.albumtier = props.tier as StreeTier;
@@ -101,7 +101,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		this.fullcallback = (this.context as any).onFullScreen;
 
 		if (!this.slides || this.slides.length === 0 
-			|| this.slides.length != this.photos.length
+			|| this.slides.length != this.photos?.length
 			|| this.slides[0].node.id != this.photos[0].node.id
 		)
 			this.parse(this.photos).then((slides: ImageSlide[]) => {
@@ -117,7 +117,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 * @param nodes 
 	 * @returns promise, resolver for parsed slides for <Gallery/>, height of 1 node gallery is forced to be 20vh.
 	 */
-	parse(nodes: AnTreeNode[]) {
+	parse(nodes: AnTreeNode[] | undefined): Promise<ImageSlide[]> {
 		return new Promise((resolve, _err) => {
 			let photos = [] as ImageSlide[];
 
@@ -132,6 +132,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					index: x,
 					node: { ...p.node, shareby: p.node.shareby as string },
 					width: wh[0], height: wh[1],
+					// TODO WP1 (media story): p.node.src ?? imgSrcReq(...): a node may carry its src, a session
+					// link in the story editor or html-service's m/<uid> in a published story (no tier there)
 					src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
 					imgstyl,
 					mime: p.node.mime as string
@@ -153,7 +155,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	 */
 	static imgSrcReq(pid: AnsonValue, doctable: string, opts: {
 		docuri(): string;
-		uri: string, client: SessionClient, port: string
+		uri: string, client: SessionClient, port: keyof typeof Protocol.Port
 	}) : string {
 
 		let {client, port} = opts;
@@ -227,6 +229,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			/>
 
 			{this.showCarousel && this.props.lightbox && (
+				// TODO WP1 (media story): this.props.photos, the nodes the gallery shows (with their src);
+				// a published story has no tnode
 				this.props.lightbox(this.props.tnode.node.children,
 				  { ix: this.currentImx,
 					open: true,
@@ -260,8 +264,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 	}
 
 	render() {
-		return this.props.visible && this.gallery(this.slides);
+		return this.props.visible && this.gallery(this.slides || []);
 	}
 }
 
-const reqMsgs = {};
+const reqMsgs: Record<string, ReturnType<SessionClient['userReq']>> = {};

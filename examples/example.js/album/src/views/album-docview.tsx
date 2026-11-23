@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import FlipCameraIosIcon from '@mui/icons-material/FlipCameraIos';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 
-import { Protocol, Inseclient, AnsonResp, AnsonMsg, 
-	AnTreeNode, ErrorCtx, SessionClient, Tierec, size} from '@anclient/semantier';
+import { Inseclient, AnsonResp, AnsonMsg, 
+	AnTreeNode, SessionClient, Tierec, size} from '@anclient/semantier';
 
-import { L, AnError, AnReactExt, Lightbox, PdfIframe,
+import { L, AnReactExt, Lightbox, PdfIframe,
 	AnTreeditor, CrudCompW, AnContextType,
 	AnTreegridCol, Media, ClassNames, AnTreegrid, regex, GalleryView, CompOpts, Comprops,
 	PdfView, gridSize
