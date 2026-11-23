@@ -26,7 +26,6 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
-    "@anclient/semantier": "^1.1.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
@@ -37,7 +36,7 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-qr-code": "^2.0.18",
-    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.5.tgz",
+    "semantic-doc": "file:../../../../semantic-doc/src/dist-pack/semantic-doc-0.1.6.tgz",
     "tss-react": "^4.9.21"
   }
 }
