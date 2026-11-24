@@ -14,7 +14,8 @@ import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './seman
  * 
  * A tree widget uses this to find indent structure, then translate to icons via AnTreeIconsType.
  */
-export type IndentName = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'spacex' | 'hlink' | 'deflt';
+/** the names of semantic.DA's IndentFlag (Java), as AnTreeNode.indents of a forest are */
+export type IndentName = 'expand' | 'collapse' | 'childi' | 'childx' | 'vlink' | 'space' | 'hlink' | 'deflt';
 export type AnTreeIconsType =
         'deflt' | '+' | '[-]' | '-' | 'T' | '.' | '|-' | 'L' | 'E' | 'F' | '|' |
         'menu-lv0' | 'menu-lv1' | 'menu-leaf' | 'collapse' | 'expand' | 'pic-lib' | '!' | '[]' | '>' | 'b';
@@ -40,14 +41,14 @@ export type IndentIcons = {
  * expand: '[-]', a box with a minus over the lines of 'T' (anreact 0.8.2; was 'T');
  * collapse: "+";
  * hlink: '-';
- * spacex: '.';
+ * space: '.' (was 'spacex', which a forest never has: semantic.DA's IndentFlag.space);
  * vlink: '|';
  * child0: '|-',
  * childx: 'L', last child;
  */
 export const defltIcons: IndentIcons = {
     expand: '[-]', collapse: '+', childi: '|-', childx: 'L',
-    vlink : '|', spacex  : '.', hlink : '-',  deflt: '.'
+    vlink : '|', space   : '.', hlink : '-',  deflt: '.'
 };
 
 /** Tree data node */

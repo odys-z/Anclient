@@ -21,3 +21,4 @@ dist
 py3/src/anclient/data
 vcpkg_installed
 vcpkg_packages
+.flattened-pom.xml
