@@ -261,10 +261,11 @@ export function parseMenus(json: Array<{node: MenuItem}> | {node: MenuItem} = []
 
 			paths.push({path: url, params: {flags, css}})
 
+			// if (children) children = parse(children);
 			if (children)
-				children = parse(children);
+				children = parse(children as unknown as {node: MenuItem}[]) as MenuItem[];
 
-			return {funcId, funcName, url, css, flags, parentId, sibling, children};
+			return {funcId, id, funcName, url, css, flags, parentId, sibling, sort, props: json.node.props, children};
 		}
 	}
 }
@@ -395,8 +396,9 @@ class SysComp extends CrudCompW<SysProps> {
 		this.anreact.loadMenu(
 			this.state.skMenu,
 			this.uri,
-			(dsResp: AnsonMsg<AnDatasetResp>) => {
-				let {menu, paths} = parseMenus(dsResp.Body()?.forest as Array<{node: MenuItem}>);
+			(dsResp: AnsonMsg<AnsonResp>) => {
+				const r = dsResp.Body() as AnDatasetResp;
+				const {menu, paths} = parseMenus(r?.forest as Array<{node: MenuItem}>);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 
