@@ -1,3 +1,4 @@
+/// <reference path="../../css.d.ts" />
 import React, { JSX } from 'react';
 import ReactModal from 'react-modal';
 /** react-modal's types are of the shared @types/react (17) in example.js/node_modules */
@@ -7,10 +8,11 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, type AnsonValue, DocsReq, Protocol, type PortType, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len, PortName
+import { AnTreeNode, type AnsonValue, DocsReq, type PortType, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len, PortName
 } from "@anclient/semantier";
 
 import { type Comprops, CrudCompW } from '../crud';
+import { treeCheckbox, treeDrag } from './tree';
 import type { ForcedStyle } from '../../photo-gallery/src/photo-ts';
 import { MediaCss, PhotoRec } from '../../photo-gallery/src/tier/photo-rec';
 
@@ -37,6 +39,18 @@ export interface ImageSlide  {
 	imgstyl?: ForcedStyle
 
 	mime: 'video' | 'image' | 'heif' | 'audio' | string | undefined;
+
+	/**
+	 * The photo's checkbox, shown over it, see TreegridProps.checkbox.
+	 * @since media story
+	 */
+	checkbox?: React.ReactNode;
+	/**
+	 * The photo can be dragged, see TreegridProps.draggable.
+	 * @since media story
+	 */
+	draggable?: boolean;
+	onDragStart?: React.DragEventHandler;
 };
 
 export type lightboxFomatter = (photos: AnTreeNode[], opts?: {
@@ -200,6 +214,14 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 
 	gallery(photos: Array<ImageSlide>) {
 		let that = this;
+		// a TreeGallary's props, checkbox, selected, draggable: on each photo, by its node, see TreegridProps
+		let {checkbox, selected, onSelectChange, draggable} = this.props;
+		if (checkbox || draggable)
+			photos = photos.map((p) => {
+				let n = this.photos?.[p.index];
+				return n ? { ...p, checkbox: treeCheckbox(n, {checkbox, selected, onSelectChange}),
+							...treeDrag(n, {draggable}) } : p;
+			});
 		return (
 		  <div>
 			<Gallery photos={photos}

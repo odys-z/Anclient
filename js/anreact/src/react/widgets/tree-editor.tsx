@@ -22,7 +22,8 @@ import { SimpleForm } from "./simple-form";
 import { L } from "../../utils/langstr";
 
 import { photos as _photos } from "./res/temp-photos";
-import { icon, levelIcons, indentLines, type AnTreegridCol, type TreeItemProps, type AnreactreeItem, TreeNodeVisual } from "./tree";
+import { icon, levelIcons, indentLines, type AnTreegridCol, type TreeItemProps, type AnreactreeItem, TreeNodeVisual,
+	treeCheckbox, treeDrag } from "./tree";
 import { AnTreegridComp } from "./treegrid";
 
 export const treeditorStyles = (theme: Theme) => ({
@@ -228,6 +229,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 		return (
 		  <Grid container key={tnode.id}
 				onClick={this.props.conClick}
+				{...treeDrag(tnode as AnTreeNode, this.props)}
 				spacing={0} className={classes.row} >
 			{ this.props.columns
 				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
@@ -238,7 +240,7 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 						{/* the indent lines are as high as the row, see indentLines() */}
 						<Typography noWrap variant='body2' component='div' sx={{height: '100%'}}>
 							{indentLines(this.props.indentSettings, tnode?.indents as IndentName[],
-								n[col.field] as React.ReactNode)}
+								<>{treeCheckbox(tnode as AnTreeNode, this.props)}{n[col.field] as React.ReactNode}</>)}
 						</Typography>
 					</Grid> );
 				  else if (col.type === 'actions')
@@ -323,6 +325,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 				that.state.expand = !expd;
 				that.setState({})
 			}}
+			{...treeDrag(tnode, that.props)}
 		>
 		  <Grid container spacing={0} key={tnode.id} className={`classes.row classes.galleryHead`}>
 			{ columns
@@ -338,6 +341,7 @@ class TreeGallaryComp extends TreeCardComp<{lightbox: lightboxFormatter}> {
 							tnode.indents as IndentName[])}
 						{expd ? icon(that.props.indentIcons, "pic-lib", 0)
 							: icon(that.props.indentIcons, "collapse", 0)}
+						{treeCheckbox(tnode, that.props)}
 						{n[col.field] as React.ReactNode}
 						</Typography>
 					</Grid>);
@@ -420,6 +424,18 @@ export interface AnTreeditorProps extends AnTablistProps {
 	nodeFormatter?: (n: AnTreeNode, parent: AnTreeNode | undefined, opts: CompOpts) => React.ReactElement;
 
 	lightbox?: lightboxFormatter;
+
+	/**
+	 * A checkbox on each node, checked by {@link selected}, see TreegridProps.checkbox.
+	 * @since media story
+	 */
+	checkbox?: boolean;
+
+	/**
+	 * Nodes that can be dragged out of the tree, see TreegridProps.draggable.
+	 * @since media story
+	 */
+	draggable?: (n: AnTreeNode) => boolean;
 }
 
 /**
@@ -692,6 +708,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 			}}
 			data-nid={treenode.id}
 			className={classes.folderHead}
+			{...treeDrag(treenode, that.props)}
 		>
 		  <Grid container spacing={0} key={treenode.id} >
 			{columns
@@ -706,7 +723,7 @@ class AnTreeditorComp<P extends AnTreeditorProps = AnTreeditorProps> extends Det
 							{indentLines(
 								{...defltIcons, ...that.props.indentSettings, ...that.props.indentIcons},
 								[...(treenode.indents as IndentName[] ?? []), expd ? 'expand' : 'collapse'],
-								that.sectionTitle(treenode))}
+								<>{treeCheckbox(treenode, that.props)}{that.sectionTitle(treenode)}</>)}
 							</Typography>
 						</Grid>);
 					else if (col.type === 'actions')

@@ -333,13 +333,21 @@ interface TreegridProps extends AnTablistProps {
 
 	/**
 	 * Nodes for which this returns true can be dragged out of the tree, e.g. the album tree's
-	 * 'p' and 'gallery' nodes into the story editor of semantic-doc. The drag's data is the
-	 * AnTreeNode itself, a folder ('gallery') with its children.
-	 * TODO WP1: AnTreegrid / TreeCard / TreeGallary render a drag handle; the drag engine is
-	 * decided by the prototype (WP0).
+	 * 'p' and 'gallery' nodes into the story editor of semantic-doc: AnTreeditor's rows (TreeCard,
+	 * TreeGallary, folder heads) and the photos of a TreeGallary's GalleryView. A HTML5 drag, its
+	 * data, 'application/json', the AnTreeNode's {type, id, node}, a folder with its children.
 	 * @since media story
 	 */
 	draggable?: (n: AnTreeNode) => boolean;
+
+	/**
+	 * AnTreeditor (TreeCard, TreeGallary's photos, folder heads): show a checkbox on each node, as
+	 * AnTree's checkbox, checked by {@link selected}: a node whose id is in selected.ids; a folder,
+	 * if all its leaves are (some: indeterminate). A click unchecks the node with all its leaves, or
+	 * checks them, calling onSelectChange() with the new ids; the host keeps selected.
+	 * @since media story
+	 */
+	checkbox?: boolean;
 
 	testData?: Array<AnTreeNode>;
 };
@@ -492,5 +500,53 @@ class AnTreeComp extends CrudCompW<Comprops> {
 }
 
 const AnTree = withStyles<any, any, Comprops>(styles)(withWidth()(AnTreeComp));
-export { levelIcons, indentLines, IndentLines, icon, TreeNodeVisual, type AnTreegridCol,
+
+/** ids of the node's leaves, the node's own if it has no children */
+function leafIds(n: AnTreeNode, ids: string[] = []): string[] {
+	if (n.node.children?.length)
+		n.node.children.forEach((c) => leafIds(c, ids));
+	else ids.push(n.id);
+	return ids;
+}
+
+/**
+ * The checkbox of a node, if props.checkbox, see {@link TreegridProps.checkbox}.
+ * @since media story
+ */
+function treeCheckbox(n: AnTreeNode, props: Pick<TreegridProps, 'checkbox' | 'selected' | 'onSelectChange'>) {
+	if (!props.checkbox) return undefined;
+
+	let ids = props.selected?.ids;
+	let leaves = leafIds(n);
+	let on = leaves.filter((id) => ids?.has(id)).length;
+	let checked = on > 0 && on === leaves.length;
+
+	return (
+	  <Checkbox color="primary" size="small" sx={{padding: 0, marginRight: 0.5}}
+		checked={checked} indeterminate={on > 0 && !checked}
+		onClick={(e) => {
+			e.stopPropagation();
+			let next = new Map(ids ?? []);
+			if (on > 0) leaves.forEach((id) => next.delete(id));
+			else leaves.forEach((id) => next.set(id, n));
+			props.onSelectChange?.(next);
+		}} />);
+}
+
+/**
+ * Props of a draggable node's element, if props.draggable(n), see {@link TreegridProps.draggable}.
+ * @since media story
+ */
+function treeDrag(n: AnTreeNode, props: Pick<TreegridProps, 'draggable'>) {
+	return props.draggable?.(n)
+		? { draggable: true,
+			onDragStart: (e: React.DragEvent) => {
+				e.stopPropagation();
+				e.dataTransfer.effectAllowed = 'copy';
+				e.dataTransfer.setData('application/json', JSON.stringify({type: n.type, id: n.id, node: n.node}));
+			} }
+		: {};
+}
+
+export { levelIcons, indentLines, IndentLines, icon, TreeNodeVisual, type AnTreegridCol, treeCheckbox, treeDrag,
 		type TreegridProps as TreeItemProps, type AnreactreeItem, AnTree, AnTreeComp }

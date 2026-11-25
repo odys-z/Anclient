@@ -95,8 +95,11 @@ export interface RenderImageProps<CustomPhotoProps extends object = {}> {
     left?: number
 }
 
-const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, containerHeight, key, onSlideLoad }
+const Photo = ({ mime, index, onClick, photo: slide, margin, direction, top, left, containerHeight, key, onSlideLoad }
     : {photo: ImageSlide, [x: string]: any}) => {
+
+  /** the checkbox shown over the photo (since media story), not an attribute of the img */
+  const { checkbox, ...photo } = slide;
 
   // ody: add user styles: photo.imgstyl
   const imgStyle = { margin: margin, display: 'block', ...photo.imgstyl } as any;
@@ -110,7 +113,7 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
     onClick(event, { photo, index });
   };
 
-  return (
+  const elem = (
     mime2type(mime) === 'video' ?
     <video key={key}
       {...photo}
@@ -133,6 +136,18 @@ const Photo = ({ mime, index, onClick, photo, margin, direction, top, left, cont
       loading="lazy"
     />
   );
+
+  if (!checkbox) return elem;
+
+  // the checkbox over the photo's corner: the wrapper takes the photo's place (margin, position)
+  const { position, left: l, top: t, margin: m, ...rest } = imgStyle;
+  return (
+    <div key={key} style={{ position: position ?? 'relative', left: l, top: t, margin: m }}>
+      {React.cloneElement(elem, { key: undefined, style: { ...rest, ...(onClick ? imgWithClick : {}) } })}
+      <span style={{ position: 'absolute', top: 4, left: 4, background: '#fffc', borderRadius: 4 }}>
+        {checkbox}
+      </span>
+    </div>);
 };
 
 export const PhotoPropType = PropTypes.shape({
