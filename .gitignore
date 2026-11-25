@@ -8,7 +8,7 @@ release
 .vs
 .vscode
 !examples/example.slint/app/.vscode
-**/temp*
+**/temp-*
 commit.comments*
 *.comments
 commit.*

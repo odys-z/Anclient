@@ -18,11 +18,13 @@ function upwardModules(dir) {
 let fs = require('fs');
 
 /**
- * Tiptap and all it depends on (ProseMirror, ...), as installed with semantic-doc: the packages in
- * node_modules/@tiptap and their dependencies, recursively. Peers (React, KaTeX) are not followed.
+ * A scope's packages and all they depend on, as installed with semantic-doc: the packages in
+ * node_modules/<scope> and their dependencies, recursively. Peers (React, KaTeX) are not followed.
+ * E.g. '@tiptap': Tiptap with ProseMirror, ...; '@puckeditor': Puck with dnd-kit, Radix, ...
+ * @param {string} scope e.g. '@tiptap'
  * @returns {RegExp} matching the modules' paths
  */
-function tiptapDependencies() {
+function scopeDependencies(scope) {
 	let found = new Set();
 	let pkgjson = (name) => upwardModules(__dirname)
 			.map((m) => path.join(m, name, 'package.json'))
@@ -35,15 +37,16 @@ function tiptapDependencies() {
 		Object.keys(JSON.parse(fs.readFileSync(f, 'utf8')).dependencies || {}).forEach(walk);
 	};
 
-	let scope = upwardModules(__dirname).map((m) => path.join(m, '@tiptap')).find((d) => fs.existsSync(d));
-	if (scope)
-		fs.readdirSync(scope).forEach((n) => walk('@tiptap/' + n));
+	let dir = upwardModules(__dirname).map((m) => path.join(m, scope)).find((d) => fs.existsSync(d));
+	if (dir)
+		fs.readdirSync(dir).forEach((n) => walk(scope + '/' + n));
 
 	let names = [...found].map((n) => n.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&').replace('\\/', '[\\\\/]'));
-	return new RegExp(`[\\\\/]node_modules[\\\\/](${names.join('|') || '@tiptap'})[\\\\/]`);
+	return new RegExp(`[\\\\/]node_modules[\\\\/](${names.join('|') || scope})[\\\\/]`);
 }
 
-const tiptapDeps = tiptapDependencies();
+const tiptapDeps = scopeDependencies('@tiptap');
+const puckDeps = scopeDependencies('@puckeditor');
 
 let version = "0.5.0";
 
@@ -89,7 +92,10 @@ class AssetsListPlugin {
  * vendor-react, vendor-mui: React and MUI (with emotion), shared by the pages, as script tags in the html;
  * doctree, vendor-tiptap, vendor-katex: the doc-tree editor (semantic-doc), Tiptap with all its
  * dependencies (ProseMirror, ...) and KaTeX, loaded when the function page is opened, see app.tsx,
- * LazyDoctree. None of them is in portfolio or login.
+ * LazyDoctree;
+ * story, vendor-puck: the story editor (semantic-doc/storytree), Puck with its dependencies and
+ * its own lazy parts (but Tiptap, which Puck also uses: vendor-tiptap), see app.tsx, LazyStory.
+ * None of them is in portfolio or login.
  *
  * @param {'development' | 'production'} mode
  */
@@ -131,6 +137,10 @@ function config(mode) {
 			tiptap: {
 				test: (m) => tiptapDeps.test(m.resource || ''),
 				name: 'vendor-tiptap', chunks: 'async', enforce: true, priority: 10 },
+			// of the story editor, loaded with chunk story; Tiptap modules stay in vendor-tiptap (priority)
+			puck: {
+				test: (m) => puckDeps.test(m.resource || ''),
+				name: 'vendor-puck', chunks: 'async', enforce: true, priority: 5 },
 			katex: {
 				test: /[\\/]node_modules[\\/]katex[\\/].*\.m?js$/,
 				name: 'vendor-katex', chunks: 'async', enforce: true, priority: 10 },
