@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { JSX, ReactElement } from 'react';
 import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';
@@ -37,6 +37,7 @@ import { AnReactExt, type ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@mui/material/Fab';
+import { AnTreeNode } from '../../../semantier/anclient';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -218,6 +219,7 @@ export interface MenuItem {
 	funcId: string;
 	id: string;
 	funcName: string;
+	text?: string;
 	url: string;
 	css: React.CSSProperties & {icon: string};
 	flags: string;
@@ -235,13 +237,13 @@ export function parseMenus(json: Array<{node: MenuItem}> | {node: MenuItem} = []
 	menu: Array<MenuItem>;
 	paths: Array<any>}
 {
-	let paths = []; // {'/home': Home}
+	let paths : Array<{path: string, params: any}> = []; // {'/home': Home}
 	let menu = parse(json);
-	return { menu, paths };
+	return { menu: Array.isArray(menu) ? menu : [menu], paths };
 
-	function parse(json) {
+	function parse(json: { node: MenuItem; }[] | { node: MenuItem; }): MenuItem | MenuItem[] {
 		if (Array.isArray(json))
-			return json.map( (jn) => { return parse(jn); } );
+			return json.map( (jn) => { return parse(jn) as MenuItem; } );
 		else {
 			// this is just a lagacy of EasyUI, will be deprecated
 			let {funcId, id, funcName, text, url, css, flags, parentId, sort, sibling, children}
@@ -252,7 +254,7 @@ export function parseMenus(json: Array<{node: MenuItem}> | {node: MenuItem} = []
 
 			sibling = sibling || sort;
 			funcId = funcId || id;
-			funcName = funcName || text;
+			funcName = funcName || text || L('Unknown');
 
 			if (url && !url.startsWith('/'))
 				url = '/' + url;
@@ -298,13 +300,13 @@ class SysComp extends CrudCompW<SysProps> {
 		showAppBar: true,
 		expandings: new Set(),
 		showMine: false,
-		currentPage: undefined as MenuItem
+		currentPage: undefined as MenuItem | undefined,
 	};
 
 	anreact!: AnReactExt;
 
 	confirmLogout: any;
-	onfullscreen: (isfull: any) => void;
+	onfullscreen?: (isfull: any) => void;
 
 	static extendLinks(links: { path: string; comp: React.ComponentType<any>; }[]) {
 		links.forEach( (l: { path: string ; comp: React.ComponentType<any>; }, _x: number) => {
@@ -394,7 +396,7 @@ class SysComp extends CrudCompW<SysProps> {
 			this.state.skMenu,
 			this.uri,
 			(dsResp: AnsonMsg<AnDatasetResp>) => {
-				let {menu, paths} = parseMenus(dsResp.Body().forest as Array<{node: MenuItem}>);
+				let {menu, paths} = parseMenus(dsResp.Body()?.forest as Array<{node: MenuItem}>);
 				that.state.sysMenu = menu;
 				that.state.cruds = paths;
 
@@ -413,7 +415,7 @@ class SysComp extends CrudCompW<SysProps> {
 		if (typeof(this.onfullscreen) === 'function')
 			(this.context as AnContextType).onFullScreen = this.onfullscreen;
 
-		if (this.props.msHideAppBar > 0 && this.barAutoHidden) {
+		if ((this.props.msHideAppBar ?? 0) > 0 && this.barAutoHidden) {
 			let that = this;
 			setTimeout(()=>{
 				this.barAutoHidden = false;
@@ -446,7 +448,7 @@ class SysComp extends CrudCompW<SysProps> {
 	norepeat: boolean = false;
 
 	showAppBar(_: React.UIEvent) {
-		if (this.props.msHideAppBar > 0 && !this.norepeat) {
+		if ((this.props.msHideAppBar ?? 0) > 0 && !this.norepeat) {
 			this.norepeat = true;
 			let that = this;
 			this.setState({showAppBar: true});
@@ -491,7 +493,7 @@ class SysComp extends CrudCompW<SysProps> {
 		function cleanup(client: SessionClient) {
 			if (client.ssInf) {
 				localStorage.removeItem(SessionClient.ssInfo);
-				this.anClient.ssInf = undefined;
+				that.anreact.client.ssInf = undefined;
 			}
 		}
 	}

@@ -9,7 +9,7 @@ import { stree_t, SessionClient, AnsonResp, AnDatasetResp, type ErrorCtx,
 
 import { AnConst } from '../utils/consts';
 import { type Comprops, CrudComp } from './crud';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { type ClientOptions, ExternalHosts, type JsonHosts } from './reactext';
 import type { MenuItem } from './sys';
 
@@ -69,7 +69,7 @@ export interface QueryPage {
 }
 
 export function toPageInf(query: QueryPage) : PageInf {
-	let p = new PageInf(query.pageInf.page, query.pageInf.size);
+	let p = new PageInf(query.pageInf?.page, query.pageInf?.size);
 	query.query?.forEach( (q, x) => {
 		p.nv(q.field, typeof q.val === 'string' ? q.val : q.val?.v);
 	});
@@ -119,7 +119,7 @@ export class AnReact {
 	 */
 	bindTablist(req: AnsonMsg<AnsonBody>, comp: CrudComp<Comprops>, errCtx: ErrorCtx) {
 		this.client.commit(req, (qrsp) => {
-			let rs = qrsp.Body().Rs();
+			let rs = qrsp.Body()?.Rs();
 			let {rows} = AnsonResp.rs2arr( rs );
 			comp.setState({rows});
 		}, errCtx );
@@ -130,7 +130,7 @@ export class AnReact {
 	 * If suceed, call qmsg.onOk (onLoad) or set rs' rows in respons to component's state.
 	 * This is a helper of simple form load & bind a record.
 	 */
-	bindStateRec( qmsg: { onOk?; onLoad?; req?; }, errCtx: ErrorCtx,
+	bindStateRec( qmsg: { onOk? : OnCommitOk; onLoad? : OnCommitOk; req : AnsonMsg<AnsonBody>; }, errCtx: ErrorCtx,
 				  compont: { setState: (arg0: { record: {}; }) => void; }) {
 		let onload = qmsg.onOk || qmsg.onLoad ||
 			// try figure out the fields
@@ -272,7 +272,7 @@ export class AnReactExt extends AnReact {
 	 * @param onLoad
 	 * @return this
 	 */
-	loadMenu(sk: string, uri: string, onLoad: OnCommitOk, tree: Array<MenuItem>): AnReactExt {
+	loadMenu(sk: string | undefined, uri: string, onLoad: OnCommitOk, tree: Array<MenuItem>): AnReactExt {
 		if (!sk && (!tree || tree.length === 0))
 			throw new Error("Both 'sk' & tree items are null - AnReact requires a dataset semantics for system menu.");
 		const pmenu = 'menu';
@@ -334,7 +334,7 @@ export class AnReactExt extends AnReact {
 
 		let onload = onOk || function (resp: AnsonMsg<AnDatasetResp>) {
 			if (component)
-				component.setState({forest: resp.Body().forest});
+				component.setState({forest: resp.Body()?.forest});
 		}
 
 		Semantier.stree(opts, this.client, onload, this.errCtx);
@@ -414,7 +414,7 @@ export class AnReactExt extends AnReact {
 				// ssInf: this.client.ssInf,
 				sk },
 			(dsResp) => {
-				let rs = dsResp.Body().Rs();
+				let rs = dsResp.Body()?.Rs();
 				if (nv.n && !AnsonResp.hasColumn(rs, nv.n))
 					console.error("Can't find data in rs for cbb item's label - needing column: 'name'.",
 						"Must provide nv with data fileds name when using ds2cbbOtpions(), e.g. opts.nv = {n: 'labelFiled', v: 'valueFiled'}",
