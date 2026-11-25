@@ -1,0 +1,17 @@
+[
+ {
+  "id": "pm-0",
+  "name": "12 Video Seedings",
+  "gif": "pm-0-216x132.gif",
+  "data": {
+   "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "page", "id": "root", "template": "pm-0",
+   "title": "My PM Story by 12 Videos", "subtitle": "",
+   "children": [
+    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Hero", "id": "Hero-1", "title": "My PM Story by 12 Videos", "subtitle": "" },
+    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Text", "id": "Text-1", "content": "" },
+    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Gallery", "id": "Gallery-1", "items": [], "layout": "rows" },
+    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Text", "id": "Text-2", "content": "" }
+   ]
+  }
+ }
+]
