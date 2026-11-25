@@ -543,9 +543,30 @@ function treeDrag(n: AnTreeNode, props: Pick<TreegridProps, 'draggable'>) {
 			onDragStart: (e: React.DragEvent) => {
 				e.stopPropagation();
 				e.dataTransfer.effectAllowed = 'copy';
+				// only the node: not the browser's own data of an img (its url, html), which the browser
+				// takes as a link (e.g. Chrome offers its split view)
+				e.dataTransfer.clearData();
 				e.dataTransfer.setData('application/json', JSON.stringify({type: n.type, id: n.id, node: n.node}));
+				e.dataTransfer.setDragImage(dragChip(n, e.currentTarget.ownerDocument), -8, -8);
 			} }
 		: {};
+}
+
+/**
+ * The image shown while a node is dragged: an icon-sized chip, the node's icon and name, instead of
+ * the element (a whole photo). Out of sight, and removed once the browser has taken its image.
+ */
+function dragChip(n: AnTreeNode, doc: Document) {
+	const chip = doc.createElement('div');
+	chip.textContent = `${n.node.children?.length ? '\u{1F5C2}' : '\u{1F5BC}'} ${n.node.docname ?? n.node.text ?? n.id}`;
+	Object.assign(chip.style, {
+		position: 'fixed', top: '-1000px', left: '0',
+		maxWidth: '12em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+		padding: '2px 6px', borderRadius: '4px', font: '12px sans-serif',
+		background: '#1976d2', color: '#fff' });
+	doc.body.appendChild(chip);
+	setTimeout(() => chip.remove());
+	return chip;
 }
 
 export { levelIcons, indentLines, IndentLines, icon, TreeNodeVisual, type AnTreegridCol, treeCheckbox, treeDrag,

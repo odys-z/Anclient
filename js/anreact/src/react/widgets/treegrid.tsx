@@ -149,7 +149,8 @@ class AnTreegridComp extends CrudCompW<TreeItemProps> {
             return (
               hide(col.grid, media) ? undefined :
               <Grid key={ix} className={classes.thCell} size={gridSize(col.grid)}>
-                {col.label || col.label === undefined ? col.field : col.label}
+                {/* the label; the field if no label is given ('' shows nothing) */}
+                {col.label ?? col.field}
               </Grid>);
             } )
       }
