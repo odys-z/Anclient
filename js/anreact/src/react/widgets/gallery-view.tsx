@@ -146,7 +146,9 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 					index: x,
 					node: { ...p.node, shareby: p.node.shareby as string },
 					width: wh[0], height: wh[1],
-					src: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
+					// the node's own src if given (since media story, e.g. a published story's media), else by the tier
+					src: p.node.src ? String(p.node.src)
+						: GalleryView.imgSrcReq(p.id, p.node.doctabl as string, {...this.albumtier, docuri: () => this.props.docuri}),
 					imgstyl,
 					mime: p.node.mime as string
 				})
@@ -249,7 +251,8 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 			/>
 
 			{this.showCarousel && this.props.lightbox && (
-				this.props.lightbox(this.props.tnode.node.children,
+				// the tree node's children, or the photos given (since media story, no tree node)
+				this.props.lightbox(this.props.tnode?.node.children ?? this.photos ?? [],
 				  { ix: this.currentImx,
 					open: true,
 					onClose: this.closeLightbox
