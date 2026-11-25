@@ -1,4 +1,5 @@
 let path = require('path')
+let webpack = require('webpack')
 
 /**
  * node_modules of this folder and its parents, the way Node looks up from here (as registry.ts).
@@ -191,4 +192,28 @@ function config(mode) {
 };
 }
 
-module.exports = [config('development'), config('production')];
+/**
+ * The viewer of published stories (semantic-doc/viewer): web-dist/_story/viewer.js, one file with
+ * all it needs, React, Puck's Render, the blocks' widgets and css (style-loader), as a published
+ * story's page (html-service, /pub/<story>/) loads nothing else: no split chunks, no lazy chunks
+ * (LimitChunkCountPlugin). html-service copies web-dist/_story/ into /pub/_story/ when it starts
+ * (semantic-doc, ResPathsTier). Not listed in webpack-assets.json: packed as it is.
+ */
+function viewer() {
+  let base = config('production');
+  return {
+	...base,
+	name: 'viewer',
+	// no source map: _story/ is copied into the public pub folder, and the map would be most of it
+	devtool: false,
+	entry: { 'viewer': 'semantic-doc/viewer' },
+	output: {
+	  filename: '[name].js',
+	  path: path.resolve(__dirname, 'web-dist', '_story'),
+	},
+	plugins: [new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
+	optimization: { splitChunks: false },
+  };
+}
+
+module.exports = [config('development'), config('production'), viewer()];
