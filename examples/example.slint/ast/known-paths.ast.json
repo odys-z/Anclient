@@ -1,0 +1,15 @@
+{ "type": "io.odysz.reflect.AnsonAst",
+  "dataAnclass": "io.oz.anclient.app.DesknownPaths",
+  "baseAnclass": "io.odysz.anson.Anson",
+  "fields" : {
+    "home"             : {"dataAnclass": "string"},
+    "desktop"          : {"dataAnclass": "string"},
+    "desktop_settings" : {"dataAnclass": "string"},
+    "download"         : {"dataAnclass": "string"},
+    "documents"        : {"dataAnclass": "string"},
+    "pictures"         : {"dataAnclass": "string"},
+    "music"            : {"dataAnclass": "string"},
+    "video"            : {"dataAnclass": "string"} 
+  },
+  "ctorsemantics": [ ]
+}
