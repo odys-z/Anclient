@@ -1,0 +1,128 @@
+import { HorizontalBox, VerticalBox, Button, ScrollView } from "std-widgets.slint";
+import { DesknownPaths, PathItemData, SyncingIcon } from "./models.slint";
+import { FileTable } from "file-table.slint";
+
+export component FileExplorer inherits Rectangle {
+    in property <DesknownPaths> known-paths: {
+        home: "/home/ody",
+        desktop_settings: "/home/ody/.config/anclient/app-settings.json",
+        desktop: "/home/ody/Desktop",
+        documents: "/home/ody/Documents",
+        download: "/home/ody/Downloads",
+        pictures: "/home/ody/Pictures",
+        music: "/home/ody/Music",
+        video: "/home/ody/Videos"
+    };
+    in property <[PathItemData]> drawer-items: [];
+    in-out property <string> current-path: "";
+    in-out property <bool> drawer-open: false;
+
+    callback known-path-selected(string /* fullpath */);
+    callback toggle-drawer();
+
+    private property <[PathItemData]> effective-drawer-items:
+        root.drawer-items.length > 0 ? root.drawer-items : [
+            { is_folder: true, indent: [], fname: "Home", size: "", type: "folder",
+              fullpath: root.known-paths.home, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.home != "" && root.known-paths.home == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Desktop", size: "", type: "folder",
+              fullpath: root.known-paths.desktop, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.desktop != "" && root.known-paths.desktop == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Documents", size: "", type: "folder",
+              fullpath: root.known-paths.documents, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.documents != "" && root.known-paths.documents == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Downloads", size: "", type: "folder",
+              fullpath: root.known-paths.download, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.download != "" && root.known-paths.download == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Pictures", size: "", type: "folder",
+              fullpath: root.known-paths.pictures, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.pictures != "" && root.known-paths.pictures == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Music", size: "", type: "folder",
+              fullpath: root.known-paths.music, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.music != "" && root.known-paths.music == root.current-path
+            },
+            { is_folder: true, indent: [], fname: "Videos", size: "", type: "folder",
+              fullpath: root.known-paths.video, syncicon: SyncingIcon.invisible,
+              iselected: root.known-paths.video != "" && root.known-paths.video == root.current-path
+            }
+        ];
+
+    HorizontalBox {
+        spacing: 0px;
+        padding: 0px;
+
+        // Quick Access Drawer
+        if root.drawer-open : Rectangle {
+            width: 210px;
+            background: #f4f5f7;
+            border-width: 1px;
+            border-color: #dcdfe4;
+
+            VerticalBox {
+                padding: 8px;
+                spacing: 4px;
+
+                HorizontalBox {
+                    height: 28px;
+                    Text {
+                        text: "Quick Access";
+                        font-weight: 700;
+                        vertical-alignment: center;
+                    }
+                    Button {
+                        text: "×";
+                        clicked => {
+                            root.drawer-open = false;
+                            root.toggle-drawer();
+                        }
+                    }
+                }
+
+                ScrollView {
+                    VerticalBox {
+                        spacing: 2px;
+                        padding: 0px;
+
+                        for item in root.effective-drawer-items : Rectangle {
+                            height: 32px;
+                            border-radius: 4px;
+                            background: (item.fullpath != "" && item.fullpath == root.current-path) || item.iselected ? #dde7f5 :
+                                        entry-touch.has-hover ? #e8eaee : transparent;
+
+                            entry-touch := TouchArea {
+                                enabled: item.fullpath != "";
+                                clicked => {
+                                    root.current-path = item.fullpath;
+                                    root.known-path-selected(item.fullpath);
+                                }
+                            }
+
+                            HorizontalBox {
+                                padding-left: 8px;
+                                padding-right: 8px;
+                                Text {
+                                    text: item.fname;
+                                    color: item.fullpath != "" ? #1f2328 : #8c959f;
+                                    vertical-alignment: center;
+                                    overflow: elide;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Main File Table Area
+        // Existing file table content goes here
+        FileTable {
+            horizontal-stretch: 1;
+            vertical-stretch: 1;
+        }
+    }
+}
