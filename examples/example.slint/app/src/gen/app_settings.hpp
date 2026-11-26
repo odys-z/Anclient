@@ -104,4 +104,87 @@ inline static void register_desktopsettingsAst(JsonOpt* ctx) {
         };
 }
 
+class DesknownPaths : public anson::Anson {
+public:
+    inline static const std::string _type_ = "io.oz.anclient.app.DesknownPaths";
+    string home;
+    string desktop;
+    string desktop_settings;
+    string download;
+    string documents;
+    string pictures;
+    string music;
+    string video;
+
+    DesknownPaths() : Anson() {
+        Type(_type_);
+    }
+};
+
+inline static void register_desknownpathsAst(JsonOpt* ctx) {
+
+    AnsonAst * ast = createAST <DesknownPaths, AnsonAst> (
+        *ctx->asts, Anson::_type_, map <string, AnsonField> {
+        {"home", {.dataAnclass="string"} },
+        {"desktop", {.dataAnclass="string"} },
+        {"desktop_settings", {.dataAnclass="string"} },
+        {"download", {.dataAnclass="string"} },
+        {"documents", {.dataAnclass="string"} },
+        {"pictures", {.dataAnclass="string"} },
+        {"music", {.dataAnclass="string"} },
+        {"video", {.dataAnclass="string"} },
+       });
+
+    entt::meta_factory <anson::DesknownPaths> ()
+        .type(ast->enttypeid)
+        .base<Anson>()
+
+        .data<&anson::DesknownPaths::home>("home")
+        .data<&anson::DesknownPaths::desktop>("desktop")
+        .data<&anson::DesknownPaths::desktop_settings>("desktop_settings")
+        .data<&anson::DesknownPaths::download>("download")
+        .data<&anson::DesknownPaths::documents>("documents")
+        .data<&anson::DesknownPaths::pictures>("pictures")
+        .data<&anson::DesknownPaths::music>("music")
+        .data<&anson::DesknownPaths::video>("video")
+        ;
+
+        //
+        ast->get_field_instance = [ast, ctx](const IJsonable& ans, const string& fieldname) -> meta_any {
+            if (ast->fields.contains(fieldname)) {
+                auto& concrete = static_cast<const DesknownPaths&>(ans);
+                if ("home" == fieldname)
+                    return entt::forward_as_meta(concrete.home);
+                if ("desktop" == fieldname)
+                    return entt::forward_as_meta(concrete.desktop);
+                if ("desktop_settings" == fieldname)
+                    return entt::forward_as_meta(concrete.desktop_settings);
+                if ("download" == fieldname)
+                    return entt::forward_as_meta(concrete.download);
+                if ("documents" == fieldname)
+                    return entt::forward_as_meta(concrete.documents);
+                if ("pictures" == fieldname)
+                    return entt::forward_as_meta(concrete.pictures);
+                if ("music" == fieldname)
+                    return entt::forward_as_meta(concrete.music);
+                if ("video" == fieldname)
+                    return entt::forward_as_meta(concrete.video);
+            }
+
+            if (ctx->has_ast(ast->baseAnclass)) {
+                AnsonAst *bast = ctx->ast<AnsonAst>(ast->baseAnclass);
+                return bast->get_field_instance(ans, fieldname);
+            }
+
+            anerror("get_field_instance<DesknownPaths>(): Failed to get entt instance (meta_any)");
+            return { };
+        };
+}
+
+inline static void register_qmltest(JsonOpt* ctx, const string &ast_folder) {
+    filesystem::path folder_path{ast_folder};
+    register_desktopsettingsAst(ctx);
+    register_desknownpathsAst(ctx);
+}
+
 }

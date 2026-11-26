@@ -12,6 +12,7 @@ message(STATUS "=========================================== SURREALIMS ${CMAKE_C
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/helper.h
+    src/knownpath.h
     src/slingleton.cpp
     src/slingleton.h
     src/ipcagent_manager.h

@@ -29,6 +29,7 @@ project(album VERSION 0.1.2 LANGUAGES CXX)
 set(CMAKE_TOOLCHAIN_FILE_openssl "${CMAKE_SOURCE_DIR}/../../../vcpkg/scripts/buildsystems/vcpkg.cmake")
 message(STATUS "=========================================== CMAKE_TOOLCHAIN_FILE ${CMAKE_TOOLCHAIN_FILE_openssl}")
 find_package(OpenSSL REQUIRED)
+find_package(cpr CONFIG REQUIRED)
 find_package(boost_url CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -53,26 +54,47 @@ cmake_policy(SET CMP0168 OLD)
 
 # cache cpr in vcpkg
 # cd ~/github/vcpkg && ./vcpkg install "curl[ssl]:x64-linux"
-set(CPR_USE_SYSTEM_CURL ON CACHE BOOL "" FORCE)
+# set(CPR_USE_SYSTEM_CURL ON CACHE BOOL "" FORCE)
 
+# 2026.11.26 Disable quiet update
+# rm -rf .../example.slint/qt-build/Debug/_deps/anson.cmake-subbuild
+# rm -rf .../example.slint/qt-build/Debug/_deps/anclient.cmake-subbuild
 FetchContent_Declare(
   anson.cmake
   GIT_REPOSITORY https://github.com/odys-z/anson.cmake.git
-  GIT_TAG        portfolio-0.8
+  GIT_TAG        origin/portfolio-0.8
 )
-
 FetchContent_Declare(
   anclient.cmake
   GIT_REPOSITORY https://github.com/odys-z/Anclient.cmake.git
-  GIT_TAG        portfolio-0.8
+  GIT_TAG        origin/portfolio-0.8
 )
+
 cmake_policy(POP)
 
-set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(anson.cmake)
 
-set(ANCLIENT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ANSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+# 2026.11.26 Disable quiet update
+FetchContent_MakeAvailable(anson.cmake)
+FetchContent_GetProperties(anson.cmake SOURCE_DIR ANSON_SRC_DIR)
+execute_process(
+    COMMAND git log -1 --oneline --date=short "--format=%h - %s (%cd)"
+    WORKING_DIRECTORY "${ANSON_SRC_DIR}"
+    OUTPUT_VARIABLE ANSON_GIT_INFO
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(STATUS "anson.cmake (${ANSON_SRC_DIR}) HEAD: ${ANSON_GIT_INFO}")
+
 FetchContent_MakeAvailable(anclient.cmake)
+FetchContent_GetProperties(anclient.cmake SOURCE_DIR ANCLIENT_SRC_DIR)
+execute_process(
+    COMMAND git log -1 --oneline --date=short "--format=%h - %s (%cd)"
+    WORKING_DIRECTORY "${ANCLIENT_SRC_DIR}"
+    OUTPUT_VARIABLE ANCLIENT_GIT_INFO
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(STATUS "anclient.cmake (${ANCLIENT_SRC_DIR}) HEAD: ${ANCLIENT_GIT_INFO}")
+
 
 if(MINGW OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-finput-charset=UTF-8 -fexec-charset=UTF-8)

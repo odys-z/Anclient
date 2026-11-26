@@ -17,6 +17,7 @@ add_executable(album_tests
     ../app/src/slingleton.cpp
     test_01_wsclient_ipcagent.cpp
     test_02_dequeue.cpp
+    test_03_knownpath.cpp
     test_common.h
     test_settings.h
 )
