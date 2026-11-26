@@ -38,7 +38,10 @@ target_link_libraries(album_tests PRIVATE
 
 # test_02 reads app/settings/app-settings-reddish.json (gitignored) from the source tree,
 # whatever the working directory is
-target_compile_definitions(album_tests PRIVATE ALBUM_APP_SETTINGS_DIR="${CMAKE_SOURCE_DIR}/app/settings")
+target_compile_definitions(album_tests PRIVATE
+    ALBUM_APP_SETTINGS_DIR="${CMAKE_SOURCE_DIR}/app/settings"
+    ALBUM_TESTS_SRC_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
 target_include_directories(album_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/app/src
@@ -61,6 +64,10 @@ add_custom_target(copy_test_resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/tests/res"
         "$<TARGET_FILE_DIR:album_tests>/res"
+
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/collect_known_paths.py"
+        "$<TARGET_FILE_DIR:album_tests>/collect_known_paths.py"
 
     COMMENT "Syncing resources to test build directory"
 )

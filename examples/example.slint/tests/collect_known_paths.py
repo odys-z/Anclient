@@ -3,7 +3,6 @@
 
 import argparse
 import ctypes
-import json
 import os
 import sys
 from pathlib import Path
@@ -27,8 +26,8 @@ def _normalize(p: Path | str | None, require_exists: bool) -> str | None:
         return None
 
 
-def _windows_known_posixfolder(guid_hex: str) -> str | None:
-    """Query a Windows KNOWNFOLDERID via SHGetKnownFolderPath."""
+def _windows_known_posixfolder(guid_hex: str, require_exists: bool = False) -> str | None:
+    """Query a Windows KNOWNFOLDERID via SHGetKnownFolderPath and return a POSIX path."""
     if sys.platform != "win32":
         return None
 
@@ -61,14 +60,14 @@ def _windows_known_posixfolder(guid_hex: str) -> str | None:
             ole32.CoTaskMemFree(p_path)
         return None
     try:
-        return Path(p_path.value).as_posix()
+        return _normalize(Path(p_path.value).as_posix(), require_exists=require_exists)
     finally:
         ole32.CoTaskMemFree(p_path)
 
 
-def _xdg_user_dirs() -> dict:
+def _xdg_user_dirs() -> dict[str, Path]:
     """Parse ~/.config/user-dirs.dirs on POSIX systems if present."""
-    result = {}
+    result: dict[str, Path] = {}
     cfg = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "user-dirs.dirs"
     if not cfg.is_file():
         return result
@@ -91,17 +90,18 @@ def _xdg_user_dirs() -> dict:
     return result
 
 
-def _win_folder_path(home: str, guid: str, require_exists: bool) -> str:
-    #     kf = _windows_known_folder(guid)
-    #     raw = Path(kf) if kf else (Path(home) / fallback_name)
-    return _normalize(raw, require_exists=require_exists)
+def _win_folder_path(home: str, guid: str, fallback_name: str, require_exists: bool) -> str:
+    kf = _windows_known_posixfolder(guid, require_exists=require_exists)
+    if kf is not None:
+        return kf
+    return _normalize(Path(home) / fallback_name, require_exists=require_exists) or ""
 
 
-def _xdg_folder_path(xdg: dict, xdg_key: str, require_exists: bool) -> str:
+def _xdg_folder_path(xdg: dict[str, Path], home: str, xdg_key: str, fallback_name: str, require_exists: bool) -> str:
     raw = xdg.get(xdg_key)
-    # if raw is None:
-    #     raw = Path(home) / fallback_name
-    return _normalize(raw, require_exists=require_exists)
+    if raw is None:
+        raw = Path(home) / fallback_name
+    return _normalize(raw, require_exists=require_exists) or ""
 
 
 def collect_known_paths(require_exists: bool = False) -> DesknownPaths:
@@ -111,24 +111,24 @@ def collect_known_paths(require_exists: bool = False) -> DesknownPaths:
         home = str(Path.home())
 
     known = DesknownPaths()
-    known.home = _normalize(home, require_exists=require_exists)
-    known.desktop_settings = _normalize(Path("settings/app-settings.json"), require_exists=require_exists)
+    known.home = _normalize(home, require_exists=require_exists) or ""
+    known.desktop_settings = _normalize(Path("settings/app-settings.json"), require_exists=require_exists) or ""
 
     if sys.platform == "win32":
-        known.desktop = _windows_known_posixfolder("{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}", require_exists)
-        known.documents = _windows_known_posixfolder("{FDD39AD0-238F-46AF-ADB4-6C85480369C7}", require_exists)
-        known.download = _windows_known_posixfolder("{374DE290-123F-4565-9164-39C4925E467B}", require_exists)
-        known.pictures = _windows_known_posixfolder("{33E28130-4E1E-4676-835A-98395C3BC3BB}", require_exists)
-        known.music = _windows_known_posixfolder("{4BD8D571-6D19-48D3-BE97-422220080E43}", require_exists)
-        known.video = _windows_known_posixfolder("{18989B1D-99B5-455B-841C-AB7C74E4DDFC}", require_exists)
+        known.desktop = _win_folder_path(home, "{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}", "Desktop", require_exists)
+        known.documents = _win_folder_path(home, "{FDD39AD0-238F-46AF-ADB4-6C85480369C7}", "Documents", require_exists)
+        known.download = _win_folder_path(home, "{374DE290-123F-4565-9164-39C4925E467B}", "Downloads", require_exists)
+        known.pictures = _win_folder_path(home, "{33E28130-4E1E-4676-835A-98395C3BC3BB}", "Pictures", require_exists)
+        known.music = _win_folder_path(home, "{4BD8D571-6D19-48D3-BE97-422220080E43}", "Music", require_exists)
+        known.video = _win_folder_path(home, "{18989B1D-99B5-455B-841C-AB7C74E4DDFC}", "Videos", require_exists)
     else:
         xdg = _xdg_user_dirs()
-        known.desktop = _xdg_folder_path(xdg, "XDG_DESKTOP_DIR", require_exists)
-        known.documents = _xdg_folder_path(xdg, "XDG_DOCUMENTS_DIR", require_exists)
-        known.download = _xdg_folder_path(xdg, "XDG_DOWNLOAD_DIR", require_exists)
-        known.pictures = _xdg_folder_path(xdg, "XDG_PICTURES_DIR", require_exists)
-        known.music = _xdg_folder_path(xdg, "XDG_MUSIC_DIR", require_exists)
-        known.video = _xdg_folder_path(xdg, "XDG_VIDEOS_DIR", require_exists)
+        known.desktop = _xdg_folder_path(xdg, home, "XDG_DESKTOP_DIR", "Desktop", require_exists)
+        known.documents = _xdg_folder_path(xdg, home, "XDG_DOCUMENTS_DIR", "Documents", require_exists)
+        known.download = _xdg_folder_path(xdg, home, "XDG_DOWNLOAD_DIR", "Downloads", require_exists)
+        known.pictures = _xdg_folder_path(xdg, home, "XDG_PICTURES_DIR", "Pictures", require_exists)
+        known.music = _xdg_folder_path(xdg, home, "XDG_MUSIC_DIR", "Music", require_exists)
+        known.video = _xdg_folder_path(xdg, home, "XDG_VIDEOS_DIR", "Videos", require_exists)
 
     return known
 

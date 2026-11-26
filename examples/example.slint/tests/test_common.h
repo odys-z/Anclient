@@ -20,8 +20,8 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 
-// #include "../app/src/gen/app_settings.hpp"
-
+static string venv_python_win = "~/github/semantic-jserv/jserv-album/.venv3.12.10/bin/python.exe";
+static string venv_python_posix = "~/github/semantic-jserv/jserv-album/domains-0.8/venv3.12.9/bin/python";
 
 namespace fs = std::filesystem;
 
@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
  * @brief getTestPushFile
  * @return If src is "report.txt", copy to "report_2026-06-14_01-04-51.txt" and return the name.
  */
-fs::path getTestPushFile(const string& src) {
+inline fs::path getTestPushFile(const string& src) {
     fs::path sourcePath{src};
     auto now = std::chrono::system_clock::now();
 

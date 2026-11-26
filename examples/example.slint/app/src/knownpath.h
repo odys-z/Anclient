@@ -32,6 +32,20 @@ std::string get_home_dir() {
     return ".";
 }
 
+std::string expand_tilde(const std::string& p) {
+    if (p.empty() || p[0] != '~') {
+        return p;
+    }
+    std::string home = anson::Anson::posix_path(anson::get_home_dir());
+    if (p.size() == 1) {
+        return home;
+    }
+    if (p[1] == '/' || p[1] == '\\') {
+        return home + p.substr(1);
+    }
+    return p;
+}
+
 std::string normalize_path(const fs::path& raw, bool require_exists) {
     if (raw.empty()) return {};
 
