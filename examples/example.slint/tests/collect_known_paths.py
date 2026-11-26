@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """Collect known user directories across Windows and POSIX platforms."""
 
-from __future__ import annotations
-
 import argparse
 import ctypes
 import json
 import os
 import sys
 from pathlib import Path
-# from semanticshare.io.odysz.anson import Anson
 from semanticshare.io.oz.anclient.app import DesknownPaths
 
 
@@ -30,7 +27,7 @@ def _normalize(p: Path | str | None, require_exists: bool) -> str | None:
         return None
 
 
-def _windows_known_folder(guid_hex: str) -> str | None:
+def _windows_known_posixfolder(guid_hex: str) -> str | None:
     """Query a Windows KNOWNFOLDERID via SHGetKnownFolderPath."""
     if sys.platform != "win32":
         return None
@@ -43,7 +40,6 @@ def _windows_known_folder(guid_hex: str) -> str | None:
             ("Data4", ctypes.c_ubyte * 8),
         ]
 
-    # Parse standard 8-4-4-4-12 UUID string
     parts = guid_hex.replace("{", "").replace("}", "").split("-")
     if len(parts) != 5:
         return None
@@ -61,16 +57,18 @@ def _windows_known_folder(guid_hex: str) -> str | None:
     # KF_FLAG_DONT_VERIFY = 0x00004000
     hr = shell32.SHGetKnownFolderPath(ctypes.byref(guid), 0x00004000, None, ctypes.byref(p_path))
     if hr != 0 or not p_path.value:
+        if p_path.value:
+            ole32.CoTaskMemFree(p_path)
         return None
     try:
-        return p_path.value
+        return Path(p_path.value).as_posix()
     finally:
         ole32.CoTaskMemFree(p_path)
 
 
-def _xdg_user_dirs() -> dict[str, Path]:
+def _xdg_user_dirs() -> dict:
     """Parse ~/.config/user-dirs.dirs on POSIX systems if present."""
-    result: dict[str, Path] = {}
+    result = {}
     cfg = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "user-dirs.dirs"
     if not cfg.is_file():
         return result
@@ -89,81 +87,50 @@ def _xdg_user_dirs() -> dict[str, Path]:
                 result[key] = Path(val)
     except OSError:
         pass
+
     return result
 
 
-def collect_known_paths(require_exists: bool = False) -> list[dict[str, str]]:
-    """Return ordered, deduplicated list of {label, path} entries."""
-    candidates: list[tuple[str, str | Path | None]] = []
+def _win_folder_path(home: str, guid: str, require_exists: bool) -> str:
+    #     kf = _windows_known_folder(guid)
+    #     raw = Path(kf) if kf else (Path(home) / fallback_name)
+    return _normalize(raw, require_exists=require_exists)
 
+
+def _xdg_folder_path(xdg: dict, xdg_key: str, require_exists: bool) -> str:
+    raw = xdg.get(xdg_key)
+    # if raw is None:
+    #     raw = Path(home) / fallback_name
+    return _normalize(raw, require_exists=require_exists)
+
+
+def collect_known_paths(require_exists: bool = False) -> DesknownPaths:
+    """Populate and return a DesknownPaths instance for Windows or POSIX."""
     home = os.environ.get("USERPROFILE") if sys.platform == "win32" else os.environ.get("HOME")
     if not home:
         home = str(Path.home())
-    candidates.append(("Home", home))
+
+    known = DesknownPaths()
+    known.home = _normalize(home, require_exists=require_exists)
+    known.desktop_settings = _normalize(Path("settings/app-settings.json"), require_exists=require_exists)
 
     if sys.platform == "win32":
-        # Windows KNOWNFOLDERID GUIDs
-        win_folders: list[tuple[str, str, str]] = [
-            ("Desktop", "{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}", "Desktop"),
-            ("Documents", "{FDD39AD0-238F-46AF-ADB4-6C85480369C7}", "Documents"),
-            ("Downloads", "{374DE290-123F-4565-9164-39C4925E467B}", "Downloads"),
-            ("Pictures", "{33E28130-4E1E-4676-835A-98395C3BC3BB}", "Pictures"),
-            ("Music", "{4BD8D571-6D19-48D3-BE97-422220080E43}", "Music"),
-            ("Videos", "{18989B1D-99B5-455B-841C-AB7C74E4DDFC}", "Videos"),
-        ]
-        for label, guid, fallback_name in win_folders:
-            p = _windows_known_folder(guid)
-            if not p:
-                p = Path(home) / fallback_name
-            candidates.append((label, p))
+        known.desktop = _windows_known_posixfolder("{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}", require_exists)
+        known.documents = _windows_known_posixfolder("{FDD39AD0-238F-46AF-ADB4-6C85480369C7}", require_exists)
+        known.download = _windows_known_posixfolder("{374DE290-123F-4565-9164-39C4925E467B}", require_exists)
+        known.pictures = _windows_known_posixfolder("{33E28130-4E1E-4676-835A-98395C3BC3BB}", require_exists)
+        known.music = _windows_known_posixfolder("{4BD8D571-6D19-48D3-BE97-422220080E43}", require_exists)
+        known.video = _windows_known_posixfolder("{18989B1D-99B5-455B-841C-AB7C74E4DDFC}", require_exists)
     else:
         xdg = _xdg_user_dirs()
-        '''
-        posix_folders: list[tuple[str, str, str]] = [
-            ("Desktop", "XDG_DESKTOP_DIR", "Desktop"),
-            ("Documents", "XDG_DOCUMENTS_DIR", "Documents"),
-            ("Downloads", "XDG_DOWNLOAD_DIR", "Downloads"),
-            ("Pictures", "XDG_PICTURES_DIR", "Pictures"),
-            ("Music", "XDG_MUSIC_DIR", "Music"),
-            ("Videos", "XDG_VIDEOS_DIR", "Videos"),
-        ]
-        posix_folders = DesknownPaths()
-        for label, xdg_key, fallback_name in posix_folders:
-            p: str | Path | None = xdg.get(xdg_key)
-            if p is None:
-                p = Path(home) / fallback_name
-            candidates.append((label, p))
+        known.desktop = _xdg_folder_path(xdg, "XDG_DESKTOP_DIR", require_exists)
+        known.documents = _xdg_folder_path(xdg, "XDG_DOCUMENTS_DIR", require_exists)
+        known.download = _xdg_folder_path(xdg, "XDG_DOWNLOAD_DIR", require_exists)
+        known.pictures = _xdg_folder_path(xdg, "XDG_PICTURES_DIR", require_exists)
+        known.music = _xdg_folder_path(xdg, "XDG_MUSIC_DIR", require_exists)
+        known.video = _xdg_folder_path(xdg, "XDG_VIDEOS_DIR", require_exists)
 
-            -----------------
-
-        This is DesknownPaths. You create a key field initialization according to the dataclass fields.
-            @dataclass
-            class DesknownPaths(Anson):
-                home: str             # need JSON-PIKING-0.8.3 ?
-                desktop: str          # need JSON-PIKING-0.8.3 ?
-                desktop_settings: str # need JSON-PIKING-0.8.3 ?
-                download: str         # need JSON-PIKING-0.8.3 ?
-                documents: str        # need JSON-PIKING-0.8.3 ?
-                pictures: str         # need JSON-PIKING-0.8.3 ?
-                music: str            # need JSON-PIKING-0.8.3 ?
-                video: str            # need JSON-PIKING-0.8.3 ?
-
-                def __init__(self):
-                    super().__init__()
-
-        seen_paths: set[str] = set()
-        entries: list[dict[str, str]] = []
-        for label, raw_path in candidates:
-            norm = _normalize(raw_path, require_exists=require_exists)
-            if not norm or norm in seen_paths:
-                continue
-            seen_paths.add(norm)
-            entries.append({"label": label, "path": norm})
-
-        return entries
-        '''
-        posix_folders = DesknownPaths()
-        return posix_folders
+    return known
 
 
 def main() -> int:
@@ -174,18 +141,15 @@ def main() -> int:
         help="Only include directories that currently exist on disk.",
     )
     parser.add_argument(
-        "--paths-only",
-        action="store_true",
-        help="Print only normalized paths (one per line) instead of JSON objects.",
+        "--out",
+        default="known_paths_dump.json",
+        help="Output JSON file path (default: known_paths_dump.json).",
     )
     args = parser.parse_args()
 
-    items = collect_known_paths(require_exists=args.existing_only)
-    if args.paths_only:
-        for item in items:
-            print(item["path"])
-    else:
-        print(json.dumps(items, indent=2, ensure_ascii=False))
+    known = collect_known_paths(require_exists=args.existing_only)
+    known.toFile(args.out)
+
     return 0
 
 

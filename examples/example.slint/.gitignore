@@ -49,3 +49,5 @@ CMakeLists.txt.user
 **/ws-agent-*.jar
 slint-*
 webview-*
+
+tests/known_paths_dump.json
