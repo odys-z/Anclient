@@ -1,21 +1,22 @@
 [{
-  "id": "pm-kinetic-showreel",
+  "id": "pm-1-showreel",
   "name": "Kinetic Showreel & Lookbook",
   "description": "Dark editorial portfolio with a hero carousel, 3-column project gallery, and split feature block.",
+  "gif": "pm-1-243x352.gif",
   "data": {
    "type": "io.oz.sdoc.puck.PuckNode",
    "pucktype": "page",
    "id": "root",
    "template": "pm-kinetic-showreel",
-   "title": "Kinetic brand worlds built for screen and space",
-   "subtitle": "We direct 3D motion systems, interactive installations, and tactile editorial campaigns.",
+   "title": "Carousel Hero",
+   "subtitle": "Subtitle text here.",
    "children": [
     {
      "type": "io.oz.sdoc.puck.PuckNode",
      "pucktype": "HeroCarousel",
      "id": "HeroCarousel-1",
-     "title": "Kinetic brand worlds built for screen and space",
-     "subtitle": "We direct 3D motion systems, interactive installations, and tactile editorial campaigns."
+     "title": "Sample Title for Carousel",
+     "subtitle": "We direct PM campaigns."
     },
     {
      "type": "io.oz.sdoc.puck.PuckNode",
@@ -34,14 +35,14 @@
  },
  {
   "id": "pm-0",
-  "name": "12 Video Seedings",
-  "gif": "pm-0-216x132.gif",
+  "name": "Main Illustration",
+  "gif": "pm-00-243x352.gif",
   "data": {
    "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "page", "id": "root", "template": "pm-0",
-   "title": "My PM Story by 12 Videos", "subtitle": "",
+   "title": "My PM Story", "subtitle": "",
    "children": [
-    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Hero", "id": "Hero-1", "title": "My PM Story by 12 Videos", "subtitle": "" },
     { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Text", "id": "Text-1", "content": "" },
+    { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Hero", "id": "Hero-1", "title": "My PM Story by 1 Videos", "subtitle": "" },
     { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Gallery", "id": "Gallery-1", "items": [], "layout": "rows" },
     { "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "Text", "id": "Text-2", "content": "" }
    ]

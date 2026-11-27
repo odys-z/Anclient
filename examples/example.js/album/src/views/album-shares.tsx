@@ -2,10 +2,8 @@ import React from 'react';
 
 import { Inseclient, SessionClient} from '@anclient/semantier';
 
-import { AnReactExt, 
-	CrudCompW, AnContextType, 
-	Comprops,
-	ExternalHosts} from '@anclient/anreact';
+import { AnReactExt, CrudCompW, AnContextType, Comprops, ExternalHosts} from '@anclient/anreact';
+
 import QRCode from 'react-qr-code';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -45,7 +43,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 	// error: ErrorCtx;
     nextAction: string | undefined;
 
-	synuri = '/album/syn';
+	synuri = '/album/syn/story';
 
 	/** 'url-root/res-vol/res.json/{apk}'; */
 	apk_web: string | undefined = undefined;
@@ -60,10 +58,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
 	constructor(props: AlbumShareProps | Readonly<AlbumShareProps>) {
 		super(props);
-
 		this.uri = '/album/sys/shares';
-
-		// this.error   = {onError: this.onError, msg: '', that: this};
 	}
 
 	componentDidMount() {
@@ -75,7 +70,6 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 
         // let res_vol = (this.context as AnContextType).res_vol || 'res-vol';
 		let host_json = (this.context as AnContextType).host_json;
-
 
 		// fetch(`${res_vol}/res.json`) // Path relative to public folder
 		fetch(host_json)
@@ -112,20 +106,6 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 		.catch((error) => console.error('Error loading JSON:', error));
 	}
 
-	// onError(c: string, r: AnsonMsg<AnsonResp> ) {
-	// 	console.error(c, r.Body()?.msg(), r);
-	// 	let ui = (this as ErrorCtx).that as AlbumShares;
-	// 	ui.error.msg = r.Body()?.msg();
-	// 	ui.state.hasError = !!c;
-	// 	ui.nextAction = c === Protocol.MsgCode.exSession ? 're-login' : 'ignore';
-	// 	ui.setState({});
-	// }
-
-	// onErrorClose() {
-    //     this.state.hasError = false;
-	// 	this.setState({});
-	// }
-
 	render() {
 	  return (
 	  <Grid container sx={{alignContent: "flex-end", alignItems: "stretch"}} style={{"marginTop": "5em"}} >
@@ -146,7 +126,7 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 		<Paper style={{"height": 200}}>
 		<Typography variant='h6' color='primary' gutterBottom>Login on Android.</Typography>
 		<Card style={{'position': 'absolute'}}>
-			{this.servdoms &&  this.servdoms.syndomx && 
+			{this.servdoms && this.servdoms.syndomx && this.servdoms.host &&
 				<QRCode value={formatJservQr(this.servdoms.host, this.servdoms.syndomx[this.servdoms.host] as string)}
 						bgColor={'#FFFFFF'} fgColor={'#000000'} size={128} level='H' />
 			}
@@ -154,7 +134,6 @@ export class AlbumShares extends CrudCompW<AlbumShareProps> {
 		</Card>
 		</Paper>
 		</Grid>
-	  </Grid>
-		);
+	  </Grid>);
 	}
 }

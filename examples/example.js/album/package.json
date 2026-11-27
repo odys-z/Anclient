@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack-cli",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-semantic-doc": "node -e \"const v = require('../../../../semantic-doc/src/package.json').version; require('child_process').execSync('npm install ../../../../semantic-doc/src/dist-pack/semantic-doc-' + v + '.tgz', {stdio: 'inherit'})\""
+    "install-semantic-doc": "npm uninstall semantic-doc && node -e \"const v = require('../../../../semantic-doc/src/package.json').version; require('child_process').execSync('npm install ../../../../semantic-doc/src/dist-pack/semantic-doc-' + v + '.tgz', {stdio: 'inherit'})\""
   },
   "keywords": [
     "Anclient",
@@ -26,6 +26,7 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
+    "@anclient/anreact": "^0.8.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",

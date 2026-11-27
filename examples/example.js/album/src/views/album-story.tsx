@@ -10,15 +10,16 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 
-import { AnStoryEditor, loadTemplates, type StoryTemplate } from 'semantic-doc/storytree';
+import { AnStoryEditor, loadTemplates, parseGifDimensions, type StoryTemplate } from 'semantic-doc/storytree';
 import { StreeDoctier, type DocInf } from 'semantic-doc/doctree';
 import { AnContext, L, type AnContextType, type Comprops, type CrudComp } from '@anclient/anreact';
 import type { SessionClient } from '@anclient/semantier';
 import { SynDocollPort } from '../tiers/syn-docoll-port';
 import { GalleryTier } from '../tiers/gallerytier';
+import Box from '@mui/material/Box';
 
 /** function uri of the page, as the doc tree's */
-const uri = '/album/sys';
+const uri = '/album/sys/storylist';
 /** the album's doc uri, as AlbumDocview's */
 const synuri = '/album/syn';
 /** the story templates' folder, templates.json and their gifs, as res-vol/lang.json */
@@ -61,6 +62,7 @@ export function AlbumStory(_props: Comprops) {
 	}, [doctier]);
 
 	React.useEffect(() => {
+		console.log(uri);
 		reload();
 	}, [reload]);
 
@@ -113,7 +115,18 @@ function TemplateDialog({ onPick, onCancel }: {
 		loadTemplates(templateFolder).then(setTmpls);
 	}, []);
 
+	const resolveGifSrc = (gif?: string) => {
+		if (!gif) return undefined;
+		if (/^(https?:\/\/|\/)/.test(gif) || gif.startsWith(`${templateFolder}/`)) {
+			return gif;
+		}
+		return `${templateFolder}/${gif}`;
+	};
+
 	const t = tmpls?.[ix];
+	const dims = parseGifDimensions(t?.gif);
+	const gif0 = resolveGifSrc(t?.gif);
+	const imgRatio = dims && dims.height > 0 ? dims.width / dims.height : 4 / 3;
 
 	return (
 		<Dialog open={true} fullWidth maxWidth="md" scroll='paper' onClose={onCancel}>
@@ -123,17 +136,33 @@ function TemplateDialog({ onPick, onCancel }: {
 			<Grid container spacing={2}>
 			  <Grid size={{xs: 12, sm: 5}}>
 				<List>
-				  {tmpls.map((t, i) => (
-					<ListItemButton key={t.id} selected={i === ix}
-						onClick={() => setIx(i)} onDoubleClick={() => onPick(t)} >
-						<ListItemText primary={t.name} secondary={t.data.title} />
-					</ListItemButton>))}
+				  {tmpls.map((t, i) => {
+					const gifSrc = resolveGifSrc(t.gif);
+					const dims = parseGifDimensions(t.gif);
+					const imgRatio = dims && dims.height > 0 ? dims.width / dims.height : 4 / 3;
+					return <ListItemButton key={t.id} selected={i === ix}
+								onClick={() => setIx(i)} onDoubleClick={() => onPick(t)} >
+								<ListItemText primary={t.name} secondary={t.data.title} />
+								{gifSrc && ( <img src={gifSrc} alt={t.name}
+										style={{ width: 96, aspectRatio: imgRatio, objectFit: 'cover', flexShrink: 0, borderRadius: 4 }}
+										onError={(e) => { e.currentTarget.style.display = 'none'; }}
+									/>)}
+							</ListItemButton>})}
 				</List>
 			  </Grid>
 			  <Grid size={{xs: 12, sm: 7}}>
 				{t?.gif &&
-				  <img key={t.gif} src={t.gif} alt={t.name} style={{maxWidth: '100%'}}
-					onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+				//   <img key={t.gif} src={t.gif} alt={t.name} style={{ width: 96, aspectRatio: dims?.aspectRatio ?? '4 / 3', objectFit: 'cover', flexShrink: 0, maxWidth: '100%'}}
+				// 	onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+					<Box sx={{ width: '100%', height: '36vh', minHeight: 220, display: 'flex',
+						alignItems: 'center', justifyContent: 'center', overflow: 'hidden', }} >
+					{gif0 && (<Box
+						component="img" key={`${t.id}:${gif0}`} src={gif0} alt={t?.name}
+						onLoad={(e) => { e.currentTarget.style.display = ''; }}
+						onError={(e) => { e.currentTarget.style.display = 'none'; }}
+						sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 3,
+							  width: imgRatio >= 1 ? '100%' : 'auto', height: imgRatio < 1 ? '100%' : 'auto', }} />)}
+					</Box> }
 			  </Grid>
 			</Grid>}
 		  </DialogContent>
