@@ -20,7 +20,7 @@
 #include <io/odysz/gen/doctier.hpp>
 #include <io/odysz/semantic/tier/docs.h>
 
-static string venv_python_win = "~/github/semantic-jserv/jserv-album/.venv3.12.10/bin/python.exe";
+static string venv_python_win = "~/github/semantic-jserv/jserv-album/.venv3.12.10/Scripts/python.exe";
 static string venv_python_posix = "~/github/semantic-jserv/jserv-album/domains-0.8/venv3.12.9/bin/python";
 
 namespace fs = std::filesystem;

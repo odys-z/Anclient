@@ -51,16 +51,16 @@ std::string resolve_python_script() {
 }
 
 const std::string& python_executable() {
-    if (const string py = std::getenv("PYTHON_BIN"); !py.empty()) {
+    if (const char* py = std::getenv("PYTHON_BIN"); py && *py) {
         static const std::string env_py = expand_tilde(py);
         return env_py;
     }
 
-    #ifdef _WIN32
+#ifdef _WIN32
     static const std::string kPythonExe = expand_tilde(string{venv_python_win});
-    #else
+#else
     static const std::string kPythonExe = expand_tilde(venv_python_posix);
-    #endif
+#endif
     return kPythonExe;
 }
 }
@@ -78,11 +78,28 @@ std::string dump_known_paths_for_test(std::ostream& out,
     std::string script = resolve_python_script();
     std::string py = python_executable();
 
-    std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
-                                  py,
-                                  script,
-                                  target,
+    // std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
+    //                               py,
+    //                               script,
+    //                               target,
+    //                               require_exists ? " --existing-only" : "");
+
+    std::string target_native = fs::path(target).make_preferred().string();
+    std::string script_native = fs::path(script).make_preferred().string();
+    std::string py_native     = fs::path(py).make_preferred().string();
+    #ifdef _WIN32
+    std::string cmd = std::format("\"\"{}\" \"{}\" --out \"{}\"{}\"",
+                                  py_native,
+                                  script_native,
+                                  target_native,
                                   require_exists ? " --existing-only" : "");
+    #else
+    std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
+                                  py_native,
+                                  script_native,
+                                  target_native,
+                                  require_exists ? " --existing-only" : "");
+    #endif
 
     int rc = std::system(cmd.c_str());
     if (rc != 0) {
