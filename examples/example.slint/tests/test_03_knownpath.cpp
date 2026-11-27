@@ -1,4 +1,5 @@
-#include <gtest/gtest.h>
+
+#include "../app/src/knownpath.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -8,10 +9,11 @@
 #include <sstream>
 #include <string>
 
+#include <gtest/gtest.h>
+
 #include <io/odysz/anson.h>
 #include <io/odysz/entt_jserv.h>
 #include "../app/src/gen/app_settings.hpp"
-#include "../app/src/knownpath.h"
 #include "test_common.h"
 
 namespace anson {
@@ -49,13 +51,13 @@ std::string resolve_python_script() {
 }
 
 const std::string& python_executable() {
-    if (const char* py = std::getenv("PYTHON_BIN"); py && *py) {
+    if (const string py = std::getenv("PYTHON_BIN"); !py.empty()) {
         static const std::string env_py = expand_tilde(py);
         return env_py;
     }
 
     #ifdef _WIN32
-    static const std::string kPythonExe = expand_tilde(venv_python_win);
+    static const std::string kPythonExe = expand_tilde(string{venv_python_win});
     #else
     static const std::string kPythonExe = expand_tilde(venv_python_posix);
     #endif
