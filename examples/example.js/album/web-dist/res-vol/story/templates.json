@@ -1,4 +1,37 @@
-[
+[{
+  "id": "pm-kinetic-showreel",
+  "name": "Kinetic Showreel & Lookbook",
+  "description": "Dark editorial portfolio with a hero carousel, 3-column project gallery, and split feature block.",
+  "data": {
+   "type": "io.oz.sdoc.puck.PuckNode",
+   "pucktype": "page",
+   "id": "root",
+   "template": "pm-kinetic-showreel",
+   "title": "Kinetic brand worlds built for screen and space",
+   "subtitle": "We direct 3D motion systems, interactive installations, and tactile editorial campaigns.",
+   "children": [
+    {
+     "type": "io.oz.sdoc.puck.PuckNode",
+     "pucktype": "HeroCarousel",
+     "id": "HeroCarousel-1",
+     "title": "Kinetic brand worlds built for screen and space",
+     "subtitle": "We direct 3D motion systems, interactive installations, and tactile editorial campaigns."
+    },
+    {
+     "type": "io.oz.sdoc.puck.PuckNode",
+     "pucktype": "Gallery",
+     "id": "Gallery-1",
+     "layout": "grid-3"
+    },
+    {
+     "type": "io.oz.sdoc.puck.PuckNode",
+     "pucktype": "SplitFeature",
+     "id": "SplitFeature-1",
+     "title": "Real-time generative shaders paired with analog optics"
+    }
+   ]
+  }
+ },
  {
   "id": "pm-0",
   "name": "12 Video Seedings",
