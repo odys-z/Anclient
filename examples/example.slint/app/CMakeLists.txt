@@ -13,6 +13,8 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/helper.h
     src/knownpath.h
+    src/knownpath.cpp
+    src/knownpath_win32.cpp
     src/slingleton.cpp
     src/slingleton.h
     src/ipcagent_manager.h

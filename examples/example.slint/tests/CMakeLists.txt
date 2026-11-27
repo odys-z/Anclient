@@ -18,6 +18,8 @@ add_executable(album_tests
     test_01_wsclient_ipcagent.cpp
     test_02_dequeue.cpp
     test_03_knownpath.cpp
+    ../app/src/knownpath.cpp
+    ../app/src/knownpath_win32.cpp
     test_common.h
     test_settings.h
 )

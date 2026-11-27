@@ -1,4 +1,5 @@
-#include <gtest/gtest.h>
+
+#include "../app/src/knownpath.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -8,10 +9,11 @@
 #include <sstream>
 #include <string>
 
+#include <gtest/gtest.h>
+
 #include <io/odysz/anson.h>
 #include <io/odysz/entt_jserv.h>
 #include "../app/src/gen/app_settings.hpp"
-#include "../app/src/knownpath.h"
 #include "test_common.h"
 
 namespace anson {
@@ -54,11 +56,11 @@ const std::string& python_executable() {
         return env_py;
     }
 
-    #ifdef _WIN32
-    static const std::string kPythonExe = expand_tilde(venv_python_win);
-    #else
+#ifdef _WIN32
+    static const std::string kPythonExe = expand_tilde(string{venv_python_win});
+#else
     static const std::string kPythonExe = expand_tilde(venv_python_posix);
-    #endif
+#endif
     return kPythonExe;
 }
 }
@@ -76,11 +78,28 @@ std::string dump_known_paths_for_test(std::ostream& out,
     std::string script = resolve_python_script();
     std::string py = python_executable();
 
-    std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
-                                  py,
-                                  script,
-                                  target,
+    // std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
+    //                               py,
+    //                               script,
+    //                               target,
+    //                               require_exists ? " --existing-only" : "");
+
+    std::string target_native = fs::path(target).make_preferred().string();
+    std::string script_native = fs::path(script).make_preferred().string();
+    std::string py_native     = fs::path(py).make_preferred().string();
+    #ifdef _WIN32
+    std::string cmd = std::format("\"\"{}\" \"{}\" --out \"{}\"{}\"",
+                                  py_native,
+                                  script_native,
+                                  target_native,
                                   require_exists ? " --existing-only" : "");
+    #else
+    std::string cmd = std::format("\"{}\" \"{}\" --out \"{}\"{}",
+                                  py_native,
+                                  script_native,
+                                  target_native,
+                                  require_exists ? " --existing-only" : "");
+    #endif
 
     int rc = std::system(cmd.c_str());
     if (rc != 0) {
