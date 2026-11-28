@@ -154,7 +154,8 @@ function config(mode) {
 
 	resolve: {
 		extensions: ['.*', '.ts', '.js', '.jsx', '.tsx'],
-		modules: upwardModules(__dirname),
+		// modules: upwardModules(__dirname),
+		modules: ['node_modules', ...upwardModules(__dirname)]
 	},
 
 	module: {

@@ -1,5 +1,5 @@
 
-import React, { JSX } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 	import type { Theme } from '@mui/material/styles';
 	import { withStyles } from './mui-compat';
@@ -79,7 +79,7 @@ class LoginComp extends React.Component<LoginProps> {
 
 	an: AnClient;
 	ssClient?: SessionClient;
-	confirm?: JSX.Element;
+	confirm?: React.ReactNode;
 
 	state: {
 		userId: string,

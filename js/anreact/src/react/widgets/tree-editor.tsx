@@ -1,4 +1,4 @@
-import React, {JSX, type ReactNode} from "react";
+import React, {type ReactNode} from "react";
 
 import { withStyles, gridSize, withWidth, type Color, type Alignment } from '../mui-compat';
 import Grid from '@mui/material/Grid';
@@ -245,8 +245,8 @@ class TreeCardComp<T> extends DetailFormW<TreeItemProps & T> implements Anreactr
 				{...treeDrag(tnode as AnTreeNode, this.props)}
 				spacing={0} className={classes?.row} >
 			{ this.props.columns
-				.filter( (v: AnlistColAttrs<JSX.Element, CompOpts>) => toBool(v.visible, true) )
-				.map( (col: AnlistColAttrs<JSX.Element, CompOpts>, cx: number) => {
+				.filter( (v: AnlistColAttrs<ReactNode, CompOpts>) => toBool(v.visible, true) )
+				.map( (col: AnlistColAttrs<ReactNode, CompOpts>, cx: number) => {
 				  if (cx === 0) return (
 					hide(col.grid, media) ? undefined :
 					<Grid key={`${tnode?.id}.${cx}`} className={classes?.rowHead} size={gridSize(col.grid)}>

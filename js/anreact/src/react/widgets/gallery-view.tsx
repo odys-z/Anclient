@@ -1,5 +1,5 @@
 /// <reference path="../../css.d.ts" />
-import React, { JSX } from 'react';
+import React, { type ReactNode } from 'react';
 import ReactModal from 'react-modal';
 /** react-modal's types are of the shared @types/react (17) in example.js/node_modules */
 const Modal = ReactModal as unknown as React.ComponentType<any>;
@@ -8,7 +8,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Gallery from '../../photo-gallery/src/gallery-ts';
 
-import { AnTreeNode, type AnsonValue, DocsReq, type PortType, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len, PortName
+import { AnTreeNode, type AnsonValue, DocsReq, type PortType, Semantier, SessionClient, StreeTier, SyncDoc, isEmpty, len, type PortName
 } from "@anclient/semantier";
 
 import { type Comprops, CrudCompW } from '../crud';
@@ -25,7 +25,7 @@ export interface ImageSlide  {
 	src: string,
 	srcSet?: string,
 	srcArr?: string[],
-	legend?: string | JSX.Element,
+	legend?: string | ReactNode,
 	/** AnTreeNode.node */
 	node?  : object & {id?: string, shareby: string, device?: string, pname?: string},
 
@@ -59,7 +59,7 @@ export type lightboxFomatter = (photos: AnTreeNode[], opts?: {
 	/** command for enable resources loading (special performance problem caused by anson64) */
 	open: boolean,
 	/** callback */
-	onClose: () => void}) => JSX.Element;
+	onClose: () => void}) => ReactNode;
 
 export interface GalleryProps {
 	cid: string;
@@ -267,7 +267,7 @@ export class GalleryView extends CrudCompW<Comprops & GalleryProps> {
 		);
 	}
 
-	photoCarousel(photos: Array<ImageSlide>, imgx: number) : JSX.Element {
+	photoCarousel(photos: Array<ImageSlide>, imgx: number) : ReactNode {
 		return (
 		<Carousel showArrows={true} dynamicHeight={false}
 				  selectedItem={imgx} showThumbs={false} width={'80vw'} >

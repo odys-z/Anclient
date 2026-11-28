@@ -4,7 +4,7 @@ import { SessionClient } from './anclient';
 
 import { Anson, type AnsonValue, Protocol, type DatasetOpts, AnDatasetReq, AnDatasetResp, DatasetierReq,
 	type LogAct, PageInf, AnsonBody, type OnCommitOk, type DbRelations, 
-	PortType} from './protocol';
+	type PortType} from './protocol';
 
 import { Semantier, type Tierec, type UIComponent, type ErrorCtx } from './semantier';
 

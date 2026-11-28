@@ -182,5 +182,5 @@ Gallery.propTypes = {
 
 const GalleryMem = React.memo(Gallery);
 
-export { Photo };
+export { Photo, Gallery };
 export default GalleryMem;

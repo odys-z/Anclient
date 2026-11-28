@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React from 'react';
 import FlipCameraIosIcon from '@mui/icons-material/FlipCameraIos';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 

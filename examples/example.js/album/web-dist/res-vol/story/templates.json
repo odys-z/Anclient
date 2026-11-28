@@ -2,7 +2,7 @@
   "id": "pm-1-showreel",
   "name": "Kinetic Showreel & Lookbook",
   "description": "Dark editorial portfolio with a hero carousel, 3-column project gallery, and split feature block.",
-  "gif": "pm-1-243x352.gif",
+  "gif": "pm-01-243x352.gif",
   "data": {
    "type": "io.oz.sdoc.puck.PuckNode",
    "pucktype": "page",
@@ -36,7 +36,7 @@
  {
   "id": "pm-0",
   "name": "Main Illustration",
-  "gif": "pm-00-243x352.gif",
+  "gif": "pm-00-243x352.png",
   "data": {
    "type": "io.oz.sdoc.puck.PuckNode", "pucktype": "page", "id": "root", "template": "pm-0",
    "title": "My PM Story", "subtitle": "",

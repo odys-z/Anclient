@@ -26,7 +26,6 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "dependencies": {
-    "@anclient/anreact": "^0.8.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",

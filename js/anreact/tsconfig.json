@@ -1,16 +1,18 @@
 {
-  "include": [".", "../semantier/stree-tier.ts"],
+  // "include": [".", "../semantier/stree-tier.ts"],
   "compilerOptions": {
     "allowJs": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "target": "es2015",
+    "types": ["mocha", "chai"],
+    "rootDir": ".",
     "outDir": "ts",
     "lib": ["esnext", "dom"],
 
     "jsx": "react",
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
-  "exclude": [ "dist", "*.ts", "ts/*", "*.tsx" ]
+  "exclude": [ "dist", "*.ts", "ts/**", "*.tsx" ]
 }

@@ -111,7 +111,7 @@ export type AnsonValue = string | object | string | number | boolean | undefined
  * - no need to collect form using JQuery in the future.
  */
 export type NameValue = {name: string, value: AnsonValue};
-export type NV = {n: string, v: AnsonValue};
+export type NV = {n: string, v: AnsonValue | undefined};
 
 /**
  * Json shape of Java io.odysz.semantics.SemanticObject,
@@ -403,16 +403,16 @@ export class Protocol {
 		return new AnHeader(ssInf.ssid, ssInf.uid, ssInf.ssToken);
     }
 
-	static rs2arr (rs) {
+	static rs2arr (rs: AnResultset) {
 		return AnsonResp.rs2arr(rs);
 	}
 
-	static nv2cell (nv: NameValue | NV): [string, string] {
+	static nv2cell (nv: NameValue | NV): [string, string | undefined] {
 		return [(nv as NV).n || (nv as NameValue).name, str((nv as NV).v || (nv as NameValue).value)];
 	}
 
 	static nvs2row (nvs: NameValue[] | NV[]) {
-		var row = [] as [string, string][];
+		var row = [] as [string, string | undefined][];
 		if (nvs) {
 			for (var ix = 0; ix < nvs.length; ix++)
 				row.push(Protocol.nv2cell(nvs[ix]));
@@ -735,7 +735,8 @@ export class AnSessionReq extends AnsonBody {
 		this.iv = iv;
     }
 
-    mds!: {}; // what's this for?
+	/** @deprecated */
+    mds!: any; // what's this for?
 
     uid  : string;
     token: string;
@@ -792,7 +793,7 @@ export class QueryReq extends AnsonBody {
 
 		if (pageInf) {
 			this.Page(pageInf.size, pageInf.page);
-			this.where = pageInf.arrCondts;
+			this.where = pageInf.arrCondts || [];
 			if (size(pageInf.mapCondts as any) > 0)
 				console.warn("Parameter map is ignored in QueryReq:", pageInf.mapCondts);
 		}
@@ -839,7 +840,7 @@ export class QueryReq extends AnsonBody {
 	}
 
 	public expr (exp: string, as?: string) : QueryReq {
-		this.exprs.push([exp, as]);
+		this.exprs.push([exp, as || '']);
 		return this;
 	}
 

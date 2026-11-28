@@ -1,4 +1,4 @@
-import React, { JSX, ReactElement } from 'react';
+import React, { type ReactNode } from 'react';
 import type { Theme } from '@mui/material/styles';
 import { withStyles, gridSize, withWidth } from './mui-compat';
 import clsx from 'clsx';
@@ -37,7 +37,6 @@ import { AnReactExt, type ClassNames } from './anreact';
 import { AnDatasetResp, AnsonMsg } from '@anclient/semantier/protocol';
 import { AnsonResp, SessionClient } from '@anclient/semantier/anclient';
 import Fab from '@mui/material/Fab';
-import { AnTreeNode } from '../../../semantier/anclient';
 
 export interface SysProps extends Comprops {
 	/** Dataset (stree) sk of system menu */
@@ -52,7 +51,7 @@ export interface SysProps extends Comprops {
     welcome?: (
 		/** @deprecated not used */
 		classes: ClassNames | undefined,
-		context: AnContextType, comp: SysComp) => JSX.Element;
+		context: AnContextType, comp: SysComp) => ReactNode;
 		
     hrefDoc?: string;
 
@@ -67,7 +66,7 @@ export interface SysProps extends Comprops {
 	 * My-info (profile, account etc.) pannels provider.
 	 * @since 0.4.50 If undefined, the event handler for clicking on user icon will not be called.
 	 */
-    myInfo: JSX.Element | ((context: AnContextType) => JSX.Element | Array<{title: string, panel: JSX.Element}>);
+    myInfo: ReactNode | ((context: AnContextType) => ReactNode | Array<{title: string, panel: ReactNode}>);
 
 	/**
 	 * Default page url when SysComp is loaded. 
@@ -289,7 +288,7 @@ class SysComp extends CrudCompW<SysProps> {
 		window: undefined,
 		welcome: true,
 		sysName: 'Anreact Sample',
-		skMenu: undefined, // e.g. 'sys.menu.jserv-sample';
+		skMenu: undefined as string | undefined, // e.g. 'sys.menu.jserv-sample';
 		// { funcId, funcName, url, css: {icon}, fullpath, parentId, sibling, children: [] }
 		sysMenu: [ ] as MenuItem[],
 
@@ -523,7 +522,7 @@ class SysComp extends CrudCompW<SysProps> {
 		let mtree = buildMenu(-1, m);
 		return mtree;
 
-		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) : ReactElement | ReactElement[] {
+		function buildMenu( depth: number, menu : MenuItem | MenuItem[] ) : ReactNode | ReactNode[] {
 			if (Array.isArray(menu)) {
 				return menu.map( (i, x) => {
 						return buildMenu( depth + 1, i );
@@ -664,12 +663,6 @@ class SysComp extends CrudCompW<SysProps> {
 			{ !showAppBar && !this.props.hideAppBar
 			  && <Fab color="primary" size="small" style={{position: 'absolute'}} aria-label="open drawer"
 					onClick={this.showMenu} >
-			      {/* <IconButton
-				 	color="inherit"
-					aria-label="open drawer"
-					edge="start"
-					className={clsx(claz.menuButton, claz.hiddenMenu)}
-				  /> */}
 				  <Menu/>
 				</Fab>
 			}
